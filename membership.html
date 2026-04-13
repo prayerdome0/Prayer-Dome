@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Prayer Dome | Official Membership Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    
+    <style>
+        :root {
+            --accent-green: #22c55e;
+            --accent-gold: #d4af37;
+            --accent-red: #ef4444;
+            --bg-primary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --card-gradient: linear-gradient(135deg, #1a4d2e 0%, #064e3b 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); transition: 0.3s; }
+        body.dark-mode { --bg-primary: #0f172a; --bg-card: #1e293b; --text-primary: #f8fafc; --border-color: #334155; }
+
+        .header { background: var(--card-gradient); color: white; padding: 30px 20px; text-align: center; }
+        .main-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 5px; margin-bottom: 25px; border-bottom: 2px solid var(--border-color); overflow-x: auto; }
+        .tab-btn { padding: 12px 20px; border: none; background: none; cursor: pointer; font-weight: 700; color: #64748b; border-bottom: 3px solid transparent; white-space: nowrap; font-size: 0.8rem; }
+        .tab-btn.active { color: var(--accent-green); border-bottom-color: var(--accent-green); }
+
+        .card { background: var(--bg-card); border-radius: 24px; padding: 30px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        
+        /* Form Styling */
+        .form-title { font-family: 'Merriweather', serif; color: var(--accent-green); font-size: 1.4rem; margin-bottom: 10px; }
+        .form-subtitle { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 25px; line-height: 1.5; }
+        .section-h { font-weight: 800; font-size: 0.9rem; color: var(--accent-gold); margin: 25px 0 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; text-transform: uppercase; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 700; font-size: 0.8rem; }
+        input, select, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-family: inherit; font-size: 0.9rem; }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; }
+
+        /* Signature Pad */
+        .sig-canvas { border: 2px dashed var(--border-color); border-radius: 15px; background: #fff; cursor: crosshair; touch-action: none; width: 100%; height: 150px; }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 15px;
+        }
+        .status-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
+        .status-approved { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        .status-rejected { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
+
+        /* Photo Upload Area */
+        .photo-upload-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .photo-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--accent-gold);
+            overflow: hidden;
+            background: var(--bg-primary);
+            position: relative;
+            cursor: pointer;
+        }
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .photo-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            text-align: center;
+            font-size: 10px;
+            padding: 4px;
+            display: none;
+        }
+        .photo-preview:hover .photo-overlay {
+            display: block;
+        }
+        .upload-btn-small {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* --- THE SHINING DIGITAL ID CARD --- */
+        .digital-id-card {
+            width: 350px; 
+            min-height: 550px;
+            border-radius: 25px; 
+            margin: 0 auto;
+            position: relative; 
+            overflow: hidden; 
+            color: white; 
+            padding: 25px;
+            background: var(--card-gradient); 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.2); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+        }
+        .digital-id-card::after {
+            content: ''; 
+            position: absolute; 
+            top: -50%; 
+            left: -50%; 
+            width: 200%; 
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg); 
+            animation: shine 5s infinite;
+        }
+        @keyframes shine { 0% { left: -100%; } 100% { left: 100%; } }
+        .digital-id-card.pending { filter: grayscale(0.3); opacity: 0.9; }
+
+        .card-photo-circle {
+            width: 120px; 
+            height: 120px; 
+            border-radius: 50%;
+            border: 4px solid var(--accent-gold); 
+            margin-top: 20px;
+            overflow: hidden; 
+            background: rgba(0,0,0,0.5);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3); 
+            position: relative; 
+            z-index: 2;
+        }
+        .card-photo-circle img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+        }
+        
+        .card-name { 
+            font-size: 1.2rem; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            margin-top: 12px; 
+            letter-spacing: 1px; 
+            text-align: center; 
+        }
+        .card-id-num { 
+            color: var(--accent-gold); 
+            font-family: monospace; 
+            font-size: 14px; 
+            font-weight: 800; 
+            margin-bottom: 15px; 
+            text-align: center; 
+        }
+        
+        .card-data-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 8px; 
+            width: 100%; 
+            background: rgba(255,255,255,0.1); 
+            padding: 10px; 
+            border-radius: 12px; 
+            text-align: left; 
+            margin: 10px 0;
+        }
+        .data-box label { 
+            font-size: 8px; 
+            opacity: 0.7; 
+            text-transform: uppercase; 
+            display: block; 
+            font-weight: 800; 
+        }
+        .data-box span { 
+            font-size: 10px; 
+            font-weight: 700; 
+            word-break: break-word;
+        }
+
+        .card-barcode-wrap { 
+            background: white; 
+            width: 100%; 
+            padding: 6px; 
+            border-radius: 8px; 
+            margin-top: auto; 
+            min-height: 50px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .card-barcode-wrap svg {
+            width: 100%;
+            max-height: 45px;
+        }
+
+        /* Benefits */
+        .benefit-card { background: var(--bg-primary); border-radius: 15px; padding: 20px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--border-color); }
+        .benefit-icon { width: 50px; height: 50px; background: var(--accent-gold); color: black; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+
+        .btn { padding: 15px 25px; border-radius: 50px; border: none; cursor: pointer; font-weight: 800; transition: 0.3s; width: 100%; }
+        .btn-primary { background: var(--accent-green); color: white; }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-outline { background: transparent; border: 2px solid var(--border-color); color: var(--text-primary); }
+
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.2); border-top-color: var(--accent-green); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast */
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            z-index: 10000;
+            font-weight: 600;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .toast-notification.error {
+            background: var(--accent-red);
+        }
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); } 
+            to { opacity: 1; transform: translateX(-50%) translateY(0); } 
+        }
+
+        @media (max-width: 600px) { 
+            .form-grid { grid-template-columns: 1fr; }
+            .digital-id-card { width: 95%; min-height: auto; padding: 20px; }
+            .card-photo-circle { width: 90px; height: 90px; margin-top: 10px; }
+            .card-name { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loader">
+    <div class="spinner"></div>
+    <p style="margin-top:15px;">Processing Membership Application...</p>
+</div>
+
+<div class="header">
+    <h1 style="letter-spacing: 2px; font-weight: 900;">PRAYER DOME</h1>
+    <p>Membership Management System</p>
+</div>
+
+<div class="main-container">
+    <div class="tabs">
+        <button class="tab-btn active" id="tabApply" onclick="switchTab('apply')">REGISTRATION FORM</button>
+        <button class="tab-btn" id="tabBenefits" onclick="switchTab('benefits')">MEMBER BENEFITS</button>
+        <button class="tab-btn" id="tabCard" onclick="switchTab('card')">MY DIGITAL ID</button>
+    </div>
+
+    <!-- FORM SECTION -->
+    <div id="section-apply" class="card">
+        <h2 class="form-title">Membership Form</h2>
+        <p class="form-subtitle">Fill this form to apply for membership. Your application will be reviewed by admin.</p>
+        
+        <!-- Photo Upload Area -->
+        <div class="photo-upload-area">
+            <div class="photo-preview" onclick="uploadProfilePhoto()">
+                <img id="photoPreview" src="https://via.placeholder.com/150" alt="Profile Photo">
+                <div class="photo-overlay">
+                    <i class="fas fa-camera"></i> Tap to change
+                </div>
+            </div>
+            <button type="button" class="upload-btn-small" onclick="uploadProfilePhoto()">
+                <i class="fas fa-camera"></i> Upload Photo
+            </button>
+            <input type="hidden" id="uploadedPhotoUrl">
+            <p style="font-size: 0.7rem; color: var(--text-secondary);">Upload a clear photo for your ID card</p>
+        </div>
+        
+        <form id="mForm">
+            <div class="section-h">Personal Details</div>
+            <div class="form-grid">
+                <div class="form-group"><label>First & Last Name *</label><input type="text" id="fullName" required></div>
+                <div class="form-group"><label>Date of Birth *</label><input type="date" id="dob" required></div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="gender"><option value="Male">Male</option><option value="Female">Female</option></select>
+                </div>
+                <div class="form-group"><label>Identity No (NID/Passport) *</label><input type="text" id="idNo" required></div>
+                <div class="form-group"><label>Cell Phone *</label><input type="tel" id="phone" required></div>
+                <div class="form-group"><label>Email Address *</label><input type="email" id="email" required></div>
+            </div>
+
+            <div class="section-h">Status & Occupation</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Membership Type</label>
+                    <select id="mType"><option value="New Member">New Member</option><option value="Renewing">Renewing Membership</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Marital Status</label>
+                    <select id="marital">
+                        <option value="Single">Single</option><option value="Married">Married</option>
+                        <option value="Separated">Separated</option><option value="Divorced">Divorced</option>
+                        <option value="Remarried">Remarried</option><option value="Widowed">Widowed</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Number of Dependants</label><input type="number" id="dependants" value="0"></div>
+                <div class="form-group"><label>Occupation</label><input type="text" id="job"></div>
+                <div class="form-group"><label>Previous Church Attended</label><input type="text" id="prevChurch"></div>
+                <div class="form-group">
+                    <label>Current Branch</label>
+                    <select id="branch">
+                        <option value="Zambia - Chama">Zambia - Chama</option>
+                        <option value="Eswatini - Manzini">Eswatini - Manzini</option>
+                        <option value="Ireland - Cork">Ireland - Cork</option>
+                        <option value="Online Global">Online Global</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section-h">Spiritual History</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Are you Born Again?</label>
+                    <select id="bornAgain"><option value="Yes">Yes</option><option value="No">No</option></select>
+                </div>
+                <div class="form-group"><label>Date Born Again (Approx)</label><input type="date" id="bornDate"></div>
+                <div class="form-group">
+                    <label>Baptised in Water?</label>
+                    <select id="waterBapt"><option value="Yes">Yes</option><option value="No">No</option></select>
+                </div>
+                <div class="form-group"><label>Date of Baptism</label><input type="date" id="baptDate"></div>
+            </div>
+            
+            <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox" id="holySpirit"> Baptised with Holy Spirit?</label>
+                <label class="checkbox-item"><input type="checkbox" id="tongues"> Speak in Tongues?</label>
+                <label class="checkbox-item"><input type="checkbox" id="gifts"> Discovered Spiritual Gifts?</label>
+            </div>
+            <textarea id="giftNames" placeholder="If yes, name your spiritual gifts..." rows="2"></textarea>
+
+            <div class="section-h">Ministry Choice</div>
+            <p style="font-size: 0.75rem; margin-bottom: 10px;">Select the ministry you wish to serve in:</p>
+            <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Usher"> Usher</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Instruments"> Instruments</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Praise"> Praise & Worship</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Compassionate"> Compassionate</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Counsellors"> Counsellors</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Intercessor"> Intercessor</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Preaching"> Preaching</label>
+            </div>
+
+            <div class="section-h">Commitment</div>
+            <label class="checkbox-item" style="font-weight: bold;">
+                <input type="checkbox" id="titheCommit" required> I commit to give offerings and tithes to the church (non-claimable)
+            </label>
+
+            <div class="section-h">Signature</div>
+            <p style="font-size: 0.7rem; margin-bottom: 10px;">Sign in the box below to confirm your agreement to follow the constitutional acts of the church and serve God in His Trinity.</p>
+            <canvas id="sig-pad" class="sig-canvas"></canvas>
+            <button type="button" onclick="clearSig()" style="font-size: 10px; background:none; border:none; color:var(--accent-red); cursor:pointer;">Clear Signature</button>
+
+            <div style="margin-top: 30px;">
+                <button type="button" class="btn btn-primary" id="submitBtn" onclick="processRegistration()">SUBMIT APPLICATION</button>
+                <p style="font-size: 0.7rem; text-align: center; margin-top: 10px; color: var(--text-secondary);">
+                    <i class="fas fa-clock"></i> Your application will be reviewed by admin
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <!-- BENEFITS SECTION -->
+    <div id="section-benefits" style="display: none;">
+        <h2 style="text-align:center; margin-bottom:20px;">Membership Benefits</h2>
+        <div class="benefit-card"><div class="benefit-icon"><i class="fas fa-id-card"></i></div><div><b>Digital Identity</b><p>Verification across all global branches instantly.</p></div></div>
+        <div class="benefit-card"><div class="benefit-icon"><i class="fas fa-hand-holding-heart"></i></div><div><b>Welfare Support</b><p>Priority access to community support and educational funds.</p></div></div>
+        <div class="benefit-card"><div class="benefit-icon"><i class="fas fa-shield-alt"></i></div><div><b>Pastoral Covering</b><p>Direct priority line for counseling and family deliverance.</p></div></div>
+        <div class="benefit-card"><div class="benefit-icon"><i class="fas fa-certificate"></i></div><div><b>Leadership Training</b><p>Access to accredited spiritual growth and leadership courses.</p></div></div>
+    </div>
+
+    <!-- CARD SECTION -->
+    <div id="section-card" style="display: none;">
+        <div id="captureArea">
+            <div class="digital-id-card" id="digitalCard">
+                <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; z-index: 2;">
+                    <div style="text-align: left;">
+                        <div style="font-weight: 900; font-size: 1rem;">PRAYER DOME</div>
+                        <div style="font-size: 7px; letter-spacing: 1.5px;">HOUSE OF PRAYER FOR ALL NATIONS</div>
+                    </div>
+                    <div style="width: 35px; height: 35px; background: white; border-radius: 8px; padding: 4px;">
+                        <img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" style="width: 100%;">
+                    </div>
+                </div>
+
+                <div class="card-photo-circle">
+                    <img id="idPhoto" src="https://via.placeholder.com/150" alt="Member Photo">
+                </div>
+
+                <div class="card-name" id="idName">MEMBER NAME</div>
+                <div class="card-id-num" id="idNumber">Pending Approval</div>
+
+                <div class="card-data-grid">
+                    <div class="data-box"><label>Branch</label><span id="idBranch">---</span></div>
+                    <div class="data-box"><label>Position</label><span id="idRole">MEMBER</span></div>
+                    <div class="data-box"><label>Marital</label><span id="idMarital">---</span></div>
+                    <div class="data-box"><label>Applied</label><span id="idDate">--/--/----</span></div>
+                </div>
+
+                <div class="card-barcode-wrap">
+                    <svg id="barcodeImg"></svg>
+                </div>
+                
+                <div id="statusBadge" class="status-badge status-pending" style="margin-top: 15px;">⏳ PENDING APPROVAL</div>
+            </div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:20px;" onclick="downloadID()">
+            <i class="fas fa-download"></i> SAVE ID TO GALLERY
+        </button>
+        <p style="text-align: center; font-size: 0.7rem; margin-top: 10px; color: var(--text-secondary);">
+            <i class="fas fa-info-circle"></i> Your membership card will be activated after admin approval
+        </p>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, query, orderBy, limit, getDocs, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = { 
+        apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo", 
+        authDomain: "prayer-dome.firebaseapp.com", 
+        projectId: "prayer-dome", 
+        storageBucket: "prayer-dome.firebasestorage.app", 
+        messagingSenderId: "198295153196", 
+        appId: "1:198295153196:web:1222b31948d7974ba3bf89" 
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let currentUid = null;
+    let canvas, ctx, drawing = false;
+    let uploadedPhotoUrl = null;
+    let currentUserData = null;
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUid = user.uid;
+            await checkMembership();
+            initSigPad();
+            await loadUserPhoto();
+        } else {
+            window.location.href = 'account.html';
+        }
+    });
+
+    async function loadUserPhoto() {
+        try {
+            const userDoc = await getDoc(doc(db, "users", currentUid));
+            if (userDoc.exists() && userDoc.data().photoURL) {
+                const photoUrl = userDoc.data().photoURL;
+                document.getElementById('photoPreview').src = photoUrl;
+                document.getElementById('uploadedPhotoUrl').value = photoUrl;
+                uploadedPhotoUrl = photoUrl;
+            }
+        } catch (error) {
+            console.error("Error loading user photo:", error);
+        }
+    }
+
+    async function checkMembership() {
+        const snap = await getDoc(doc(db, "memberships", currentUid));
+        if(snap.exists()) {
+            currentUserData = snap.data();
+            renderCard(currentUserData);
+            prefillForm(currentUserData);
+            switchTab('card');
+        } else {
+            switchTab('apply');
+        }
+    }
+
+    function prefillForm(data) {
+        if(document.getElementById('fullName')) document.getElementById('fullName').value = data.fullName || '';
+        if(document.getElementById('dob')) document.getElementById('dob').value = data.dateOfBirth || '';
+        if(document.getElementById('gender')) document.getElementById('gender').value = data.gender || 'Male';
+        if(document.getElementById('idNo')) document.getElementById('idNo').value = data.identityNumber || '';
+        if(document.getElementById('phone')) document.getElementById('phone').value = data.phone || '';
+        if(document.getElementById('email')) document.getElementById('email').value = data.email || '';
+        if(document.getElementById('mType')) document.getElementById('mType').value = data.membershipType || 'New Member';
+        if(document.getElementById('marital')) document.getElementById('marital').value = data.maritalStatus || 'Single';
+        if(document.getElementById('branch')) document.getElementById('branch').value = data.branch || 'Zambia - Chama';
+        if(data.photoUrl) {
+            document.getElementById('photoPreview').src = data.photoUrl;
+            document.getElementById('uploadedPhotoUrl').value = data.photoUrl;
+            uploadedPhotoUrl = data.photoUrl;
+        }
+    }
+
+    function initSigPad() {
+        canvas = document.getElementById('sig-pad');
+        if (!canvas) return;
+        ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        
+        const getPos = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+            const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        };
+
+        const start = (e) => { 
+            e.preventDefault();
+            drawing = true; 
+            const p = getPos(e); 
+            ctx.beginPath(); 
+            ctx.moveTo(p.x, p.y); 
+        };
+        const draw = (e) => { 
+            if(!drawing) return; 
+            e.preventDefault();
+            const p = getPos(e); 
+            ctx.lineTo(p.x, p.y); 
+            ctx.stroke(); 
+        };
+        const stop = () => drawing = false;
+
+        canvas.addEventListener('mousedown', start);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stop);
+        canvas.addEventListener('touchstart', start);
+        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchend', stop);
+    }
+
+    window.clearSig = () => {
+        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+
+    // Cloudinary Photo Upload
+    window.uploadProfilePhoto = () => {
+        if (typeof cloudinary === 'undefined') {
+            showToast("Cloudinary not loaded. Please refresh the page.", "error");
+            return;
+        }
+        
+        const uploadWidget = cloudinary.createUploadWidget({
+            cloudName: 'prayerdome',
+            uploadPreset: 'profile_photos',
+            folder: `profile_photos/${currentUid || 'temp'}`,
+            cropping: true,
+            croppingAspectRatio: 1,
+            multiple: false,
+            maxFileSize: 5 * 1024 * 1024,
+            clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp']
+        }, async (error, result) => {
+            if (error) {
+                console.error("Cloudinary error:", error);
+                showToast("Upload failed. Please try again.", "error");
+                return;
+            }
+            
+            if (result && result.event === "success") {
+                const url = result.info.secure_url;
+                uploadedPhotoUrl = url;
+                document.getElementById('photoPreview').src = url;
+                document.getElementById('uploadedPhotoUrl').value = url;
+                showToast("Photo uploaded successfully!", "success");
+            }
+        });
+        uploadWidget.open();
+    };
+
+    window.processRegistration = async () => {
+        if(!document.getElementById('titheCommit').checked) {
+            showToast("Please commit to church duties by checking the commitment box.", "error");
+            return;
+        }
+        
+        const requiredFields = ['fullName', 'dob', 'idNo', 'phone', 'email'];
+        for(let field of requiredFields) {
+            if(!document.getElementById(field).value) {
+                showToast(`Please fill in ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`, "error");
+                return;
+            }
+        }
+        
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        document.getElementById('loader').style.display = 'flex';
+        
+        try {
+            const existingSnap = await getDoc(doc(db, "memberships", currentUid));
+            if (existingSnap.exists()) {
+                showToast("You have already submitted a membership application.", "error");
+                switchTab('card');
+                return;
+            }
+            
+            const signatureData = canvas.toDataURL();
+            
+            // Use uploaded photo or fallback
+            const photoUrl = uploadedPhotoUrl || "https://via.placeholder.com/150";
+            
+            // Also update users collection with the photo
+            await updateDoc(doc(db, "users", currentUid), { 
+                photoURL: photoUrl,
+                updatedAt: serverTimestamp()
+            }).catch(() => {});
+            
+            const memberData = {
+                membershipId: null,
+                fullName: document.getElementById('fullName').value,
+                dateOfBirth: document.getElementById('dob').value,
+                gender: document.getElementById('gender').value,
+                identityNumber: document.getElementById('idNo').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                membershipType: document.getElementById('mType').value,
+                maritalStatus: document.getElementById('marital').value,
+                dependants: parseInt(document.getElementById('dependants').value) || 0,
+                occupation: document.getElementById('job').value || "",
+                previousChurch: document.getElementById('prevChurch').value || "",
+                branch: document.getElementById('branch').value,
+                bornAgain: document.getElementById('bornAgain').value,
+                bornAgainDate: document.getElementById('bornDate').value || null,
+                waterBaptism: document.getElementById('waterBapt').value,
+                baptismDate: document.getElementById('baptDate').value || null,
+                holySpiritBaptism: document.getElementById('holySpirit').checked,
+                speaksTongues: document.getElementById('tongues').checked,
+                spiritualGifts: document.getElementById('gifts').checked,
+                giftNames: document.getElementById('giftNames').value || "",
+                ministries: Array.from(document.querySelectorAll('input[name="min"]:checked')).map(cb => cb.value),
+                titheCommitment: true,
+                signature: signatureData,
+                status: 'pending',
+                role: 'member',
+                photoUrl: photoUrl,
+                uid: currentUid,
+                appliedAt: serverTimestamp(),
+                createdAt: serverTimestamp()
+            };
+            
+            await setDoc(doc(db, "memberships", currentUid), memberData);
+            
+            confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+            renderCard(memberData);
+            switchTab('card');
+            
+            showToast("✅ Membership Application Submitted! Pending admin approval.", "success");
+            
+        } catch (e) { 
+            console.error("Registration error:", e);
+            showToast("Error: " + e.message, "error"); 
+        } finally { 
+            document.getElementById('loader').style.display = 'none';
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'SUBMIT APPLICATION';
+        }
+    };
+
+    function renderCard(data) {
+        const photoEl = document.getElementById('idPhoto');
+        const photoUrl = data.photoUrl || "https://via.placeholder.com/150";
+        photoEl.src = photoUrl;
+        
+        document.getElementById('idName').innerText = data.fullName || "MEMBER NAME";
+        
+        if (data.status === 'approved' && data.membershipId) {
+            document.getElementById('idNumber').innerText = data.membershipId;
+            document.getElementById('statusBadge').innerHTML = '✓ ACTIVE MEMBER';
+            document.getElementById('statusBadge').className = 'status-badge status-approved';
+            document.getElementById('digitalCard').classList.remove('pending');
+            
+            try {
+                JsBarcode("#barcodeImg", data.membershipId, { 
+                    format: "CODE128", 
+                    lineColor: "#000", 
+                    width: 2, 
+                    height: 40, 
+                    displayValue: false 
+                });
+            } catch(e) {
+                console.error("Barcode error:", e);
+                const barcodeContainer = document.getElementById('barcodeImg');
+                if (barcodeContainer) {
+                    barcodeContainer.innerHTML = '<text x="10" y="25" fill="black" font-family="monospace" font-size="12">' + data.membershipId + '</text>';
+                }
+            }
+        } else if (data.status === 'rejected') {
+            document.getElementById('idNumber').innerText = 'Application Rejected';
+            document.getElementById('statusBadge').innerHTML = '✗ REJECTED';
+            document.getElementById('statusBadge').className = 'status-badge status-rejected';
+        } else {
+            document.getElementById('idNumber').innerText = 'Pending Approval';
+            document.getElementById('statusBadge').innerHTML = '⏳ PENDING APPROVAL';
+            document.getElementById('statusBadge').className = 'status-badge status-pending';
+            document.getElementById('digitalCard').classList.add('pending');
+            const barcodeContainer = document.getElementById('barcodeImg');
+            if (barcodeContainer) {
+                barcodeContainer.innerHTML = '<text x="10" y="25" fill="black" font-family="monospace" font-size="10">PENDING</text>';
+            }
+        }
+        
+        document.getElementById('idBranch').innerText = data.branch || "Global";
+        document.getElementById('idRole').innerText = data.role ? data.role.toUpperCase() : "MEMBER";
+        document.getElementById('idMarital').innerText = data.maritalStatus || data.marital || "SINGLE";
+        
+        let date = new Date();
+        if (data.appliedAt) {
+            if (typeof data.appliedAt.toDate === 'function') {
+                date = data.appliedAt.toDate();
+            } else if (data.appliedAt.seconds) {
+                date = new Date(data.appliedAt.seconds * 1000);
+            }
+        }
+        document.getElementById('idDate').innerText = moment(date).format('DD/MM/YYYY');
+    }
+
+    window.switchTab = (t) => {
+        document.getElementById('section-apply').style.display = t === 'apply' ? 'block' : 'none';
+        document.getElementById('section-benefits').style.display = t === 'benefits' ? 'block' : 'none';
+        document.getElementById('section-card').style.display = t === 'card' ? 'block' : 'none';
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            const isActive = (t === 'apply' && b.id === 'tabApply') ||
+                            (t === 'benefits' && b.id === 'tabBenefits') ||
+                            (t === 'card' && b.id === 'tabCard');
+            b.classList.toggle('active', isActive);
+        });
+    };
+
+    window.downloadID = () => {
+        const element = document.getElementById('captureArea');
+        html2canvas(element, { useCORS: true, scale: 3, backgroundColor: null }).then(canvas => {
+            const a = document.createElement('a');
+            a.href = canvas.toDataURL("image/png");
+            a.download = `PrayerDome-ID-${moment().format('YYYYMMDD-HHmmss')}.png`;
+            a.click();
+            showToast("ID Card saved to gallery!", "success");
+        }).catch(err => {
+            console.error("Download error:", err);
+            showToast("Error downloading ID. Please try again.", "error");
+        });
+    };
+    
+    async function checkMembershipStatus() {
+        if (!currentUid) return;
+        try {
+            const snap = await getDoc(doc(db, "memberships", currentUid));
+            if (snap.exists()) {
+                const data = snap.data();
+                const currentDisplayStatus = document.getElementById('statusBadge').innerText;
+                if (data.status === 'approved' && currentDisplayStatus !== '✓ ACTIVE MEMBER') {
+                    renderCard(data);
+                    showToast("🎉 Your membership has been approved! Your ID card is now active.", "success");
+                    confetti({ particleCount: 200, spread: 100 });
+                } else if (data.status === 'rejected' && currentDisplayStatus !== '✗ REJECTED') {
+                    renderCard(data);
+                    showToast("Your membership application was not approved. Please contact admin for details.", "error");
+                }
+            }
+        } catch(e) {
+            console.error("Status check error:", e);
+        }
+    }
+    
+    function showToast(message, type = 'success') {
+        // Remove existing toast
+        const existingToast = document.querySelector('.toast-notification');
+        if (existingToast) existingToast.remove();
+        
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${type === 'error' ? 'error' : ''}`;
+        toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 5000);
+    }
+    
+    setInterval(checkMembershipStatus, 30000);
+</script>
+</body>
+</html>

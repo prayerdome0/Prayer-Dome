@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Prayer Dome | Our Team - Pastors, Worship & Ministries</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --accent-green: #22c55e;
+            --accent-gold: #d4af37;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --border-color: #e2e8f0;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 35px -10px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+            min-height: 100vh;
+        }
+
+        body.dark-mode {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
+        }
+
+        /* Header */
+        .team-header {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-gold));
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .logo-text h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-gold));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .theme-toggle, .back-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* Founder Featured Card */
+        .founder-featured {
+            background: linear-gradient(135deg, var(--accent-gold), #b45309);
+            border-radius: 40px;
+            padding: 50px;
+            margin-bottom: 50px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .founder-featured::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            animation: rotate 25s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .founder-image {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 5px solid white;
+            margin: 0 auto 25px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .founder-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .founder-featured h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .founder-featured h3 {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .founder-featured p {
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 28px;
+            padding: 30px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-green);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 10px 0 20px;
+            margin-bottom: 30px;
+            scrollbar-width: thin;
+        }
+
+        .category-btn {
+            padding: 12px 28px;
+            border-radius: 40px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, var(--accent-green), #16a34a);
+            color: white;
+            border-color: var(--accent-green);
+            transform: scale(1.05);
+        }
+
+        .category-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-green);
+        }
+
+        /* Team Grid */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .team-card {
+            background: var(--bg-card);
+            border-radius: 28px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: fadeInUp 0.5s ease;
+            position: relative;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent-gold);
+        }
+
+        .team-image {
+            position: relative;
+            height: 320px;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-gold));
+        }
+
+        .team-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .team-card:hover .team-image img {
+            transform: scale(1.1);
+        }
+
+        .team-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 25px;
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+
+        .team-card:hover .team-overlay {
+            transform: translateY(0);
+        }
+
+        .team-overlay p {
+            color: white;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .team-info {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .team-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            margin-bottom: 5px;
+        }
+
+        .team-title {
+            color: var(--accent-gold);
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .team-badges {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .team-badge {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--accent-green);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .team-social {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .team-social a {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-green);
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .team-social a:hover {
+            background: var(--accent-green);
+            color: white;
+            transform: rotate(360deg) scale(1.1);
+        }
+
+        /* Footer */
+        .team-footer {
+            background: var(--bg-secondary);
+            margin-top: 60px;
+            border-top: 2px solid var(--border-color);
+            padding: 40px 30px 20px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-section h3 {
+            color: var(--accent-green);
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .footer-section p {
+            margin: 12px 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container { padding: 20px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .team-grid { grid-template-columns: 1fr; }
+            .founder-featured { padding: 30px; }
+            .founder-featured h1 { font-size: 1.8rem; }
+            .category-tabs { gap: 8px; }
+            .category-btn { padding: 8px 16px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="team-header">
+        <div class="header-content">
+            <div class="logo-area">
+                <div class="logo-icon"><i class="fas fa-users"></i></div>
+                <div class="logo-text">
+                    <h1>Prayer Dome Team</h1>
+                    <p>Pastors | Worship Leaders | Ministries</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
+                <button class="theme-toggle" onclick="toggleDarkMode()"><i class="fas fa-moon"></i> Dark Mode</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- Founder Featured Card -->
+        <div class="founder-featured">
+            <div class="founder-image">
+                <img src="https://i.ibb.co/RTbNh1hB/founder-2.jpg" alt="Founder Seedwell Khayalethu Masuku">
+            </div>
+            <h1>Seedwell Khayalethu Masuku</h1>
+            <h3>Founder & Senior Pastor</h3>
+            <p>"A House of Prayer for All Nations – Matthew 21:13. Our calling is to see lives transformed through the power of prayer and the Word of God."</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="teamCount">16</div>
+                <div class="stat-label">Team Members</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, var(--accent-gold), #b45309); color: white;">
+                <div class="stat-number">2</div>
+                <div class="stat-label">Countries</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #3b82f6, #1e40af); color: white;">
+                <div class="stat-number">7+</div>
+                <div class="stat-label">Years of Ministry</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white;">
+                <div class="stat-number">5</div>
+                <div class="stat-label">Ministries</div>
+            </div>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="category-tabs">
+            <button class="category-btn active" onclick="filterTeam('all')"><i class="fas fa-users"></i> All Team (16)</button>
+            <button class="category-btn" onclick="filterTeam('founder')"><i class="fas fa-crown"></i> Founder</button>
+            <button class="category-btn" onclick="filterTeam('eswatini')"><i class="fas fa-flag"></i> Eswatini (6)</button>
+            <button class="category-btn" onclick="filterTeam('zambia')"><i class="fas fa-flag"></i> Zambia (2)</button>
+            <button class="category-btn" onclick="filterTeam('worship')"><i class="fas fa-music"></i> Worship (5)</button>
+            <button class="category-btn" onclick="filterTeam('ministries')"><i class="fas fa-church"></i> Ministries (2)</button>
+        </div>
+
+        <!-- Team Grid -->
+        <div id="teamGrid" class="team-grid"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="team-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Prayer Dome</h3>
+                <p>A House of Prayer for All Nations</p>
+                <p><i class="fas fa-map-marker-alt"></i> Eswatini & Zambia</p>
+                <p><i class="fas fa-phone"></i> +268 7658 1804</p>
+                <p><i class="fas fa-envelope"></i> info@prayerdome.net</p>
+            </div>
+            <div class="footer-section">
+                <h3>Our Leadership</h3>
+                <p><i class="fas fa-crown"></i> Pastor Seedwell K. Masuku - Founder</p>
+                <p><i class="fas fa-church"></i> 6 Pastors in Eswatini</p>
+                <p><i class="fas fa-church"></i> 2 Pastors in Zambia</p>
+                <p><i class="fas fa-music"></i> 5 Worship Leaders</p>
+            </div>
+            <div class="footer-section">
+                <h3>Scripture</h3>
+                <p>"How good and pleasant it is when God's people live together in unity!"</p>
+                <p><i>Psalm 133:1</i></p>
+                <p style="margin-top: 10px;">"So Christ himself gave the apostles, the prophets, the evangelists, the pastors and teachers, to equip his people for works of service."</p>
+                <p><i>Ephesians 4:11-12</i></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Powered by <strong>Prayer Dome</strong> | Seedwel Investment Limited</p>
+            <p>© 2018 Prayer Dome Ministry. All Rights Reserved.</p>
+            <p style="margin-top: 8px;">"A House of Prayer for All Nations" - Matthew 21:13</p>
+        </div>
+    </footer>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Team Data from index.html
+        const teamMembers = [
+            { name: "Seedwell K. Masuku", title: "Founder & Senior Pastor", category: "founder", image: "https://i.ibb.co/RTbNh1hB/founder-2.jpg", description: "Visionary leader called to raise prayer warriors across nations. Founder of Prayer Dome Ministry with a heart for intercession and revival.", country: "Eswatini/Zambia", scripture: "Matthew 21:13" },
+            { name: "Pastor Philmon Gumbi", title: "Prayer Dome Pastor - Eswatini", category: "eswatini", image: "https://i.ibb.co/6c7wRtJW/philmon.jpg", description: "Committed to leading prayer services and preaching the Word. Passionate about seeing lives transformed through the power of prayer.", country: "Eswatini", role: "Senior Pastor" },
+            { name: "Pastor Sabelo Simelane", title: "Prayer Dome Pastor - Eswatini", category: "eswatini", image: "https://i.ibb.co/tp58qGfQ/sabelo-1.jpg", description: "Focuses on intercession, counseling, and encouraging members. Dedicated to spiritual growth and discipleship.", country: "Eswatini", role: "Pastor" },
+            { name: "Pastor Dumsani Nxumalo", title: "Prayer Dome Pastor - Eswatini", category: "eswatini", image: "https://i.ibb.co/gFgBhyqG/dumisa.jpg", description: "Leads worship and prayer sessions. Anointed worship leader with a heart for prophetic worship.", country: "Eswatini", role: "Worship Pastor" },
+            { name: "Pastor Andile Makhanya", title: "Prayer Dome Pastor - Eswatini", category: "eswatini", image: "https://i.ibb.co/xqHjHqr6/ma.jpg", description: "Serves with dedication and spiritual leadership. Committed to teaching and equipping believers.", country: "Eswatini", role: "Teaching Pastor" },
+            { name: "Pastor Jerome Mkhabela", title: "Prayer Dome Pastor - Eswatini", category: "eswatini", image: "https://i.ibb.co/ksTrfSfp/alan.jpg", description: "Committed to preaching the Word of God. Passionate about evangelism and outreach.", country: "Eswatini", role: "Evangelist" },
+            { name: "Pastor Zacheus Simbaya", title: "Prayer Dome Pastor - Zambia", category: "zambia", image: "https://i.ibb.co/B2r1xPLb/pst.jpg", description: "Devoted to spiritual growth and leadership development. Oversees Prayer Dome Zambia operations.", country: "Zambia", role: "Lead Pastor" },
+            { name: "Pastor Alex Mushawa", title: "Prayer Dome Pastor - Zambia", category: "zambia", image: "https://i.ibb.co/sJMzbpQC/al-1.jpg", description: "Faithfully serves in ministry focusing on teaching. Passionate about youth discipleship.", country: "Zambia", role: "Associate Pastor" },
+            { name: "Nomvula Masuku", title: "Praise & Worship Leader", category: "worship", image: "https://i.ibb.co/ksK9tLk1/pnw.jpg", description: "Leads worship and oversees Compassionate Ministry. Anointed singer with a heart for prophetic worship.", country: "Eswatini", role: "Worship Director" },
+            { name: "Tengetile Mkhabela", title: "Secretary - Worship Ministry", category: "worship", image: "https://i.ibb.co/21YBRMzK/nom.jpg", description: "Ensures proper communication and organization. Coordinates worship team schedules and events.", country: "Eswatini", role: "Administrator" },
+            { name: "Nondumiso Simelane", title: "Compassionate Ministry - Eswatini", category: "worship", image: "https://i.ibb.co/qFL3KxMr/tenge.jpg", description: "Leads caring and support initiatives for people. Coordinates outreach and community support programs.", country: "Eswatini", role: "Outreach Coordinator" },
+            { name: "Gabsile Makhanya", title: "Praise & Worship Leader", category: "worship", image: "https://i.ibb.co/27zgJ7fL/cnc.jpg", description: "Leads worship and oversees Compassionate Ministry. Gifted vocalist and worship leader.", country: "Eswatini", role: "Worship Leader" },
+            { name: "Petrina Kumwenda", title: "Praise and Worship - Zambia", category: "worship", image: "https://i.ibb.co/S4G3vhMt/pet.jpg", description: "Devoted praise and worshiper using her gift of music. Leads worship in Zambia services.", country: "Zambia", role: "Worship Leader" },
+            { name: "Compassionate Ministry", title: "Children's Ministry", category: "ministries", image: "https://i.ibb.co/rG15FCg5/cd.jpg", description: "Dedicated to nurturing spiritual growth of children. Weekly Sunday school and children's programs.", country: "Eswatini", role: "Children's Ministry" },
+            { name: "Ngculwini Prayer Dome", title: "Prayer Center - Eswatini", category: "ministries", image: "https://i.ibb.co/qKCwrZ1/pd.jpg", description: "Vibrant prayer community dedicated to intercession. 24/7 prayer coverage and weekly prayer meetings.", country: "Eswatini", role: "Prayer Center" },
+            { name: "Hluthi Prayer Dome", title: "Prayer Center - Eswatini", category: "ministries", image: "https://i.ibb.co/Kc7HhZd1/lv.jpg", description: "Growing community of believers committed to prayer. Evangelism and discipleship programs.", country: "Eswatini", role: "Prayer Center" }
+        ];
+
+        let currentFilter = "all";
+
+        function renderTeam() {
+            const container = document.getElementById('teamGrid');
+            let filtered = teamMembers;
+            
+            if (currentFilter !== 'all') {
+                filtered = teamMembers.filter(member => member.category === currentFilter);
+            }
+            
+            container.innerHTML = filtered.map((member, index) => `
+                <div class="team-card" style="animation-delay: ${index * 0.05}s">
+                    <div class="team-image">
+                        <img src="${member.image}" alt="${member.name}" onerror="this.src='https://i.ibb.co/RTbNh1hB/founder-2.jpg'">
+                        <div class="team-overlay">
+                            <p>${member.description}</p>
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <div class="team-name">${member.name}</div>
+                        <div class="team-title">${member.title}</div>
+                        <div class="team-badges">
+                            <span class="team-badge"><i class="fas ${member.category === 'founder' ? 'fa-crown' : member.category === 'worship' ? 'fa-music' : member.category === 'ministries' ? 'fa-church' : 'fa-flag'}"></i> ${getCategoryName(member.category)}</span>
+                            ${member.country ? `<span class="team-badge"><i class="fas fa-globe"></i> ${member.country}</span>` : ''}
+                            ${member.role ? `<span class="team-badge"><i class="fas fa-user-tag"></i> ${member.role}</span>` : ''}
+                        </div>
+                        <div class="team-social">
+                            <a href="#" onclick="shareTeamMember('${member.name}')"><i class="fas fa-share-alt"></i></a>
+                            <a href="#" onclick="prayForMember('${member.name}')"><i class="fas fa-pray"></i></a>
+                            <a href="#" onclick="contactMember('${member.name}')"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getCategoryName(category) {
+            const names = {
+                founder: 'Founder',
+                eswatini: 'Eswatini',
+                zambia: 'Zambia',
+                worship: 'Worship',
+                ministries: 'Ministries'
+            };
+            return names[category] || category;
+        }
+
+        function filterTeam(category) {
+            currentFilter = category;
+            
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase().includes(category) || 
+                    (category === 'all' && btn.textContent.includes('All'))) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            renderTeam();
+            
+            // Add confetti effect when filtering
+            confetti({ particleCount: 30, spread: 50, origin: { y: 0.6 } });
+        }
+
+        function shareTeamMember(name) {
+            const text = `Join me in supporting ${name} at Prayer Dome Ministry! #PrayerDome`;
+            if (navigator.share) {
+                navigator.share({ title: 'Prayer Dome Team', text: text });
+            } else {
+                navigator.clipboard.writeText(text);
+                showToast(`Shared ${name} profile!`, 'success');
+            }
+        }
+
+        function prayForMember(name) {
+            showToast(`🙏 Praying for ${name}. God bless their ministry!`, 'success');
+            confetti({ particleCount: 50, spread: 50, origin: { y: 0.6 } });
+        }
+
+        function contactMember(name) {
+            showToast(`Contact information for ${name} is available in the church directory.`, 'info');
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            if (!container) {
+                const newContainer = document.createElement('div');
+                newContainer.className = 'toast-container';
+                newContainer.id = 'toastContainer';
+                document.body.appendChild(newContainer);
+            }
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i> ${message}`;
+            document.getElementById('toastContainer').appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const btn = document.querySelector('.theme-toggle');
+            btn.innerHTML = document.body.classList.contains('dark-mode') ? '<i class="fas fa-sun"></i> Light Mode' : '<i class="fas fa-moon"></i> Dark Mode';
+        }
+
+        // Initialize
+        renderTeam();
+
+        // Expose functions globally
+        window.filterTeam = filterTeam;
+        window.shareTeamMember = shareTeamMember;
+        window.prayForMember = prayForMember;
+        window.contactMember = contactMember;
+        window.toggleDarkMode = toggleDarkMode;
+    </script>
+</body>
+</html>
+            

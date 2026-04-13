@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Prayer Dome | Global Support & Secure Fintech Wallet</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+
+    <style>
+        :root {
+            --pd-green: #15803d;
+            --pd-gold: #d4af37;
+            --pd-navy: #0f172a;
+            --pd-red: #ef4444;
+            --tier-bronze: #cd7f32;
+            --tier-gold: #d4af37;
+            --tier-platinum: #94a3b8;
+            --tier-diamond: #0ea5e9;
+            --bg-base: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.9);
+            --border: #e2e8f0;
+            --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg-base); color: var(--pd-navy); transition: 0.4s; overflow-x: hidden; padding-bottom: 120px; }
+        body.dark-mode { --bg-base: #020617; --glass: rgba(15, 23, 42, 0.95); --pd-navy: #f8fafc; --border: #1e293b; }
+
+        /* --- HIGH-END HEADER --- */
+        .app-header {
+            background: linear-gradient(135deg, var(--pd-green), #064e3b);
+            padding: 15px 25px; color: white; position: sticky; top: 0; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; cursor: pointer; text-decoration: none; color: white;}
+        .logo-container { width: 45px; height: 45px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 3px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
+        .logo-container img { width: 100%; height: 100%; object-fit: contain; }
+        .header-title h1 { font-size: 1.2rem; font-weight: 900; letter-spacing: -0.5px; }
+        .header-title span { font-size: 0.7rem; font-weight: 600; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px;}
+
+        /* --- NAVIGATION TABS --- */
+        .tab-wrapper { display: flex; background: var(--glass); margin: 20px auto; max-width: 800px; padding: 8px; border-radius: 50px; border: 1px solid var(--border); backdrop-filter: blur(10px); overflow-x: auto; box-shadow: var(--shadow-sm);}
+        .tab-item { flex: 1; padding: 12px 20px; text-align: center; border-radius: 50px; font-weight: 800; font-size: 0.75rem; cursor: pointer; transition: 0.3s; color: #94a3b8; white-space: nowrap; min-width: 130px;}
+        .tab-item.active { background: var(--pd-green); color: white; box-shadow: 0 4px 15px rgba(21, 128, 61, 0.4); }
+
+        .page-container { padding: 0 20px; max-width: 900px; margin: 0 auto; }
+        .view-section { display: none; animation: fadeIn 0.4s ease; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- PROGRAM DISPLAY CARDS --- */
+        .hero-card { background: var(--bg-card); border-radius: 35px; overflow: hidden; margin-bottom: 35px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); transition: 0.4s; }
+        .hero-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: var(--pd-green);}
+        .hero-image { width: 100%; height: 200px; position: relative; overflow: hidden; background: #000;}
+        .hero-image img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8;}
+        .img-tint { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); }
+        
+        .hero-title-overlay { position: absolute; bottom: 20px; left: 25px; color: white; z-index: 2;}
+        .hero-tag { font-size: 11px; font-weight: 900; color: var(--pd-green); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; display: block; background: rgba(255,255,255,0.9); padding: 4px 10px; border-radius: 20px; width: fit-content;}
+        .hero-title { font-family: 'Merriweather', serif; font-size: 1.8rem; }
+
+        .hero-body { padding: 25px; }
+        .hero-text { font-size: 0.95rem; color: var(--text-sub); line-height: 1.7; margin-bottom: 20px; font-weight: 500;}
+
+        /* Tiers */
+        .tiers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .tier-box { background: var(--bg-base); padding: 18px; border-radius: 20px; border: 2px solid var(--border); cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;}
+        .tier-box:hover { transform: translateY(-4px); box-shadow: var(--shadow-sm); }
+        
+        .tier-bronze { border-color: var(--tier-bronze); }
+        .tier-bronze .tier-name { color: var(--tier-bronze); }
+        .tier-gold { border-color: var(--tier-gold); }
+        .tier-gold .tier-name { color: var(--tier-gold); }
+        .tier-platinum { border-color: var(--tier-platinum); }
+        .tier-platinum .tier-name { color: var(--tier-platinum); }
+        .tier-diamond { border-color: var(--tier-diamond); }
+        .tier-diamond .tier-name { color: var(--tier-diamond); }
+
+        .tier-name { font-weight: 900; font-size: 1rem; text-transform: uppercase; margin-bottom: 5px;}
+        .tier-val { color: var(--text-main); font-weight: 800; font-size: 1.2rem; }
+        .tier-desc { font-size: 0.75rem; color: var(--text-sub); margin-top: 5px; font-weight: 500;}
+
+        /* --- MY PLANS & PROGRESS --- */
+        .plan-progress-container { background: rgba(0,0,0,0.05); height: 8px; border-radius: 10px; margin: 15px 0 5px; overflow: hidden;}
+        .plan-progress-bar { height: 100%; background: linear-gradient(90deg, var(--pd-gold), var(--pd-green)); border-radius: 10px; transition: 1s ease-out;}
+        .maturity-text { font-size: 0.75rem; font-weight: 700; color: var(--text-sub); display: flex; justify-content: space-between;}
+
+        /* --- FINTECH SECURITY (PIN INTERFACE) --- */
+        #secureOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.98); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; padding: 20px; backdrop-filter: blur(15px);}
+        .secure-icon { width: 80px; height: 80px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: var(--pd-gold); margin-bottom: 20px; box-shadow: 0 0 30px rgba(212,175,55,0.2);}
+        .pin-display { display: flex; gap: 15px; margin: 30px 0; }
+        .pin-dot { width: 18px; height: 18px; border: 2px solid var(--pd-gold); border-radius: 50%; transition: 0.3s; }
+        .pin-dot.active { background: var(--pd-gold); box-shadow: 0 0 15px var(--pd-gold); }
+        
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; max-width: 320px; }
+        .n-key { width: 75px; height: 75px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 600; cursor: pointer; transition: 0.2s; margin: 0 auto;}
+        .n-key:active { background: var(--pd-gold); color: black; transform: scale(0.9);}
+
+        /* --- WALLET DASHBOARD --- */
+        .wallet-card { background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: 40px; padding: 40px; color: white; position: relative; overflow: hidden; margin-bottom: 30px; border: 1px solid rgba(212,175,55,0.3); text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4);}
+        .balance-label { font-size: 0.85rem; font-weight: 800; opacity: 0.7; text-transform: uppercase; letter-spacing: 3px; }
+        .balance-val { font-size: 4rem; font-weight: 900; color: var(--pd-gold); margin: 10px 0; text-shadow: 0 4px 20px rgba(212,175,55,0.4); letter-spacing: -2px;}
+        
+        .secret-reveal { background: var(--bg-card); border: 2px dashed var(--border); border-radius: 30px; padding: 35px; text-align: center; margin: 25px 0; }
+        .blur-text { filter: blur(8px); transition: 0.6s ease; user-select: none; pointer-events: none; }
+        .blur-text.unveiled { filter: blur(0); user-select: text; pointer-events: auto; }
+
+        .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--border); background: var(--bg-card); margin-bottom: 10px; border-radius: 16px;}
+        .tx-icon { width: 45px; height: 45px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .tx-icon.dep { background: rgba(34,197,94,0.1); color: var(--pd-green); }
+        .tx-icon.wth { background: rgba(239,68,68,0.1); color: var(--pd-red); }
+
+        /* --- BUTTONS --- */
+        .btn-main { width: 100%; padding: 16px; border-radius: 40px; border: none; font-weight: 800; font-size: 1rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px;}
+        .btn-green { background: linear-gradient(135deg, var(--pd-green), #16a34a); color: white; }
+        .btn-gold { background: linear-gradient(135deg, #fbbf24, var(--pd-gold)); color: black; }
+        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+        .btn-main:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* --- MODALS & FORMS --- */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); padding: 20px;}
+        .modal-body { background: var(--bg-card); border-radius: 35px; padding: 35px; width: 100%; max-width: 550px; animation: modalIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 90vh; overflow-y: auto;}
+        @keyframes modalIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; font-weight: 800; font-size: 0.85rem; margin-bottom: 8px; color: var(--pd-navy); text-transform: uppercase; letter-spacing: 0.5px;}
+        input, select, textarea { width: 100%; padding: 16px; border-radius: 16px; border: 2px solid var(--border); background: var(--bg-base); color: var(--text-main); font-size: 1rem; font-weight: 500; outline: none; transition: 0.3s; font-family: inherit;}
+        input:focus, select:focus, textarea:focus { border-color: var(--pd-green); background: var(--bg-card); box-shadow: 0 0 0 4px rgba(34,197,94,0.1);}
+
+        /* Document Upload Zone */
+        .doc-upload-zone { border: 2px dashed var(--border); border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; background: var(--bg-base); margin-bottom: 15px; display: flex; align-items: center; gap: 15px; justify-content: center;}
+        .doc-upload-zone:hover { border-color: var(--pd-blue); background: rgba(59, 130, 246, 0.05); }
+        .doc-status { font-size: 0.85rem; font-weight: 700; color: var(--text-sub); }
+        .doc-status.success { color: var(--pd-green); }
+
+        /* --- TOASTS & LOADERS --- */
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;}
+        .toast { background: var(--bg-card); padding: 16px 24px; border-radius: 20px; box-shadow: var(--shadow-lg); border-left: 5px solid var(--pd-green); display: flex; align-items: center; gap: 12px; font-weight: 700; animation: slideIn 0.3s ease; font-size: 0.95rem;}
+        .toast.error { border-left-color: var(--pd-red); }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-base); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--pd-navy);}
+        .spinner { width: 60px; height: 60px; border: 5px solid var(--border); border-top-color: var(--pd-green); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;}
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <!-- FULL PAGE LOADER -->
+    <div class="loader-overlay" id="globalLoader">
+        <div class="spinner"></div>
+        <h3 id="loaderText" style="font-weight: 800; letter-spacing: 1px;">Authenticating...</h3>
+    </div>
+
+    <div class="toast-container" id="toastBox"></div>
+
+    <!-- SECURITY: NUMPAD PIN WALL -->
+    <div id="secureOverlay">
+        <div class="secure-icon" id="js-secure-icon"><i class="fas fa-fingerprint"></i></div>
+        <h2 id="js-secure-title" style="font-size: 2rem; font-weight: 900;">Secure Access</h2>
+        <p id="js-secure-sub" style="opacity:0.6; font-size:0.9rem; margin-top:10px; text-align:center;">Please authenticate to continue</p>
+        
+        <div class="pin-display">
+            <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+        </div>
+
+        <div class="numpad">
+            <div class="n-key" onclick="tapPin(1)">1</div><div class="n-key" onclick="tapPin(2)">2</div><div class="n-key" onclick="tapPin(3)">3</div>
+            <div class="n-key" onclick="tapPin(4)">4</div><div class="n-key" onclick="tapPin(5)">5</div><div class="n-key" onclick="tapPin(6)">6</div>
+            <div class="n-key" onclick="tapPin(7)">7</div><div class="n-key" onclick="tapPin(8)">8</div><div class="n-key" onclick="tapPin(9)">9</div>
+            <div class="n-key" style="background:transparent;" onclick="cancelSecure()"><i class="fas fa-times"></i></div>
+            <div class="n-key" onclick="tapPin(0)">0</div>
+            <div class="n-key" style="background:transparent; color: var(--pd-red);" onclick="clearPin()"><i class="fas fa-backspace"></i></div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="app-header">
+        <a href="index.html" class="header-left">
+            <div class="logo-container"><img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" alt="Logo"></div>
+            <div class="header-title">
+                <h1>PRAYER DOME</h1>
+                <span>SUPPORT & FINANCE</span>
+            </div>
+        </a>
+        <i class="fas fa-shield-halved" style="color: var(--pd-gold); font-size: 24px;"></i>
+    </header>
+
+    <!-- TABS -->
+    <div class="tab-wrapper">
+        <div class="tab-item active" onclick="setView('programs', this)">GLOBAL VISION</div>
+        <div class="tab-item" onclick="setView('myplans', this)">MY PLANS</div>
+        <div class="tab-item" onclick="setView('wallet', this)">SECURE WALLET</div>
+    </div>
+
+    <main class="page-container">
+        
+        <!-- ========================================== -->
+        <!-- SECTION 1: PROGRAMS (ENROLLMENT)           -->
+        <!-- ========================================== -->
+        <div id="view-programs" class="view-section active">
+            <p style="text-align: center; color: var(--text-sub); margin-bottom: 30px; font-weight: 500;">Select a kingdom support program. All plans require a 12-month maturity period before claims can be filed.</p>
+            
+            <!-- EDUCATION -->
+            <div class="hero-card">
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=2070&auto=format&fit=crop" alt="Education">
+                    <div class="img-tint"></div>
+                    <div class="hero-title-overlay">
+                        <span class="hero-tag">Legacy & Knowledge</span>
+                        <h2 class="hero-title">Education Support</h2>
+                    </div>
+                </div>
+                <div class="hero-body">
+                    <p class="hero-text">Secure the future. This program covers Tuition Fees, Books, and International Scholarship needs. Open a fund today for 12 months to secure their future.</p>
+                    <div class="tiers-grid">
+                        <div class="tier-box tier-bronze" onclick="openEnrollForm('Education', 'Bronze', 5, 50)">
+                            <div><div class="tier-name">Bronze</div><div class="tier-desc">Basic Needs</div></div>
+                            <div class="tier-val">$5 - $50</div>
+                        </div>
+                        <div class="tier-box tier-gold" onclick="openEnrollForm('Education', 'Gold', 50, 100)">
+                            <div><div class="tier-name">Gold</div><div class="tier-desc">Standard Tuition</div></div>
+                            <div class="tier-val">$50 - $100</div>
+                        </div>
+                        <div class="tier-box tier-platinum" onclick="openEnrollForm('Education', 'Platinum', 100, 500)">
+                            <div><div class="tier-name">Platinum</div><div class="tier-desc">University</div></div>
+                            <div class="tier-val">$100 - $500</div>
+                        </div>
+                        <div class="tier-box tier-diamond" onclick="openEnrollForm('Education', 'Diamond', 500, 1000)">
+                            <div><div class="tier-name">Diamond</div><div class="tier-desc">International</div></div>
+                            <div class="tier-val">$500 - $1k</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BUSINESS -->
+            <div class="hero-card">
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=2070&auto=format&fit=crop" alt="Business">
+                    <div class="img-tint"></div>
+                    <div class="hero-title-overlay">
+                        <span class="hero-tag">Economic Growth</span>
+                        <h2 class="hero-title">Business Seeding</h2>
+                    </div>
+                </div>
+                <div class="hero-body">
+                    <p class="hero-text">Empower your hands to work. We support members with material goods, machinery, or direct capital for business expansion.</p>
+                    <div class="tiers-grid">
+                        <div class="tier-box tier-bronze" onclick="openEnrollForm('Business', 'Bronze', 5, 50)">
+                            <div><div class="tier-name">Bronze</div><div class="tier-desc">Micro Startup</div></div>
+                            <div class="tier-val">$5 - $50</div>
+                        </div>
+                        <div class="tier-box tier-gold" onclick="openEnrollForm('Business', 'Gold', 50, 100)">
+                            <div><div class="tier-name">Gold</div><div class="tier-desc">SME Support</div></div>
+                            <div class="tier-val">$50 - $100</div>
+                        </div>
+                        <div class="tier-box tier-platinum" onclick="openEnrollForm('Business', 'Platinum', 100, 500)">
+                            <div><div class="tier-name">Platinum</div><div class="tier-desc">Expansion</div></div>
+                            <div class="tier-val">$100 - $500</div>
+                        </div>
+                        <div class="tier-box tier-diamond" onclick="openEnrollForm('Business', 'Diamond', 500, 1000)">
+                            <div><div class="tier-name">Diamond</div><div class="tier-desc">Enterprise</div></div>
+                            <div class="tier-val">$500 - $1k</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FUNERAL COVER -->
+            <div class="hero-card">
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1517400508447-f8dd518b86db?q=80&w=2070&auto=format&fit=crop" alt="Funeral">
+                    <div class="img-tint"></div>
+                    <div class="hero-title-overlay">
+                        <span class="hero-tag">Community Care</span>
+                        <h2 class="hero-title">Compassion Cover</h2>
+                    </div>
+                </div>
+                <div class="hero-body">
+                    <p class="hero-text">The church stands with you in grief. Dignified funeral support for bereaved families during difficult times.</p>
+                    <div class="tiers-grid">
+                        <div class="tier-box tier-bronze" onclick="openEnrollForm('Funeral', 'Basic', 2.50, 25)">
+                            <div><div class="tier-name">Basic</div><div class="tier-desc">Standard Care</div></div>
+                            <div class="tier-val">$2.50 - $25</div>
+                        </div>
+                        <div class="tier-box tier-platinum" onclick="openEnrollForm('Funeral', 'Standard', 25, 50)">
+                            <div><div class="tier-name">Standard</div><div class="tier-desc">Extended Family</div></div>
+                            <div class="tier-val">$25 - $50</div>
+                        </div>
+                        <div class="tier-box tier-gold" onclick="openEnrollForm('Funeral', 'Premium', 50, 100)">
+                            <div><div class="tier-name">Premium</div><div class="tier-desc">Full Support</div></div>
+                            <div class="tier-val">$50 - $100</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SECTION 2: MY PLANS & CLAIMS               -->
+        <!-- ========================================== -->
+        <div id="view-myplans" class="view-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 style="font-weight: 900;"><i class="fas fa-list-alt" style="color:var(--pd-green);"></i> Active Enrollments</h2>
+                <button class="btn-main btn-gold" style="width: auto; padding: 10px 20px; font-size: 0.8rem;" onclick="loadMyPlans()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            </div>
+            <div id="myPlansList">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SECTION 3: SECURE WALLET                   -->
+        <!-- ========================================== -->
+        <div id="view-wallet" class="view-section">
+            
+            <div class="wallet-card">
+                <div class="balance-label">Total Secure Balance</div>
+                <div class="balance-val" id="dispBalance">$ 0.00</div>
+                <div style="font-size: 12px; opacity: 0.8; margin-bottom: 25px;">Available for Withdrawals & Contributions</div>
+                
+                <div style="display:flex; gap:15px;">
+                    <button class="btn-main btn-gold" style="flex:1;" onclick="document.getElementById('modalDeposit').style.display='flex'"><i class="fas fa-plus"></i> DEPOSIT</button>
+                    <button class="btn-main btn-green" style="flex:1; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.3);" onclick="pinChallenge('withdraw_req')"><i class="fas fa-arrow-up"></i> WITHDRAW</button>
+                </div>
+            </div>
+
+            <!-- SENSITIVE MOMO NUMBERS REVEAL -->
+            <div class="secret-reveal" id="momoRevealSection">
+                <i class="fas fa-lock-open" style="font-size: 2rem; color: var(--pd-gold); margin-bottom: 10px;"></i>
+                <h3 style="font-weight:900; font-size: 1.4rem;">Official Payment Channels</h3>
+                <p style="font-size: 0.85rem; color: var(--text-sub); margin-top: 5px;">Verify PIN to reveal Mobile Money details.</p>
+                
+                <div id="revealTarget" class="blur-text" style="margin-top: 25px;">
+                    <div style="background: var(--bg-base); padding: 25px; border-radius: 20px; text-align: left; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                        <p style="font-size: 0.75rem; font-weight: 900; color: var(--pd-green); text-transform: uppercase; margin-bottom: 5px;"><i class="fas fa-mobile-alt"></i> Eswatini / Zambia MoMo</p>
+                        <p style="font-size: 2rem; font-weight: 900; letter-spacing: 2px; color: var(--text-main); margin: 5px 0;">+268 7658 1804</p>
+                        <p style="font-size: 0.9rem; color: var(--text-sub); font-weight:600;">Account Name: <span style="color: var(--text-main);">PRAYER DOME GROUP</span></p>
+                        <button class="btn-main btn-green" style="padding: 12px; font-size: 0.85rem; margin-top:20px;" onclick="copyToClipboard('+26876581804')"><i class="fas fa-copy"></i> COPY NUMBER</button>
+                    </div>
+                </div>
+
+                <button class="btn-main btn-gold" id="btnReveal" style="width: auto; padding: 15px 40px; margin: 20px auto 0;" onclick="pinChallenge('reveal')"><i class="fas fa-eye"></i> REVEAL NUMBERS</button>
+            </div>
+
+            <!-- TRANSACTION HISTORY -->
+            <h3 style="margin: 40px 0 20px; font-weight: 900; font-size: 1.4rem;"><i class="fas fa-history" style="color:var(--pd-gold);"></i> Transaction Ledger</h3>
+            <div id="txHistoryList" style="background: var(--bg-card); border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden;">
+                <!-- Injected via JS -->
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- =========================================================
+         MODALS
+         ========================================================= -->
+
+    <!-- ENROLLMENT MODAL -->
+    <div class="modal" id="modalEnroll">
+        <div class="modal-body">
+            <h2 id="modalFormTitle" style="color: var(--pd-green); font-weight: 900; margin-bottom: 5px;">Enrollment</h2>
+            <p id="modalFormSub" style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 25px; line-height: 1.5;"></p>
+            
+            <div class="form-group">
+                <label>Monthly Contribution Amount ($)</label>
+                <input type="number" id="enAmount" placeholder="Enter amount within tier limits">
+                <small id="enLimits" style="color: var(--pd-gold); font-weight: 700; font-size: 0.75rem; display: block; margin-top: 5px;"></small>
+            </div>
+
+            <div style="background: var(--bg-base); padding: 20px; border-radius: 16px; margin: 25px 0; border: 1px solid var(--border);">
+                <h4 style="margin-bottom: 15px; font-size: 0.9rem; text-transform: uppercase; color: var(--text-sub);">Next of Kin Details</h4>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="enKinName" placeholder="e.g. John Doe">
+                </div>
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Phone Number</label>
+                        <input type="tel" id="enKinPhone" placeholder="+268...">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Relationship</label>
+                        <input type="text" id="enKinRel" placeholder="e.g. Spouse">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-main btn-green" id="btnConfirmEnroll" onclick="confirmEnroll()">CONFIRM ACTIVATION</button>
+            <button class="btn-main" style="background:transparent; color:var(--text-sub); border: 2px solid var(--border); margin-top: 15px;" onclick="closeModal('modalEnroll')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- DYNAMIC CLAIM MODAL -->
+    <div class="modal" id="modalClaim">
+        <div class="modal-body" id="claimModalBody">
+            <!-- Injected dynamically based on plan type -->
+        </div>
+    </div>
+
+    <!-- DEPOSIT MODAL -->
+    <div class="modal" id="modalDeposit">
+        <div class="modal-body">
+            <h2 style="color: var(--pd-green); font-weight: 900; margin-bottom: 10px;"><i class="fas fa-plus-circle"></i> Add Funds</h2>
+            <p style="font-size: 0.9rem; color: var(--text-sub); margin-bottom: 25px;">Send funds to the MoMo number, then upload the screenshot here.</p>
+            
+            <div class="form-group">
+                <label>Amount Sent ($ equivalent)</label>
+                <input type="number" id="depAmount" placeholder="e.g. 50">
+            </div>
+            
+            <div class="doc-upload-zone" onclick="triggerCloudinary('deposit', 'receipt')">
+                <i class="fas fa-file-invoice-dollar" style="font-size: 1.8rem; color: var(--pd-gold);"></i>
+                <div style="text-align: left;">
+                    <div style="font-weight: 800; font-size: 0.95rem;">Payment Receipt</div>
+                    <div class="doc-status" id="stat_receipt">Waiting for upload...</div>
+                </div>
+            </div>
+            
+            <button class="btn-main btn-green" id="btnSubmitDep" onclick="submitDeposit()" style="margin-top: 25px;">SUBMIT FOR APPROVAL</button>
+            <button class="btn-main" style="background:transparent; color:var(--text-sub); margin-top: 10px;" onclick="closeModal('modalDeposit')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- WITHDRAW MODAL -->
+    <div class="modal" id="modalWithdraw">
+        <div class="modal-body">
+            <h2 style="color: var(--pd-red); font-weight: 900; margin-bottom: 10px;"><i class="fas fa-arrow-up"></i> Request Withdrawal</h2>
+            <p style="font-size: 0.9rem; color: var(--text-sub); margin-bottom: 25px;">Funds will be sent to your provided Mobile Money number. Minimum $10 equivalent.</p>
+            
+            <div class="form-group">
+                <label>Amount to Withdraw ($)</label>
+                <input type="number" id="withAmount" placeholder="e.g. 50">
+            </div>
+            <div class="form-group">
+                <label>MoMo Number to Receive</label>
+                <input type="tel" id="withPhone" placeholder="+268...">
+            </div>
+
+            <button class="btn-main btn-green" style="background: var(--pd-red); margin-top: 25px;" id="btnSubmitWith" onclick="submitWithdrawal()">WITHDRAW FUNDS</button>
+            <button class="btn-main" style="background:transparent; color:var(--text-sub); margin-top: 10px;" onclick="closeModal('modalWithdraw')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- FIREBASE & LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo", authDomain: "prayer-dome.firebaseapp.com", projectId: "prayer-dome", storageBucket: "prayer-dome.firebasestorage.app", messagingSenderId: "198295153196", appId: "1:198295153196:web:1222b31948d7974ba3bf89" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Global State
+        let currentUser = null;
+        let userData = null;
+        let pinInput = "";
+        let storedPin = null;
+        let actionTarget = ""; 
+        
+        // Enrollment & Claim State
+        let activeEnrollment = {};
+        let claimDocs = {}; // Stores uploaded URLs for claims
+
+        // --- AUTH CHECK ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                try {
+                    const wDoc = await getDoc(doc(db, "wallets", user.uid));
+                    if(wDoc.exists()) {
+                        userData = wDoc.data();
+                        storedPin = userData.pin || null;
+                    } else {
+                        await setDoc(doc(db, "wallets", user.uid), { userId: user.uid, balance: 0, currency: 'USD', createdAt: serverTimestamp() });
+                        userData = { balance: 0 };
+                    }
+                    hideLoading();
+                } catch(e) { console.error(e); hideLoading(); }
+            } else {
+                window.location.href = 'account.html'; // Force login
+            }
+        });
+
+        // --- UI UTILS ---
+        window.showLoading = (txt = "Processing...") => { document.getElementById('loaderText').innerText = txt; document.getElementById('globalLoader').style.display = 'flex'; };
+        window.hideLoading = () => { document.getElementById('globalLoader').style.display = 'none'; };
+        window.toast = (msg, type='success') => {
+            const b = document.getElementById('toastBox');
+            const t = document.createElement('div');
+            t.className = `toast ${type === 'error' ? 'error' : ''}`;
+            t.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> <span>${msg}</span>`;
+            b.appendChild(t);
+            setTimeout(() => { t.style.animation = 'slideIn 0.3s ease reverse forwards'; setTimeout(() => t.remove(), 300); }, 3500);
+        };
+        window.closeModal = (id) => { document.getElementById(id).style.display = 'none'; };
+        window.copyToClipboard = (txt) => { navigator.clipboard.writeText(txt); toast("Copied!"); };
+
+        window.setView = (view, el) => {
+    // For wallet, check if PIN is already set and if numbers are revealed
+    if(view === 'wallet') {
+        // If wallet was already accessed and PIN verified, just show it
+        if(document.getElementById('revealTarget').classList.contains('unveiled')) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.getElementById(`view-${view}`).classList.add('active');
+            if(el) el.classList.add('active');
+            loadWalletData();
+            return;
+        }
+        // Otherwise require PIN challenge
+        pinChallenge('wallet');
+        return;
+    }
+    
+    document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    document.getElementById(`view-${view}`).classList.add('active');
+    if(el) el.classList.add('active');
+
+    if(view === 'myplans') loadMyPlans();
+};
+
+        // --- PIN ENGINE ---
+        window.pinChallenge = (target) => {
+    actionTarget = target;
+    pinInput = "";
+    updateDots();
+    
+    // Get stored PIN from wallet
+    const getStoredPin = async () => {
+        const wDoc = await getDoc(doc(db, "wallets", currentUser.uid));
+        if(wDoc.exists()) {
+            storedPin = wDoc.data().pin || null;
+        }
+        
+        if(!storedPin) {
+            document.getElementById('js-secure-title').innerText = "Create Wallet PIN";
+            document.getElementById('js-secure-sub').innerHTML = "Set a 4-digit PIN to secure your wallet.<br>This will be required for withdrawals.";
+        } else {
+            document.getElementById('js-secure-title').innerText = "Security Check";
+            document.getElementById('js-secure-sub').innerText = "Enter your 4-digit PIN to continue.";
+        }
+        
+        document.getElementById('secureOverlay').style.display = 'flex';
+    };
+    
+    getStoredPin();
+};
+
+        window.tapPin = (n) => {
+            if(pinInput.length < 4) { 
+                pinInput += n; 
+                updateDots(); 
+                if(pinInput.length === 4) confirmPinAction(); // Auto submit on 4th digit
+            }
+        };
+
+        window.clearPin = () => { pinInput = ""; updateDots(); };
+        window.cancelSecure = () => { document.getElementById('secureOverlay').style.display = 'none'; };
+
+        function updateDots() {
+            const dots = document.querySelectorAll('.pin-dot');
+            dots.forEach((dot, i) => { dot.classList.toggle('active', i < pinInput.length); });
+        }
+
+        window.confirmPinAction = async () => {
+            if(pinInput.length !== 4) return toast("Enter exactly 4 digits", "error");
+
+            if(!storedPin) {
+                showLoading("Securing Wallet...");
+                try {
+                    await updateDoc(doc(db, "wallets", currentUser.uid), { pin: btoa(pinInput) });
+                    storedPin = btoa(pinInput);
+                    successAnimate("PIN Secured!");
+                } catch(e) { toast(e.message, 'error'); }
+                finally { hideLoading(); }
+            } else {
+                if(btoa(pinInput) === storedPin) {
+                    successAnimate("Verified!");
+                } else {
+                    toast("Invalid PIN", "error");
+                    clearPin();
+                }
+            }
+        };
+
+        function successAnimate(msg) {
+            document.getElementById('js-secure-title').innerText = msg;
+            document.getElementById('js-secure-icon').innerHTML = '<i class="fas fa-shield-check" style="color:var(--pd-green)"></i>';
+            document.getElementById('js-secure-icon').style.boxShadow = '0 0 30px rgba(34,197,94,0.4)';
+            
+            setTimeout(() => {
+                document.getElementById('secureOverlay').style.display = 'none';
+                document.getElementById('js-secure-icon').innerHTML = '<i class="fas fa-fingerprint"></i>';
+                document.getElementById('js-secure-icon').style.boxShadow = '0 0 30px rgba(212,175,55,0.2)';
+                finalizeAccess();
+            }, 800);
+        }
+
+        function finalizeAccess() {
+    if(actionTarget === 'wallet') {
+        // Mark that wallet is now accessible
+        // Also reveal the numbers automatically
+        document.getElementById('revealTarget').classList.add('unveiled');
+        // Now switch to wallet view
+        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        document.getElementById('view-wallet').classList.add('active');
+        document.querySelectorAll('.tab-item')[2].classList.add('active');
+        loadWalletData();
+    } else if (actionTarget === 'reveal') {
+        document.getElementById('revealTarget').classList.add('unveiled');
+        if(document.getElementById('btnReveal')) {
+            document.getElementById('btnReveal').style.display = 'none';
+        }
+        toast("Payment details revealed!", "success");
+    } else if (actionTarget === 'withdraw_req') {
+        document.getElementById('modalWithdraw').style.display = 'flex';
+    }
+}
+
+        // --- ENROLLMENT LOGIC ---
+        window.openEnrollForm = (type, tier, min, max) => {
+            if(!currentUser) return toast('Login required', 'error');
+            
+            activeEnrollment = { type, tier, min, max };
+            
+            document.getElementById('modalFormTitle').innerText = `${tier} ${type}`;
+            document.getElementById('modalFormSub').innerText = `You are opening a ${type} fund. This account matures in 365 days.`;
+            document.getElementById('enLimits').innerText = `Amount must be between $${min} and $${max} per month.`;
+            document.getElementById('enAmount').value = min; // Default to minimum
+            
+            document.getElementById('modalEnroll').style.display = 'flex';
+        };
+
+        window.confirmEnroll = async () => {
+            const amt = parseFloat(document.getElementById('enAmount').value);
+            const kName = document.getElementById('enKinName').value;
+            const kPhone = document.getElementById('enKinPhone').value;
+            const kRel = document.getElementById('enKinRel').value;
+            
+            if(!amt || amt < activeEnrollment.min || amt > activeEnrollment.max) return toast(`Amount must be between $${activeEnrollment.min} and $${activeEnrollment.max}`, "error");
+            if(!kName || !kPhone || !kRel) return toast("Fill all Next of Kin fields", "error");
+
+            document.getElementById('btnConfirmEnroll').innerText = "Processing...";
+            try {
+                // Prevent duplicate active plans of the same type
+                const exist = await getDocs(query(collection(db, "activePlans"), where("userId", "==", currentUser.uid), where("planType", "==", activeEnrollment.type), where("status", "==", "active")));
+                if(!exist.empty) {
+                    toast(`You already have an active ${activeEnrollment.type} plan.`, "error");
+                    closeModal('modalEnroll');
+                    return;
+                }
+
+                await addDoc(collection(db, "activePlans"), {
+                    userId: currentUser.uid,
+                    userName: currentUser.displayName || currentUser.email,
+                    planType: activeEnrollment.type,
+                    planTier: activeEnrollment.tier,
+                    monthlyAmount: amt,
+                    nextOfKin: { name: kName, phone: kPhone, relation: kRel },
+                    status: 'active',
+                    createdAt: serverTimestamp()
+                });
+
+                closeModal('modalEnroll');
+                toast(`Successfully enrolled in ${activeEnrollment.tier} ${activeEnrollment.type}!`);
+                confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+                
+                // Clear form
+                document.getElementById('enAmount').value = "";
+                document.getElementById('enKinName').value = "";
+                document.getElementById('enKinPhone').value = "";
+                document.getElementById('enKinRel').value = "";
+
+                setView('myplans', document.querySelectorAll('.tab-item')[1]);
+
+            } catch(e) { toast(e.message, 'error'); }
+            finally { document.getElementById('btnConfirmEnroll').innerText = "CONFIRM ACTIVATION"; }
+        };
+
+       // --- MY PLANS & 1-YEAR MATURITY UI (FIXED - No orderBy) ---
+window.loadMyPlans = async () => {
+    const list = document.getElementById('myPlansList');
+    list.innerHTML = '<div style="text-align:center; padding:60px;"><div class="spinner"></div></div>';
+    
+    try {
+        // Remove orderBy to avoid index requirement
+        const q = query(collection(db, "activePlans"), where("userId", "==", currentUser.uid));
+        const snap = await getDocs(q);
+        
+        if(snap.empty) {
+            list.innerHTML = `<div style="text-align:center; padding:60px 20px; background: var(--bg-card); border-radius: 30px; border: 1px dashed var(--border);">
+                <i class="fas fa-box-open" style="font-size: 50px; color:var(--border); margin-bottom:15px;"></i>
+                <h3 style="font-weight: 800; color: var(--text-main);">No Active Portfolios</h3>
+                <p style="font-size:0.9rem; color:var(--text-sub); margin-top: 5px;">Enroll in a program from the Global Vision tab.</p>
+            </div>`;
+            return;
+        }
+
+        // Convert to array and sort in memory
+        let plans = [];
+        snap.forEach(d => {
+            plans.push({ id: d.id, ...d.data() });
+        });
+        plans.sort((a,b) => (b.createdAt?.toDate() || 0) - (a.createdAt?.toDate() || 0));
+
+        let html = '';
+        plans.forEach(data => {
+            const createdAt = data.createdAt ? moment(data.createdAt.toDate()) : moment();
+            const daysActive = moment().diff(createdAt, 'days');
+            const progress = Math.min((daysActive / 365) * 100, 100);
+            
+            let maturityText = progress >= 100 ? `<span style="color: var(--pd-green);"><i class="fas fa-check-circle"></i> MATURED</span>` : `Matures in ${365 - daysActive} days`;
+            
+            // Determine theme color
+            let themeColor = 'var(--pd-green)';
+            if(data.planType === 'Business') themeColor = '#1e3a5f';
+            if(data.planType === 'Funeral') themeColor = '#5f1e1e';
+
+            html += `
+                <div class="hero-card" style="padding: 25px; margin-bottom: 20px; border-left: 6px solid ${themeColor};">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 15px;">
+                        <div>
+                            <span style="font-size: 10px; font-weight: 900; color: ${themeColor}; text-transform: uppercase; letter-spacing: 1px;">${data.planTier || 'Standard'} TIER</span>
+                            <h3 style="font-weight:900; color:var(--pd-navy); font-size: 1.4rem;">${data.planType}</h3>
+                        </div>
+                        <span style="background:rgba(34,197,94,0.1); color:var(--pd-green); padding:6px 14px; border-radius:20px; font-size:0.75rem; font-weight:800;">ACTIVE</span>
+                    </div>
+                    
+                    <div style="background:var(--bg-base); padding:15px 20px; border-radius:18px; margin-bottom:20px; display:flex; justify-content:space-between; border: 1px solid var(--border);">
+                        <div><div style="font-size:10px; font-weight:800; color:var(--text-sub);">MONTHLY SEED</div><div style="font-weight:900; color:var(--pd-green); font-size: 1.1rem;">$${data.monthlyAmount}</div></div>
+                        <div style="text-align:right;"><div style="font-size:10px; font-weight:800; color:var(--text-sub);">NEXT OF KIN</div><div style="font-weight:700; font-size:0.95rem;">${data.nextOfKin?.name || 'Not provided'}</div></div>
+                    </div>
+
+                    <div class="maturity-text">
+                        <span>FUND MATURITY</span>
+                        <span>${maturityText}</span>
+                    </div>
+                    <div class="plan-progress-container">
+                        <div class="plan-progress-bar" style="width: ${progress}%"></div>
+                    </div>
+                    
+                    <button class="btn-main" style="background: ${themeColor}; color: white; margin-top:20px;" onclick="openClaimForm('${data.id}', '${data.planType}')">
+                        <i class="fas fa-file-signature"></i> FILE A SUPPORT CLAIM
+                    </button>
+                </div>
+            `;
+        });
+        list.innerHTML = html;
+    } catch(e) { 
+        console.error(e);
+        list.innerHTML = `<div style="text-align:center; padding:60px 20px; color: var(--pd-red);">
+            <i class="fas fa-exclamation-triangle" style="font-size: 40px; margin-bottom: 15px;"></i>
+            <p>Error loading plans: ${e.message}</p>
+        </div>`;
+    }
+};
+
+        // --- DYNAMIC CLAIM FORM ---
+        window.openClaimForm = (planId, planType) => {
+            activePlanIdForClaim = planId;
+            claimDocs = {}; // reset docs
+
+            const modalBody = document.getElementById('claimModalBody');
+            
+            let formFields = '';
+            let requiredDocs =[];
+
+            if (planType === 'Education') {
+                formFields = `
+                    <div class="form-group"><label>Institution / School Name</label><input type="text" id="clSchool" placeholder="e.g. University of Zambia"></div>
+                    <div class="form-group"><label>Student ID Number</label><input type="text" id="clStudentId" placeholder="ID Number"></div>
+                `;
+                requiredDocs =[
+                    { key: 'acceptance', label: 'Acceptance Letter / Proof of Enrollment', icon: 'fa-envelope-open-text' },
+                    { key: 'results', label: 'Latest Academic Results', icon: 'fa-chart-bar' }
+                ];
+            } else if (planType === 'Business') {
+                formFields = `
+                    <div class="form-group"><label>Business Name</label><input type="text" id="clBizName" placeholder="Name of Enterprise"></div>
+                    <div class="form-group"><label>Registration Number (if applicable)</label><input type="text" id="clBizReg" placeholder="Registration No."></div>
+                `;
+                requiredDocs =[
+                    { key: 'bizplan', label: 'Business Plan / Proposal', icon: 'fa-file-invoice' },
+                    { key: 'identity', label: 'National ID Copy', icon: 'fa-id-card' }
+                ];
+            } else if (planType === 'Funeral') {
+                formFields = `
+                    <div class="form-group"><label>Name of Deceased</label><input type="text" id="clDecName" placeholder="Full Name"></div>
+                    <div class="form-group"><label>Date of Passing</label><input type="date" id="clDecDate"></div>
+                `;
+                requiredDocs =[
+                    { key: 'deathcert', label: 'Official Death Certificate', icon: 'fa-file-medical-alt' },
+                    { key: 'identity', label: 'Your ID Copy', icon: 'fa-id-card' }
+                ];
+            }
+
+            modalBody.innerHTML = `
+                <h2 style="color: var(--pd-gold); font-weight: 900; margin-bottom: 5px;"><i class="fas fa-file-invoice"></i> ${planType} Claim</h2>
+                <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 25px;">Please provide the specific details and official documents required for this program.</p>
+                
+                <div class="form-group">
+                    <label>Requested Support Amount ($)</label>
+                    <input type="number" id="clAmount" placeholder="e.g. 500">
+                </div>
+                
+                ${formFields}
+
+                <h3 style="font-size: 0.95rem; font-weight: 800; margin: 30px 0 15px; border-bottom: 2px solid var(--border); padding-bottom: 8px;">Required Documents</h3>
+                
+                ${requiredDocs.map(doc => `
+                    <div class="doc-upload-zone" onclick="triggerCloudinary('claim', '${doc.key}')">
+                        <i class="fas ${doc.icon}" style="font-size: 1.5rem; color: var(--pd-navy);"></i>
+                        <div style="flex: 1; text-align: left;">
+                            <div style="font-weight: 800; font-size: 0.85rem;">${doc.label}</div>
+                            <div class="doc-status" id="stat_${doc.key}">Tap to upload PDF/Image</div>
+                        </div>
+                    </div>
+                `).join('')}
+
+                <button class="btn-main btn-gold" id="btnSubmitClaim" style="margin-top: 30px;" onclick="submitClaim('${planType}', '${JSON.stringify(requiredDocs).replace(/"/g, '&quot;')}')">SUBMIT TO ADMIN</button>
+                <button class="btn-main" style="background:transparent; color:var(--text-sub); border: 2px solid var(--border); margin-top: 10px;" onclick="closeModal('modalClaim')">Cancel</button>
+            `;
+
+            document.getElementById('modalClaim').style.display = 'flex';
+        };
+
+        // --- CLOUDINARY UPLOADS ---
+        window.triggerCloudinary = (context, docKey) => {
+            cloudinary.createUploadWidget({
+                cloudName: 'prayerdome',
+                uploadPreset: 'gallery_uploads', // Using standard unsigned preset
+                clientAllowedFormats:['jpg', 'jpeg', 'png', 'pdf'],
+                maxFileSize: 5000000
+            }, (error, result) => {
+                if (!error && result && result.event === "success") {
+                    const url = result.info.secure_url;
+                    
+                    if(context === 'deposit') {
+                        claimDocs['receipt'] = url;
+                        document.getElementById('stat_receipt').innerText = "✅ Uploaded";
+                        document.getElementById('stat_receipt').classList.add('success');
+                        toast('Payment receipt attached!');
+                    } else if (context === 'claim') {
+                        claimDocs[docKey] = url;
+                        document.getElementById(`stat_${docKey}`).innerText = "✅ Uploaded";
+                        document.getElementById(`stat_${docKey}`).classList.add('success');
+                        toast('Document attached successfully!');
+                    }
+                }
+            }).open();
+        };
+
+        window.submitClaim = async (planType, docsJson) => {
+            const amt = document.getElementById('clAmount').value;
+            const requiredDocs = JSON.parse(docsJson.replace(/&quot;/g, '"'));
+
+            if(!amt || amt <= 0) return toast("Enter valid claim amount", "error");
+
+            // Verify specific fields based on plan type
+            let extraData = {};
+            if(planType === 'Education') {
+                extraData.school = document.getElementById('clSchool').value;
+                extraData.studentId = document.getElementById('clStudentId').value;
+                if(!extraData.school) return toast("Enter institution name", "error");
+            } else if (planType === 'Business') {
+                extraData.businessName = document.getElementById('clBizName').value;
+                extraData.registration = document.getElementById('clBizReg').value;
+                if(!extraData.businessName) return toast("Enter business name", "error");
+            } else if (planType === 'Funeral') {
+                extraData.deceasedName = document.getElementById('clDecName').value;
+                extraData.dateOfDeath = document.getElementById('clDecDate').value;
+                if(!extraData.deceasedName || !extraData.dateOfDeath) return toast("Complete deceased details", "error");
+            }
+
+            // Verify all required docs are uploaded
+            for(let d of requiredDocs) {
+                if(!claimDocs[d.key]) return toast(`Please upload: ${d.label}`, "error");
+            }
+
+            document.getElementById('btnSubmitClaim').innerText = "Processing...";
+            try {
+                await addDoc(collection(db, "supportClaims"), {
+                    userId: currentUser.uid, 
+                    userEmail: currentUser.email, 
+                    planId: activePlanIdForClaim,
+                    planType: planType,
+                    requestedAmount: parseFloat(amt), 
+                    details: extraData, 
+                    documents: claimDocs,
+                    status: 'pending', 
+                    createdAt: serverTimestamp()
+                });
+
+                closeModal('modalClaim');
+                toast("Claim securely submitted for admin review!", "success");
+                confetti();
+                loadWalletData(); // Refresh history
+            } catch(e) { toast(e.message, 'error'); }
+            finally { document.getElementById('btnSubmitClaim').innerText = "SUBMIT TO ADMIN"; }
+        };
+
+        // --- WALLET & TRANSACTIONS (FIXED) ---
+window.loadWalletData = async () => {
+    try {
+        // Get wallet balance
+        const wDoc = await getDoc(doc(db, "wallets", currentUser.uid));
+        if(wDoc.exists()) {
+            document.getElementById('dispBalance').innerText = `$ ${(wDoc.data().balance || 0).toFixed(2)}`;
+        } else {
+            document.getElementById('dispBalance').innerText = `$ 0.00`;
+        }
+
+        // Fetch deposits (no orderBy)
+        const depositsQuery = query(collection(db, "deposits"), where("userId", "==", currentUser.uid));
+        const dSnap = await getDocs(depositsQuery);
+        
+        // Fetch withdrawals
+        const withdrawalsQuery = query(collection(db, "withdrawals"), where("userId", "==", currentUser.uid));
+        const wSnap = await getDocs(withdrawalsQuery);
+        
+        // Fetch claims
+        const claimsQuery = query(collection(db, "supportClaims"), where("userId", "==", currentUser.uid));
+        const cSnap = await getDocs(claimsQuery);
+
+        let history = [];
+        
+        dSnap.forEach(d => {
+            const data = d.data();
+            history.push({ 
+                type: 'Deposit', 
+                amt: data.amount, 
+                stat: data.status, 
+                date: data.createdAt?.toDate() || new Date(), 
+                pos: true 
+            });
+        });
+        
+        wSnap.forEach(w => {
+            const data = w.data();
+            history.push({ 
+                type: 'Withdrawal', 
+                amt: data.amount, 
+                stat: data.status, 
+                date: data.createdAt?.toDate() || new Date(), 
+                pos: false 
+            });
+        });
+        
+        cSnap.forEach(c => {
+            const data = c.data();
+            history.push({ 
+                type: 'Claim Filed', 
+                amt: data.requestedAmount, 
+                stat: data.status, 
+                date: data.createdAt?.toDate() || new Date(), 
+                pos: true 
+            });
+        });
+
+        // Sort in memory by date (newest first)
+        history.sort((a,b) => b.date - a.date);
+
+        const list = document.getElementById('txHistoryList');
+        if(history.length === 0) {
+            list.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-sub); font-weight:600;"><i class="fas fa-receipt" style="font-size:40px; opacity:0.3; margin-bottom:10px; display:block;"></i>No transactions yet.</div>';
+            return;
+        }
+
+        list.innerHTML = history.slice(0, 20).map(t => {
+            let icon = '';
+            let iconClass = '';
+            if(t.type === 'Deposit') {
+                icon = '<i class="fas fa-arrow-down"></i>';
+                iconClass = 'dep';
+            } else if(t.type === 'Withdrawal') {
+                icon = '<i class="fas fa-arrow-up"></i>';
+                iconClass = 'wth';
+            } else {
+                icon = '<i class="fas fa-file-invoice-dollar"></i>';
+                iconClass = 'dep';
+            }
+            
+            const statColor = t.stat === 'approved' ? '#22c55e' : (t.stat === 'rejected' ? '#ef4444' : '#f59e0b');
+            const statText = t.stat === 'approved' ? '✓ Approved' : (t.stat === 'rejected' ? '✗ Rejected' : '⏳ Pending');
+
+            return `
+                <div class="tx-item">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <div class="tx-icon ${iconClass}">${icon}</div>
+                        <div>
+                            <strong style="display:block; font-size:0.95rem; color: var(--text-main);">${t.type}</strong>
+                            <span style="font-size:0.75rem; color:var(--text-sub); font-weight:600;">${moment(t.date).format('MMM D, YYYY')}</span>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-weight: 800; color: ${t.pos ? 'var(--pd-green)' : 'var(--pd-red)'};">${t.pos ? '+' : '-'} $${t.amt.toFixed(2)}</div>
+                        <div style="font-size:0.65rem; font-weight:800; color:${statColor}; text-transform:uppercase; margin-top:3px;">${statText}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+    } catch(e) { 
+        console.error("Wallet load error:", e);
+        document.getElementById('txHistoryList').innerHTML = `<div style="text-align:center; padding:40px; color: var(--pd-red);">Error loading transactions: ${e.message}</div>`;
+    }
+};
+
+        window.openDepositPanel = () => { claimDocs = {}; document.getElementById('modalDeposit').style.display = 'flex'; };
+        
+        window.submitDeposit = async () => {
+            const amt = document.getElementById('depAmount').value;
+            const url = claimDocs['receipt'];
+            if(!amt || amt < 5) return toast("Minimum deposit is $5", "error");
+            if(!url) return toast("Attach payment receipt", "error");
+
+            document.getElementById('btnSubmitDep').innerText = "Processing...";
+            try {
+                await addDoc(collection(db, "deposits"), {
+                    userId: currentUser.uid, userEmail: currentUser.email, userName: currentUser.displayName || 'Member',
+                    amount: parseFloat(amt), currency: 'USD', proofUrl: url, status: 'pending', createdAt: serverTimestamp()
+                });
+                
+                closeModal('modalDeposit');
+                toast("Deposit submitted for approval!");
+                confetti();
+                
+                document.getElementById('depAmount').value = "";
+                document.getElementById('stat_receipt').innerText = "Waiting for upload...";
+                document.getElementById('stat_receipt').classList.remove('success');
+
+                loadWalletData();
+            } catch(e) { toast(e.message, 'error'); }
+            finally { document.getElementById('btnSubmitDep').innerText = "SUBMIT FOR APPROVAL"; }
+        };
+
+        window.submitWithdrawal = async () => {
+            const amt = document.getElementById('withAmount').value;
+            const phone = document.getElementById('withPhone').value;
+            if(!amt || amt < 10) return toast("Minimum withdrawal is $10", "error");
+            if(!phone) return toast("Enter MoMo number", "error");
+
+            document.getElementById('btnSubmitWith').innerText = "Processing...";
+            try {
+                const wDoc = await getDoc(doc(db, "wallets", currentUser.uid));
+                if(!wDoc.exists() || wDoc.data().balance < parseFloat(amt)) {
+                    toast("Insufficient wallet balance", "error");
+                    document.getElementById('btnSubmitWith').innerText = "WITHDRAW FUNDS";
+                    return;
+                }
+
+                await addDoc(collection(db, "withdrawals"), {
+                    userId: currentUser.uid, userEmail: currentUser.email, userName: currentUser.displayName || 'Member',
+                    amount: parseFloat(amt), receivePhone: phone, status: 'pending', createdAt: serverTimestamp()
+                });
+
+                closeModal('modalWithdraw');
+                toast("Withdrawal requested successfully!");
+                document.getElementById('withAmount').value = "";
+                document.getElementById('withPhone').value = "";
+                loadWalletData();
+            } catch(e) { toast(e.message, 'error'); }
+            finally { document.getElementById('btnSubmitWith').innerText = "WITHDRAW FUNDS"; }
+        };
+
+    </script>
+</body>
+</html>

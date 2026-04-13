@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Prayer Dome | Global Membership & Profile</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+
+    <style>
+        :root {
+            --accent-green: #15803d;
+            --accent-green-light: #22c55e;
+            --accent-gold: #d4af37;
+            --accent-red: #ef4444;
+            --bg-primary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+        }
+
+        body.dark-mode {
+            --bg-primary: #020617; 
+            --bg-card: #0f172a; 
+            --text-main: #f8fafc; 
+            --text-sub: #94a3b8;
+            --border: #1e293b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-primary); color: var(--text-main); transition: 0.3s; padding-bottom: 50px; }
+
+        .auth-header { background: var(--bg-card); padding: 15px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .logo-ring { width: 45px; height: 45px; background: linear-gradient(135deg, var(--accent-green), var(--accent-gold)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 22px; }
+
+        .container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        .auth-card { background: var(--bg-card); border-radius: 32px; padding: 35px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+
+        .tabs { display: flex; background: var(--bg-primary); padding: 5px; border-radius: 50px; margin-bottom: 30px; }
+        .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; border-radius: 50px; font-weight: 700; transition: 0.3s; color: var(--text-main); opacity: 0.5; }
+        .tab.active { background: var(--bg-card); box-shadow: 0 4px 10px rgba(0,0,0,0.1); opacity: 1; color: var(--accent-green); }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 20px; position: relative; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.85rem; }
+        input, select, textarea { width: 100%; padding: 14px 18px; border-radius: 16px; border: 2px solid var(--border); background: var(--bg-primary); color: var(--text-main); outline: none; font-size: 0.95rem; }
+        input:focus { border-color: var(--accent-green); }
+        .full-width { grid-column: span 2; }
+
+        .password-wrapper { position: relative; }
+        .password-wrapper input { padding-right: 50px; }
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--text-sub);
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+        }
+
+        .phone-wrapper { display: flex; gap: 10px; }
+        .country-code { width: 100px; flex-shrink: 0; }
+        .phone-number { flex: 1; }
+
+        .btn { padding: 14px 28px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 10px; justify-content: center; width: 100%; }
+        .btn-primary { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); color: white; }
+        .btn-danger { background: linear-gradient(135deg, var(--accent-red), #dc2626); color: white; }
+        .btn-google { background: white; border: 2px solid var(--border); color: var(--text-main); }
+        .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text-main); }
+        .btn-sm { padding: 8px 16px; font-size: 0.8rem; width: auto; }
+
+        .verification-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .verification-badge.verified { background: rgba(34,197,94,0.2); color: var(--accent-green); }
+        .verification-badge.unverified { background: rgba(239,68,68,0.1); color: #ef4444; }
+        .verification-badge.unverified:hover { background: rgba(239,68,68,0.2); transform: scale(1.02); }
+
+        .verify-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .verify-modal-content {
+            background: var(--bg-card);
+            border-radius: 32px;
+            padding: 35px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            animation: modalPop 0.3s ease;
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .spam-tip {
+            background: rgba(212,175,55,0.1);
+            border-left: 4px solid var(--accent-gold);
+            padding: 12px 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-size: 0.8rem;
+            text-align: left;
+        }
+
+        .profile-hero { text-align: center; margin-bottom: 30px; }
+        .avatar-frame { width: 140px; height: 140px; border-radius: 50%; border: 4px solid var(--accent-gold); margin: 0 auto 15px; position: relative; cursor: pointer; overflow: hidden; background: var(--bg-primary); }
+        .avatar-frame img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .camera-overlay { position: absolute; bottom: 10px; right: 10px; background: var(--accent-green); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid white; color: white; }
+        
+        .membership-badge { background: linear-gradient(135deg, var(--accent-green), #064e3b); color: white; padding: 12px 24px; border-radius: 30px; margin: 15px auto; font-weight: 800; display: inline-block; }
+        .profile-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 25px 0; }
+        .stat-item { background: var(--bg-primary); padding: 15px 10px; border-radius: 20px; text-align: center; border: 1px solid var(--border); }
+        .stat-number { font-size: 1.5rem; font-weight: 800; color: var(--accent-green); }
+        .stat-label { font-size: 0.7rem; color: var(--text-sub); margin-top: 4px; }
+        .spiritual-card { background: var(--bg-primary); border-radius: 24px; padding: 20px; margin: 20px 0; border: 1px solid var(--border); }
+        .progress-bar { height: 8px; background: var(--border); border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-green), var(--accent-gold)); border-radius: 10px; transition: width 0.5s ease; }
+        .ministry-tag { display: inline-block; background: rgba(34,197,94,0.1); color: var(--accent-green); padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; margin: 4px; }
+        .toast-box { position: fixed; top: 20px; right: 20px; z-index: 2000; }
+        .toast { background: var(--bg-card); padding: 15px 25px; border-radius: 40px; margin-bottom: 10px; border-left: 5px solid var(--accent-green); animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 12px; font-weight: 600; }
+        .toast.error { border-left-color: var(--accent-red); }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .age-warning { color: #ef4444; font-size: 0.75rem; font-weight: bold; display: none; }
+
+        /* Loading Spinner */
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            flex-direction: column;
+            gap: 15px;
+            backdrop-filter: blur(5px);
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: var(--accent-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Delete Account Button */
+        .delete-account-btn {
+            margin-top: 20px;
+            background: rgba(239,68,68,0.1);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+        .delete-account-btn:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .profile-stat-grid { grid-template-columns: repeat(2, 1fr); }
+            .phone-wrapper { flex-direction: column; }
+            .country-code { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast-box" id="toastContainer"></div>
+
+    <header class="auth-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="logo-ring"><i class="fas fa-church"></i></div>
+            <h1 style="font-size: 1.2rem; font-weight: 900;">PRAYER DOME</h1>
+        </div>
+        <button onclick="toggleDarkMode()" style="background:none; border:none; color:inherit; font-size: 1.4rem; cursor:pointer;"><i class="fas fa-moon"></i></button>
+    </header>
+
+    <div class="container">
+        <div id="authTabs" class="tabs">
+            <div class="tab active" onclick="switchTab('login')">SIGN IN</div>
+            <div class="tab" onclick="switchTab('register')">REGISTER</div>
+        </div>
+
+        <!-- LOGIN SCREEN -->
+        <div id="loginForm" class="auth-card">
+            <h2 style="margin-bottom: 30px; text-align: center;">Welcome Back</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group"><label>Email Address</label><input type="email" id="lEmail" required></div>
+                <div class="form-group password-wrapper">
+                    <label>Password</label>
+                    <input type="password" id="lPass" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword('lPass', this)"><i class="fas fa-eye"></i></button>
+                </div>
+                <button type="submit" class="btn btn-primary">Sign In <i class="fas fa-arrow-right"></i></button>
+            </form>
+            <div style="text-align: center; margin: 20px 0;">
+                <a href="#" onclick="resetPassword()" style="color: var(--accent-green); font-size: 0.85rem;">Forgot Password?</a>
+            </div>
+            <div style="text-align: center; margin: 25px 0; color: var(--text-sub); font-size: 0.8rem;">OR CONTINUE WITH</div>
+            <button class="btn btn-google" onclick="handleGoogle()"><i class="fab fa-google"></i> Sign in with Google</button>
+        </div>
+
+        <!-- REGISTRATION SCREEN -->
+        <div id="registerForm" class="auth-card" style="display: none;">
+            <h2 style="margin-bottom: 25px; text-align: center;">Join the Family</h2>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div class="avatar-frame"><img id="regPreview" src="https://via.placeholder.com/150"></div>
+                <button type="button" onclick="uploadPhoto('register')" class="btn btn-outline" style="width: auto; padding: 8px 20px;">Upload Photo</button>
+                <input type="hidden" id="uploadedPhoto">
+            </div>
+
+            <form onsubmit="handleRegister(event)">
+                <div class="form-grid">
+                    <div class="form-group full-width"><label>Full Name *</label><input type="text" id="rName" required></div>
+                    <div class="form-group"><label>Email Address *</label><input type="email" id="rEmail" required></div>
+                    <div class="form-group">
+                        <label>Phone Number *</label>
+                        <div class="phone-wrapper">
+                            <select id="rCountryCode" class="country-code">
+                                <option value="+1">+1 (USA)</option>
+                                <option value="+44">+44 (UK)</option>
+                                <option value="+27">+27 (South Africa)</option>
+                                <option value="+260">+260 (Zambia)</option>
+                                <option value="+268" selected>+268 (Eswatini)</option>
+                                <option value="+353">+353 (Ireland)</option>
+                                <option value="+254">+254 (Kenya)</option>
+                                <option value="+234">+234 (Nigeria)</option>
+                                <option value="+233">+233 (Ghana)</option>
+                            </select>
+                            <input type="tel" id="rPhone" class="phone-number" placeholder="71234567" required>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Date of Birth *</label><input type="date" id="rDob" onchange="checkAge(this.value)" required><p id="ageWarn" class="age-warning">⚠️ Must be 13+ years old</p></div>
+                    <div class="form-group"><label>Gender</label><select id="rGender"><option>Male</option><option>Female</option><option>Prefer not to say</option></select></div>
+                    <div class="form-group"><label>Your Branch</label><select id="rBranch"><option>Chama, Zambia</option><option>Manzini, Eswatini</option><option>Cork, Ireland</option><option>Online Global</option></select></div>
+                    <div class="form-group"><label>Ministry Interest</label><select id="rMinistry"><option>Worship</option><option>Intercessor</option><option>Usher</option><option>Outreach</option><option>Children</option><option>Technical</option></select></div>
+                    <div class="form-group password-wrapper"><label>Password *</label><input type="password" id="rPass" minlength="6" required><button type="button" class="toggle-password" onclick="togglePassword('rPass', this)"><i class="fas fa-eye"></i></button></div>
+                    <div class="form-group password-wrapper"><label>Confirm Password *</label><input type="password" id="rConfirm" required><button type="button" class="toggle-password" onclick="togglePassword('rConfirm', this)"><i class="fas fa-eye"></i></button></div>
+                </div>
+                <div class="form-group full-width"><label>How did you hear about us?</label><select id="rReferral"><option>Social Media</option><option>Friend/Family</option><option>Radio/TV</option><option>Church Event</option><option>Online Search</option></select></div>
+                <button type="submit" id="regBtn" class="btn btn-primary">Register Membership <i class="fas fa-user-plus"></i></button>
+            </form>
+            <div style="text-align: center; margin: 25px 0; color: var(--text-sub);">OR REGISTER WITH</div>
+            <button class="btn btn-google" onclick="handleGoogle()"><i class="fab fa-google"></i> Continue with Google</button>
+        </div>
+
+        <!-- PROFILE SECTION -->
+        <div id="profileSection" class="auth-card" style="display: none;">
+            <div id="profileView">
+                <div class="profile-hero">
+                    <div class="avatar-frame" onclick="changeProfilePhoto()">
+                        <img id="pPhoto" src="https://via.placeholder.com/150">
+                        <div class="camera-overlay"><i class="fas fa-camera"></i></div>
+                    </div>
+                    <h2 id="pNameDisplay">User Name</h2>
+                    <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                        <p id="pRoleDisplay" style="color: var(--accent-gold); font-weight: 800;"></p>
+                        <span id="emailVerifiedBadge" class="verification-badge unverified" onclick="verifyEmail()"><i class="fas fa-envelope"></i> <span id="emailStatusText">Verify Email</span></span>
+                    </div>
+                    <div class="membership-badge"><i class="fas fa-id-card"></i> <span id="pIdDisplay">Not Assigned</span></div>
+                </div>
+                <div class="profile-stat-grid">
+                    <div class="stat-item"><div class="stat-number" id="pPrayers">0</div><div class="stat-label">PRAYERS</div></div>
+                    <div class="stat-item"><div class="stat-number" id="pDaysActive">0</div><div class="stat-label">DAYS ACTIVE</div></div>
+                    <div class="stat-item"><div class="stat-number" id="pWallet">E0</div><div class="stat-label">WALLET</div></div>
+                    <div class="stat-item"><div class="stat-number" id="pLevel">1</div><div class="stat-label">QUIZ LEVEL</div></div>
+                </div>
+                <div class="spiritual-card">
+                    <div class="spiritual-header"><strong><i class="fas fa-seedling"></i> Spiritual Growth</strong><span id="spiritualLevel">Seeker</span></div>
+                    <div class="progress-bar"><div class="progress-fill" id="spiritualProgress" style="width: 0%"></div></div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.7rem; margin-top: 8px;">
+                        <span>🌱 Seeker</span><span>📖 Disciple</span><span>🔥 Warrior</span><span>👑 Leader</span>
+                    </div>
+                </div>
+                <div style="background: var(--bg-primary); border-radius: 20px; padding: 20px; margin: 15px 0;"><p id="pBioDisplay">No bio added yet.</p></div>
+                <div style="background: var(--bg-primary); border-radius: 20px; padding: 20px; margin: 15px 0;"><div id="pMinistriesDisplay">Not specified</div></div>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button onclick="toggleEdit(true)" class="btn btn-primary" style="flex: 2;">Edit Profile</button>
+                    <button onclick="handleLogout()" class="btn btn-outline" style="flex: 1; color: #ef4444;">Logout</button>
+                </div>
+                <button onclick="showDeleteAccountModal()" class="btn btn-outline delete-account-btn" style="width: 100%; margin-top: 15px;">
+                    <i class="fas fa-trash-alt"></i> Delete Account
+                </button>
+            </div>
+            <div id="profileEdit" style="display: none;">
+                <h3 style="margin-bottom: 20px;">Edit Profile</h3>
+                <div class="form-group">
+                    <label>Profile Photo</label>
+                    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                        <img id="editPhotoPreview" src="https://via.placeholder.com/80" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+                        <button type="button" onclick="changeProfilePhoto()" class="btn btn-outline" style="width: auto;">Change Photo</button>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group"><label>Full Name</label><input type="text" id="eName"></div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <div class="phone-wrapper">
+                            <select id="eCountryCode" class="country-code">
+                                <option value="+1">+1 (USA)</option>
+                                <option value="+44">+44 (UK)</option>
+                                <option value="+27">+27 (South Africa)</option>
+                                <option value="+260">+260 (Zambia)</option>
+                                <option value="+268">+268 (Eswatini)</option>
+                                <option value="+353">+353 (Ireland)</option>
+                            </select>
+                            <input type="tel" id="ePhone" class="phone-number" placeholder="71234567">
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Gender</label><select id="eGender"><option>Male</option><option>Female</option></select></div>
+                    <div class="form-group"><label>Branch</label><select id="eBranch"><option>Chama, Zambia</option><option>Manzini, Eswatini</option><option>Cork, Ireland</option><option>Online Global</option></select></div>
+                </div>
+                <div class="form-group"><label>Spiritual Bio</label><textarea id="eBio" rows="3" placeholder="Share your faith journey..."></textarea></div>
+                <div class="form-group"><label>Interests</label><input type="text" id="eInterests" placeholder="Worship, Bible Study, Outreach..."></div>
+                <div class="form-group">
+                    <label>Ministry Involvement</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;" id="ministryCheckboxes">
+                        <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" value="Worship"> 🎵 Worship</label>
+                        <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" value="Intercessor"> 🙏 Intercessor</label>
+                        <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" value="Usher"> 🚪 Usher</label>
+                        <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" value="Outreach"> 🤝 Outreach</label>
+                        <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" value="Children"> 👶 Children's Ministry</label>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button onclick="saveProfile()" class="btn btn-primary" style="flex: 2;">Save Changes</button>
+                    <button onclick="toggleEdit(false)" class="btn btn-outline" style="flex: 1;">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Verification Modal -->
+    <div id="emailVerifyModal" class="verify-modal">
+        <div class="verify-modal-content">
+            <i class="fas fa-envelope" style="font-size: 3rem; color: var(--accent-green);"></i>
+            <h2>Verify Your Email</h2>
+            <p>We've sent a verification email to <strong id="verifyEmailAddress"></strong></p>
+            <div class="spam-tip">
+                <i class="fas fa-envelope-open-text"></i>
+                <strong>📧 Didn't receive the email?</strong><br>
+                • Check your <strong>Spam/Junk folder</strong><br>
+                • Add <strong>noreply@prayerdome.net</strong> to your contacts<br>
+                • Wait a few minutes and check again<br>
+                • Click the link in the email to verify your account
+            </div>
+            <button class="btn btn-primary" onclick="sendEmailVerificationCode()">Resend Verification Email</button>
+            <button class="btn btn-outline" style="margin-top: 10px;" onclick="closeModal('emailVerifyModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- Delete Account Confirmation Modal -->
+    <div id="deleteAccountModal" class="verify-modal">
+        <div class="verify-modal-content">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--accent-red);"></i>
+            <h2>Delete Account</h2>
+            <p>Are you sure you want to permanently delete your account?</p>
+            <p style="font-size: 0.85rem; color: var(--text-sub); margin-top: 10px;">This action cannot be undone. All your data will be permanently removed.</p>
+            <div style="margin: 20px 0;">
+                <label>Type "DELETE" to confirm:</label>
+                <input type="text" id="deleteConfirmText" placeholder="DELETE" style="margin-top: 10px; text-align: center;">
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-danger" onclick="deleteAccount()" style="flex: 1;">Delete Permanently</button>
+                <button class="btn btn-outline" onclick="closeModal('deleteAccountModal')" style="flex: 1;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, GoogleAuthProvider, signInWithPopup, sendEmailVerification, sendPasswordResetEmail, deleteUser } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo",
+            authDomain: "prayer-dome.firebaseapp.com",
+            projectId: "prayer-dome",
+            storageBucket: "prayer-dome.firebasestorage.app",
+            messagingSenderId: "198295153196",
+            appId: "1:198295153196:web:1222b31948d7974ba3bf89"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        let currentUserData = null;
+        let currentPhotoUrl = "";
+
+        // Helper Functions
+        window.showToast = (msg, type) => {
+            const container = document.getElementById('toastContainer');
+            const t = document.createElement('div');
+            t.className = `toast ${type === 'error' ? 'error' : ''}`;
+            t.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${msg}`;
+            container.appendChild(t);
+            setTimeout(() => t.remove(), 4000);
+        };
+
+        window.showLoading = () => {
+            if (document.getElementById('customLoader')) return;
+            const loader = document.createElement('div');
+            loader.id = 'customLoader';
+            loader.className = 'spinner-overlay';
+            loader.innerHTML = `<div class="spinner"></div><p style="color: white; font-weight: 600;">Processing...</p>`;
+            document.body.appendChild(loader);
+        };
+
+        window.hideLoading = () => {
+            const loader = document.getElementById('customLoader');
+            if (loader) loader.remove();
+        };
+
+        window.togglePassword = (inputId, button) => {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                input.type = "password";
+                button.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        };
+
+        window.closeModal = (id) => {
+            document.getElementById(id).style.display = 'none';
+        };
+
+        window.showDeleteAccountModal = () => {
+            document.getElementById('deleteConfirmText').value = '';
+            document.getElementById('deleteAccountModal').style.display = 'flex';
+        };
+
+        // Delete Account Function
+        window.deleteAccount = async () => {
+            const confirmText = document.getElementById('deleteConfirmText').value;
+            if (confirmText !== 'DELETE') {
+                showToast('Please type DELETE to confirm account deletion', 'error');
+                return;
+            }
+            
+            if (!auth.currentUser) {
+                showToast('No user logged in', 'error');
+                return;
+            }
+            
+            showLoading();
+            try {
+                await deleteDoc(doc(db, "users", auth.currentUser.uid));
+                await deleteDoc(doc(db, "memberships", auth.currentUser.uid)).catch(() => {});
+                await deleteDoc(doc(db, "wallets", auth.currentUser.uid)).catch(() => {});
+                await deleteDoc(doc(db, "userTokens", auth.currentUser.uid)).catch(() => {});
+                await deleteUser(auth.currentUser);
+                closeModal('deleteAccountModal');
+                showToast('Account permanently deleted', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            } catch (error) {
+                console.error('Delete account error:', error);
+                if (error.code === 'auth/requires-recent-login') {
+                    showToast('Please sign in again before deleting your account', 'error');
+                } else {
+                    showToast('Error: ' + error.message, 'error');
+                }
+            } finally {
+                hideLoading();
+            }
+        };
+
+        // EMAIL VERIFICATION
+        window.verifyEmail = async () => {
+            if (!auth.currentUser) return showToast("Please login first", "error");
+            
+            await auth.currentUser.reload();
+            if (auth.currentUser.emailVerified) {
+                showToast("Your email is already verified!", "success");
+                updateVerificationStatus();
+                return;
+            }
+            
+            try {
+                const actionCodeSettings = {
+                    url: window.location.href,
+                    handleCodeInApp: false
+                };
+                await sendEmailVerification(auth.currentUser, actionCodeSettings);
+                document.getElementById('verifyEmailAddress').innerText = auth.currentUser.email;
+                document.getElementById('emailVerifyModal').style.display = 'flex';
+                showToast("Verification email sent! Check your spam folder.", "success");
+            } catch (e) {
+                showToast(e.message, "error");
+            }
+        };
+
+        window.sendEmailVerificationCode = async () => {
+            try {
+                const actionCodeSettings = {
+                    url: window.location.href,
+                    handleCodeInApp: false
+                };
+                await sendEmailVerification(auth.currentUser, actionCodeSettings);
+                showToast("Verification email resent! Check spam folder.", "success");
+            } catch (e) {
+                showToast(e.message, "error");
+            }
+        };
+
+        async function checkEmailVerification() {
+            if (auth.currentUser) {
+                await auth.currentUser.reload();
+                const isVerified = auth.currentUser.emailVerified;
+                if (isVerified) {
+                    await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+                        emailVerified: true,
+                        emailVerifiedAt: serverTimestamp()
+                    }).catch(() => {});
+                }
+                updateVerificationStatus();
+                return isVerified;
+            }
+            return false;
+        }
+        
+        async function handleEmailVerificationLink() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode');
+            if (mode === 'verifyEmail') {
+                showLoading();
+                try {
+                    await auth.currentUser?.reload();
+                    if (auth.currentUser?.emailVerified) {
+                        await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+                            emailVerified: true,
+                            emailVerifiedAt: serverTimestamp()
+                        });
+                        showToast("✅ Email verified successfully!", "success");
+                        confetti({ particleCount: 150, spread: 100 });
+                        updateVerificationStatus();
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    } else {
+                        showToast("Verification pending. Please click the link in your email.", "info");
+                    }
+                } catch (error) {
+                    console.error("Verification error:", error);
+                    showToast("Verification failed: " + error.message, "error");
+                } finally {
+                    hideLoading();
+                }
+            }
+        }
+
+        // Password Reset
+        window.resetPassword = async () => {
+            const email = prompt("Enter your email address to reset password:");
+            if (!email) return;
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showToast("Password reset email sent! Check your spam folder.", "success");
+            } catch (e) {
+                showToast(e.message, "error");
+            }
+        };
+
+        // Google Login
+        window.handleGoogle = async () => {
+            try {
+                const res = await signInWithPopup(auth, googleProvider);
+                const userDoc = await getDoc(doc(db, "users", res.user.uid));
+                if (!userDoc.exists()) {
+                    await setDoc(doc(db, "users", res.user.uid), {
+                        fullName: res.user.displayName,
+                        email: res.user.email,
+                        photoURL: res.user.photoURL || "https://via.placeholder.com/150",
+                        emailVerified: res.user.emailVerified,
+                        createdAt: serverTimestamp()
+                    });
+                }
+                showToast("Signed in with Google!", "success");
+            } catch (e) { 
+                showToast(e.message, "error"); 
+            }
+        };
+        
+        // Register
+        window.handleRegister = async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('rName').value;
+            const email = document.getElementById('rEmail').value;
+            const pass = document.getElementById('rPass').value;
+            const confirm = document.getElementById('rConfirm').value;
+            const countryCode = document.getElementById('rCountryCode').value;
+            const phoneNum = document.getElementById('rPhone').value;
+            const fullPhone = `${countryCode}${phoneNum}`;
+            const photoUrl = document.getElementById('uploadedPhoto').value || "https://via.placeholder.com/150";
+            
+            if(pass !== confirm) return showToast("Passwords don't match", "error");
+            
+            showLoading();
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, email, pass);
+                await updateProfile(cred.user, { displayName: name, photoURL: photoUrl });
+                await setDoc(doc(db, "users", cred.user.uid), {
+                    fullName: name,
+                    email: email,
+                    phone: fullPhone,
+                    photoURL: photoUrl,
+                    gender: document.getElementById('rGender').value,
+                    branch: document.getElementById('rBranch').value,
+                    ministry: document.getElementById('rMinistry').value,
+                    referral: document.getElementById('rReferral').value,
+                    emailVerified: false,
+                    prayerCount: 0,
+                    walletBalance: 0,
+                    quizLevel: 1,
+                    createdAt: serverTimestamp()
+                });
+                await sendEmailVerification(cred.user);
+                showToast("Registration successful! Please verify your email. Check spam folder!", "success");
+                confetti({ particleCount: 150, spread: 70 });
+            } catch (e) { 
+                showToast(e.message, "error"); 
+            } finally {
+                hideLoading();
+            }
+        };
+        
+        // Login
+        window.handleLogin = async (e) => {
+            e.preventDefault();
+            showLoading();
+            try {
+                await signInWithEmailAndPassword(auth, document.getElementById('lEmail').value, document.getElementById('lPass').value);
+                showToast("Welcome back!", "success");
+            } catch (e) { 
+                showToast("Invalid Credentials", "error"); 
+            } finally {
+                hideLoading();
+            }
+        };
+
+        // Save Profile - FIXED
+        window.saveProfile = async () => {
+            const countryCode = document.getElementById('eCountryCode').value;
+            const phoneNum = document.getElementById('ePhone').value;
+            const fullPhone = `${countryCode}${phoneNum}`;
+            const ministries = Array.from(document.querySelectorAll('#ministryCheckboxes input:checked')).map(cb => cb.value);
+            
+            // Get the current photo URL from the image element or stored variable
+            const currentPhoto = document.getElementById('pPhoto').src;
+            const finalPhotoUrl = currentPhotoUrl || currentPhoto;
+            
+            const updates = {
+                fullName: document.getElementById('eName').value,
+                phone: fullPhone,
+                gender: document.getElementById('eGender').value,
+                branch: document.getElementById('eBranch').value,
+                bio: document.getElementById('eBio').value,
+                interests: document.getElementById('eInterests').value,
+                ministries: ministries,
+                photoURL: finalPhotoUrl,
+                updatedAt: serverTimestamp()
+            };
+            
+            showLoading();
+            try {
+                // Update Firestore first
+                await updateDoc(doc(db, "users", auth.currentUser.uid), updates);
+                
+                // Update Firebase Auth profile
+                await updateProfile(auth.currentUser, { 
+                    displayName: updates.fullName,
+                    photoURL: finalPhotoUrl
+                });
+                
+                showToast("Profile updated successfully!", "success");
+                toggleEdit(false);
+                await loadProfileData(auth.currentUser);
+                confetti({ particleCount: 80, spread: 60 });
+            } catch (e) { 
+                console.error("Save error:", e);
+                showToast(e.message, "error"); 
+            } finally {
+                hideLoading();
+            }
+        };
+
+        // Load Profile Data
+        async function loadProfileData(user) {
+            const userSnap = await getDoc(doc(db, "users", user.uid));
+            const memberSnap = await getDoc(doc(db, "memberships", user.uid));
+
+            if (userSnap.exists()) {
+                currentUserData = userSnap.data();
+                const data = currentUserData;
+                const photoUrl = data.photoURL || user.photoURL || "https://via.placeholder.com/150";
+                currentPhotoUrl = photoUrl;
+                
+                document.getElementById('pNameDisplay').innerText = data.fullName;
+                document.getElementById('pRoleDisplay').innerText = data.ministry?.toUpperCase() || "MEMBER";
+                document.getElementById('pPhoto').src = photoUrl;
+                document.getElementById('pPrayers').innerText = data.prayerCount || 0;
+                document.getElementById('pWallet').innerText = "E" + (data.walletBalance || 0);
+                document.getElementById('pLevel').innerText = data.quizLevel || 1;
+                document.getElementById('pBioDisplay').innerHTML = data.bio || "No bio added yet.";
+                
+                // Calculate days active
+                if (data.createdAt?.toDate) {
+                    const days = Math.floor((Date.now() - data.createdAt.toDate().getTime()) / (1000 * 60 * 60 * 24));
+                    document.getElementById('pDaysActive').innerText = days;
+                } else {
+                    document.getElementById('pDaysActive').innerText = "0";
+                }
+                
+                const ministries = data.ministries || [];
+                document.getElementById('pMinistriesDisplay').innerHTML = ministries.length ? ministries.map(m => `<span class="ministry-tag">${m}</span>`).join('') : "Not specified";
+                
+                const prayers = data.prayerCount || 0;
+                let level = "Seeker", progress = 0;
+                if (prayers < 10) { level = "🌱 Seeker"; progress = (prayers / 10) * 25; }
+                else if (prayers < 50) { level = "📖 Disciple"; progress = 25 + ((prayers - 10) / 40) * 25; }
+                else if (prayers < 200) { level = "🔥 Warrior"; progress = 50 + ((prayers - 50) / 150) * 25; }
+                else { level = "👑 Leader"; progress = 75 + Math.min((prayers - 200) / 300, 1) * 25; }
+                document.getElementById('spiritualLevel').innerHTML = level;
+                document.getElementById('spiritualProgress').style.width = `${progress}%`;
+                
+                // Populate edit form
+                document.getElementById('eName').value = data.fullName || "";
+                const phoneFull = data.phone || "";
+                let countryCode = "+268";
+                let phoneNumber = phoneFull;
+                const codeMatch = phoneFull.match(/^(\+\d+)/);
+                if (codeMatch) {
+                    countryCode = codeMatch[1];
+                    phoneNumber = phoneFull.substring(countryCode.length);
+                }
+                document.getElementById('eCountryCode').value = countryCode;
+                document.getElementById('ePhone').value = phoneNumber;
+                document.getElementById('eGender').value = data.gender || "Male";
+                document.getElementById('eBranch').value = data.branch || "Chama, Zambia";
+                document.getElementById('eBio').value = data.bio || "";
+                document.getElementById('eInterests').value = data.interests || "";
+                document.getElementById('editPhotoPreview').src = photoUrl;
+                
+                // Set ministry checkboxes
+                document.querySelectorAll('#ministryCheckboxes input').forEach(cb => {
+                    cb.checked = ministries.includes(cb.value);
+                });
+                
+                updateVerificationStatus();
+            }
+            document.getElementById('pIdDisplay').innerText = memberSnap.exists() ? memberSnap.data().membershipId : "Pending";
+        }
+
+        function updateVerificationStatus() {
+            if (!auth.currentUser) return;
+            
+            const emailBadge = document.getElementById('emailVerifiedBadge');
+            const emailStatus = document.getElementById('emailStatusText');
+            
+            if (auth.currentUser.emailVerified) {
+                emailBadge.className = 'verification-badge verified';
+                emailStatus.innerText = 'Verified';
+                updateDoc(doc(db, "users", auth.currentUser.uid), { emailVerified: true }).catch(() => {});
+            } else {
+                emailBadge.className = 'verification-badge unverified';
+                emailStatus.innerText = 'Verify Email';
+            }
+        }
+
+        // Photo Upload with Cloudinary - FIXED
+        window.uploadPhoto = async (context) => {
+            if (typeof cloudinary === 'undefined') {
+                showToast("Cloudinary not loaded. Please refresh the page.", "error");
+                return;
+            }
+            
+            const uploadWidget = cloudinary.createUploadWidget({
+                cloudName: 'prayerdome',
+                uploadPreset: 'profile_photos',
+                folder: context === 'register' ? 'profile_photos/temp' : `profile_photos/${auth.currentUser?.uid}`,
+                cropping: true,
+                croppingAspectRatio: 1,
+                multiple: false,
+                maxFileSize: 5 * 1024 * 1024,
+                clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp']
+            }, async (error, result) => {
+                if (error) {
+                    console.error("Cloudinary error:", error);
+                    showToast("Upload failed. Please try again.", "error");
+                    return;
+                }
+                
+                if (result && result.event === "success") {
+                    const url = result.info.secure_url;
+                    
+                    if (context === 'register') {
+                        document.getElementById('uploadedPhoto').value = url;
+                        document.getElementById('regPreview').src = url;
+                        showToast("Photo uploaded!", "success");
+                    } 
+                    else if (context === 'profile') {
+                        showLoading();
+                        try {
+                            // Update Firestore
+                            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+                                photoURL: url,
+                                updatedAt: serverTimestamp()
+                            });
+                            // Update Auth profile
+                            await updateProfile(auth.currentUser, { photoURL: url });
+                            // Update UI
+                            document.getElementById('pPhoto').src = url;
+                            document.getElementById('editPhotoPreview').src = url;
+                            currentPhotoUrl = url;
+                            showToast("Profile photo updated!", "success");
+                            confetti({ particleCount: 80, spread: 60 });
+                        } catch (err) {
+                            console.error("Save photo error:", err);
+                            showToast("Failed to save photo: " + err.message, "error");
+                        } finally {
+                            hideLoading();
+                        }
+                    }
+                }
+            });
+            uploadWidget.open();
+        };
+        
+        window.changeProfilePhoto = () => {
+            if (!auth.currentUser) {
+                showToast("Please login first", "error");
+                return;
+            }
+            uploadPhoto('profile');
+        };
+        
+        // Auth Observer
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                document.getElementById('authTabs').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('profileSection').style.display = 'block';
+                await loadProfileData(user);
+                await checkEmailVerification();
+                await handleEmailVerificationLink();
+            } else {
+                document.getElementById('authTabs').style.display = 'flex';
+                document.getElementById('profileSection').style.display = 'none';
+                switchTab('login');
+            }
+        });
+
+        window.switchTab = (type) => {
+            document.getElementById('loginForm').style.display = type === 'login' ? 'block' : 'none';
+            document.getElementById('registerForm').style.display = type === 'register' ? 'block' : 'none';
+            document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (type === 'login' && i === 0) || (type === 'register' && i === 1)));
+        };
+        
+        window.toggleEdit = (show) => {
+            document.getElementById('profileView').style.display = show ? 'none' : 'block';
+            document.getElementById('profileEdit').style.display = show ? 'block' : 'none';
+            if (show && currentPhotoUrl) {
+                document.getElementById('editPhotoPreview').src = currentPhotoUrl;
+            }
+        };
+        
+        window.handleLogout = () => signOut(auth);
+        window.toggleDarkMode = () => document.body.classList.toggle('dark-mode');
+        
+        window.checkAge = (val) => {
+            const age = Math.floor((Date.now() - new Date(val).getTime()) / (1000 * 60 * 60 * 24 * 365));
+            const btn = document.getElementById('regBtn');
+            if (age < 13) {
+                btn.disabled = true;
+                document.getElementById('ageWarn').style.display = 'block';
+            } else {
+                btn.disabled = false;
+                document.getElementById('ageWarn').style.display = 'none';
+            }
+        };
+        
+        // Close modals on outside click
+        document.querySelectorAll('.verify-modal').forEach(modal => {
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+        });
+        
+        handleEmailVerificationLink();
+    </script>
+</body>
+</html>

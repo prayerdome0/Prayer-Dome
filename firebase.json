@@ -1,0 +1,80 @@
+{
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default"
+    }
+  ],
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "rewrites": [
+      {
+        "source": "/bible",
+        "destination": "/bible.html"
+      },
+      {
+        "source": "/admin",
+        "destination": "/admin.html"
+      },
+      {
+        "source": "/gallery",
+        "destination": "/gallery.html"
+      },
+      {
+        "source": "/prayer",
+        "destination": "/prayer.html"
+      },
+      {
+        "source": "/give",
+        "destination": "/give.html"
+      },
+      {
+        "source": "/events",
+        "destination": "/event.html"
+      },
+      {
+        "source": "/quiz",
+        "destination": "/quiz.html"
+      },
+      {
+        "source": "/membership",
+        "destination": "/membership.html"
+      },
+      {
+        "source": "/support",
+        "destination": "/support.html"
+      },
+      {
+        "source": "/team",
+        "destination": "/team.html"
+      },
+      {
+        "source": "/testimony",
+        "destination": "/testimony.html"
+      },
+      {
+        "source": "/video",
+        "destination": "/video.html"
+      },
+      {
+        "source": "/finance",
+        "destination": "/finance-report.html"
+      },
+      {
+        "source": "/account",
+        "destination": "/account.html"
+      },
+      {
+        "source": "/**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

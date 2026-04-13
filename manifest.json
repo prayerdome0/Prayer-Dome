@@ -1,0 +1,21 @@
+{
+    "name": "Prayer Dome",
+    "short_name": "Prayer Dome",
+    "description": "A House of Prayer for All Nations",
+    "start_url": "/index.html",
+    "display": "standalone",
+    "background_color": "#15803d",
+    "theme_color": "#15803d",
+    "icons": [
+        {
+            "src": "https://i.ibb.co/TB5Fx4tb/logo-0.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "https://i.ibb.co/TB5Fx4tb/logo-0.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
