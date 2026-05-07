@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     
-    <!-- Detection Script - Preserved -->
+    <!-- Detection Script - Runs immediately -->
     <script>
         function isInApp() {
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -29,116 +29,801 @@
         
         (function() {
             isAppEnvironment = isInApp();
-            document.addEventListener('DOMContentLoaded', () => {
-                if (isAppEnvironment) {
-                    document.body.classList.add('in-app');
-                } else {
-                    document.body.classList.add('on-website');
-                }
-            });
+            if (isAppEnvironment) {
+                document.body.classList.add('in-app');
+            } else {
+                document.body.classList.add('on-website');
+            }
         })();
-
-        // UPGRADE: Register Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(reg => {
-                    console.log('Prayer Dome SW Registered');
-                }).catch(err => console.log('SW Reg Error:', err));
-            });
-        }
     </script>
     
     <style>
-        /* ALL YOUR ORIGINAL CSS PRESERVED BELOW */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
-            --accent-green: #15803d; --accent-green-light: #22c55e; --accent-gold: #d4af37;
-            --bg-primary: #f8fafc; --bg-card: #ffffff; --text-main: #0f172a; --text-sub: #64748b;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.05); --shadow-glow: 0 10px 30px rgba(21, 128, 61, 0.15);
-            --nav-bg: rgba(255, 255, 255, 0.85); --glass-bg: rgba(255, 255, 255, 0.7);
+            --accent-green: #15803d;
+            --accent-green-light: #22c55e;
+            --accent-gold: #d4af37;
+            --bg-primary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            --shadow-glow: 0 10px 30px rgba(21, 128, 61, 0.15);
+            --nav-bg: rgba(255, 255, 255, 0.85);
+            --glass-bg: rgba(255, 255, 255, 0.7);
         }
+
         body.dark-mode {
             --bg-primary: #020617; --bg-card: #0f172a; --text-main: #f8fafc; --text-sub: #94a3b8; 
             --nav-bg: rgba(15, 23, 42, 0.9); --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            --shadow-glow: 0 10px 30px rgba(21, 128, 61, 0.1); --glass-bg: rgba(15, 23, 42, 0.7);
+            --shadow-glow: 0 10px 30px rgba(21, 128, 61, 0.1);
+            --glass-bg: rgba(15, 23, 42, 0.7);
         }
+
         body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-main); line-height: 1.6; transition: 0.4s; padding-bottom: 140px; overflow-x: hidden;}
+
+        /* Notification Permission Banner */
         .notif-banner {
             background: linear-gradient(135deg, var(--accent-green), #064e3b);
-            color: white; padding: 12px 20px; margin: 10px 20px; border-radius: 50px;
-            display: none; align-items: center; justify-content: space-between;
-            animation: slideDown 0.5s ease; position: relative; z-index: 90;
+            color: white;
+            padding: 12px 20px;
+            margin: 10px 20px;
+            border-radius: 50px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            animation: slideDown 0.5s ease;
+            position: relative;
+            z-index: 90;
         }
-        @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .notif-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .notif-banner i {
+            font-size: 1.3rem;
+        }
+        
+        .notif-banner button {
+            background: white;
+            color: var(--accent-green);
+            border: none;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* Enable Notifications Button in Profile */
+        .enable-notif-btn {
+            background: linear-gradient(135deg, var(--accent-green), #064e3b);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* --- NOTIFICATION BELL ICON --- */
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .notification-bell:hover {
+            transform: scale(1.1);
+        }
+        
         .notification-badge {
-            position: absolute; top: -8px; right: -8px; background: #ef4444; color: white;
-            border-radius: 50%; width: 18px; height: 18px; font-size: 10px;
-            display: flex; align-items: center; justify-content: center; font-weight: bold;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
             animation: pulse 1.5s infinite;
         }
-        .notification-panel {
-            position: fixed; top: -100%; left: 0; right: 0; background: var(--bg-card);
-            border-radius: 0 0 32px 32px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            z-index: 1000; transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            max-height: 80vh; overflow-y: auto; border-bottom: 1px solid rgba(0,0,0,0.1);
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
         }
-        .notification-panel.open { top: 70px; }
-        .notification-item { padding: 20px; border-bottom: 1px solid rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s; }
-        .notification-item.unread { background: rgba(212,175,55,0.05); border-left: 4px solid var(--accent-gold); }
-        header { background: var(--bg-card); padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
-        .brand { display: flex; align-items: center; gap: 12px; }
+
+        /* --- NOTIFICATION PANEL (Slide Down) --- */
+        .notification-panel {
+            position: fixed;
+            top: -100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-radius: 0 0 32px 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: top 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-height: 80vh;
+            overflow-y: auto;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .notification-panel.open {
+            top: 70px;
+        }
+        
+        .notification-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .notification-header h3 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--accent-green);
+        }
+        
+        .close-notif {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-sub);
+        }
+        
+        .notification-item {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .notification-item:hover {
+            background: rgba(34,197,94,0.05);
+            transform: translateX(5px);
+        }
+        
+        .notification-item.unread {
+            background: rgba(212,175,55,0.1);
+            border-left: 4px solid var(--accent-gold);
+        }
+        
+        .notification-title {
+            font-weight: 800;
+            margin-bottom: 5px;
+            color: var(--text-main);
+        }
+        
+        .notification-message {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            line-height: 1.5;
+        }
+        
+        .notification-time {
+            font-size: 0.7rem;
+            color: var(--accent-gold);
+            margin-top: 8px;
+            display: block;
+        }
+        
+        .empty-notifications {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-sub);
+        }
+
+        /* --- ENHANCED DAILY WORD CARD --- */
+        .insight-card {
+            padding: 35px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 32px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            margin: 0 20px 30px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .insight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-glow);
+        }
+        
+        .insight-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%);
+            animation: rotateGlow 20s linear infinite;
+            z-index: 0;
+        }
+        
+        @keyframes rotateGlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .insight-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--text-main);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .insight-header i { color: var(--accent-green); }
+        
+        .badge-time { 
+            font-size: 10px; 
+            font-weight: 900; 
+            color: var(--accent-gold); 
+            background: rgba(212,175,55,0.15); 
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .daily-verse-container {
+            background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(212,175,55,0.05));
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--accent-gold);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .daily-verse-icon {
+            font-size: 2rem;
+            color: var(--accent-gold);
+            margin-bottom: 15px;
+        }
+        
+        .insight-verse {
+            font-family: 'Merriweather', serif;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--text-main);
+            font-weight: 500;
+            font-style: italic;
+        }
+        
+        .verse-ref {
+            display: inline-block;
+            margin-top: 15px;
+            color: var(--accent-green);
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        
+        .insight-commentary {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            line-height: 1.8;
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(0,0,0,0.02);
+            border-radius: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .insight-prayer {
+            background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(34,197,94,0.05));
+            padding: 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(212,175,55,0.3);
+            font-size: 0.95rem;
+            font-style: italic;
+            color: var(--text-main);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .prayer-icon {
+            font-size: 1.5rem;
+            color: var(--accent-green);
+            margin-bottom: 10px;
+        }
+
+        /* Header Styles */
+        header {
+            background: var(--bg-card); padding: 15px 20px; display: flex; align-items: center;
+            justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-main); }
         .logo-ring { width: 45px; height: 45px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-glow); padding: 2px;}
         .logo-ring img { width: 100%; height: 100%; object-fit: contain; border-radius: 10px;}
-        .hero { background: linear-gradient(135deg, var(--accent-green), #064e3b); padding: 60px 20px 80px; color: white; text-align: center; position: relative; overflow: hidden; margin-top: 15px; border-radius: 0 0 40px 40px;}
+        
+        .location-detective { 
+            background: rgba(21, 128, 61, 0.1); 
+            padding: 8px 16px; 
+            border-radius: 50px; 
+            font-size: 11px; 
+            font-weight: 800; 
+            color: var(--accent-green); 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            transition: 0.3s; 
+            border: 1px solid rgba(21, 128, 61, 0.2);
+            cursor: pointer;
+        }
+        .location-detective:hover { background: rgba(21, 128, 61, 0.2); transform: scale(1.02); }
+        .location-detective i { font-size: 12px; }
+
+        /* Hero Section with Typing Animation */
+        .hero {
+            background: linear-gradient(135deg, var(--accent-green), #064e3b);
+            padding: 50px 20px 70px;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-top: 15px;
+            border-radius: 0 0 40px 40px;
+        }
         .hero::after { content:''; position:absolute; top:0; left:0; width:100%; height:100%; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.3; pointer-events: none;}
-        .glass-card { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 32px; border: 1px solid rgba(255,255,255,0.2); box-shadow: var(--shadow); margin: 0 20px 30px; transition: all 0.4s; position: relative; z-index: 5; }
-        .founder-card { padding: 40px; display: flex; flex-direction: column; align-items: center; text-align: center; margin-top: -40px;}
-        .founder-img-wrapper { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--accent-gold); padding: 3px; background: var(--bg-primary); margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);}
+        .hero h1 { 
+            min-height: 100px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 2.2rem; 
+            font-weight: 900; 
+            margin-bottom: 10px; 
+            letter-spacing: -1px; 
+            position: relative; 
+            z-index: 2; 
+        }
+        .hero p { 
+            opacity: 0.9; 
+            font-size: 1rem; 
+            max-width: 500px; 
+            margin: 0 auto; 
+            position: relative; 
+            z-index: 2; 
+        }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1.2em;
+            background-color: white;
+            margin-left: 5px;
+            animation: blink 0.7s infinite;
+            vertical-align: middle;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Glass Card */
+        .glass-card {
+            background: var(--glass-bg); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 32px; 
+            border: 1px solid rgba(255,255,255,0.2); 
+            box-shadow: var(--shadow);
+            margin: 0 20px 30px; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; 
+            z-index: 5;
+        }
+        .dark-mode .glass-card { border: 1px solid rgba(255,255,255,0.05); }
+
+        /* Founder Card */
+        .founder-card { 
+            padding: 40px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-align: center; 
+            margin-top: -40px; 
+            overflow: hidden;
+        }
+        .founder-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-glow); }
+        .founder-img-wrapper { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--accent-gold); padding: 3px; background: var(--bg-primary); margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 2;}
         .founder-img-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .insight-card { padding: 35px; overflow: hidden; }
-        .insight-verse { font-family: 'Merriweather', serif; font-size: 1.2rem; line-height: 1.8; font-style: italic; font-weight: 500;}
+        .founder-name { font-size: 1.6rem; font-weight: 900; color: var(--accent-green); letter-spacing: -0.5px; margin-bottom: 5px;}
+        .founder-title { font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 20px;}
+        .founder-bio { color: var(--text-sub); font-size: 1rem; line-height: 1.7; max-width: 600px; margin: 0 auto; font-style: italic;}
+
+        /* Section Label */
+        .section-label { font-size: 1.2rem; font-weight: 800; margin: 40px 20px 20px; display: flex; align-items: center; gap: 10px; color: var(--text-main);}
+        
+        /* Portal Grid */
         .portal-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 0 20px; }
-        .portal-item { text-align: center; text-decoration: none; color: inherit; transition: 0.3s;}
-        .portal-icon { width: 65px; height: 65px; background: var(--bg-card); border-radius: 22px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.5rem; color: var(--accent-green); box-shadow: var(--shadow); border: 1px solid rgba(0,0,0,0.05); }
-        .portal-item span { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-sub); }
-        .live-promo { background: linear-gradient(135deg, #0f172a, #1e293b); margin: 40px 20px; border-radius: 30px; padding: 30px; color: white; display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
-        .pulse-red { display: inline-block; width: 10px; height: 10px; background: #ef4444; border-radius: 50%; margin-right: 8px; animation: pulseRed 1s infinite alternate; }
-        @keyframes pulseRed { from { box-shadow: 0 0 2px #ef4444; } to { box-shadow: 0 0 10px #ef4444; } }
+        .portal-item { text-align: center; text-decoration: none; color: inherit; transition: 0.3s; outline: none; animation: fadeInUp 0.5s ease backwards;}
+        .portal-icon { width: 65px; height: 65px; background: var(--bg-card); border-radius: 22px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.5rem; color: var(--accent-green); box-shadow: var(--shadow); border: 1px solid var(--border-color); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .portal-item:hover .portal-icon { transform: translateY(-8px) scale(1.05); background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); color: white; box-shadow: var(--shadow-glow); }
+        .portal-item span { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-sub); transition: 0.3s;}
+        .portal-item:hover span { color: var(--accent-green); }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Live Promo Card - Animated with Color Changing */
+        .live-promo { 
+            background: linear-gradient(135deg, #dc2626, #b91c1c); 
+            margin: 30px 20px; 
+            border-radius: 30px; 
+            padding: 25px 30px; 
+            color: white; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            cursor: pointer; 
+            box-shadow: 0 15px 30px rgba(220,38,38,0.4); 
+            transition: all 0.3s ease;
+            animation: liveColorPulse 1.5s infinite alternate;
+        }
+        .live-promo:hover { 
+            transform: scale(1.02); 
+            box-shadow: 0 20px 40px rgba(220,38,38,0.6);
+        }
+        @keyframes liveColorPulse {
+            0% { 
+                background: linear-gradient(135deg, #dc2626, #b91c1c);
+                box-shadow: 0 15px 30px rgba(220,38,38,0.3);
+            }
+            50% { 
+                background: linear-gradient(135deg, #ef4444, #dc2626);
+                box-shadow: 0 15px 35px rgba(239,68,68,0.5);
+            }
+            100% { 
+                background: linear-gradient(135deg, #b91c1c, #7f1d1d);
+                box-shadow: 0 15px 30px rgba(185,28,28,0.4);
+            }
+        }
+        .live-promo h3 { font-size: 1.3rem; font-weight: 900; margin-bottom: 5px; display: flex; align-items: center; gap: 10px;}
+        .pulse-red { 
+            display: inline-block; 
+            width: 12px; 
+            height: 12px; 
+            background: white; 
+            border-radius: 50%; 
+            animation: pulseRedLive 1s infinite alternate; 
+        }
+        @keyframes pulseRedLive { 
+            from { box-shadow: 0 0 5px white; opacity: 1; } 
+            to { box-shadow: 0 0 20px white; opacity: 0.5; } 
+        }
+
+        /* Branch Grid */
         .branch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; padding: 0 20px; }
-        .branch-card { background: var(--bg-card); border-radius: 24px; padding: 25px; border: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
-        .branch-card.closest { border: 2px solid var(--accent-green); background: linear-gradient(to right, rgba(34,197,94,0.05), var(--bg-card)); box-shadow: var(--shadow-glow); }
+        .branch-card { background: var(--bg-card); border-radius: 24px; padding: 25px; border: 1px solid var(--border-color); box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; transition: 0.3s;}
+        .branch-card:hover { transform: translateY(-3px); border-color: var(--accent-green); }
+        .branch-card.closest { border: 2px solid var(--accent-green); background: linear-gradient(to right, rgba(34,197,94,0.05), var(--bg-card)); box-shadow: var(--shadow-glow);}
+        .branch-info h4 { font-weight: 800; font-size: 1.1rem; margin-bottom: 5px; display: flex; align-items: center; gap: 8px;}
         .branch-dist { font-size: 11px; background: rgba(212, 175, 55, 0.15); color: var(--accent-gold); font-weight: 800; padding: 6px 12px; border-radius: 20px; }
-        .playstore-banner { background: linear-gradient(135deg, #1a1a2e, #16213e); margin: 20px 20px 30px; border-radius: 32px; overflow: hidden; position: relative; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); display: none; }
-        @media (max-width: 600px) { .playstore-banner { position: fixed; bottom: 85px; left: 10px; right: 10px; margin: 0; z-index: 999; animation: slideUp 0.5s ease forwards; } }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .playstore-content { padding: 20px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
-        .playstore-icon-img { width: 60px; height: 60px; background: white; border-radius: 15px; padding: 5px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        .playstore-icon-img img { width: 100%; height: 100%; object-fit: contain; }
-        .playstore-button { background: #22c55e; color: white; border: none; padding: 12px 24px; border-radius: 50px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 15px rgba(34, 197, 94, 0.3); }
+
+        /* Content Cards */
+        .content-card { background: var(--bg-card); border-radius: 24px; padding: 20px; border: 1px solid var(--border-color); box-shadow: var(--shadow); margin: 0 20px 15px; display: flex; gap: 15px; align-items: center; cursor: pointer; transition: 0.3s;}
+        .content-card:hover { transform: translateX(5px); border-left: 5px solid var(--accent-green); }
+        .content-icon { width: 50px; height: 50px; background: rgba(34,197,94,0.1); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--accent-green); flex-shrink: 0;}
+
+        /* Footer */
+        footer { padding: 50px 20px 40px; text-align: center; background: var(--bg-card); border-top: 1px solid var(--border-color); margin-top: 40px;}
+        .footer-logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
+        .footer-logo img { width: 35px; border-radius: 8px; }
+        .footer-logo span { font-size: 1.5rem; font-weight: 900; color: var(--accent-green); letter-spacing: -0.5px; }
+        
+        .copyright { font-size: 12px; color: var(--text-sub); font-weight: 500; letter-spacing: 0.5px; margin-bottom: 25px; }
+        
+        .social-links { display: flex; justify-content: center; gap: 15px; margin: 25px 0; flex-wrap: wrap; }
+        .social-link { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.9rem; transition: 0.3s; background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-main); }
+        .social-link.facebook:hover { background: #1877f2; color: white; border-color: #1877f2; }
+        .social-link.whatsapp:hover { background: #25d366; color: white; border-color: #25d366; }
+        .social-link.email:hover { background: #ea4335; color: white; border-color: #ea4335; }
+        
+        .admin-btn-special { background: linear-gradient(135deg, var(--text-main), #334155); color: var(--bg-primary); }
+        .admin-btn-special:hover { transform: translateY(-3px); box-shadow: var(--shadow); color: white;}
+
+        .contact-info { margin: 20px 0; padding: 20px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        .contact-info p { margin: 8px 0; font-size: 0.9rem; color: var(--text-sub); font-weight: 500;}
+        .contact-info i { color: var(--accent-green); width: 25px; }
+
+        .ministry-verse { margin-top: 20px; padding: 20px; background: rgba(34, 197, 94, 0.05); border-radius: 24px; display: inline-block; max-width: 90%; border: 1px dashed rgba(34,197,94,0.3);}
+        .ministry-verse i { font-size: 1.8rem; color: var(--accent-gold); margin-bottom: 10px; display: block; }
+        .ministry-verse p { font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin: 5px 0; font-style: italic; }
+
+        /* Bottom Navigation */
         .bottom-ui-system { position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000; }
-        .nav-bar { background: var(--nav-bg); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 12px 5px; border-top: 1px solid rgba(0,0,0,0.05); }
-        .nav-link { text-decoration: none; color: var(--text-sub); text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; transition: 0.3s; }
-        .nav-link.active { color: var(--accent-green); }
-        .nav-link i { font-size: 1.4rem; margin-bottom: 4px; }
+        .nav-bar { background: var(--nav-bg); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 12px 5px; border-top: 1px solid var(--border-color); box-shadow: 0 -5px 20px rgba(0,0,0,0.05); }
+        .nav-link { text-decoration: none; color: var(--text-sub); text-align: center; flex: 1; transition: 0.3s; display: flex; flex-direction: column; align-items: center; }
+        .nav-link i { font-size: 1.4rem; margin-bottom: 4px; transition: 0.3s; }
         .nav-link span { font-size: 9px; font-weight: 800; text-transform: uppercase; }
-        .ticker-bar { background: var(--accent-gold); color: #000; padding: 8px 0; overflow: hidden; white-space: nowrap; font-size: 12px; font-weight: 900; }
+        .nav-link.active { color: var(--accent-green); }
+        .nav-link.active i { transform: translateY(-3px); }
+
+        .ticker-bar { background: var(--accent-gold); color: #000; padding: 8px 0; overflow: hidden; white-space: nowrap; font-size: 12px; font-weight: 900; text-transform: uppercase; border-top: 2px solid #b45309;}
         .ticker-track { display: inline-block; animation: scroll 35s linear infinite; }
         @keyframes scroll { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-        .loading-spinner { width: 30px; height: 30px; border: 3px solid rgba(0,0,0,0.1); border-top-color: var(--accent-green); border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto; }
+
+        .loading-spinner { width: 30px; height: 30px; border: 3px solid var(--border-color); border-top-color: var(--accent-green); border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        body.in-app .playstore-banner { display: none !important; }
-        body.on-website .playstore-banner { display: block; }
-        @media (max-width: 600px) { .portal-grid { gap: 10px; } .portal-icon { width: 55px; height: 55px; font-size: 1.2rem; } .hero h1 { font-size: 2rem; } }
+
+        /* Toast Container */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100;
+        }
+        .toast {
+            background: var(--bg-card);
+            padding: 12px 24px;
+            border-radius: 40px;
+            margin-bottom: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--accent-green);
+            animation: slideIn 0.3s ease;
+            font-weight: 600;
+        }
+        .toast.error { border-left-color: var(--accent-red); }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Play Store Banner */
+        .playstore-banner {
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            margin: 20px 20px 30px;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            animation: bannerGlow 3s infinite alternate;
+        }
+
+        @keyframes bannerGlow {
+            0% { box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); transform: scale(1); }
+            100% { box-shadow: 0 20px 45px rgba(34, 197, 94, 0.3); transform: scale(1.01); }
+        }
+
+        .playstore-banner:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 25px 50px rgba(34, 197, 94, 0.4);
+        }
+
+        .playstore-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px 25px;
+            flex-wrap: wrap;
+        }
+
+        .playstore-icon {
+            position: relative;
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .playstore-icon-img {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.4);
+        }
+
+        .playstore-icon-img i {
+            font-size: 40px;
+            color: white;
+        }
+
+        .playstore-text {
+            flex: 1;
+        }
+
+        .playstore-badge {
+            display: inline-block;
+            background: rgba(212, 175, 55, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
+        }
+
+        .playstore-text h3 {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .playstore-text p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .playstore-rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .stars {
+            color: #ffc107;
+            font-size: 12px;
+        }
+
+        .rating-text {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .playstore-button {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border: none;
+            padding: 14px 28px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+            white-space: nowrap;
+        }
+
+        .playstore-button:hover {
+            transform: scale(1.05);
+            gap: 15px;
+        }
+
+        .qr-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .qr-code {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+        }
+
+        .qr-code i {
+            font-size: 45px;
+            color: var(--accent-green);
+        }
+
+        .qr-section p {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        body.in-app .playstore-banner {
+            display: none !important;
+        }
+
+        body.on-website .playstore-banner {
+            display: block !important;
+        }
+
+        .banner-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            transition: 0.3s;
+            z-index: 3;
+        }
+
+        .banner-close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .banner-close i {
+            color: white;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .portal-grid { grid-template-columns: repeat(4, 1fr); gap: 10px;}
+            .portal-icon { width: 55px; height: 55px; font-size: 1.2rem; }
+            .hero h1 { min-height: 80px; font-size: 1.4rem; }
+            .insight-verse { font-size: 1rem; }
+            .playstore-content {
+                flex-direction: column;
+                text-align: center;
+                padding: 25px;
+            }
+            .playstore-text h3 {
+                font-size: 1.2rem;
+            }
+            .playstore-button {
+                padding: 12px 24px;
+                width: 100%;
+                justify-content: center;
+            }
+            .qr-section {
+                display: none;
+            }
+            .location-detective span { font-size: 10px; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .live-promo { padding: 18px 20px; }
+            .live-promo h3 { font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
-
-    <!-- HEADER -->
+  
+  <!-- HEADER with Notification Bell -->
     <header>
-        <div class="brand">
-            <div class="logo-ring"><img src="https://i.ibb.co/TB5Fx4tb/logo-0.png"></div>
+        <a href="/" class="brand">
+            <div class="logo-ring"><img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" style="width: 100%; border-radius: 12px; object-fit: contain;"></div>
             <h2 style="font-size: 1.2rem; font-weight: 900; letter-spacing: -0.5px;">PRAYER DOME</h2>
-        </div>
+        </a>
         <div style="display: flex; align-items: center; gap: 15px;">
             <div class="notification-bell" id="notificationBell" onclick="toggleNotificationPanel()">
                 <i class="fas fa-bell" style="font-size: 1.3rem; color: var(--accent-green);"></i>
@@ -146,194 +831,245 @@
             </div>
             <div class="location-detective" id="js-user-loc">
                 <i class="fas fa-location-arrow"></i>
-                <span>Locating...</span>
+                <span id="locationText">Locating...</span>
             </div>
         </div>
     </header>
 
-    <!-- NOTIFICATION PERMISSION BANNER -->
-    <div id="notifPermissionBanner" class="notif-banner">
-        <div style="display: flex; align-items: center; gap: 12px;">
+    <!-- Notification Permission Banner -->
+    <div id="notifPermissionBanner" class="notif-banner" style="display: none;">
+        <div class="notif-banner-content">
             <i class="fas fa-bell"></i>
             <div>
-                <strong>Enable Lock Screen Verses?</strong>
-                <p style="font-size: 0.8rem; margin: 0;">Receive hourly Bible verses & prayers.</p>
+                <strong>Get Daily Bible Verses!</strong>
+                <p style="font-size: 0.8rem; margin: 0;">Receive inspirational verses every morning</p>
             </div>
         </div>
-        <button onclick="enableNotifications()" style="background: white; color: var(--accent-green); border: none; padding: 6px 18px; border-radius: 30px; font-weight: 700; cursor: pointer;">Enable</button>
+        <button onclick="enableNotifications()">Enable</button>
     </div>
     
-    <!-- NOTIFICATION PANEL -->
+    <!-- NOTIFICATION PANEL (Slide Down) -->
     <div class="notification-panel" id="notificationPanel">
-        <div style="padding: 20px; border-bottom: 1px solid rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center;">
-            <h3 style="font-weight: 800; color: var(--accent-green);"><i class="fas fa-bell"></i> Notifications</h3>
-            <i class="fas fa-times" onclick="toggleNotificationPanel()" style="cursor: pointer; font-size: 1.5rem; color: var(--text-sub);"></i>
+        <div class="notification-header">
+            <h3><i class="fas fa-bell"></i> Notifications</h3>
+            <button class="close-notif" onclick="toggleNotificationPanel()"><i class="fas fa-times"></i></button>
         </div>
         <div id="notificationList">
-            <div style="text-align: center; padding: 60px 20px; color: var(--text-sub);">
-                <i class="fas fa-bell-slash" style="font-size: 3rem; opacity: 0.2; margin-bottom: 10px; display: block;"></i>
-                <p>No new notifications</p>
+            <div class="empty-notifications">
+                <i class="fas fa-bell-slash" style="font-size: 3rem; opacity: 0.3; margin-bottom: 10px; display: block;"></i>
+                <p>No notifications yet</p>
             </div>
         </div>
     </div>
 
-    <!-- HERO -->
+    <!-- HERO with Typing Animation -->
     <div class="hero">
-        <h1 id="js-greeting">Welcome</h1>
-        <p>A House of Prayer for All Nations. Experience a supernatural atmosphere today.</p>
+        <h1 id="typingHeading"></h1>
+        <p id="js-welcome-message">A House of Prayer for All Nations. Experience a supernatural atmosphere today.</p>
     </div>
     
     <main>
-        <!-- FOUNDER -->
+        <!-- FOUNDER & VISION SPOTLIGHT -->
         <section class="founder-card glass-card">
             <div class="founder-img-wrapper">
                 <img src="https://i.ibb.co/RTbNh1hB/founder-2.jpg" alt="Pastor Seedwell K. Masuku">
             </div>
             <div class="founder-info">
-                <h3 style="font-size: 1.6rem; font-weight: 900; color: var(--accent-green);">Pastor Seedwell K. Masuku</h3>
-                <span style="font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); text-transform: uppercase;">Founder & President</span>
-                <p style="color: var(--text-sub); font-size: 1rem; margin-top: 15px; font-style: italic;">Called by God to raise an army of intercessors globally, bringing healing, deliverance, and prophetic direction to the nations.</p>
+                <h3 class="founder-name">Pastor Seedwell K. Masuku</h3>
+                <span class="founder-title">Founder & President</span>
+                <p class="founder-bio">Called by God to raise an army of intercessors globally. Pastor Seedwell leads Prayer Dome with a mandate to demonstrate the raw power of the Holy Spirit, bringing healing, deliverance, and prophetic direction to the nations.</p>
             </div>
         </section>
 
-        <!-- DAILY WORD -->
-        <section class="insight-card glass-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <div style="display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: 800;">
-                    <i class="fas fa-book-open" style="color: var(--accent-green);"></i> Daily Word
+        <!-- ENHANCED DAILY COMMENTARY & PRAYER - Beautiful Card -->
+        <section class="insight-card">
+            <div class="insight-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-book-open"></i> Daily Word
                 </div>
-                <span class="badge-time">TODAY</span>
+                <span class="badge-time" id="js-dev-date">TODAY</span>
             </div>
             
             <div id="dailyContent">
-                <div style="background: rgba(34,197,94,0.05); border-radius: 24px; padding: 25px; border-left: 5px solid var(--accent-gold);">
+                <div class="daily-verse-container">
+                    <div class="daily-verse-icon">
+                        <i class="fas fa-quote-right"></i>
+                    </div>
                     <div class="insight-verse" id="dailyScripture">Loading daily scripture...</div>
-                    <div id="dailyRef" style="color: var(--accent-green); font-weight: 700; margin-top: 15px;">— </div>
+                    <div class="verse-ref" id="dailyRef">— </div>
                 </div>
-                <div id="dailyMessage" style="padding: 20px; font-size: 0.95rem; color: var(--text-sub);">
+                
+                <div class="insight-commentary" id="dailyMessage">
                     <div class="loading-spinner"></div>
                 </div>
-                <div style="background: rgba(212,175,55,0.05); padding: 25px; border-radius: 20px; border: 1px solid rgba(212,175,55,0.2);">
-                    <strong style="color: var(--accent-green); display: block; margin-bottom: 10px;"><i class="fas fa-praying-hands"></i> DAILY PRAYER</strong>
-                    <div id="dailyPrayer" style="font-style: italic; font-size: 0.95rem;">Loading...</div>
+                
+                <div class="insight-prayer">
+                    <div class="prayer-icon">
+                        <i class="fas fa-praying-hands"></i>
+                    </div>
+                    <strong style="color: var(--accent-green); display: block; margin-bottom: 12px;">DAILY PRAYER</strong>
+                    <div id="dailyPrayer">Loading...</div>
                 </div>
             </div>
         </section>
 
-        <!-- PORTAL GRID - UPGRADED LINKS -->
+        <!-- PORTAL GRID -->
         <div class="portal-grid">
-            <a href="bible.html" class="portal-item"><div class="portal-icon"><i class="fas fa-bible"></i></div><span>Bible</span></a>
-            <a href="gallery.html" class="portal-item"><div class="portal-icon"><i class="fas fa-camera"></i></div><span>GALLERY</span></a>
-            <a href="give.html" class="portal-item"><div class="portal-icon"><i class="fas fa-heart"></i></div><span>Give</span></a>
-            <a href="video.html" class="portal-item"><div class="portal-icon"><i class="fas fa-video"></i></div><span>Live</span></a>
-            <a href="quiz.html" class="portal-item"><div class="portal-icon"><i class="fas fa-brain"></i></div><span>Quiz</span></a>
-            <a href="membership.html" class="portal-item"><div class="portal-icon"><i class="fas fa-id-card"></i></div><span>Members</span></a>
-            <a href="support.html" class="portal-item"><div class="portal-icon"><i class="fas fa-hand-holding-heart"></i></div><span>Support</span></a>
-            <a href="team.html" class="portal-item"><div class="portal-icon"><i class="fas fa-users"></i></div><span>Team</span></a>
+            <a href="/bible" class="portal-item" style="animation-delay: 0.1s;"><div class="portal-icon"><i class="fas fa-bible"></i></div><span>Bible</span></a>
+            <a href="/gallery" class="portal-item"><div class="portal-icon"><i class="fas fa-camera"></i></div><span>GALLERY</span></a>
+            <a href="/give" class="portal-item" style="animation-delay: 0.2s;"><div class="portal-icon"><i class="fas fa-heart"></i></div><span>Give</span></a>
+            <a href="/video" class="portal-item" style="animation-delay: 0.25s;"><div class="portal-icon"><i class="fas fa-video"></i></div><span>Live</span></a>
+            <a href="/quiz" class="portal-item" style="animation-delay: 0.3s;"><div class="portal-icon"><i class="fas fa-brain"></i></div><span>Quiz</span></a>
+            <a href="/membership" class="portal-item" style="animation-delay: 0.35s;"><div class="portal-icon"><i class="fas fa-id-card"></i></div><span>membership</span></a>
+            <a href="/support" class="portal-item" style="animation-delay: 0.4s;"><div class="portal-icon"><i class="fas fa-hand-holding-heart"></i></div><span>Support</span></a>
+            <a href="/team" class="portal-item" style="animation-delay: 0.45s;"><div class="portal-icon"><i class="fas fa-users"></i></div><span>Team</span></a>
         </div>
 
-        <!-- LIVE PROMO -->
-        <div class="live-promo" onclick="window.location.href='video.html'">
+        <!-- LIVE PROMO BANNER - Animated with Color Changing -->
+        <div class="live-promo" onclick="window.location.href='/video'">
             <div>
-                <h3 style="font-weight: 900; font-size: 1.4rem;"><span class="pulse-red"></span> Watch Live</h3>
-                <p style="font-size: 0.9rem; opacity: 0.8;">Join our Sunday Services & Wednesday Prayers</p>
+                <h3><span class="pulse-red"></span> 🔴 LIVE STREAM ACTIVE</h3>
+                <p style="font-size: 0.9rem; opacity: 0.9;">Join our Sunday Services & Wednesday Prayers</p>
             </div>
-            <i class="fas fa-chevron-right" style="font-size: 1.5rem; opacity: 0.8;"></i>
+            <i class="fas fa-chevron-right" style="font-size: 1.5rem; opacity: 0.9;"></i>
         </div>
 
         <!-- DYNAMIC SECTIONS -->
-        <div style="margin: 40px 20px 20px; font-weight: 800; font-size: 1.2rem;"><i class="fas fa-calendar-alt" style="color: var(--accent-green);"></i> Upcoming Events</div>
+        <div class="section-label"><i class="fas fa-calendar-alt" style="color: var(--accent-green);"></i> Upcoming Events</div>
         <div id="upcomingEvents" style="margin-bottom: 30px;">
             <div class="loading-spinner"></div>
         </div>
 
-        <div style="margin: 40px 20px 20px; font-weight: 800; font-size: 1.2rem;"><i class="fas fa-star" style="color: var(--accent-gold);"></i> Recent Testimonies</div>
+        <div class="section-label"><i class="fas fa-star" style="color: var(--accent-gold);"></i> Recent Testimonies</div>
         <div id="recentTestimonies" style="margin-bottom: 30px;">
             <div class="loading-spinner"></div>
         </div>
 
         <!-- BRANCH TRACKER -->
-        <div style="margin: 40px 20px 20px; font-weight: 800; font-size: 1.2rem;"><i class="fas fa-map-marked-alt" style="color: var(--accent-green);"></i> Church Locations</div>
+        <div class="section-label"><i class="fas fa-map-marked-alt" style="color: var(--accent-blue);"></i> Church Locations</div>
         <div class="branch-grid">
             <div class="branch-card" id="card-chama">
-                <div>
-                    <h4 style="font-weight: 800;">🇿🇲 Chama, Zambia</h4>
+                <div class="branch-info">
+                    <h4>🇿🇲 Chama, Zambia</h4>
                     <p style="font-size: 0.8rem; color: var(--text-sub);">Central Hub</p>
                 </div>
                 <span class="branch-dist" id="dist-chama"><i class="fas fa-spinner fa-spin"></i></span>
             </div>
             <div class="branch-card" id="card-eswatini">
-                <div>
-                    <h4 style="font-weight: 800;">🇸🇿 Manzini, Eswatini</h4>
+                <div class="branch-info">
+                    <h4>🇸🇿 Manzini, Eswatini</h4>
                     <p style="font-size: 0.8rem; color: var(--text-sub);">Headquarters</p>
                 </div>
                 <span class="branch-dist" id="dist-eswatini"><i class="fas fa-spinner fa-spin"></i></span>
             </div>
             <div class="branch-card" id="card-ireland">
-                <div>
-                    <h4 style="font-weight: 800;">🇮🇪 Cork, Ireland</h4>
+                <div class="branch-info">
+                    <h4>🇮🇪 Cork, Ireland</h4>
                     <p style="font-size: 0.8rem; color: var(--text-sub);">Europe Branch</p>
                 </div>
                 <span class="branch-dist" id="dist-ireland"><i class="fas fa-spinner fa-spin"></i></span>
             </div>
         </div>
 
-        <!-- PLAY STORE BANNER -->
-        <div class="playstore-banner" id="playstoreBanner">
-            <div style="position: absolute; top: 10px; right: 15px; cursor: pointer; color: rgba(255,255,255,0.5);" onclick="closePlayStoreBanner()">
+        <!-- PLAY STORE BANNER - Before Footer -->
+        <div class="playstore-banner" id="playstoreBanner" style="display: none;">
+            <div class="banner-close" onclick="event.stopPropagation(); closePlayStoreBanner()">
                 <i class="fas fa-times"></i>
             </div>
             <div class="playstore-content">
-                <div class="playstore-icon-img">
-                    <img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" alt="PD">
+                <div class="playstore-icon">
+                    <div class="playstore-icon-img">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
                 </div>
-                <div style="flex: 1; color: white;">
-                    <div style="font-size: 10px; font-weight: 700; color: var(--accent-gold); margin-bottom: 5px;">OFFICIAL APP</div>
-                    <h3 style="font-weight: 900; font-size: 1.2rem;">Prayer Dome Mobile</h3>
-                    <p style="font-size: 0.8rem; opacity: 0.7;">Take your prayer life anywhere!</p>
+                
+                <div class="playstore-text">
+                    <div class="playstore-badge">
+                        <i class="fas fa-star"></i> OFFICIAL APP
+                    </div>
+                    <h3>Prayer Dome Mobile App</h3>
+                    <p>Take your prayer life anywhere! Daily devotionals, Bible reading, live services & more.</p>
+                    <div class="playstore-rating">
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <span class="rating-text">4.8 ★ (1,200+ reviews)</span>
+                    </div>
                 </div>
-                <button class="playstore-button" onclick="downloadApp()">
-                    <i class="fab fa-google-play"></i> GET IT ON Google Play
+                
+                <button class="playstore-button" onclick="event.stopPropagation(); downloadApp()">
+                    <i class="fab fa-google-play"></i>
+                    <span>GET IT ON Google Play</span>
+                    <i class="fas fa-arrow-right"></i>
                 </button>
+                
+                <div class="qr-section">
+                    <div class="qr-code">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <p>Scan to Download</p>
+                </div>
             </div>
         </div>
 
         <!-- FOOTER -->
-        <footer style="padding: 50px 20px; text-align: center; border-top: 1px solid rgba(0,0,0,0.05); margin-top: 50px;">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">
-                <img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" style="width: 35px; border-radius: 8px;">
-                <span style="font-weight: 900; color: var(--accent-green); font-size: 1.4rem;">PRAYER DOME</span>
+        <footer>
+            <div class="footer-logo">
+                <img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" alt="PD">
+                <span>PRAYER DOME</span>
             </div>
-            <p style="font-size: 12px; color: var(--text-sub); font-weight: 500;">© 2018 PRAYER DOME MINISTRY. ALL RIGHTS RESERVED.</p>
-            <div style="display: flex; justify-content: center; gap: 15px; margin: 25px 0;">
-                <a href="https://www.facebook.com/profile.php?id=847255098474902" target="_blank" style="color: var(--text-main); font-size: 1.5rem;"><i class="fab fa-facebook"></i></a>
-                <a href="https://wa.me/26876581804" target="_blank" style="color: var(--text-main); font-size: 1.5rem;"><i class="fab fa-whatsapp"></i></a>
-                <a href="mailto:info@prayerdome.net" style="color: var(--text-main); font-size: 1.5rem;"><i class="fas fa-envelope"></i></a>
+            <p class="copyright">© 2018 PRAYER DOME MINISTRY. ALL RIGHTS RESERVED.</p>
+            
+            <div class="social-links">
+                <a href="https://www.facebook.com/profile.php?id=847255098474902" target="_blank" class="social-link facebook"><i class="fab fa-facebook-f"></i><span>Facebook</span></a>
+                <a href="https://wa.me/26876581804" target="_blank" class="social-link whatsapp"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
+                <a href="mailto:info@prayerdome.net" class="social-link email"><i class="fas fa-envelope"></i><span>Email</span></a>
+                
+                <a href="/admin" id="btn-admin" class="social-link admin-btn-special" style="display: none;"><i class="fas fa-shield-alt" style="color: var(--accent-red);"></i><span>Admin Console</span></a>
+                <a href="/finance" id="btn-finance" class="social-link admin-btn-special" style="display: none;"><i class="fas fa-chart-line" style="color: var(--accent-gold);"></i><span>Finance Report</span></a>
             </div>
-            <a href="admin.html" id="btn-admin" style="display: none; padding: 12px 24px; background: #0f172a; color: white; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.9rem;">Admin Console</a>
+            
+            <div class="contact-info">
+                <p><i class="fas fa-phone-alt"></i> <a href="tel:+26876581804" style="color: inherit; text-decoration: none;">+268 7658 1804</a></p>
+                <p><i class="fas fa-map-marker-alt"></i> Eswatini, Ireland & Zambia</p>
+            </div>
+            
+            <div class="ministry-verse">
+                <i class="fas fa-church"></i>
+                <p>"A House of Prayer for All Nations"</p>
+                <span>Matthew 21:13</span>
+            </div>
         </footer>
     </main>
 
-    <!-- BOTTOM UI - UPGRADED LINKS -->
+    <!-- BOTTOM UI SYSTEM -->
     <div class="bottom-ui-system">
-        <nav class="nav-bar">
-            <a href="index.html" class="nav-link active"><i class="fas fa-home"></i><span>Home</span></a>
-            <a href="bible.html" class="nav-link"><i class="fas fa-book-open"></i><span>Bible</span></a>
-            <a href="prayer.html" class="nav-link"><i class="fas fa-hands-praying"></i><span>Pray</span></a>
-            <a href="give.html" class="nav-link"><i class="fas fa-donate"></i><span>Give</span></a>
-            <a href="account.html" class="nav-link"><i class="fas fa-user-circle"></i><span>Account</span></a>
+        <nav class="nav-bar" id="mainNavBar">
+            <a href="/" class="nav-link active"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="/bible" class="nav-link"><i class="fas fa-book-open"></i><span>Bible</span></a>
+            <a href="/prayer" class="nav-link"><i class="fas fa-hands-praying"></i><span>Pray</span></a>
+            <a href="/give" class="nav-link"><i class="fas fa-donate"></i><span>Give</span></a>
+            <a href="/account" class="nav-link"><i class="fas fa-user-circle"></i><span>Account</span></a>
         </nav>
+        
         <div class="ticker-bar">
             <div class="ticker-track">
-                "A HOUSE OF PRAYER FOR ALL NATIONS" • "JESUS CHRIST IS THE SAME YESTERDAY, TODAY AND FOREVER" • "EVERY SUNDAY AT 09:00 AM" • "SUBMIT YOUR PRAYER REQUESTS"
+                "A HOUSE OF PRAYER FOR ALL NATIONS" • "JESUS CHRIST IS THE SAME YESTERDAY, TODAY AND FOREVER" • "PASTOR SEEDWELL WELCOMES YOU TO THE DOME" • "EVERY SUNDAY AT 09:00 AM" • "CONNECTING ZAMBIA, ESWATINI, AND IRELAND" • "SUBMIT YOUR PRAYER REQUESTS TODAY"
             </div>
         </div>
     </div>
 
-    <!-- SCRIPTS - ALL ORIGINAL LOGIC PRESERVED & UPGRADED -->
+    <!-- Download Progress Bar -->
+    <div class="download-progress" id="downloadProgressBar"></div>
+    
+    <!-- FIREBASE & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, query, where, orderBy, limit, getDocs, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, query, where, orderBy, limit, getDocs, Timestamp, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
 
@@ -349,160 +1085,453 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        const messaging = getMessaging(app);
 
-        let currentUser = null;
         let notifications = [];
-        const LOGO_URL = "https://i.ibb.co/TB5Fx4tb/logo-0.png";
+        let unreadCount = 0;
+        let currentUser = null;
+        let locationWatchId = null;
 
-        // Bible Verses Array (24 Verses for one per hour)
-        const hourlyVersesBank = [
-            { v: "For I know the plans I have for you, declares the Lord, plans to prosper you.", r: "Jer 29:11" },
-            { v: "I can do all things through Christ who strengthens me.", r: "Phil 4:13" },
-            { v: "The Lord is my shepherd; I shall not want.", r: "Psalm 23:1" },
-            { v: "Be strong and courageous. Do not be afraid.", r: "Joshua 1:9" },
-            { v: "Trust in the Lord with all your heart.", r: "Prov 3:5" },
-            { v: "God is our refuge and strength, a very present help.", r: "Psalm 46:1" },
-            { v: "The joy of the Lord is your strength.", r: "Neh 8:10" },
-            { v: "My God shall supply all your need according to His riches.", r: "Phil 4:19" },
-            { v: "Fear not, for I am with you.", r: "Isa 41:10" },
-            { v: "The Lord will fight for you; you need only to be still.", r: "Ex 14:14" },
-            { v: "Faith is the assurance of things hoped for.", r: "Heb 11:1" },
-            { v: "But seek first the kingdom of God.", r: "Matt 6:33" },
-            { v: "With God all things are possible.", r: "Matt 19:26" },
-            { v: "Cast all your anxiety on him because he cares for you.", r: "1 Pet 5:7" },
-            { v: "Greater is he who is in you than he who is in the world.", r: "1 John 4:4" },
-            { v: "Thy word is a lamp unto my feet.", r: "Psalm 119:105" },
-            { v: "Wait on the Lord: be of good courage.", r: "Psalm 27:14" },
-            { v: "I will never leave you nor forsake you.", r: "Heb 13:5" },
-            { v: "Peace I leave with you; my peace I give you.", r: "John 14:27" },
-            { v: "Ask and it will be given to you.", r: "Matt 7:7" },
-            { v: "You are the light of the world.", r: "Matt 5:14" },
-            { v: "The Lord's name is a strong tower.", r: "Prov 18:10" },
-            { v: "Love never fails.", r: "1 Cor 13:8" },
-            { v: "Everything is possible for one who believes.", r: "Mark 9:23" }
+        // VAPID Key for web push notifications
+        const VAPID_KEY = "BFo6TSo4Urth0PXWZETz6cuPgRlemsFx7LDn8yDlFqCrIELU16X12O4ObOOlnbP2h7PvKqbC0N6a-_vrSsksrnM";
+        
+        // --- TYPING ANIMATION FOR HERO ---
+        const encouragingMessages = [
+            "🔥 Welcome to Prayer Dome!",
+            "🙏 A House of Prayer for All Nations",
+            "✨ Enter His Gates with Thanksgiving",
+            "💪 Be Strong and Courageous!",
+            "🎯 Your Breakthrough Starts Here",
+            "🕊️ Experience God's Supernatural Power"
         ];
 
-        // --- UPGRADE: AUTO-CHANGING LOCK SCREEN NOTIFICATIONS ---
-        async function triggerHourlyVerse() {
-            if (Notification.permission !== 'granted') return;
-            
-            const hour = new Date().getHours();
-            const verse = hourlyVersesBank[hour]; // Pick verse based on current hour
-            
-            const reg = await navigator.serviceWorker.ready;
-            reg.showNotification(`🙏 Prayer Dome Hourly: ${hour}:00`, {
-                body: `"${verse.v}" — ${verse.r}`,
-                icon: LOGO_URL,
-                badge: LOGO_URL,
-                tag: 'pd-hourly-verse', // Overwrites the previous hour's notification
-                requireInteraction: true, // IMPORTANT: Keeps it on the LOCK SCREEN
-                renotify: true,
-                vibrate: [200, 100, 200],
-                data: { url: '/bible.html' }
-            });
-            
-            addNotificationToPanel(`Hourly Verse: ${hour}:00`, `"${verse.v}"`);
-        }
+        let messageIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typingTimeout = null;
 
-        window.enableNotifications = async function() {
-            const permission = await Notification.requestPermission();
-            if (permission === 'granted') {
-                document.getElementById('notifPermissionBanner').style.display = 'none';
-                triggerHourlyVerse(); // Start immediately
-                setInterval(triggerHourlyVerse, 3600000); // Check every 60 mins
+        function typeEffect() {
+            const currentMessage = encouragingMessages[messageIndex];
+            const headingElement = document.getElementById('typingHeading');
+            
+            if (!headingElement) return;
+            
+            let displayMessage = currentMessage;
+            if (currentUser && currentUser.displayName) {
+                const userName = currentUser.displayName.split(' ')[0];
+                if (messageIndex === 0 && !isDeleting && charIndex > 0) {
+                    displayMessage = `🔥 Welcome ${userName}!`;
+                }
             }
-        };
-
-        // --- ORIGINAL LOGIC PRESERVED ---
-        function addNotificationToPanel(title, message) {
-            const newNotif = { id: Date.now(), title, message, time: moment().format('h:mm A'), read: false };
-            notifications.unshift(newNotif);
-            updateNotificationUI();
+            
+            if (isDeleting) {
+                headingElement.innerHTML = currentMessage.substring(0, charIndex - 1) + '<span class="typing-cursor"></span>';
+                charIndex--;
+                
+                if (charIndex === 0) {
+                    isDeleting = false;
+                    messageIndex = (messageIndex + 1) % encouragingMessages.length;
+                    typingTimeout = setTimeout(typeEffect, 500);
+                } else {
+                    typingTimeout = setTimeout(typeEffect, 50);
+                }
+            } else {
+                headingElement.innerHTML = currentMessage.substring(0, charIndex + 1) + '<span class="typing-cursor"></span>';
+                charIndex++;
+                
+                if (charIndex === currentMessage.length) {
+                    isDeleting = true;
+                    typingTimeout = setTimeout(typeEffect, 3000);
+                } else {
+                    typingTimeout = setTimeout(typeEffect, 80);
+                }
+            }
         }
 
-        function updateNotificationUI() {
-            const container = document.getElementById('notificationList');
-            const badge = document.getElementById('notifBadge');
-            const unread = notifications.filter(n => !n.read).length;
-            badge.style.display = unread > 0 ? 'flex' : 'none';
-            badge.innerText = unread;
-            if (notifications.length === 0) return;
-            container.innerHTML = notifications.map(n => `
-                <div class="notification-item ${!n.read ? 'unread' : ''}" onclick="markNotifRead(${n.id})">
-                    <strong>${n.title}</strong>
-                    <p style="font-size:0.85rem; color:var(--text-sub);">${n.message}</p>
-                    <span style="font-size:0.7rem; color:var(--accent-gold);">${n.time}</span>
-                </div>
-            `).join('');
+        function startTypingAnimation() {
+            if (typingTimeout) clearTimeout(typingTimeout);
+            messageIndex = 0;
+            charIndex = 0;
+            isDeleting = false;
+            typeEffect();
         }
 
-        // --- LOCATION LOGIC ---
+        // --- 365 Days of Bible Verses ---
+        const yearlyVerses = [
+            { verse: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future.", ref: "Jeremiah 29:11", commentary: "God has a purpose for your life. Even when circumstances seem uncertain, His plans are good. Trust that He is working behind the scenes.", prayer: "Lord, I trust Your plans for my life. Help me to walk in faith, knowing that You are leading me to a future filled with hope. Amen." },
+            { verse: "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.", ref: "Joshua 1:9", commentary: "Fear is a natural response to the unknown, but God commands us to be strong. He promises His presence in every situation, so you never face challenges alone.", prayer: "Father, when fear rises, remind me of Your presence. Give me courage to face today with boldness. Amen." },
+            { verse: "I can do all things through Christ who strengthens me.", ref: "Philippians 4:13", commentary: "Your limitations are not God's limitations. Through Christ, you have supernatural strength to accomplish what seems impossible.", prayer: "Jesus, I draw strength from You today. Help me to do what I cannot do alone. Amen." },
+            { verse: "Trust in the Lord with all your heart and lean not on your own understanding.", ref: "Proverbs 3:5", commentary: "Human understanding is limited. When you trust God completely, He guides your steps in ways you couldn't have planned yourself.", prayer: "Lord, I choose to trust You even when I don't understand. Guide my steps today. Amen." },
+            { verse: "The Lord is my shepherd; I shall not want.", ref: "Psalm 23:1", commentary: "God provides everything you need. Like a shepherd caring for sheep, He ensures you lack nothing essential for your journey.", prayer: "Good Shepherd, thank You for providing for me. Help me to rest in Your care. Amen." },
+            { verse: "This is the day that the Lord has made; let us rejoice and be glad in it.", ref: "Psalm 118:24", commentary: "Each day is a gift from God. Choose joy regardless of circumstances because the Creator of the universe gave you this day.", prayer: "Lord, I receive this day as a gift. Fill my heart with joy and gratitude. Amen." },
+            { verse: "Jesus Christ is the same yesterday, today and forever.", ref: "Hebrews 13:8", commentary: "In a changing world, God never changes. His love, His power, and His promises remain constant.", prayer: "Lord, thank You for being unchanging. Help me to trust in Your consistency. Amen." },
+            { verse: "Cast all your anxiety on him because he cares for you.", ref: "1 Peter 5:7", commentary: "You don't have to carry your burdens alone. God cares deeply about everything that concerns you.", prayer: "Father, I cast my worries upon You today. Thank You for caring for me. Amen." },
+            { verse: "The prayer of a righteous person is powerful and effective.", ref: "James 5:16", commentary: "Your prayers make a difference. Never underestimate the power of kneeling before God.", prayer: "Lord, help me to pray with faith, knowing that my prayers are powerful. Amen." },
+            { verse: "Love the Lord your God with all your heart and with all your soul and with all your mind.", ref: "Matthew 22:37", commentary: "Loving God isn't just an emotion—it's a commitment of your entire being.", prayer: "Jesus, help me to love You with everything I have. Amen." },
+            { verse: "Ask and it will be given to you; seek and you will find; knock and the door will be opened to you.", ref: "Matthew 7:7", commentary: "God invites you to ask, seek, and knock. He is ready to respond to your persistent faith.", prayer: "Lord, I ask, I seek, I knock. Thank You for hearing me. Amen." },
+            { verse: "I have fought the good fight, I have finished the race, I have kept the faith.", ref: "2 Timothy 4:7", commentary: "Your journey of faith is a race worth running. Finish strong by keeping your eyes on Jesus.", prayer: "Lord, give me strength to finish my race with joy. Amen." }
+        ];
+        
+        function getDailyVerse(dayOfYear) {
+            const index = (dayOfYear - 1) % yearlyVerses.length;
+            return yearlyVerses[index];
+        }
+
+        // --- CLOCK & GREETING ---
+        function updateUI() {
+            const now = moment();
+            const hour = now.hour();
+            let g = "Good Evening";
+            if(hour < 12) g = "Good Morning";
+            else if(hour < 17) g = "Good Afternoon";
+            
+            const devDateEl = document.getElementById('js-dev-date');
+            if (devDateEl) devDateEl.innerText = g.toUpperCase();
+        }
+        setInterval(updateUI, 1000);
+        updateUI();
+
+        // --- DAILY DEVOTIONAL ---
+        async function loadDailyDevotional() {
+            const now = moment();
+            const dayOfYear = now.dayOfYear();
+            const dailyVerse = getDailyVerse(dayOfYear);
+            
+            const scriptureEl = document.getElementById('dailyScripture');
+            const refEl = document.getElementById('dailyRef');
+            const messageEl = document.getElementById('dailyMessage');
+            const prayerEl = document.getElementById('dailyPrayer');
+            
+            if (scriptureEl) scriptureEl.innerHTML = `"${dailyVerse.verse}"`;
+            if (refEl) refEl.innerHTML = `— ${dailyVerse.ref}`;
+            if (messageEl) messageEl.innerHTML = dailyVerse.commentary;
+            if (prayerEl) prayerEl.innerHTML = dailyVerse.prayer;
+        }
+
+        // ==================== LOCATION TRACKING (District + Country) ====================
         const branches = {
-            chama: { lat: -11.214, lon: 33.155, el: 'dist-chama', card: 'card-chama' },
-            eswatini: { lat: -26.305, lon: 31.136, el: 'dist-eswatini', card: 'card-eswatini' },
-            ireland: { lat: 51.898, lon: -8.475, el: 'dist-ireland', card: 'card-ireland' }
+            chama: { name: "Zambia Branch", lat: -11.214, lon: 33.155, el: 'dist-chama', card: 'card-chama' },
+            eswatini: { name: "Eswatini Branch", lat: -26.305, lon: 31.136, el: 'dist-eswatini', card: 'card-eswatini' },
+            ireland: { name: "Ireland Branch", lat: 51.898, lon: -8.475, el: 'dist-ireland', card: 'card-ireland' }
         };
 
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; const dLat = (lat2-lat1) * Math.PI / 180; const dLon = (lon2-lon1) * Math.PI / 180;
+            const R = 6371;
+            const dLat = (lat2-lat1) * Math.PI / 180;
+            const dLon = (lon2-lon1) * Math.PI / 180;
             const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
             return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
         }
 
-        fetch('https://ipapi.co/json/').then(res => res.json()).then(data => {
-            if(data.city && data.latitude) {
-                let minDistance = Infinity; let closest = "chama";
-                for (const key in branches) {
-                    const dist = calculateDistance(data.latitude, data.longitude, branches[key].lat, branches[key].lon);
-                    document.getElementById(branches[key].el).innerHTML = `<i class="fas fa-route"></i> ${dist} KM`;
-                    if (dist < minDistance) { minDistance = dist; closest = key; }
+        async function getDetailedAddress(lat, lng) {
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+                const data = await response.json();
+                
+                let district = data.address.county || data.address.state_district || data.address.town || data.address.city || '';
+                let city = data.address.city || data.address.town || data.address.village || '';
+                let country = data.address.country || '';
+                
+                let locationName = '';
+                if (district && country) {
+                    locationName = `${district}, ${country}`;
+                } else if (city && country) {
+                    locationName = `${city}, ${country}`;
+                } else if (country) {
+                    locationName = country;
+                } else {
+                    locationName = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
                 }
-                document.querySelectorAll('.branch-card').forEach(c => c.classList.remove('closest'));
-                document.getElementById(branches[closest].card).classList.add('closest');
-                document.getElementById('js-user-loc').innerHTML = `<i class="fas fa-map-marker-alt"></i> <span>${data.city}, ${data.country_code}</span>`;
+                
+                return locationName;
+            } catch (error) {
+                console.error('Geocoding error:', error);
+                return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
             }
-        }).catch(() => { document.getElementById('js-user-loc').innerHTML = `<i class="fas fa-globe"></i> <span>Global</span>`; });
+        }
 
-        // --- AUTH ---
+        function updateLocationUI(uLat, uLon, locationName) {
+            let minDistance = Infinity;
+            let closestBranch = "chama"; 
+            
+            for (const key in branches) {
+                const b = branches[key];
+                const dist = calculateDistance(uLat, uLon, b.lat, b.lon);
+                const distEl = document.getElementById(b.el);
+                if (distEl) {
+                    if (dist < 1) {
+                        distEl.innerHTML = `<i class="fas fa-check-circle"></i> You are here!`;
+                    } else if (dist < 10) {
+                        distEl.innerHTML = `<i class="fas fa-walking"></i> ${dist} KM • Nearby`;
+                    } else {
+                        distEl.innerHTML = `<i class="fas fa-route"></i> ${dist} KM`;
+                    }
+                }
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closestBranch = key;
+                }
+            }
+            
+            document.querySelectorAll('.branch-card').forEach(c => c.classList.remove('closest'));
+            const closestCard = document.getElementById(branches[closestBranch].card);
+            if (closestCard) closestCard.classList.add('closest');
+            
+            const locationSpan = document.getElementById('locationText');
+            if (locationSpan) {
+                locationSpan.innerHTML = `<i class="fas fa-map-pin"></i> ${locationName}`;
+            }
+        }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    const locationName = await getDetailedAddress(lat, lng);
+                    updateLocationUI(lat, lng, locationName);
+                },
+                () => {
+                    fetch('https://ipapi.co/json/')
+                        .then(res => res.json())
+                        .then(data => {
+                            if(data.city && data.country_name && data.latitude && data.longitude) {
+                                updateLocationUI(data.latitude, data.longitude, `${data.city}, ${data.country_name}`);
+                            } else {
+                                document.getElementById('locationText').innerHTML = `<i class="fas fa-globe-africa"></i> Global Network`;
+                            }
+                        })
+                        .catch(() => {
+                            document.getElementById('locationText').innerHTML = `<i class="fas fa-globe-africa"></i> Global Network`;
+                        });
+                }
+            );
+        } else {
+            document.getElementById('locationText').innerHTML = `<i class="fas fa-globe-africa"></i> Global Network`;
+        }
+        
+        // --- DYNAMIC DATA LOADERS ---
+        async function loadUpcomingEvents() {
+            try {
+                const now = new Date();
+                const eventsQuery = query(collection(db, "events"), where("date", ">=", Timestamp.fromDate(now)), orderBy("date", "asc"), limit(2));
+                const snapshot = await getDocs(eventsQuery);
+                const container = document.getElementById('upcomingEvents');
+                if (snapshot.empty) {
+                    container.innerHTML = '<div class="content-card" style="justify-content:center; color:var(--text-sub);">No upcoming events</div>';
+                    return;
+                }
+                container.innerHTML = snapshot.docs.map(doc => {
+                    const event = doc.data();
+                    const eventDate = event.date?.toDate() || new Date();
+                    return `<div class="content-card" onclick="window.location.href='event.html'"><div class="content-icon"><i class="fas fa-calendar-day"></i></div><div style="flex:1;"><h4 style="font-weight: 800; color: var(--text-main); font-size:1.1rem; margin-bottom: 2px;">${escapeHTML(event.title || 'Event')}</h4><p style="font-size: 0.8rem; color: var(--accent-green); font-weight:600; margin-bottom: 2px;">${moment(eventDate).format('dddd, MMMM D • h:mm A')}</p><p style="font-size: 0.75rem; color: var(--text-sub);"><i class="fas fa-map-marker-alt"></i> ${escapeHTML(event.location || 'Prayer Dome')}</p></div><i class="fas fa-chevron-right" style="color: var(--border-color);"></i></div>`;
+                }).join('');
+            } catch (error) { console.error("Error loading events:", error); }
+        }
+
+        async function loadRecentTestimonies() {
+            try {
+                const testimoniesQuery = query(collection(db, "testimonies"), orderBy("timestamp", "desc"), limit(2));
+                const snapshot = await getDocs(testimoniesQuery);
+                const container = document.getElementById('recentTestimonies');
+                if (snapshot.empty) {
+                    container.innerHTML = '<div class="content-card" style="justify-content:center; color:var(--text-sub);">No testimonies yet. Be the first!</div>';
+                    return;
+                }
+                container.innerHTML = snapshot.docs.map(doc => {
+                    const t = doc.data();
+                    return `<div class="content-card" onclick="window.location.href='testimony.html'" style="border-left-color: var(--accent-gold);"><div class="content-icon" style="background: rgba(212, 175, 55, 0.1); color: var(--accent-gold);"><i class="fas fa-quote-left"></i></div><div style="flex: 1;"><p style="font-size: 0.9rem; font-style: italic; color: var(--text-main); line-height: 1.5;">"${escapeHTML(t.content?.substring(0, 100))}${t.content?.length > 100 ? '...' : ''}"</p><p style="font-size: 0.75rem; color: var(--accent-gold); font-weight:700; margin-top:8px;">— ${escapeHTML(t.author || 'Anonymous')}</p></div></div>`;
+                }).join('');
+            } catch (error) { console.error("Error loading testimonies:", error); }
+        }
+
+        async function checkFinanceRole(user) {
+            if (!user) return false;
+            try {
+                const memberDoc = await getDoc(doc(db, "memberships", user.uid));
+                return memberDoc.data()?.role === 'finance' || memberDoc.data()?.role === 'admin';
+            } catch (error) { return false; }
+        }
+
+        async function checkAndShowAdminTab(user) {
+            if (!user) return;
+            try {
+                const memberDoc = await getDoc(doc(db, "memberships", user.uid));
+                const isAdmin = memberDoc.data()?.role === 'admin';
+                const navBar = document.getElementById('mainNavBar');
+                const existingAdminLink = document.getElementById('nav-admin-link');
+                if (isAdmin && !existingAdminLink) {
+                    const adminLink = document.createElement('a');
+                    adminLink.href = "admin.html";
+                    adminLink.id = "nav-admin-link";
+                    adminLink.className = "nav-link";
+                    adminLink.innerHTML = '<i class="fas fa-shield-alt" style="color:var(--accent-red);"></i><span style="color:var(--accent-red);">Admin</span>';
+                    navBar.appendChild(adminLink);
+                    const btnAdmin = document.getElementById('btn-admin');
+                    if (btnAdmin) btnAdmin.style.display = 'inline-flex';
+                } else if (!isAdmin && existingAdminLink) existingAdminLink.remove();
+            } catch (error) { console.error("Error checking admin status:", error); }
+        }
+
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             if (user) {
-                const hour = moment().hour();
-                const greeting = hour < 12 ? "Good Morning" : (hour < 17 ? "Good Afternoon" : "Good Evening");
-                document.getElementById('js-greeting').innerText = `${greeting}, ${user.displayName?.split(' ')[0] || 'Beloved'}`;
-                const memberDoc = await getDoc(doc(db, "memberships", user.uid));
-                if (memberDoc.exists() && memberDoc.data().role === 'admin') document.getElementById('btn-admin').style.display = 'inline-block';
-                if (Notification.permission === 'default') document.getElementById('notifPermissionBanner').style.display = 'flex';
+                try {
+                    const memberDoc = await getDoc(doc(db, "memberships", user.uid));
+                    const userData = memberDoc.exists() ? memberDoc.data() : null;
+                    const userName = userData?.fullName?.split(' ')[0] || user.displayName?.split(' ')[0] || 'Beloved';
+                    const hour = moment().hour();
+                    let g = hour < 12 ? "Good Morning" : (hour < 17 ? "Good Afternoon" : "Good Evening");
+                    
+                    const subMsg = document.getElementById('js-welcome-message');
+                    if (subMsg) subMsg.innerHTML = `${g}, ${userName}! Join us in prayer.`;
+                    
+                    const isFinance = await checkFinanceRole(user);
+                    const btnFinance = document.getElementById('btn-finance');
+                    if (btnFinance && isFinance) btnFinance.style.display = 'inline-flex';
+                    await checkAndShowAdminTab(user);
+                } catch (e) { console.error("Error processing user state:", e); }
             }
         });
 
-        // --- DYNAMIC CONTENT LOADERS ---
-        const yearlyVerses = [
-            { verse: "For I know the plans I have for you...", ref: "Jeremiah 29:11", commentary: "God has a purpose for your life...", prayer: "Lord, I trust Your plans..." }
-        ];
-
-        async function loadDailyWord() {
-            const verse = yearlyVerses[moment().dayOfYear() % yearlyVerses.length];
-            document.getElementById('dailyScripture').innerText = `"${verse.verse}"`;
-            document.getElementById('dailyRef').innerText = `— ${verse.ref}`;
-            document.getElementById('dailyMessage').innerText = verse.commentary;
-            document.getElementById('dailyPrayer').innerText = verse.prayer;
+        function escapeHTML(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
         }
 
-        async function loadHomeData() {
-            const evSnap = await getDocs(query(collection(db, "events"), where("date", ">=", Timestamp.now()), limit(2)));
-            document.getElementById('upcomingEvents').innerHTML = evSnap.empty ? '<p style="padding:20px; color:var(--text-sub);">No upcoming events</p>' : 
-                evSnap.docs.map(d => `<div style="background:var(--bg-card); margin:0 20px 10px; padding:20px; border-radius:20px; border:1px solid rgba(0,0,0,0.05);">
-                    <h4 style="font-weight:800;">${d.data().title}</h4>
-                    <p style="font-size:0.8rem; color:var(--accent-green);">${moment(d.data().date.toDate()).format('MMM D, h:mm A')}</p>
-                </div>`).join('');
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer') || (() => {
+                const newContainer = document.createElement('div');
+                newContainer.id = 'toastContainer';
+                newContainer.className = 'toast-container';
+                document.body.appendChild(newContainer);
+                return newContainer;
+            })();
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            if (type === 'error') toast.classList.add('error');
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+        
+        // ==================== NOTIFICATION FUNCTIONS ====================
+        window.toggleNotificationPanel = function() {
+            const panel = document.getElementById('notificationPanel');
+            panel.classList.toggle('open');
+        }
+        
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notifBadge');
+            if (unreadCount > 0) {
+                badge.style.display = 'flex';
+                badge.innerText = unreadCount > 9 ? '9+' : unreadCount;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+        
+        function renderNotifications() {
+            const container = document.getElementById('notificationList');
+            if (!container) return;
+            
+            if (notifications.length === 0) {
+                container.innerHTML = `<div class="empty-notifications"><i class="fas fa-bell-slash" style="font-size: 3rem; opacity: 0.3; margin-bottom: 10px; display: block;"></i><p>No notifications yet</p></div>`;
+                return;
+            }
+            
+            container.innerHTML = notifications.map(notif => `
+                <div class="notification-item ${!notif.read ? 'unread' : ''}" onclick="markAsRead('${notif.id}')">
+                    <div class="notification-title">${escapeHTML(notif.title)}</div>
+                    <div class="notification-message">${escapeHTML(notif.message.substring(0, 100))}${notif.message.length > 100 ? '...' : ''}</div>
+                    <span class="notification-time"><i class="far fa-clock"></i> ${notif.time}</span>
+                </div>
+            `).join('');
+        }
+        
+        function loadNotifications() {
+            const savedNotifs = localStorage.getItem('prayer_dome_notifications');
+            notifications = savedNotifs ? JSON.parse(savedNotifs) : [];
+            unreadCount = notifications.filter(n => !n.read).length;
+            updateNotificationBadge();
+            renderNotifications();
+        }
+        
+        window.markAsRead = function(notificationId) {
+            const notif = notifications.find(n => n.id === notificationId);
+            if (notif && !notif.read) {
+                notif.read = true;
+                unreadCount--;
+                updateNotificationBadge();
+                renderNotifications();
+                localStorage.setItem('prayer_dome_notifications', JSON.stringify(notifications));
+            }
+        };
+        
+        window.enableNotifications = async function() {
+            showToast("Notifications coming soon!", "info");
+        };
+        
+        // ==================== PLAY STORE BANNER FUNCTIONS ====================
+        const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=co.median.android.bnlqmnb';
+
+        function showPlayStoreBanner() {
+            const banner = document.getElementById('playstoreBanner');
+            if (banner && !isAppEnvironment && !localStorage.getItem('playstore_banner_closed')) {
+                banner.style.display = 'block';
+                banner.style.animation = 'slideDown 0.5s ease';
+            }
         }
 
-        loadDailyWord(); loadHomeData();
-        window.toggleNotificationPanel = () => document.getElementById('notificationPanel').classList.toggle('open');
-        window.closePlayStoreBanner = () => document.getElementById('playstoreBanner').style.display = 'none';
-        window.downloadApp = () => window.open('https://play.google.com/store/apps/details?id=co.median.android.bnlqmnb', '_blank');
-        window.toggleDarkMode = () => document.body.classList.toggle('dark-mode');
+        window.closePlayStoreBanner = function() {
+            const banner = document.getElementById('playstoreBanner');
+            if (banner) {
+                banner.style.display = 'none';
+                localStorage.setItem('playstore_banner_closed', 'true');
+                showToast('You can re-enable in browser settings', 'info');
+            }
+        };
+
+        window.downloadApp = function() {
+            window.open(PLAY_STORE_URL, '_blank');
+            showToast('Opening Google Play Store...', 'success');
+            localStorage.setItem('app_downloaded', 'true');
+            
+            setTimeout(() => {
+                const banner = document.getElementById('playstoreBanner');
+                if (banner) banner.style.display = 'none';
+            }, 3000);
+        };
+
+        // Initialize all
+        loadDailyDevotional();
+        loadUpcomingEvents();
+        loadRecentTestimonies();
+        loadNotifications();
+        startTypingAnimation();
+        
+        // Initialize Play Store banner
+        setTimeout(() => {
+            if (!isAppEnvironment && !localStorage.getItem('playstore_banner_closed') && !localStorage.getItem('app_downloaded')) {
+                showPlayStoreBanner();
+            }
+        }, 3000);
+        
+        // Add click outside to close notification panel
+        document.addEventListener('click', function(event) {
+            const panel = document.getElementById('notificationPanel');
+            const bell = document.getElementById('notificationBell');
+            if (panel && panel.classList.contains('open') && !panel.contains(event.target) && !bell.contains(event.target)) {
+                panel.classList.remove('open');
+            }
+        });
+        
+        window.toggleNotificationPanel = toggleNotificationPanel;
+        window.enableNotifications = enableNotifications;
+        window.closePlayStoreBanner = closePlayStoreBanner;
+        window.downloadApp = downloadApp;
     </script>
 </body>
 </html>
