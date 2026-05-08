@@ -504,12 +504,12 @@
             <div class="sub-selection-card" onclick="selectRegistrationType('myself')">
                 <i class="fas fa-user myself"></i>
                 <h3>Myself</h3>
-                <p><i class="fas fa-check"></i> Register as yourself</p>
+                <p><i class="fas fa-check-circle"></i> Register as yourself</p>
             </div>
             <div class="sub-selection-card" onclick="selectRegistrationType('someone')">
                 <i class="fas fa-users someone"></i>
                 <h3>Someone Else</h3>
-                <p><i class="fas fa-hand-holding-heart"></i> Register for family/friend</p>
+                <p><i class="fas fa-hand-holding-heart"></i> Register for family/friend (Pending Admin Approval)</p>
             </div>
         </div>
     </div>
@@ -664,7 +664,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = { 
@@ -692,6 +692,9 @@
         currentUser = user;
         if (user) {
             await checkUserMembership();
+        } else {
+            // User not logged in, they need to login first
+            window.location.href = 'account.html';
         }
         initSigPad();
     });
@@ -705,7 +708,10 @@
                 currentMemberData = membershipSnap.data();
                 renderCard(currentMemberData);
                 switchMainTab('card');
-                showToast("Welcome back! Your membership is active.", "success");
+                // Only show toast if they just logged in or membership was approved
+                if (currentMemberData.status === 'approved') {
+                    showToast("Welcome back! Your membership is active.", "success");
+                }
             }
         } catch (error) { console.error("Error checking membership:", error); }
     }
@@ -779,10 +785,10 @@
         
         if (type === 'myself') {
             formTitle.innerHTML = '<i class="fas fa-user"></i> Registering Myself';
-            formSubtitle.innerHTML = 'You are registering yourself as a new church member.';
+            formSubtitle.innerHTML = 'You are registering yourself as a new church member. Awaiting admin approval.';
         } else {
             formTitle.innerHTML = '<i class="fas fa-users"></i> Registering Someone Else';
-            formSubtitle.innerHTML = 'You are registering another person as a church member.';
+            formSubtitle.innerHTML = 'You are registering another person as a church member. They will receive a Membership ID after admin approval.';
         }
         
         document.getElementById('step2NewContainer').style.display = 'none';
@@ -864,14 +870,18 @@
         showLoading("Registering new member...");
         
         try {
+            // Check if member already exists with same identity number
             const existingQuery = query(collection(db, "memberships"), where("identityNumber", "==", document.getElementById('idNo').value));
             const existingSnap = await getDocs(existingQuery);
             if (!existingSnap.empty) {
+                const existingMember = existingSnap.docs[0];
+                // If registration is for someone else and the member already exists, show error
                 showToast("A member with this Identity Number already exists!", "error");
                 hideLoading();
                 return;
             }
             
+            // Generate new Membership ID
             const year = new Date().getFullYear();
             const prefix = `PD${year}`;
             let maxNum = 0;
@@ -888,9 +898,12 @@
             const signatureData = canvas.toDataURL();
             const photoUrl = uploadedPhotoUrl || "https://via.placeholder.com/150";
             
-            const targetUid = currentUser.uid;
+            // IMPORTANT: For someone else registration, use a DIFFERENT UID
+            // Generate a temporary unique ID for the new member
+            const targetUid = isRegisteringForSelf ? currentUser.uid : `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             const registeredBy = currentUser.email;
             const registeredFor = isRegisteringForSelf ? 'self' : 'other';
+            const registrationStatus = isRegisteringForSelf ? 'pending' : 'pending'; // Both need admin approval now
             
             const memberData = {
                 membershipId: newMemberId,
@@ -916,7 +929,7 @@
                 titheCommitment: true,
                 signature: signatureData,
                 photoUrl: photoUrl,
-                status: 'approved',
+                status: 'pending', // Pending admin approval
                 role: 'member',
                 uid: targetUid,
                 registeredBy: registeredBy,
@@ -925,32 +938,53 @@
                 createdAt: serverTimestamp()
             };
             
+            // Create the membership document
             await setDoc(doc(db, "memberships", targetUid), memberData);
-            await setDoc(doc(db, "users", targetUid), {
-                membershipId: newMemberId,
-                fullName: memberData.fullName,
-                email: currentUser.email,
-                photoURL: photoUrl,
-                role: 'member'
-            }, { merge: true });
             
+            // If registering for self, also update user document
             if (isRegisteringForSelf) {
+                await setDoc(doc(db, "users", currentUser.uid), {
+                    membershipId: newMemberId,
+                    fullName: memberData.fullName,
+                    email: currentUser.email,
+                    phone: memberData.phone,
+                    photoURL: photoUrl,
+                    role: 'member'
+                }, { merge: true });
+                
                 await updateProfile(currentUser, {
                     displayName: memberData.fullName,
                     photoURL: photoUrl
                 }).catch(() => {});
+                
+                currentMemberData = memberData;
+                renderCard(memberData);
+                showToast(`✅ Registration submitted! Your Membership ID: ${newMemberId}. Awaiting admin approval.`, "success");
+            } else {
+                // For someone else, don't update current user's membership
+                showToast(`✅ ${memberData.fullName} has been registered! Membership ID: ${newMemberId}. Awaiting admin approval.`, "success");
             }
             
-            currentMemberData = memberData;
-            renderCard(memberData);
-            
-            const message = isRegisteringForSelf 
-                ? `✅ Welcome! Your Membership ID: ${newMemberId}` 
-                : `✅ Member registered! Membership ID: ${newMemberId}`;
-            showToast(message, "success");
             confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
             
-            switchMainTab('card');
+            // Reset form and go to appropriate tab
+            if (isRegisteringForSelf) {
+                switchMainTab('card');
+            } else {
+                // Reset the form for next registration
+                document.getElementById('fullName').value = '';
+                document.getElementById('dob').value = '';
+                document.getElementById('idNo').value = '';
+                document.getElementById('phone').value = '';
+                document.getElementById('email').value = '';
+                document.getElementById('job').value = '';
+                uploadedPhotoUrl = null;
+                document.getElementById('photoPreview').src = 'https://via.placeholder.com/150';
+                document.getElementById('uploadedPhotoUrl').value = '';
+                clearSig();
+                // Go back to step 1 to register another person
+                goBackToStep1();
+            }
             
         } catch (error) {
             console.error("Registration error:", error);
@@ -975,13 +1009,20 @@
             const querySnapshot = await getDocs(q);
             
             if (querySnapshot.empty) {
-                showToast("Membership ID not found.", "error");
+                showToast("Membership ID not found or pending approval.", "error");
                 hideLoading();
                 return;
             }
             
             const memberDoc = querySnapshot.docs[0];
             const memberData = memberDoc.data();
+            
+            if (memberData.status !== 'approved') {
+                showToast("Your membership is pending admin approval. Please check back later.", "info");
+                hideLoading();
+                return;
+            }
+            
             retrievedMembershipData = { id: memberDoc.id, ...memberData };
             
             document.getElementById('retrievedPhoto').src = memberData.photoUrl || "https://via.placeholder.com/80";
@@ -1014,20 +1055,29 @@
         showLoading("Linking membership...");
         
         try {
-            if (retrievedMembershipData.uid && retrievedMembershipData.uid !== currentUser.uid) {
+            // Check if this membership is already linked to another user
+            if (retrievedMembershipData.uid && retrievedMembershipData.uid !== currentUser.uid && !retrievedMembershipData.uid.startsWith('temp_')) {
                 showToast("This membership is already linked to another account. Contact admin.", "error");
                 hideLoading();
                 return;
             }
             
-            const newMemberData = { ...retrievedMembershipData, uid: currentUser.uid, linkedAt: serverTimestamp() };
+            // Create a new document under current user's UID (copy the membership)
+            const newMemberData = { ...retrievedMembershipData };
             delete newMemberData.id;
+            newMemberData.uid = currentUser.uid;
+            newMemberData.linkedAt = serverTimestamp();
+            
             await setDoc(doc(db, "memberships", currentUser.uid), newMemberData);
+            
+            // Update user document
             await setDoc(doc(db, "users", currentUser.uid), {
                 membershipId: retrievedMembershipData.membershipId,
                 fullName: retrievedMembershipData.fullName,
+                email: currentUser.email,
+                phone: retrievedMembershipData.phone || "",
                 photoURL: retrievedMembershipData.photoUrl,
-                role: 'member'
+                role: retrievedMembershipData.role || 'member'
             }, { merge: true });
             
             await updateProfile(currentUser, {
@@ -1045,39 +1095,62 @@
             switchMainTab('card');
             
         } catch (error) {
+            console.error("Link error:", error);
             showToast("Error: " + error.message, "error");
         } finally {
             hideLoading();
         }
     };
-
+    
     function renderCard(data) {
-        document.getElementById('idPhoto').src = data.photoUrl || "https://via.placeholder.com/150";
-        document.getElementById('idName').innerText = data.fullName || "MEMBER NAME";
+        const idPhoto = document.getElementById('idPhoto');
+        if (idPhoto) idPhoto.src = data.photoUrl || "https://via.placeholder.com/150";
+        const idName = document.getElementById('idName');
+        if (idName) idName.innerText = data.fullName || "MEMBER NAME";
         
-        if (data.membershipId) {
-            document.getElementById('idNumber').innerText = data.membershipId;
-            document.getElementById('statusBadge').innerHTML = '<i class="fas fa-check-circle"></i> ACTIVE MEMBER';
-            document.getElementById('statusBadge').className = 'status-badge status-approved';
+        if (data.membershipId && data.status === 'approved') {
+            const idNumber = document.getElementById('idNumber');
+            if (idNumber) idNumber.innerText = data.membershipId;
+            const statusBadge = document.getElementById('statusBadge');
+            if (statusBadge) {
+                statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> ACTIVE MEMBER';
+                statusBadge.className = 'status-badge status-approved';
+            }
             try {
                 JsBarcode("#barcodeImg", data.membershipId, { format: "CODE128", lineColor: "#000", width: 2, height: 40, displayValue: false });
             } catch(e) { console.error("Barcode error:", e); }
+        } else if (data.membershipId && data.status === 'pending') {
+            const idNumber = document.getElementById('idNumber');
+            if (idNumber) idNumber.innerText = data.membershipId;
+            const statusBadge = document.getElementById('statusBadge');
+            if (statusBadge) {
+                statusBadge.innerHTML = '<i class="fas fa-clock"></i> PENDING APPROVAL';
+                statusBadge.className = 'status-badge status-pending';
+            }
         } else {
-            document.getElementById('idNumber').innerText = 'No Membership';
-            document.getElementById('statusBadge').innerHTML = '<i class="fas fa-clock"></i> NO MEMBERSHIP';
-            document.getElementById('statusBadge').className = 'status-badge status-pending';
+            const idNumber = document.getElementById('idNumber');
+            if (idNumber) idNumber.innerText = 'No Membership';
+            const statusBadge = document.getElementById('statusBadge');
+            if (statusBadge) {
+                statusBadge.innerHTML = '<i class="fas fa-clock"></i> NO MEMBERSHIP';
+                statusBadge.className = 'status-badge status-pending';
+            }
         }
         
-        document.getElementById('idBranch').innerText = data.branch || "Global";
-        document.getElementById('idRole').innerText = data.role ? data.role.toUpperCase() : "MEMBER";
-        document.getElementById('idMarital').innerText = data.maritalStatus || "SINGLE";
+        const idBranch = document.getElementById('idBranch');
+        if (idBranch) idBranch.innerText = data.branch || "Global";
+        const idRole = document.getElementById('idRole');
+        if (idRole) idRole.innerText = data.role ? data.role.toUpperCase() : "MEMBER";
+        const idMarital = document.getElementById('idMarital');
+        if (idMarital) idMarital.innerText = data.maritalStatus || "SINGLE";
         
         let date = new Date();
         if (data.createdAt) {
             if (typeof data.createdAt.toDate === 'function') date = data.createdAt.toDate();
             else if (data.createdAt.seconds) date = new Date(data.createdAt.seconds * 1000);
         }
-        document.getElementById('idDate').innerText = moment(date).format('DD/MM/YYYY');
+        const idDate = document.getElementById('idDate');
+        if (idDate) idDate.innerText = moment(date).format('DD/MM/YYYY');
     }
 
     window.switchMainTab = (tab) => {
@@ -1086,28 +1159,36 @@
         const cardDiv = document.getElementById('cardSection');
         
         if (tab === 'membership') {
-            membershipDiv.style.display = 'block';
-            benefitsDiv.style.display = 'none';
-            cardDiv.style.display = 'none';
+            if (membershipDiv) membershipDiv.style.display = 'block';
+            if (benefitsDiv) benefitsDiv.style.display = 'none';
+            if (cardDiv) cardDiv.style.display = 'none';
         } else if (tab === 'benefits') {
-            membershipDiv.style.display = 'none';
-            benefitsDiv.style.display = 'block';
-            cardDiv.style.display = 'none';
+            if (membershipDiv) membershipDiv.style.display = 'none';
+            if (benefitsDiv) benefitsDiv.style.display = 'block';
+            if (cardDiv) cardDiv.style.display = 'none';
         } else if (tab === 'card') {
-            membershipDiv.style.display = 'none';
-            benefitsDiv.style.display = 'none';
-            cardDiv.style.display = 'block';
+            if (membershipDiv) membershipDiv.style.display = 'none';
+            if (benefitsDiv) benefitsDiv.style.display = 'none';
+            if (cardDiv) cardDiv.style.display = 'block';
             if (currentMemberData) renderCard(currentMemberData);
         }
         
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        if (tab === 'membership') document.querySelector('.tab-btn:first-child').classList.add('active');
-        else if (tab === 'benefits') document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        else if (tab === 'card') document.querySelectorAll('.tab-btn')[2].classList.add('active');
+        if (tab === 'membership') {
+            const firstBtn = document.querySelector('.tab-btn:first-child');
+            if (firstBtn) firstBtn.classList.add('active');
+        } else if (tab === 'benefits') {
+            const btns = document.querySelectorAll('.tab-btn');
+            if (btns[1]) btns[1].classList.add('active');
+        } else if (tab === 'card') {
+            const btns = document.querySelectorAll('.tab-btn');
+            if (btns[2]) btns[2].classList.add('active');
+        }
     };
 
     window.downloadID = () => {
         const element = document.getElementById('captureArea');
+        if (!element) return;
         html2canvas(element, { useCORS: true, scale: 3, backgroundColor: null }).then(canvas => {
             const a = document.createElement('a');
             a.href = canvas.toDataURL("image/png");
@@ -1115,6 +1196,7 @@
             a.click();
             showToast("ID Card saved to gallery!", "success");
         }).catch(err => {
+            console.error("Download error:", err);
             showToast("Error downloading ID.", "error");
         });
     };
@@ -1127,7 +1209,8 @@
     }
     
     function hideLoading() {
-        document.getElementById('loader').style.display = 'none';
+        const loader = document.getElementById('loader');
+        if (loader) loader.style.display = 'none';
     }
     
     function showToast(message, type = 'success') {
