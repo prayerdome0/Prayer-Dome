@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Prayer Dome | About Us - Our Vision & Mission</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --accent-green: #15803d;
+            --accent-green-light: #22c55e;
+            --accent-gold: #d4af37;
+            --accent-gold-dark: #b45309;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --bg-primary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 35px -10px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s;
+            min-height: 100vh;
+        }
+
+        body.dark-mode {
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
+        }
+
+        /* Luxury Font */
+        .luxury-font, h1, h2, h3, .founder-name, .stat-number, .value-title { font-family: 'Playfair Display', serif; }
+
+        /* Header with Logo */
+        .about-header {
+            background: var(--bg-card);
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.95);
+        }
+        body.dark-mode .about-header { background: rgba(15,23,42,0.95); }
+        
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+        .logo-ring { 
+            width: 55px; 
+            height: 55px; 
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-gold)); 
+            border-radius: 15px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(21,128,61,0.3);
+        }
+        .logo-ring img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 10px;
+            background: white;
+            padding: 6px;
+        }
+        .brand-text h1 { 
+            font-size: 1.4rem; 
+            font-weight: 900; 
+            letter-spacing: 1px;
+            font-family: 'Playfair Display', serif;
+        }
+        .brand-text p { 
+            font-size: 0.65rem; 
+            opacity: 0.7; 
+            letter-spacing: 1px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .theme-btn, .back-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+        .theme-btn:hover, .back-btn:hover {
+            transform: translateY(-2px);
+            background: rgba(34,197,94,0.1);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 30px;
+        }
+
+        /* Hero Section */
+        .about-hero {
+            background: linear-gradient(135deg, var(--accent-green), #064e3b);
+            border-radius: 40px;
+            padding: 60px 40px;
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            animation: fadeInUp 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .about-hero::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 25s linear infinite;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .about-hero h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        .about-hero p {
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Founder Section */
+        .founder-section {
+            background: var(--bg-card);
+            border-radius: 40px;
+            padding: 40px;
+            margin-bottom: 50px;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: 0.3s;
+        }
+        .founder-section:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        .founder-image {
+            flex: 0 0 200px;
+            text-align: center;
+        }
+        .founder-img-wrapper {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 4px solid var(--accent-gold);
+            overflow: hidden;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .founder-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .founder-info {
+            flex: 1;
+        }
+        .founder-info h2 {
+            color: var(--accent-green);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .founder-info h3 {
+            color: var(--accent-gold);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+        .founder-info p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+        .founder-signature {
+            margin-top: 20px;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            color: var(--accent-green);
+        }
+
+        /* Content Cards */
+        .content-card {
+            background: var(--bg-card);
+            border-radius: 32px;
+            padding: 35px;
+            margin-bottom: 40px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: 0.3s;
+            animation: fadeInUp 0.5s ease;
+        }
+        .content-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        .card-title {
+            font-size: 1.8rem;
+            color: var(--accent-green);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 4px solid var(--accent-gold);
+            padding-left: 20px;
+        }
+        .card-text {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        /* Grid Layout for What We Do */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        .service-item {
+            background: var(--bg-primary);
+            border-radius: 24px;
+            padding: 25px;
+            text-align: center;
+            transition: 0.3s;
+            border: 1px solid var(--border-color);
+        }
+        .service-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-gold);
+            background: rgba(212,175,55,0.05);
+        }
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-gold));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.8rem;
+            color: white;
+        }
+        .service-item h4 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--accent-green);
+        }
+        .service-item p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Values Grid */
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .value-item {
+            background: linear-gradient(135deg, rgba(34,197,94,0.05), rgba(212,175,55,0.03));
+            border-radius: 20px;
+            padding: 25px 15px;
+            text-align: center;
+            transition: 0.3s;
+            border: 1px solid var(--border-color);
+        }
+        .value-item:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-gold);
+        }
+        .value-icon {
+            font-size: 2rem;
+            color: var(--accent-gold);
+            margin-bottom: 15px;
+        }
+        .value-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--accent-green);
+            margin-bottom: 8px;
+        }
+        .value-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Stats Banner */
+        .stats-banner {
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark));
+            border-radius: 32px;
+            padding: 40px;
+            margin: 40px 0;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            text-align: center;
+            color: white;
+        }
+        .stat-item h3 {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+        .stat-item p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Footer */
+        .about-footer {
+            background: var(--bg-card);
+            margin-top: 60px;
+            border-top: 1px solid var(--border-color);
+            padding: 40px 30px 20px;
+            text-align: center;
+        }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .footer-links a:hover {
+            color: var(--accent-green);
+        }
+        .copyright {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .main-container { padding: 20px; }
+            .about-hero h1 { font-size: 2rem; }
+            .about-hero { padding: 40px 20px; }
+            .founder-section { flex-direction: column; text-align: center; }
+            .card-title { font-size: 1.4rem; }
+            .stats-banner { grid-template-columns: repeat(2, 1fr); }
+            .services-grid { grid-template-columns: 1fr; }
+            .values-grid { grid-template-columns: repeat(2, 1fr); }
+            .about-header { padding: 12px 20px; }
+            .logo-ring { width: 45px; height: 45px; }
+            .brand-text h1 { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="about-header">
+        <div class="logo-area" onclick="window.location.href='index.html'">
+            <div class="logo-ring">
+                <img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" alt="Prayer Dome Logo">
+            </div>
+            <div class="brand-text">
+                <h1>PRAYER DOME</h1>
+                <p>ABOUT US</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="index.html" class="back-btn"><i class="fas fa-home"></i> Home</a>
+            <button class="theme-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Hero Section -->
+        <div class="about-hero">
+            <h1><i class="fas fa-church"></i> About Prayer Dome</h1>
+            <p>A House of Prayer for All Nations — Matthew 21:13</p>
+        </div>
+
+        <!-- Founder Section -->
+        <div class="founder-section">
+            <div class="founder-image">
+                <div class="founder-img-wrapper">
+                    <img src="https://i.ibb.co/RTbNh1hB/founder-2.jpg" alt="Pastor Seedwell K. Masuku">
+                </div>
+            </div>
+            <div class="founder-info">
+                <h2>Pastor Seedwell K. Masuku</h2>
+                <h3><i class="fas fa-crown"></i> Founder & President</h3>
+                <p>Called by God to raise an army of intercessors globally. Pastor Seedwell leads Prayer Dome with a mandate to demonstrate the raw power of the Holy Spirit, bringing healing, deliverance, and prophetic direction to the nations. His vision is to see lives transformed through the power of prayer and the Word of God.</p>
+                <div class="founder-signature">"A House of Prayer for All Nations"</div>
+            </div>
+        </div>
+
+        <!-- About Content -->
+        <div class="content-card">
+            <h2 class="card-title"><i class="fas fa-heart"></i> Who We Are</h2>
+            <div class="card-text">
+                <p>Prayer Dome is a Christ-centered ministry committed to preaching the Gospel of Jesus Christ, transforming lives through prayer, and raising believers who walk in faith, holiness, and the power of the Holy Spirit. Founded by Pastor Seedwell Masuku, the ministry was established with a vision to reach nations, plant churches, and bring people closer to God through sincere worship, biblical teaching, and compassionate service.</p>
+                <p style="margin-top: 15px;">At Prayer Dome, we believe that prayer is the foundation of spiritual growth and breakthrough. We are passionate about creating an atmosphere where people can encounter God, grow spiritually, and discover their purpose in Christ. Through regular prayer gatherings, worship services, Bible studies, evangelism, and discipleship programs, we aim to strengthen individuals, families, and communities.</p>
+                <p style="margin-top: 15px;">Our ministry is built on the teachings of the Holy Bible and guided by Christian values of love, unity, integrity, humility, and service. We believe in salvation through Jesus Christ, water baptism, the work of the Holy Spirit, divine healing, and holy living according to the Word of God.</p>
+                <p style="margin-top: 15px;">Prayer Dome is also dedicated to community impact through compassionate outreach. We believe the Church should not only preach the Gospel but also demonstrate God's love by supporting widows, orphans, youth, and vulnerable people in society.</p>
+            </div>
+        </div>
+
+        <!-- Stats Banner -->
+        <div class="stats-banner">
+            <div class="stat-item">
+                <h3>3</h3>
+                <p>Countries</p>
+            </div>
+            <div class="stat-item">
+                <h3>7+</h3>
+                <p>Years of Ministry</p>
+            </div>
+            <div class="stat-item">
+                <h3>5</h3>
+                <p>Ministries</p>
+            </div>
+            <div class="stat-item">
+                <h3>16+</h3>
+                <p>Team Members</p>
+            </div>
+        </div>
+
+        <!-- What We Do -->
+        <div class="content-card">
+            <h2 class="card-title"><i class="fas fa-hands-helping"></i> What We Do</h2>
+            <div class="services-grid">
+                <div class="service-item">
+                    <div class="service-icon"><i class="fas fa-praying-hands"></i></div>
+                    <h4>Prayer & Intercession</h4>
+                    <p>Regular prayer gatherings and intercessory meetings</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon"><i class="fas fa-church"></i></div>
+                    <h4>Sunday Worship Services</h4>
+                    <p>Powerful worship and Word-filled services</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon"><i class="fas fa-bible"></i></div>
+                    <h4>Bible Teaching</h4>
+                    <p>In-depth Bible study and discipleship programs</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon"><i class="fas fa-users"></i></div>
+                    <h4>Youth & Women Programs</h4>
+                    <p>Empowerment and leadership development</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon"><i class="fas fa-globe"></i></div>
+                    <h4>Evangelism & Church Planting</h4>
+                    <p>Spreading the Gospel and planting churches</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon"><i class="fas fa-music"></i></div>
+                    <h4>Music & Worship Ministry</h4>
+                    <p>Developing worshippers and musicians</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                    <h4>Community Outreach</h4>
+                    <p>Compassionate ministry to the needy</p>
+                </div>
+                <div class="service-item">
+                    <div class="service-icon"><i class="fas fa-chalkboard-user"></i></div>
+                    <h4>Leadership Development</h4>
+                    <p>Spiritual mentorship and training</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mission & Vision -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+            <div class="content-card" style="margin-bottom: 0;">
+                <h2 class="card-title"><i class="fas fa-bullseye"></i> Our Mission</h2>
+                <div class="card-text">
+                    <p>To spread the Gospel of Jesus Christ, raise faithful disciples, and transform lives through prayer, worship, teaching, and compassionate service.</p>
+                </div>
+            </div>
+            <div class="content-card" style="margin-bottom: 0;">
+                <h2 class="card-title"><i class="fas fa-eye"></i> Our Vision</h2>
+                <div class="card-text">
+                    <p>To build a strong and spiritually mature generation that reflects the character of Christ and impacts communities and nations through the power of God.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Core Values -->
+        <div class="content-card">
+            <h2 class="card-title"><i class="fas fa-gem"></i> Our Core Values</h2>
+            <div class="values-grid">
+                <div class="value-item">
+                    <div class="value-icon"><i class="fas fa-cross"></i></div>
+                    <div class="value-title">Faith in God</div>
+                    <div class="value-desc">Trusting God in all circumstances</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon"><i class="fas fa-pray"></i></div>
+                    <div class="value-title">Prayer & Worship</div>
+                    <div class="value-desc">Prioritizing God's presence</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon"><i class="fas fa-star-of-life"></i></div>
+                    <div class="value-title">Holiness & Integrity</div>
+                    <div class="value-desc">Living blamelessly before God</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon"><i class="fas fa-heart"></i></div>
+                    <div class="value-title">Love & Compassion</div>
+                    <div class="value-desc">Showing God's love to all</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon"><i class="fas fa-handshake"></i></div>
+                    <div class="value-title">Unity & Service</div>
+                    <div class="value-desc">Working together for the Kingdom</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon"><i class="fas fa-bible"></i></div>
+                    <div class="value-title">Biblical Truth</div>
+                    <div class="value-desc">Standing on God's Word</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon"><i class="fas fa-chalkboard-user"></i></div>
+                    <div class="value-title">Leadership & Discipleship</div>
+                    <div class="value-desc">Raising the next generation</div>
+                </div>
+                <div class="value-item">
+                    <div class="value-icon"><i class="fas fa-dove"></i></div>
+                    <div class="value-title">Holy Spirit Power</div>
+                    <div class="value-desc">Walking in supernatural grace</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Welcome Message -->
+        <div class="content-card" style="background: linear-gradient(135deg, rgba(34,197,94,0.05), rgba(212,175,55,0.03));">
+            <h2 class="card-title"><i class="fas fa-door-open"></i> Welcome to Prayer Dome</h2>
+            <div class="card-text">
+                <p>Prayer Dome welcomes people from all backgrounds to experience God's presence, grow in faith, and become part of a loving spiritual family committed to advancing the Kingdom of God.</p>
+                <p style="margin-top: 20px; font-style: italic; color: var(--accent-green);">"Come and hear, all you who fear God; let me tell you what he has done for me." — Psalm 66:16</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="about-footer">
+        <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About Us</a>
+            <a href="team.html">Our Team</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="events.html">Events</a>
+            <a href="give.html">Give</a>
+            <a href="contact.html">Contact</a>
+        </div>
+        <div class="copyright">
+            <p>© 2018 Prayer Dome Ministry. All Rights Reserved.</p>
+            <p>"A House of Prayer for All Nations" — Matthew 21:13</p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const btn = document.querySelector('.theme-btn i');
+            if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
+        window.toggleDarkMode = toggleDarkMode;
+    </script>
+</body>
+</html>

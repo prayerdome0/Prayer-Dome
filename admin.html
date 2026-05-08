@@ -7,7 +7,7 @@
     
     <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     
     <!-- SDKs -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -17,9 +17,10 @@
 
     <style>
         :root {
-            --accent-green: #22c55e;
+            --accent-green: #15803d;
             --accent-green-dark: #16a34a;
             --accent-gold: #d4af37;
+            --accent-gold-dark: #b45309;
             --accent-red: #ef4444;
             --accent-blue: #3b82f6;
             --accent-purple: #8b5cf6;
@@ -49,15 +50,36 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { display: flex; height: 100vh; overflow: hidden; background: var(--bg-main); color: var(--text-main); transition: 0.3s; }
 
+        /* Luxury Font */
+        .luxury-font, .sidebar-title, .page-title, .kpi-details h3, .panel-header h3, .modal-header h2 { font-family: 'Playfair Display', serif; }
+
         /* --- SIDEBAR --- */
         .sidebar { width: 280px; background: var(--sidebar-bg); color: var(--text-light); display: flex; flex-direction: column; transition: 0.3s; z-index: 100; border-right: 1px solid rgba(255,255,255,0.1);}
-        .sidebar-header { padding: 25px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-logo { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent-green), var(--accent-gold)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; }
-        .sidebar-title { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.5px; }
-        .sidebar-subtitle { font-size: 0.7rem; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; }
+        .sidebar-header { padding: 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-logo { 
+            width: 45px; 
+            height: 45px; 
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-gold)); 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(21,128,61,0.3);
+        }
+        .sidebar-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 10px;
+            background: white;
+            padding: 6px;
+        }
+        .sidebar-title { font-size: 1.2rem; font-weight: 900; letter-spacing: 0.5px; }
+        .sidebar-subtitle { font-size: 0.65rem; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 1px; }
         
         .nav-menu { flex: 1; overflow-y: auto; padding: 20px 10px; }
-        .nav-item { display: flex; align-items: center; gap: 15px; padding: 14px 20px; color: #cbd5e1; text-decoration: none; border-radius: 12px; margin-bottom: 5px; transition: 0.2s; cursor: pointer; font-weight: 500; }
+        .nav-item { display: flex; align-items: center; gap: 15px; padding: 12px 18px; color: #cbd5e1; text-decoration: none; border-radius: 12px; margin-bottom: 5px; transition: 0.2s; cursor: pointer; font-weight: 500; }
         .nav-item i { font-size: 1.2rem; width: 24px; text-align: center; }
         .nav-item:hover { background: var(--sidebar-hover); color: white; }
         .nav-item.active { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); color: white; box-shadow: 0 4px 12px rgba(34,197,94,0.3); }
@@ -71,9 +93,9 @@
         .mobile-toggle { display: none; background: none; border: none; font-size: 1.5rem; color: var(--text-main); cursor: pointer; }
         .topbar-actions { display: flex; align-items: center; gap: 15px; margin-left: auto; }
         .action-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-main); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-main); transition: 0.2s; }
-        .action-btn:hover { background: var(--border); }
+        .action-btn:hover { background: var(--border); transform: scale(1.05); }
         .admin-profile { display: flex; align-items: center; gap: 10px; padding: 5px 15px 5px 5px; background: var(--bg-main); border-radius: 30px; border: 1px solid var(--border); cursor: pointer; }
-        .admin-avatar { width: 32px; height: 32px; background: var(--accent-green); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .admin-avatar { width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent-green), var(--accent-gold)); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
         .content-area { flex: 1; padding: 30px; overflow-y: auto; }
         .section-view { display: none; animation: fadeIn 0.3s ease; }
@@ -85,64 +107,67 @@
         .page-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 25px; color: var(--text-main); display: flex; justify-content: space-between; align-items: center; }
         
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .kpi-card { background: var(--bg-panel); padding: 25px; border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 20px; transition: 0.3s; cursor: pointer; }
-        .kpi-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--accent-green); }
-        .kpi-icon { width: 60px; height: 60px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .kpi-card { background: var(--bg-panel); padding: 25px; border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 20px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
+        .kpi-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--accent-gold); }
+        .kpi-icon { width: 60px; height: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
         .kpi-icon.green { background: rgba(34,197,94,0.1); color: var(--accent-green); }
         .kpi-icon.gold { background: rgba(212,175,55,0.1); color: var(--accent-gold); }
         .kpi-icon.blue { background: rgba(59,130,246,0.1); color: var(--accent-blue); }
         .kpi-icon.red { background: rgba(239,68,68,0.1); color: var(--accent-red); }
         .kpi-details h3 { font-size: 2rem; font-weight: 800; color: var(--text-main); line-height: 1; margin-bottom: 5px;}
-        .kpi-details p { font-size: 0.85rem; color: var(--text-sub); font-weight: 600; text-transform: uppercase; }
+        .kpi-details p { font-size: 0.8rem; color: var(--text-sub); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
 
         /* --- TABLES & LISTS --- */
-        .panel-card { background: var(--bg-panel); border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 30px; }
+        .panel-card { background: var(--bg-panel); border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 30px; transition: 0.3s; }
+        .panel-card:hover { box-shadow: var(--shadow-md); }
         .panel-header { padding: 20px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg-main); flex-wrap: wrap; gap: 15px;}
-        .panel-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+        .panel-header h3 { font-size: 1.2rem; font-weight: 800; color: var(--accent-green); }
         
         .table-responsive { overflow-x: auto; width: 100%; }
         table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th { padding: 15px 25px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-sub); border-bottom: 1px solid var(--border); background: var(--bg-panel); font-weight: 700; }
-        td { padding: 16px 25px; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 0.95rem; vertical-align: middle; }
-        tr:hover td { background: var(--bg-main); }
+        th { padding: 15px 25px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-sub); border-bottom: 1px solid var(--border); background: var(--bg-panel); font-weight: 800; }
+        td { padding: 16px 25px; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 0.9rem; vertical-align: middle; }
+        tr:hover td { background: rgba(34,197,94,0.05); }
         tr:last-child td { border-bottom: none; }
 
         .user-cell { display: flex; align-items: center; gap: 12px; }
-        .user-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: var(--border); }
-        .user-info h4 { font-size: 0.95rem; font-weight: 600; }
-        .user-info p { font-size: 0.75rem; color: var(--text-sub); }
+        .user-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: var(--border); border: 2px solid var(--accent-gold); }
+        .user-info h4 { font-size: 0.95rem; font-weight: 700; }
+        .user-info p { font-size: 0.7rem; color: var(--text-sub); }
 
-        .badge { padding: 6px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; }
-        .badge-success { background: rgba(34,197,94,0.1); color: var(--accent-green); }
-        .badge-warning { background: rgba(245,158,11,0.1); color: #d97706; }
-        .badge-danger { background: rgba(239,68,68,0.1); color: var(--accent-red); }
-        .badge-info { background: rgba(59,130,246,0.1); color: var(--accent-blue); }
-        .badge-gold { background: rgba(212,175,55,0.1); color: var(--accent-gold); }
+        .badge { padding: 5px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; }
+        .badge-success { background: rgba(34,197,94,0.15); color: var(--accent-green); }
+        .badge-warning { background: rgba(245,158,11,0.15); color: #f59e0b; }
+        .badge-danger { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+        .badge-info { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+        .badge-gold { background: rgba(212,175,55,0.15); color: var(--accent-gold); }
 
         /* --- BUTTONS & FORMS --- */
         .btn { padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; }
-        .btn-sm { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; }
+        .btn-sm { padding: 6px 12px; font-size: 0.75rem; border-radius: 8px; }
         .btn-primary { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); color: white; }
         .btn-primary:hover { box-shadow: 0 4px 12px rgba(34,197,94,0.3); transform: translateY(-1px); }
         .btn-danger { background: rgba(239,68,68,0.1); color: var(--accent-red); }
         .btn-danger:hover { background: var(--accent-red); color: white; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
-        .btn-outline:hover { border-color: var(--text-sub); background: var(--bg-main); }
-        .btn-gold { background: linear-gradient(135deg, var(--accent-gold), #b45309); color: white; }
+        .btn-outline:hover { border-color: var(--accent-gold); background: rgba(212,175,55,0.05); }
+        .btn-gold { background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark)); color: white; }
 
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-main); font-size: 0.9rem;}
-        .form-control { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-main); color: var(--text-main); font-family: inherit; font-size: 0.95rem; outline: none; transition: 0.2s;}
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 700; color: var(--text-main); font-size: 0.85rem;}
+        .form-group label i { margin-right: 6px; color: var(--accent-gold); }
+        .form-control { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-main); color: var(--text-main); font-family: inherit; font-size: 0.9rem; outline: none; transition: 0.2s;}
         .form-control:focus { border-color: var(--accent-green); box-shadow: 0 0 0 3px rgba(34,197,94,0.1); }
         textarea.form-control { resize: vertical; min-height: 100px; }
         select.form-control { cursor: pointer; }
 
         /* --- MODALS --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; }
         .modal-card { background: var(--bg-panel); border-radius: 28px; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); animation: modalIn 0.3s ease; }
         .modal-header { padding: 20px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .modal-header h2 { font-size: 1.2rem; font-weight: 700; }
-        .modal-close { background: none; border: none; font-size: 1.5rem; color: var(--text-sub); cursor: pointer; }
+        .modal-header h2 { font-size: 1.3rem; font-weight: 800; color: var(--accent-green); }
+        .modal-close { background: none; border: none; font-size: 1.5rem; color: var(--text-sub); cursor: pointer; transition: 0.2s; }
+        .modal-close:hover { color: var(--accent-red); transform: scale(1.1); }
         .modal-body { padding: 25px; }
         .modal-footer { padding: 20px 25px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; background: var(--bg-main); }
 
@@ -150,7 +175,7 @@
 
         /* --- GALLERY GRID --- */
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
-        .gallery-item { background: var(--bg-panel); border-radius: 20px; overflow: hidden; border: 1px solid var(--border); transition: 0.3s; cursor: pointer; }
+        .gallery-item { background: var(--bg-panel); border-radius: 20px; overflow: hidden; border: 1px solid var(--border); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
         .gallery-item:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--accent-gold); }
         .gallery-image { width: 100%; height: 200px; object-fit: cover; }
         .gallery-info { padding: 15px; }
@@ -197,12 +222,14 @@
             .sidebar { position: fixed; left: -280px; height: 100%; }
             .sidebar.open { left: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
             .mobile-toggle { display: block; }
+            .topbar { padding: 12px 20px; }
+            .content-area { padding: 20px; }
         }
         
-        .status-pending { background: rgba(245,158,11,0.2); color: #f59e0b; }
-        .status-approved { background: rgba(34,197,94,0.2); color: var(--accent-green); }
-        .status-suspended { background: rgba(239,68,68,0.2); color: var(--accent-red); }
-        .status-rejected { background: rgba(100,116,139,0.2); color: #64748b; }
+        .status-pending { background: rgba(245,158,11,0.15); color: #f59e0b; }
+        .status-approved { background: rgba(34,197,94,0.15); color: var(--accent-green); }
+        .status-suspended { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+        .status-rejected { background: rgba(100,116,139,0.15); color: #64748b; }
     </style>
 </head>
 <body>
@@ -210,7 +237,7 @@
     <!-- Full Page Loader -->
     <div class="loader-overlay" id="globalLoader">
         <div class="spinner"></div>
-        <h3 style="color: var(--text-main);">Authenticating Admin...</h3>
+        <h3 style="color: var(--text-main); font-family: 'Playfair Display', serif;">Authenticating Admin...</h3>
     </div>
 
     <!-- Toasts -->
@@ -219,7 +246,9 @@
     <!-- SIDEBAR NAVIGATION -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">PD</div>
+            <div class="sidebar-logo">
+                <img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" alt="Prayer Dome Logo">
+            </div>
             <div>
                 <div class="sidebar-title">Admin Console</div>
                 <div class="sidebar-subtitle">System Control Hub</div>
@@ -237,10 +266,11 @@
             <div class="nav-item" onclick="switchView('media', this)"><i class="fas fa-camera"></i> Media Upload</div>
             <div class="nav-item" onclick="switchView('content', this)"><i class="fas fa-comment-dots"></i> Prayers & Testimonies</div>
             <div class="nav-item" onclick="switchView('notifications', this)"><i class="fas fa-bell"></i> Notifications</div>
+            <div class="nav-item" onclick="switchView('contacts', this)"><i class="fas fa-envelope"></i> Contact Messages</div>
         </div>
         <div class="sidebar-footer">
             <button class="btn btn-outline" style="width: 100%; color: #ef4444; border-color: rgba(239,68,68,0.3);" onclick="logoutAdmin()">
-                <i class="fas fa-power-off"></i> Secure Logout
+                <i class="fas fa-sign-out-alt"></i> Secure Logout
             </button>
         </div>
     </nav>
@@ -251,7 +281,7 @@
         <header class="topbar">
             <div style="display: flex; align-items: center; gap: 15px;">
                 <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-                <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--text-main); display: none;" id="mobileHeaderTitle">Dashboard</h2>
+                <h2 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main); display: none;" id="mobileHeaderTitle">Dashboard</h2>
             </div>
             <div class="topbar-actions">
                 <button class="action-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
@@ -269,7 +299,7 @@
             <!-- DASHBOARD VIEW -->
             <div id="view-dashboard" class="section-view active">
                 <div class="page-title">
-                    <span>System Overview</span>
+                    <span><i class="fas fa-chart-line"></i> System Overview</span>
                     <button class="btn btn-primary btn-sm" onclick="loadDashboardStats()"><i class="fas fa-sync-alt"></i> Refresh</button>
                 </div>
                 <div class="kpi-grid">
@@ -295,91 +325,91 @@
                     </div>
                 </div>
                 <div class="panel-card">
-                    <div class="panel-header"><h3>Recent Membership Applications</h3><button class="btn btn-outline btn-sm" onclick="switchView('members', document.querySelectorAll('.nav-item')[1])">View All</button></div>
-                    <div class="table-responsive"> <table><thead> <tr><th>Applicant</th><th>Branch</th><th>Date</th><th>Status</th><th>Action</th> </tr></thead><tbody id="dashPendingMembers"> <tr><td colspan="5" style="text-align: center;">Loading...</td></tr> </tbody></table> </div>
+                    <div class="panel-header"><h3><i class="fas fa-user-clock"></i> Recent Membership Applications</h3><button class="btn btn-outline btn-sm" onclick="switchView('members', document.querySelectorAll('.nav-item')[1])">View All</button></div>
+                    <div class="table-responsive"><table><thead> <tr><th>Applicant</th><th>Branch</th><th>Date</th><th>Status</th><th>Action</th> </tr></thead><tbody id="dashPendingMembers"> <tr><td colspan="5" style="text-align: center;"><div class="spinner" style="width:30px;height:30px;"></div></td></tr> </tbody> </table> </div>
                 </div>
             </div>
 
             <!-- MEMBERS CRM VIEW -->
             <div id="view-members" class="section-view">
-                <div class="page-title">Members Management</div>
+                <div class="page-title"><i class="fas fa-users"></i> Members Management</div>
                 <div class="panel-card">
                     <div class="panel-header">
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                            <input type="text" id="searchMember" class="form-control" placeholder="Search name, email, or ID..." style="width: 280px; padding: 8px 12px;" onkeyup="filterMembers()">
+                            <input type="text" id="searchMember" class="form-control" placeholder="🔍 Search name, email, or ID..." style="width: 260px; padding: 8px 12px;" onkeyup="filterMembers()">
                             <select id="filterMemberStatus" class="form-control" style="width: 130px; padding: 8px 12px;" onchange="filterMembers()">
                                 <option value="all">All Statuses</option>
-                                <option value="approved">Active</option>
-                                <option value="pending">Pending</option>
-                                <option value="suspended">Suspended</option>
-                                <option value="rejected">Rejected</option>
+                                <option value="approved">✅ Active</option>
+                                <option value="pending">⏳ Pending</option>
+                                <option value="suspended">⛔ Suspended</option>
+                                <option value="rejected">❌ Rejected</option>
                             </select>
                             <select id="filterMemberRole" class="form-control" style="width: 130px; padding: 8px 12px;" onchange="filterMembers()">
                                 <option value="all">All Roles</option>
-                                <option value="member">Member</option>
-                                <option value="finance">Finance</option>
-                                <option value="admin">Admin</option>
-                                <option value="pastor">Pastor</option>
-                                <option value="worship">Worship</option>
+                                <option value="member">👤 Member</option>
+                                <option value="finance">💰 Finance</option>
+                                <option value="admin">👑 Admin</option>
+                                <option value="pastor">🙏 Pastor</option>
+                                <option value="worship">🎵 Worship</option>
                             </select>
                         </div>
-                        <button class="btn btn-primary btn-sm" onclick="loadMembers()"><i class="fas fa-sync"></i> Reload</button>
+                        <button class="btn btn-primary btn-sm" onclick="loadMembers()"><i class="fas fa-sync-alt"></i> Reload</button>
                     </div>
                     <div class="table-responsive">
-                        <table><thead> <tr><th>Member</th><th>ID</th><th>Contact</th><th>Plan</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th> </tr></thead><tbody id="listMembers"> <tr><td colspan="8" style="text-align: center;">Loading...</td></tr> </tbody></table>
+                        <table><thead> <tr><th>Member</th><th>ID</th><th>Contact</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th> </tr></thead><tbody id="listMembers"> <tr><td colspan="7" style="text-align: center;"><div class="spinner" style="width:30px;height:30px;"></div></td></tr> </tbody> </table>
                     </div>
                 </div>
             </div>
 
             <!-- GALLERY MANAGEMENT VIEW -->
             <div id="view-gallery" class="section-view">
-                <div class="page-title"><span>Gallery Management</span><button class="btn btn-primary btn-sm" onclick="uploadGalleryImage()"><i class="fas fa-plus"></i> Upload Image</button></div>
+                <div class="page-title"><span><i class="fas fa-images"></i> Gallery Management</span><button class="btn btn-primary btn-sm" onclick="uploadGalleryImage()"><i class="fas fa-plus"></i> Upload Image</button></div>
                 <div class="panel-card">
                     <div class="panel-header">
-                        <div style="display: flex; gap: 10px;">
-                            <select id="galleryStatusFilter" class="form-control" style="width: 150px;" onchange="loadGallery()"><option value="all">All Status</option><option value="approved">Approved</option><option value="pending">Pending</option><option value="rejected">Rejected</option></select>
-                            <select id="galleryCategoryFilter" class="form-control" style="width: 150px;" onchange="loadGallery()"><option value="all">All Categories</option><option value="pastors">Pastors & Leaders</option><option value="worship">Worship</option><option value="ministries">Ministries</option><option value="church">Church & Locations</option></select>
-                            <input type="text" id="gallerySearch" class="form-control" placeholder="Search by title..." style="width: 200px;" onkeyup="filterGallery()">
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <select id="galleryStatusFilter" class="form-control" style="width: 140px;" onchange="loadGallery()"><option value="all">All Status</option><option value="approved">✅ Approved</option><option value="pending">⏳ Pending</option><option value="rejected">❌ Rejected</option></select>
+                            <select id="galleryCategoryFilter" class="form-control" style="width: 160px;" onchange="loadGallery()"><option value="all">All Categories</option><option value="pastors">👨‍🏫 Pastors & Leaders</option><option value="worship">🎵 Worship</option><option value="ministries">🤝 Ministries</option><option value="church">⛪ Church & Locations</option></select>
+                            <input type="text" id="gallerySearch" class="form-control" placeholder="🔍 Search by title..." style="width: 200px;" onkeyup="filterGallery()">
                         </div>
-                        <button class="btn btn-outline btn-sm" onclick="loadGallery()"><i class="fas fa-sync"></i> Refresh</button>
+                        <button class="btn btn-outline btn-sm" onclick="loadGallery()"><i class="fas fa-sync-alt"></i> Refresh</button>
                     </div>
-                    <div class="gallery-grid" id="galleryGrid"><div style="grid-column: 1/-1; text-align: center; padding: 40px;">Loading gallery...</div></div>
+                    <div class="gallery-grid" id="galleryGrid"><div style="grid-column: 1/-1; text-align: center; padding: 40px;"><div class="spinner"></div></div></div>
                 </div>
             </div>
 
             <!-- FINANCE VIEW -->
             <div id="view-finance" class="section-view">
-                <div class="page-title">Financial Ledger</div>
+                <div class="page-title"><i class="fas fa-coins"></i> Financial Ledger</div>
                 <div class="panel-card">
-                    <div class="panel-header"><h3>Deposits & Offerings</h3><button class="btn btn-outline btn-sm" onclick="loadFinances()"><i class="fas fa-sync"></i> Refresh</button></div>
-                    <div class="table-responsive"> <table><thead> <tr><th>Date</th><th>Member</th><th>Amount</th><th>Proof</th><th>Status</th><th>Actions</th> </tr></thead><tbody id="listDeposits"> <tr><td colspan="6" style="text-align: center;">Loading...</td></tr> </tbody></table> </div>
+                    <div class="panel-header"><h3><i class="fas fa-arrow-down"></i> Deposits & Offerings</h3><button class="btn btn-outline btn-sm" onclick="loadFinances()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
+                    <div class="table-responsive"> <table><thead> <tr><th>Date</th><th>Member</th><th>Amount</th><th>Proof</th><th>Status</th><th>Actions</th> </tr></thead><tbody id="listDeposits"> <tr><td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div></td></tr> </tbody> </table> </div>
                 </div>
                 <div class="panel-card">
-                    <div class="panel-header"><h3>Wallet Withdrawals</h3></div>
-                    <div class="table-responsive"> <table><thead> <tr><th>Date</th><th>Member</th><th>Amount</th><th>Phone/Account</th><th>Status</th><th>Actions</th> </tr></thead><tbody id="listWithdrawals"> <tr><td colspan="6" style="text-align: center;">Loading...</td></tr> </tbody></table> </div>
+                    <div class="panel-header"><h3><i class="fas fa-arrow-up"></i> Wallet Withdrawals</h3></div>
+                    <div class="table-responsive"> <table><thead> <tr><th>Date</th><th>Member</th><th>Amount</th><th>Phone/Account</th><th>Status</th><th>Actions</th> </tr></thead><tbody id="listWithdrawals"> <tr><td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div></td></tr> </tbody> </table> </div>
                 </div>
             </div>
 
             <!-- SUPPORT CLAIMS VIEW -->
             <div id="view-support" class="section-view">
-                <div class="page-title">Community Support Claims</div>
+                <div class="page-title"><i class="fas fa-hand-holding-heart"></i> Community Support Claims</div>
                 <div class="panel-card">
-                    <div class="panel-header"><h3>Pending Claims & Active Plans</h3><button class="btn btn-outline btn-sm" onclick="loadSupport()"><i class="fas fa-sync"></i> Refresh</button></div>
-                    <div class="table-responsive"> <table><thead> <tr><th>Date Applied</th><th>Member</th><th>Plan Type</th><th>Amount</th><th>Documents</th><th>Status</th><th>Actions</th> </tr></thead><tbody id="listSupportClaims"> <tr><td colspan="7" style="text-align: center;">Loading...</td></tr> </tbody></table> </div>
+                    <div class="panel-header"><h3><i class="fas fa-file-invoice"></i> Pending Claims & Active Plans</h3><button class="btn btn-outline btn-sm" onclick="loadSupport()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
+                    <div class="table-responsive"> <tr><thead> <tr><th>Date Applied</th><th>Member</th><th>Plan Type</th><th>Amount</th><th>Documents</th><th>Status</th><th>Actions</th> </tr></thead><tbody id="listSupportClaims"> <tr><td colspan="7"><div class="spinner" style="width:30px;height:30px;"></div></td></tr> </tbody> </table> </div>
                 </div>
             </div>
 
             <!-- FINANCIAL REPORTS VIEW -->
             <div id="view-financial_reports" class="section-view">
-                <div class="page-title"><span>Financial Reports (Sunday Collections)</span><button class="btn btn-primary btn-sm" onclick="loadFinancialReports()"><i class="fas fa-sync-alt"></i> Refresh</button><button class="btn btn-primary btn-sm" onclick="uploadFinancialReport()" style="background: var(--accent-purple); margin-left: 10px;"><i class="fas fa-upload"></i> Upload Report</button></div>
+                <div class="page-title"><span><i class="fas fa-file-alt"></i> Financial Reports (Sunday Collections)</span><button class="btn btn-primary btn-sm" onclick="loadFinancialReports()"><i class="fas fa-sync-alt"></i> Refresh</button><button class="btn btn-primary btn-sm" onclick="uploadFinancialReport()" style="background: var(--accent-purple); margin-left: 10px;"><i class="fas fa-upload"></i> Upload Report</button></div>
                 <div class="panel-card">
                     <div class="panel-header">
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             <select id="reportBranchFilter" class="form-control" style="width: 150px;" onchange="loadFinancialReports()"><option value="all">All Branches</option><option value="eswatini">🇸🇿 Eswatini</option><option value="zambia">🇿🇲 Zambia</option><option value="ireland">🇮🇪 Ireland</option></select>
-                            <select id="reportStatusFilter" class="form-control" style="width: 150px;" onchange="loadFinancialReports()"><option value="all">All Status</option><option value="submitted">Submitted</option><option value="approved">Approved</option></select>
-                            <input type="date" id="reportDateFilter" class="form-control" style="width: 150px;" placeholder="Filter by date" onchange="loadFinancialReports()">
+                            <select id="reportStatusFilter" class="form-control" style="width: 150px;" onchange="loadFinancialReports()"><option value="all">All Status</option><option value="submitted">📤 Submitted</option><option value="approved">✅ Approved</option></select>
+                            <input type="date" id="reportDateFilter" class="form-control" style="width: 150px;" onchange="loadFinancialReports()">
                         </div>
-                        <button class="btn btn-success btn-sm" onclick="exportFinancialReports()"><i class="fas fa-download"></i> Export All</button>
+                        <button class="btn btn-gold btn-sm" onclick="exportFinancialReports()"><i class="fas fa-download"></i> Export All</button>
                     </div>
                 </div>
                 <div class="kpi-grid" id="reportsStatsGrid">
@@ -389,47 +419,56 @@
                     <div class="kpi-card"><div class="kpi-icon red"><i class="fas fa-chart-line"></i></div><div class="kpi-details"><h3 id="totalIncomeAll">E0</h3><p>Total Income</p></div></div>
                 </div>
                 <div class="panel-card">
-                    <div class="panel-header"><h3>Submitted Financial Reports</h3><button class="btn btn-outline btn-sm" onclick="loadFinancialReports()"><i class="fas fa-sync"></i> Reload</button></div>
-                    <div class="table-responsive"><table id="financialReportsTable"><thead> <tr><th>Date</th><th>Branch</th><th>Submitted By</th><th>Total Income</th><th>Total Expense</th><th>Surplus</th><th>Approved By</th><th>Status</th><th>Actions</th> </tr></thead><tbody id="financialReportsList"> <tr><td colspan="9" style="text-align: center;">Loading reports......</td> </tr> </tbody> </table> </div>
+                    <div class="panel-header"><h3><i class="fas fa-list"></i> Submitted Financial Reports</h3><button class="btn btn-outline btn-sm" onclick="loadFinancialReports()"><i class="fas fa-sync-alt"></i> Reload</button></div>
+                    <div class="table-responsive"><table id="financialReportsTable"><thead> <tr><th>Date</th><th>Branch</th><th>Submitted By</th><th>Total Income</th><th>Total Expense</th><th>Surplus</th><th>Approved By</th><th>Status</th><th>Actions</th> </tr></thead><tbody id="financialReportsList"> <tr><td colspan="9"><div class="spinner" style="width:30px;height:30px;"></div> </td> </tr> </tbody> </table> </div>
                 </div>
             </div>
-
+            
             <!-- EVENTS VIEW -->
             <div id="view-events" class="section-view">
-                <div class="page-title"><span>Events Management</span><button class="btn btn-primary" onclick="openModal('modalEvent')"><i class="fas fa-plus"></i> Create Event</button></div>
-                <div class="panel-card"><div class="table-responsive"> <tr><thead> <tr><th>Date & Time</th><th>Event Title</th><th>Location</th><th>Category</th><th>Actions</th> </tr></thead><tbody id="listEvents"> <tr><td colspan="5" style="text-align: center;">Loading......</td> </tr> </tbody> </table> </div></div>
+                <div class="page-title"><span><i class="fas fa-calendar-alt"></i> Events Management</span><button class="btn btn-primary" onclick="openModal('modalEvent')"><i class="fas fa-plus"></i> Create Event</button></div>
+                <div class="panel-card"><div class="table-responsive"> <table><thead> <tr><th>Date & Time</th><th>Event Title</th><th>Location</th><th>Category</th><th>Actions</th> </tr></thead><tbody id="listEvents"> <tr><td colspan="5"><div class="spinner" style="width:30px;height:30px;"></div> </td> </tr> </tbody> </table> </div></div>
             </div>
 
             <!-- MEDIA UPLOAD VIEW -->
             <div id="view-media" class="section-view">
-                <div class="page-title"><span>Media Upload</span><button class="btn btn-primary" onclick="uploadMedia()"><i class="fas fa-cloud-upload-alt"></i> Upload Image</button></div>
-                <div class="panel-card" style="padding: 20px;"><p>Upload images to be displayed in the gallery. All uploads require admin approval before appearing publicly.</p></div>
+                <div class="page-title"><span><i class="fas fa-camera"></i> Media Upload</span><button class="btn btn-primary" onclick="uploadMedia()"><i class="fas fa-cloud-upload-alt"></i> Upload Image</button></div>
+                <div class="panel-card" style="padding: 30px; text-align: center;"><i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: var(--accent-gold); margin-bottom: 15px;"></i><p>Upload images to be displayed in the gallery. All uploads require admin approval before appearing publicly.</p></div>
             </div>
 
             <!-- CONTENT VIEW -->
             <div id="view-content" class="section-view">
-                <div class="page-title">Prayers & Testimonies Moderation</div>
+                <div class="page-title"><i class="fas fa-comment-dots"></i> Prayers & Testimonies Moderation</div>
                 <div class="panel-card">
-                    <div class="panel-header"><h3>Public Wall Content</h3><select class="form-control" id="contentFilter" style="width: 200px; padding: 6px; margin: 0;" onchange="loadContent()"><option value="prayers">Prayers</option><option value="testimonies">Testimonies</option></select></div>
-                    <div class="table-responsive"> </table><thead> <tr><th>Date</th><th>Author</th><th>Content Text</th><th>Actions</th> </tr></thead><tbody id="listContent"> <tr><td colspan="4" style="text-align: center;">Loading......</td> </tr> </tbody> </table> </div>
+                    <div class="panel-header"><h3><i class="fas fa-filter"></i> Public Wall Content</h3><select class="form-control" id="contentFilter" style="width: 200px; padding: 6px;" onchange="loadContent()"><option value="prayers">🙏 Prayers</option><option value="testimonies">✨ Testimonies</option></select></div>
+                    <div class="table-responsive"> <table><thead> <tr><th>Date</th><th>Author</th><th>Content Text</th><th>Actions</th> </tr></thead><tbody id="listContent"> <tr><td colspan="4"><div class="spinner" style="width:30px;height:30px;"></div> </td> </tr> </tbody> </table> </div>
                 </div>
             </div>
 
             <!-- NOTIFICATIONS VIEW -->
             <div id="view-notifications" class="section-view">
-                <div class="page-title">Broadcast Notifications</div>
-                <div class="panel-card" style="max-width: 600px;">
-                    <div class="panel-header"><h3>Create Global Announcement</h3></div>
+                <div class="page-title"><i class="fas fa-bell"></i> Broadcast Notifications</div>
+                <div class="panel-card" style="max-width: 650px;">
+                    <div class="panel-header"><h3><i class="fas fa-broadcast-tower"></i> Create Global Announcement</h3></div>
                     <div style="padding: 25px;">
-                        <div class="form-group"><label>Title</label><input type="text" id="notifTitle" class="form-control" placeholder="e.g. Urgent Prayer Meeting Tonight"></div>
-                        <div class="form-group"><label>Message</label><textarea id="notifMessage" class="form-control" rows="4" placeholder="Enter the full message..."></textarea></div>
-                        <div class="form-group"><label>Type / Category</label><select id="notifType" class="form-control"><option value="general">General Info</option><option value="urgent">Urgent Alert</option><option value="event">Event Reminder</option></select></div>
+                        <div class="form-group"><label><i class="fas fa-heading"></i> Title</label><input type="text" id="notifTitle" class="form-control" placeholder="e.g. Urgent Prayer Meeting Tonight"></div>
+                        <div class="form-group"><label><i class="fas fa-comment"></i> Message</label><textarea id="notifMessage" class="form-control" rows="4" placeholder="Enter the full message..."></textarea></div>
+                        <div class="form-group"><label><i class="fas fa-tag"></i> Type / Category</label><select id="notifType" class="form-control"><option value="general">📢 General Info</option><option value="urgent">⚠️ Urgent Alert</option><option value="event">📅 Event Reminder</option></select></div>
                         <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="sendNotification()"><i class="fas fa-paper-plane"></i> Broadcast to All Users</button>
                         <button class="btn btn-outline" style="width: 100%;" onclick="testNotification()"><i class="fas fa-flask"></i> Test Notification (Send to Me)</button>
-                        <p style="font-size: 0.7rem; margin-top: 10px; color: var(--text-sub);">
+                        <p style="font-size: 0.7rem; margin-top: 15px; color: var(--text-sub); text-align: center;">
                             <i class="fas fa-info-circle"></i> Make sure you have notifications enabled in your browser.
                         </p>
                     </div>
+                </div>
+            </div>
+
+            <!-- CONTACT MESSAGES VIEW -->
+            <div id="view-contacts" class="section-view">
+                <div class="page-title"><i class="fas fa-envelope"></i> Contact Messages</div>
+                <div class="panel-card">
+                    <div class="panel-header"><h3><i class="fas fa-inbox"></i> User Messages</h3><button class="btn btn-outline btn-sm" onclick="loadContactMessages()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
+                    <div class="table-responsive"> <table><thead> <tr><th>Date</th><th>Name</th><th>Email</th><th>Subject</th><th>Message</th><th>Actions</th> </tr></thead><tbody id="contactMessagesList"> <tr><td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div> </td> </tr> </tbody> </table> </div>
                 </div>
             </div>
         </div>
@@ -438,12 +477,12 @@
     <!-- MODALS -->
     <div id="loginModal" class="modal-overlay" style="display: none;">
         <div class="modal-card" style="max-width: 400px; text-align: center; padding: 40px;">
-            <div style="width: 60px; height: 60px; background: rgba(239,68,68,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--accent-red); font-size: 24px;"><i class="fas fa-lock"></i></div>
-            <h2 style="margin-bottom: 10px;">Admin Access Only</h2>
+            <div class="sidebar-logo" style="margin: 0 auto 20px;"><img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" alt="Logo"></div>
+            <h2 style="margin-bottom: 10px; font-family: 'Playfair Display', serif; color: var(--accent-green);">Admin Access Only</h2>
             <p style="color: var(--text-sub); margin-bottom: 25px; font-size: 0.9rem;">Sign in with your administrator credentials.</p>
             <div class="form-group"><input type="email" id="adminEmail" class="form-control" placeholder="Admin Email"></div>
             <div class="form-group"><input type="password" id="adminPassword" class="form-control" placeholder="Password"></div>
-            <button class="btn btn-danger" style="width: 100%; padding: 14px;" onclick="adminLogin()">Authenticate</button>
+            <button class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="adminLogin()">Authenticate</button>
             <a href="index.html" style="display:block; margin-top:20px; color:var(--text-sub); text-decoration:none;">Return to Main Site</a>
         </div>
     </div>
@@ -504,11 +543,8 @@
         let allMembersCache = [];
         let allGalleryCache = [];
 
-        // VAPID Key for web push notifications
         const VAPID_KEY = "BFo6TSo4Urth0PXWZETz6cuPgRlemsFx7LDn8yDlFqCrIELU16X12O4ObOOlnbP2h7PvKqbC0N6a-_vrSsksrnM";
-        const FCM_SERVER_KEY = "AAAA_Vd9FEE:APA91bGvZPp_hJKpH7cOqTSAs5Hm-uwE1FNRdKJMRddkpH_0iGJhJpIhUy1LIdfnygU4DQ4MgAtnqlFtrTvhZZGryk7gT8hY-aNcYI93Hj-t-gLhRgTqMlUYx9wWn1q2Mx7LbUvWYkWw";
 
-        // ==================== UTILITY FUNCTIONS ====================
         window.toast = (msg, type = 'success') => { 
             const box = document.getElementById('toastBox'); 
             const t = document.createElement('div'); 
@@ -521,14 +557,7 @@
         window.showAdminToast = (title, message, type = 'info') => {
             const toast = document.createElement('div');
             toast.className = `admin-toast ${type === 'error' ? 'error' : type === 'warning' ? 'warning' : ''}`;
-            toast.innerHTML = `
-                <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-clock' : 'fa-bell'}" style="color: ${type === 'error' ? 'var(--accent-red)' : type === 'warning' ? 'var(--accent-gold)' : 'var(--accent-green)'}"></i>
-                <div>
-                    <strong>${title}</strong>
-                    <p style="margin: 0; font-size: 0.85rem;">${message}</p>
-                </div>
-                <button onclick="this.parentElement.remove()" style="background: none; border: none; font-size: 1rem; cursor: pointer; margin-left: auto;">&times;</button>
-            `;
+            toast.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-clock' : 'fa-bell'}" style="color: ${type === 'error' ? 'var(--accent-red)' : type === 'warning' ? 'var(--accent-gold)' : 'var(--accent-green)'}"></i><div><strong>${title}</strong><p style="margin: 0; font-size: 0.85rem;">${message}</p></div><button onclick="this.parentElement.remove()" style="background: none; border: none; font-size: 1rem; cursor: pointer; margin-left: auto;">&times;</button>`;
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 8000);
         };
@@ -542,25 +571,37 @@
         window.hideLoading = () => document.getElementById('globalLoader').style.display = 'none';
         window.loadMembers = function() { filterMembers(); };
 
-        // ==================== LOG ADMIN ACTIVITY ====================
         async function logAdminActivity(action, details) {
             if (!adminUser) return;
-            try {
-                await addDoc(collection(db, "adminLogs"), {
-                    action: action,
-                    details: details,
-                    adminId: adminUser.uid,
-                    adminEmail: adminUser.email,
-                    timestamp: serverTimestamp()
-                });
-            } catch (e) { console.error("Error logging activity:", e); }
+            try { await addDoc(collection(db, "adminLogs"), { action, details, adminId: adminUser.uid, adminEmail: adminUser.email, timestamp: serverTimestamp() }); }
+            catch (e) { console.error("Error logging activity:", e); }
         }
+        
+        // Contact Messages
+        window.loadContactMessages = async function() {
+            const tbody = document.getElementById('contactMessagesList');
+            if (!tbody) return;
+            tbody.innerHTML = '<td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div></td>';
+            try {
+                const snapshot = await getDocs(query(collection(db, "contactMessages"), orderBy("timestamp", "desc"), limit(50)));
+                if (snapshot.empty) { tbody.innerHTML = '<td colspan="6">No messages yet</td>'; return; }
+                let html = '';
+                snapshot.forEach(doc => {
+                    const msg = doc.data();
+                    html += `<tr><td>${msg.timestamp ? moment(msg.timestamp.toDate()).format('MMM D, YYYY h:mm A') : 'N/A'}</td>
+                        <td>${escapeHTML(msg.name)}</td><td>${escapeHTML(msg.email)}</td>
+                        <td><span class="badge badge-info">${escapeHTML(msg.subject)}</span></td>
+                        <td style="max-width:250px; white-space:normal;">${escapeHTML(msg.message.substring(0, 100))}${msg.message.length > 100 ? '...' : ''}</td>
+                        <td><button class="btn btn-sm btn-danger" onclick="deleteRecord('contactMessages','${doc.id}')"><i class="fas fa-trash"></i> Delete</button></td></tr>`;
+                });
+                tbody.innerHTML = html;
+            } catch(e) { console.error(e); tbody.innerHTML = '<td colspan="6">Error loading messages</td>'; }
+        };
 
-        // ==================== MEMBERS MANAGEMENT ====================
         window.loadDashboardStats = async function() {
             try {
                 const membersSnap = await getDocs(query(collection(db, "memberships"), orderBy("createdAt", "desc")));
-                let total=0,pending=0; allMembersCache=[]; let pendingHtml='';
+                let total=0, pending=0; allMembersCache=[]; let pendingHtml='';
                 membersSnap.forEach(d => { const data=d.data(); data.id=d.id; allMembersCache.push(data); if(data.status==='approved') total++; if(data.status==='pending'){ pending++; if(pending<=5){ pendingHtml+=`<tr><td><div class="user-cell"><img src="${data.photoUrl||'https://via.placeholder.com/40'}" class="user-img"><div><h4>${escapeHTML(data.fullName||'N/A')}</h4><p>${escapeHTML(data.email||'')}</p></div></div></td><td>${escapeHTML(data.branch||'Global')}</td><td>${data.createdAt?moment(data.createdAt.toDate()).format('MMM D'):'N/A'}</td><td><span class="badge badge-warning">Pending</span></td><td><button class="btn btn-sm btn-primary" onclick="approveMember('${d.id}')">Approve</button></td></tr>`; } } });
                 document.getElementById('statTotalMembers').innerText = total;
                 document.getElementById('statPendingMembers').innerText = pending;
@@ -601,22 +642,11 @@
                 const year = new Date().getFullYear(); 
                 const prefix=`PD${year}`; 
                 let max=0; 
-                allMembersCache.forEach(m=>{ 
-                    if(m.membershipId && m.membershipId.startsWith(prefix)){ 
-                        const num=parseInt(m.membershipId.substring(prefix.length),10); 
-                        if(!isNaN(num)&&num>max) max=num; 
-                    } 
-                }); 
+                allMembersCache.forEach(m=>{ if(m.membershipId && m.membershipId.startsWith(prefix)){ const num=parseInt(m.membershipId.substring(prefix.length),10); if(!isNaN(num)&&num>max) max=num; } }); 
                 const newId=`${prefix}${String(max+1).padStart(4,'0')}`; 
-                await updateDoc(doc(db,"memberships",uid),{
-                    status:'approved',
-                    membershipId:newId,
-                    approvedAt:serverTimestamp(),
-                    approvedBy:adminUser?.email || adminUser?.uid
-                }); 
+                await updateDoc(doc(db,"memberships",uid),{ status:'approved', membershipId:newId, approvedAt:serverTimestamp(), approvedBy:adminUser?.email || adminUser?.uid }); 
                 const wRef=doc(db,"wallets",uid); 
-                if(!(await getDoc(wRef)).exists()) 
-                    await setDoc(wRef,{userId:uid,balance:0,currency:'SZL',createdAt:serverTimestamp()}); 
+                if(!(await getDoc(wRef)).exists()) await setDoc(wRef,{userId:uid,balance:0,currency:'SZL',createdAt:serverTimestamp()}); 
                 await logAdminActivity('member_approved', { memberId: uid, membershipId: newId });
                 toast(`✅ Membership Approved! ID: ${newId}`); 
                 await loadDashboardStats(); 
@@ -653,17 +683,9 @@
                 const sigDisplay=document.getElementById('signatureDisplay'); 
                 sigDisplay.innerHTML=member.signatureUrl?`<img src="${member.signatureUrl}" style="max-width:100%;max-height:80px;">`:'<p>No signature on file</p>'; 
                 const suspendBtn=document.getElementById('suspendFullBtn'); 
-                if(member.status==='suspended'){ 
-                    suspendBtn.innerHTML='Activate'; 
-                    suspendBtn.onclick=()=>activateMemberFull(uid); 
-                    suspendBtn.classList.remove('btn-danger'); 
-                    suspendBtn.classList.add('btn-primary'); 
-                } else if(member.status==='approved' || member.status==='pending'){ 
-                    suspendBtn.innerHTML='Suspend'; 
-                    suspendBtn.onclick=()=>suspendMemberFull(uid); 
-                    suspendBtn.classList.remove('btn-primary'); 
-                    suspendBtn.classList.add('btn-danger'); 
-                } else { suspendBtn.style.display='none'; } 
+                if(member.status==='suspended'){ suspendBtn.innerHTML='Activate'; suspendBtn.onclick=()=>activateMemberFull(uid); suspendBtn.classList.remove('btn-danger'); suspendBtn.classList.add('btn-primary'); } 
+                else if(member.status==='approved' || member.status==='pending'){ suspendBtn.innerHTML='Suspend'; suspendBtn.onclick=()=>suspendMemberFull(uid); suspendBtn.classList.remove('btn-primary'); suspendBtn.classList.add('btn-danger'); } 
+                else { suspendBtn.style.display='none'; } 
                 openModal('modalFullMemberDetails'); 
             } catch(e){ toast(e.message,'error'); } 
             finally { hideLoading(); } 
@@ -674,23 +696,7 @@
             if(!uid) return; 
             const gifts=document.getElementById('fullMemberGifts').value.split(',').map(g=>g.trim()).filter(g=>g); 
             const ministries=document.getElementById('fullMemberMinistries').value.split(',').map(m=>m.trim()).filter(m=>m); 
-            const data={
-                fullName:document.getElementById('fullMemberName').value,
-                phone:document.getElementById('fullMemberPhone').value,
-                idNumber:document.getElementById('fullMemberIdNumber').value,
-                dateOfBirth:document.getElementById('fullMemberDob').value,
-                gender:document.getElementById('fullMemberGender').value,
-                maritalStatus:document.getElementById('fullMemberMarital').value,
-                branch:document.getElementById('fullMemberBranch').value,
-                role:document.getElementById('fullMemberRole').value,
-                status:document.getElementById('fullMemberStatus').value,
-                bio:document.getElementById('fullMemberBio').value,
-                spiritualGifts:gifts,
-                ministries:ministries,
-                adminNotes:document.getElementById('fullMemberAdminNotes').value,
-                updatedAt:serverTimestamp(),
-                updatedBy:adminUser?.email || adminUser?.uid
-            }; 
+            const data={ fullName:document.getElementById('fullMemberName').value, phone:document.getElementById('fullMemberPhone').value, idNumber:document.getElementById('fullMemberIdNumber').value, dateOfBirth:document.getElementById('fullMemberDob').value, gender:document.getElementById('fullMemberGender').value, maritalStatus:document.getElementById('fullMemberMarital').value, branch:document.getElementById('fullMemberBranch').value, role:document.getElementById('fullMemberRole').value, status:document.getElementById('fullMemberStatus').value, bio:document.getElementById('fullMemberBio').value, spiritualGifts:gifts, ministries:ministries, adminNotes:document.getElementById('fullMemberAdminNotes').value, updatedAt:serverTimestamp(), updatedBy:adminUser?.email || adminUser?.uid }; 
             showLoading(); 
             try{ 
                 await updateDoc(doc(db,"memberships",uid),data); 
@@ -735,9 +741,7 @@
             const uid=document.getElementById('editMemberId').value; 
             if(!uid) return; 
             if(typeof cloudinary === 'undefined') return toast("Cloudinary not loaded", "error");
-            cloudinary.createUploadWidget({
-                cloudName:'prayerdome', uploadPreset:'signatures', folder:'member_signatures', cropping:true
-            },async(e,r)=>{ 
+            cloudinary.createUploadWidget({ cloudName:'prayerdome', uploadPreset:'signatures', folder:'member_signatures', cropping:true },async(e,r)=>{ 
                 if(!e&&r&&r.event==="success"){ 
                     showLoading(); 
                     try{ 
@@ -754,9 +758,7 @@
             const uid=document.getElementById('editMemberId').value; 
             if(!uid) return; 
             if(typeof cloudinary === 'undefined') return toast("Cloudinary not loaded", "error");
-            cloudinary.createUploadWidget({
-                cloudName:'prayerdome', uploadPreset:'profile_photos', folder:'member_photos', cropping:true, croppingAspectRatio:1
-            },async(e,r)=>{ 
+            cloudinary.createUploadWidget({ cloudName:'prayerdome', uploadPreset:'profile_photos', folder:'member_photos', cropping:true, croppingAspectRatio:1 },async(e,r)=>{ 
                 if(!e&&r&&r.event==="success"){ 
                     showLoading(); 
                     try{ 
@@ -771,7 +773,6 @@
             }).open(); 
         };
 
-        // ==================== GALLERY MANAGEMENT ====================
         async function loadGallery() {
             const statusFilter = document.getElementById('galleryStatusFilter')?.value || 'all';
             const categoryFilter = document.getElementById('galleryCategoryFilter')?.value || 'all';
@@ -817,159 +818,71 @@
 
         window.filterGallery = function() { const searchTerm=document.getElementById('gallerySearch')?.value.toLowerCase(); if(!searchTerm) return loadGallery(); const filtered=allGalleryCache.filter(img=>img.title?.toLowerCase().includes(searchTerm)||img.category?.toLowerCase().includes(searchTerm)); const grid=document.getElementById('galleryGrid'); if(filtered.length===0){ grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;">No matching images</div>'; return; } grid.innerHTML=filtered.map(img=>`<div class="gallery-item"><img src="${img.url}" class="gallery-image"><div class="gallery-info"><div class="gallery-title">${escapeHTML(img.title)}</div><div class="gallery-meta"><span><i class="fas fa-user"></i> ${escapeHTML(img.userName)}</span><span>${img.createdAt?moment(img.createdAt.toDate()).fromNow():'Recently'}</span></div><div class="gallery-meta"><span>${img.category}</span><span class="badge ${img.status==='approved'?'badge-success':'badge-warning'}">${img.status}</span></div><div class="gallery-actions">${img.status==='pending'?`<button class="btn btn-sm btn-success" onclick="approveGalleryImage('${img.id}')">Approve</button>`:''}<button class="btn btn-sm btn-outline" onclick="deleteGalleryImage('${img.id}')">Delete</button></div></div></div>`).join(''); };
 
-        // ==================== FINANCE FUNCTIONS ====================
         window.loadFinances = async function() { 
             const dBody=document.getElementById('listDeposits'), wBody=document.getElementById('listWithdrawals');
-            if(dBody) dBody.innerHTML='<td colspan="6">Loading...<\/td>';
-            if(wBody) wBody.innerHTML='<td colspan="6">Loading...<\/td>';
+            if(dBody) dBody.innerHTML='<td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div></td>';
+            if(wBody) wBody.innerHTML='<td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div></td>';
             try {
                 const dSnap=await getDocs(query(collection(db,"deposits"),orderBy("createdAt","desc"),limit(30)));
-                let dHtml=''; dSnap.forEach(d=>{ const data=d.data(); const badge=data.status==='approved'?'<span class="badge badge-success">Approved</span>':data.status==='rejected'?'<span class="badge badge-danger">Rejected</span>':'<span class="badge badge-warning">Pending</span>'; dHtml+=`<tr><td>${data.createdAt?moment(data.createdAt.toDate()).format('MMM D, YYYY'):'N/A'}</td><td>${escapeHTML(data.userName||data.userEmail)}</td><td>E${data.amount.toFixed(2)}</td><td>${data.proofUrl?`<button class="btn btn-sm btn-outline" onclick="viewDoc('${data.proofUrl}','image')">View</button>`:'No Proof'}</td><td>${badge}</td><td>${data.status==='pending'?`<button class="btn btn-sm btn-primary" onclick="approveFinance('deposits','${d.id}','${data.userId}',${data.amount})">Approve</button><button class="btn btn-sm btn-danger" onclick="rejectFinance('deposits','${d.id}')">Reject</button>`:'-'}</td></tr>`; }); if(dBody) dBody.innerHTML=dHtml||'<td colspan="6">No deposits<\/td>';
+                let dHtml=''; dSnap.forEach(d=>{ const data=d.data(); const badge=data.status==='approved'?'<span class="badge badge-success">Approved</span>':data.status==='rejected'?'<span class="badge badge-danger">Rejected</span>':'<span class="badge badge-warning">Pending</span>'; dHtml+=`<tr><td>${data.createdAt?moment(data.createdAt.toDate()).format('MMM D, YYYY'):'N/A'}</td><td>${escapeHTML(data.userName||data.userEmail)}</td><td style="color:var(--accent-green);font-weight:bold;">E${data.amount.toFixed(2)}</td><td>${data.proofUrl?`<button class="btn btn-sm btn-outline" onclick="viewDoc('${data.proofUrl}','image')">View</button>`:'No Proof'}</td><td>${badge}</td><td>${data.status==='pending'?`<button class="btn btn-sm btn-primary" onclick="approveFinance('deposits','${d.id}','${data.userId}',${data.amount})">Approve</button><button class="btn btn-sm btn-danger" onclick="rejectFinance('deposits','${d.id}')">Reject</button>`:'-'}</td></tr>`; }); if(dBody) dBody.innerHTML=dHtml||'<td colspan="6">No deposits<\/td>';
                 const wSnap=await getDocs(query(collection(db,"withdrawals"),orderBy("createdAt","desc"),limit(30)));
-                let wHtml=''; wSnap.forEach(w=>{ const data=w.data(); const badge=data.status==='approved'?'<span class="badge badge-success">Processed</span>':data.status==='rejected'?'<span class="badge badge-danger">Rejected</span>':'<span class="badge badge-warning">Pending</span>'; wHtml+=`<tr><td>${data.createdAt?moment(data.createdAt.toDate()).format('MMM D, YYYY'):'N/A'}</td><td>${escapeHTML(data.userName||data.userEmail)}</td><td style="color:var(--accent-red);">E${data.amount.toFixed(2)}</td><td>${escapeHTML(data.receivePhone||'N/A')}</td><td>${badge}</td><td>${data.status==='pending'?`<button class="btn btn-sm btn-primary" onclick="approveFinance('withdrawals','${w.id}','${data.userId}',${data.amount})">Approve</button><button class="btn btn-sm btn-danger" onclick="rejectFinance('withdrawals','${w.id}')">Reject</button>`:'-'}</td></tr>`; }); if(wBody) wBody.innerHTML=wHtml||'<td colspan="6">No withdrawals<\/td>';
+                let wHtml=''; wSnap.forEach(w=>{ const data=w.data(); const badge=data.status==='approved'?'<span class="badge badge-success">Processed</span>':data.status==='rejected'?'<span class="badge badge-danger">Rejected</span>':'<span class="badge badge-warning">Pending</span>'; wHtml+=`<tr><td>${data.createdAt?moment(data.createdAt.toDate()).format('MMM D, YYYY'):'N/A'}</td><td>${escapeHTML(data.userName||data.userEmail)}</td><td style="color:var(--accent-red);font-weight:bold;">E${data.amount.toFixed(2)}</td><td>${escapeHTML(data.receivePhone||'N/A')}</td><td>${badge}</td><td>${data.status==='pending'?`<button class="btn btn-sm btn-primary" onclick="approveFinance('withdrawals','${w.id}','${data.userId}',${data.amount})">Approve</button><button class="btn btn-sm btn-danger" onclick="rejectFinance('withdrawals','${w.id}')">Reject</button>`:'-'}</td></tr>`; }); if(wBody) wBody.innerHTML=wHtml||'<td colspan="6">No withdrawals<\/td>';
             } catch(e){ console.error(e); }
         };
 
         window.approveFinance = async function(type,docId,userId,amount){ if(!confirm("Approve?")) return; try{ if(type==='deposits'){ await updateDoc(doc(db,"deposits",docId),{status:'approved',approvedAt:serverTimestamp(),approvedBy:adminUser?.uid}); await updateDoc(doc(db,"wallets",userId),{balance:increment(amount)}); toast("Deposit approved!"); } else { const wRef=doc(db,"wallets",userId); const wSnap=await getDoc(wRef); if(wSnap.data().balance<amount) return toast("Insufficient funds","error"); await updateDoc(wRef,{balance:increment(-amount)}); await updateDoc(doc(db,"withdrawals",docId),{status:'approved',approvedAt:serverTimestamp(),approvedBy:adminUser?.uid}); toast("Withdrawal approved!"); } await loadFinances(); await loadDashboardStats(); } catch(e){ toast(e.message,'error'); } };
         window.rejectFinance = async function(type,docId){ const reason=prompt("Reason:"); if(!reason) return; await updateDoc(doc(db,type,docId),{status:'rejected',rejectReason:reason,rejectedAt:serverTimestamp(),rejectedBy:adminUser?.uid}); toast("Rejected"); await loadFinances(); await loadDashboardStats(); };
         
-        // ==================== SUPPORT CLAIMS ====================
-        window.loadSupport = async function(){ const tbody=document.getElementById('listSupportClaims'); if(tbody) tbody.innerHTML='<td colspan="7">Loading...<\/td>'; try{ const snap=await getDocs(query(collection(db,"supportClaims"),orderBy("createdAt","desc"),limit(30))); let html=''; snap.forEach(d=>{ const data=d.data(); const badge=data.status==='approved'?'<span class="badge badge-success">Approved</span>':data.status==='rejected'?'<span class="badge badge-danger">Rejected</span>':'<span class="badge badge-warning">Pending</span>'; let docs=''; if(data.documents){ for(const[key,url] of Object.entries(data.documents)) docs+=`<button class="btn btn-sm btn-outline" onclick="viewDoc('${url}','auto')">${key}</button>`; } html+=`<tr><td>${data.createdAt?moment(data.createdAt.toDate()).format('MMM D, YYYY'):'N/A'}</td><td>${escapeHTML(data.userName||data.userEmail)}</td><td>${data.planType}</td><td>E${data.requestedAmount}</td><td>${docs||'None'}</td><td>${badge}</td><td>${data.status==='pending'?`<button class="btn btn-sm btn-primary" onclick="approveClaim('${d.id}')">Approve</button><button class="btn btn-sm btn-danger" onclick="rejectClaim('${d.id}')">Reject</button>`:'-'}</td></tr>`; }); if(tbody) tbody.innerHTML=html||'<td colspan="7">No claims<\/td>'; } catch(e){ console.error(e); } };
+        window.loadSupport = async function(){ const tbody=document.getElementById('listSupportClaims'); if(tbody) tbody.innerHTML='<td colspan="7"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try{ const snap=await getDocs(query(collection(db,"supportClaims"),orderBy("createdAt","desc"),limit(30))); let html=''; snap.forEach(d=>{ const data=d.data(); const badge=data.status==='approved'?'<span class="badge badge-success">Approved</span>':data.status==='rejected'?'<span class="badge badge-danger">Rejected</span>':'<span class="badge badge-warning">Pending</span>'; let docs=''; if(data.documents){ for(const[key,url] of Object.entries(data.documents)) docs+=`<button class="btn btn-sm btn-outline" onclick="viewDoc('${url}','auto')">${key}</button>`; } html+=`<tr><td>${data.createdAt?moment(data.createdAt.toDate()).format('MMM D, YYYY'):'N/A'}</td><td>${escapeHTML(data.userName||data.userEmail)}</td><td>${data.planType}</td><td style="color:var(--accent-green);font-weight:bold;">E${data.requestedAmount}</td><td>${docs||'None'}</td><td>${badge}</td><td>${data.status==='pending'?`<button class="btn btn-sm btn-primary" onclick="approveClaim('${d.id}')">Approve</button><button class="btn btn-sm btn-danger" onclick="rejectClaim('${d.id}')">Reject</button>`:'-'}</td></tr>`; }); if(tbody) tbody.innerHTML=html||'<td colspan="7">No claims<\/td>'; } catch(e){ console.error(e); } };
         window.approveClaim = async function(id){ if(!confirm("Approve claim?")) return; await updateDoc(doc(db,"supportClaims",id),{status:'approved',approvedBy:adminUser?.uid,approvedAt:serverTimestamp()}); toast("Claim approved!"); await loadSupport(); await loadDashboardStats(); };
         window.rejectClaim = async function(id){ const reason=prompt("Reason:"); if(!reason) return; await updateDoc(doc(db,"supportClaims",id),{status:'rejected',rejectReason:reason,rejectedAt:serverTimestamp(),rejectedBy:adminUser?.uid}); toast("Claim rejected!"); await loadSupport(); await loadDashboardStats(); };
         
-        // ==================== EVENTS ====================
-        window.loadEvents = async function(){ const tbody=document.getElementById('listEvents'); if(tbody) tbody.innerHTML='<td colspan="5">Loading...<\/td>'; try{ const snap=await getDocs(query(collection(db,"events"),orderBy("date","desc"))); let html=''; snap.forEach(d=>{ const data=d.data(); html+=`<tr><td>${data.date?moment(data.date.toDate()).format('MMM D, YYYY HH:mm'):'N/A'}</td><td><strong>${escapeHTML(data.title)}</strong></td><td>${escapeHTML(data.location)}</td><td>${data.category}</td><td><button class="btn btn-sm btn-danger" onclick="deleteRecord('events','${d.id}')">Delete</button></td></tr>`; }); if(tbody) tbody.innerHTML=html||'<td colspan="5">No events<\/td>'; } catch(e){ console.error(e); } };
+        window.loadEvents = async function(){ const tbody=document.getElementById('listEvents'); if(tbody) tbody.innerHTML='<td colspan="5"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try{ const snap=await getDocs(query(collection(db,"events"),orderBy("date","desc"))); let html=''; snap.forEach(d=>{ const data=d.data(); html+=`<tr><td>${data.date?moment(data.date.toDate()).format('MMM D, YYYY HH:mm'):'N/A'}</td><td><strong>${escapeHTML(data.title)}</strong></td><td>${escapeHTML(data.location)}</td><td>${data.category}</td><td><button class="btn btn-sm btn-danger" onclick="deleteRecord('events','${d.id}')">Delete</button></td></tr>`; }); if(tbody) tbody.innerHTML=html||'<td colspan="5">No events<\/td>'; } catch(e){ console.error(e); } };
         window.saveEvent = async function(){ const title=document.getElementById('evTitle').value, date=document.getElementById('evDate').value; if(!title||!date) return toast("Title and date required","error"); showLoading(); try{ await addDoc(collection(db,"events"),{title:title,date:new Date(date),location:document.getElementById('evLocation').value,category:document.getElementById('evCategory').value,description:document.getElementById('evDesc').value,attendeeCount:0,createdAt:serverTimestamp(),createdBy:adminUser?.uid}); closeModal('modalEvent'); toast("Event published!"); await loadEvents(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
         
-        // ==================== CONTENT ====================
-        window.loadContent = async function(){ const col=document.getElementById('contentFilter').value, tbody=document.getElementById('listContent'); if(tbody) tbody.innerHTML='<td colspan="4">Loading...<\/td>'; try{ const snap=await getDocs(query(collection(db,col),orderBy("timestamp","desc"),limit(30))); if(snap.empty){ if(tbody) tbody.innerHTML=`<td colspan="4">No ${col}<\/td>`; return; } let html=''; snap.forEach(d=>{ const data=d.data(); const text=data.text||data.content||''; html+=`<tr><td>${data.timestamp?moment(data.timestamp.toDate()).format('MMM D, YYYY'):'N/A'}</td><td><strong>${escapeHTML(data.name||data.author||'Anonymous')}</strong></td><td title="${escapeHTML(text)}">${escapeHTML(text).substring(0,50)}...</td><td><button class="btn btn-sm btn-danger" onclick="deleteRecord('${col}','${d.id}')">Delete</button></td></tr>`; }); if(tbody) tbody.innerHTML=html; } catch(e){ console.error(e); } };
+        window.loadContent = async function(){ const col=document.getElementById('contentFilter').value, tbody=document.getElementById('listContent'); if(tbody) tbody.innerHTML='<td colspan="4"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try{ const snap=await getDocs(query(collection(db,col),orderBy("timestamp","desc"),limit(30))); if(snap.empty){ if(tbody) tbody.innerHTML=`<td colspan="4">No ${col}<\/td>`; return; } let html=''; snap.forEach(d=>{ const data=d.data(); const text=data.text||data.content||''; html+=`<tr><td>${data.timestamp?moment(data.timestamp.toDate()).format('MMM D, YYYY'):'N/A'}</td><td><strong>${escapeHTML(data.name||data.author||'Anonymous')}</strong></td><td title="${escapeHTML(text)}">${escapeHTML(text).substring(0,50)}...</td><td><button class="btn btn-sm btn-danger" onclick="deleteRecord('${col}','${d.id}')">Delete</button></td></tr>`; }); if(tbody) tbody.innerHTML=html; } catch(e){ console.error(e); } };
         
-        // ==================== NOTIFICATIONS WITH PUSH (USING CLOUD FUNCTION) ====================
-window.sendPushNotificationToAll = async function(title, message, type = 'general') {
-    if (!adminUser) {
-        toast("Admin not logged in", "error");
-        return;
-    }
-    
-    showLoading();
-    try {
-        // Get all user tokens
-        const tokensSnapshot = await getDocs(collection(db, "userTokens"));
-        const tokens = [];
-        tokensSnapshot.forEach(doc => { 
-            if (doc.data().active !== false && doc.data().token) {
-                tokens.push(doc.data().token);
-            }
-        });
-        
-        if (tokens.length === 0) { 
-            toast("❌ No active tokens found. Users need to enable notifications first.", "error");
-            hideLoading();
-            return; 
-        }
-        
-        // Save to Firestore - Cloud Function will send the actual notifications
-        await addDoc(collection(db, "notifications"), {
-            title: title,
-            message: message,
-            type: type,
-            tokens: tokens,
-            status: 'pending',
-            createdAt: serverTimestamp(),
-            createdBy: adminUser?.email
-        });
-        
-        toast(`✅ Notification queued! Will be sent to ${tokens.length} users.`, "success");
-        
-        // Also save to latest_alert for in-app notifications
-        await setDoc(doc(db, "notifications", "latest_alert"), { 
-            title: title, 
-            message: message, 
-            type: type, 
-            active: true, 
-            createdAt: serverTimestamp(), 
-            createdBy: adminUser?.email,
-            sentTo: tokens.length
-        }, { merge: true });
-        
-        await logAdminActivity('notification_sent', { title: title, type: type, recipients: tokens.length });
-        confetti({ particleCount: 150, spread: 100 });
-        
-    } catch (error) { 
-        console.error("Error saving notification:", error); 
-        toast("Error: " + error.message, "error"); 
-    } finally {
-        hideLoading();
-    }
-};
+        window.sendPushNotificationToAll = async function(title, message, type = 'general') {
+            if (!adminUser) { toast("Admin not logged in", "error"); return; }
+            showLoading();
+            try {
+                const tokensSnapshot = await getDocs(collection(db, "userTokens"));
+                const tokens = [];
+                tokensSnapshot.forEach(doc => { if (doc.data().active !== false && doc.data().token) { tokens.push(doc.data().token); } });
+                if (tokens.length === 0) { toast("❌ No active tokens found.", "error"); hideLoading(); return; }
+                await addDoc(collection(db, "notifications"), { title, message, type, tokens, status: 'pending', createdAt: serverTimestamp(), createdBy: adminUser?.email });
+                toast(`✅ Notification queued! Will be sent to ${tokens.length} users.`, "success");
+                await setDoc(doc(db, "notifications", "latest_alert"), { title, message, type, active: true, createdAt: serverTimestamp(), createdBy: adminUser?.email, sentTo: tokens.length }, { merge: true });
+                await logAdminActivity('notification_sent', { title, type, recipients: tokens.length });
+                confetti({ particleCount: 150, spread: 100 });
+            } catch (error) { console.error("Error saving notification:", error); toast("Error: " + error.message, "error"); } finally { hideLoading(); }
+        };
 
-// Test notification - sends to admin only
-window.testNotification = async function() {
-    const title = "🔔 Test Notification";
-    const message = "This is a test notification from Prayer Dome Admin Panel.";
-    
-    if (!confirm("Send test notification to YOUR device only?")) return;
-    
-    if (!adminUser) {
-        toast("Admin not logged in", "error");
-        return;
-    }
-    
-    showLoading();
-    try {
-        // Get current admin's token
-        const tokenDoc = await getDoc(doc(db, "userTokens", adminUser.uid));
-        if (!tokenDoc.exists() || !tokenDoc.data().token) {
-            toast("❌ No token found for your device.", "error");
-            toast("Please enable notifications in your browser first.", "info");
-            hideLoading();
-            return;
-        }
-        
-        // Save test notification to Firestore for Cloud Function to process
-        await addDoc(collection(db, "test_notifications"), {
-            title: title,
-            message: message,
-            token: tokenDoc.data().token,
-            userId: adminUser.uid,
-            status: 'pending',
-            createdAt: serverTimestamp(),
-            createdBy: adminUser?.email
-        });
-        
-        toast("✅ Test notification queued! Check your device in a few seconds.", "success");
-        
-    } catch (error) {
-        toast("Error: " + error.message, "error");
-    } finally {
-        hideLoading();
-    }
-};
+        window.testNotification = async function() {
+            const title = "🔔 Test Notification";
+            const message = "This is a test notification from Prayer Dome Admin Panel.";
+            if (!confirm("Send test notification to YOUR device only?")) return;
+            if (!adminUser) { toast("Admin not logged in", "error"); return; }
+            showLoading();
+            try {
+                const tokenDoc = await getDoc(doc(db, "userTokens", adminUser.uid));
+                if (!tokenDoc.exists() || !tokenDoc.data().token) { toast("❌ No token found for your device.", "error"); hideLoading(); return; }
+                await addDoc(collection(db, "test_notifications"), { title, message, token: tokenDoc.data().token, userId: adminUser.uid, status: 'pending', createdAt: serverTimestamp(), createdBy: adminUser?.email });
+                toast("✅ Test notification queued! Check your device in a few seconds.", "success");
+            } catch (error) { toast("Error: " + error.message, "error"); } finally { hideLoading(); }
+        };
 
-// Main send notification function
-window.sendNotification = async function() {
-    const title = document.getElementById('notifTitle').value;
-    const msg = document.getElementById('notifMessage').value;
-    const type = document.getElementById('notifType').value;
-    
-    if (!title || !msg) {
-        toast("Title and message required", "error");
-        return;
-    }
-    
-    if (!confirm(`Send notification to ALL users?\n\nTitle: ${title}\nMessage: ${msg}\n\nThis will send push notifications to all registered devices.`)) {
-        return;
-    }
-    
-    await sendPushNotificationToAll(title, msg, type);
-    
-    // Clear form
-    document.getElementById('notifTitle').value = '';
-    document.getElementById('notifMessage').value = '';
-};
+        window.sendNotification = async function() {
+            const title = document.getElementById('notifTitle').value;
+            const msg = document.getElementById('notifMessage').value;
+            const type = document.getElementById('notifType').value;
+            if (!title || !msg) { toast("Title and message required", "error"); return; }
+            if (!confirm(`Send notification to ALL users?\n\nTitle: ${title}\nMessage: ${msg}`)) return;
+            await sendPushNotificationToAll(title, msg, type);
+            document.getElementById('notifTitle').value = '';
+            document.getElementById('notifMessage').value = '';
+        };
 
-        // ==================== FINANCIAL REPORTS ====================
         window.uploadFinancialReport = function() {
             if(typeof cloudinary === 'undefined') return toast("Cloudinary not loaded", "error");
             const branch = prompt("Select branch (eswatini/zambia/ireland):", "eswatini");
@@ -978,13 +891,12 @@ window.sendNotification = async function() {
             if (!reportDate) return;
             const totalIncome = parseFloat(prompt("Total Income (E):", "0"));
             const totalExpense = parseFloat(prompt("Total Expense (E):", "0"));
-            const surplus = totalIncome - totalExpense;
             cloudinary.createUploadWidget({ cloudName:'prayerdome', uploadPreset:'financial_reports', folder:`financial_reports/${branch}`, allowedFormats:['pdf','jpg','jpeg','png'], maxFileSize:10*1024*1024 }, async (error, result) => {
                 if(error) return toast("Upload failed: " + error.message, "error");
                 if(result && result.event === "success") {
                     showLoading();
                     try {
-                        await addDoc(collection(db, "financialReports"), { branch:branch, date:reportDate, totalIncome:totalIncome, totalExpense:totalExpense, surplus:surplus, documentUrl:result.info.secure_url, documentPublicId:result.info.public_id, status:'submitted', submittedBy:adminUser?.email, submittedAt:serverTimestamp(), notes:prompt("Additional notes (optional):", "") || "" });
+                        await addDoc(collection(db, "financialReports"), { branch, date:reportDate, totalIncome, totalExpense, surplus: totalIncome - totalExpense, documentUrl:result.info.secure_url, documentPublicId:result.info.public_id, status:'submitted', submittedBy:adminUser?.email, submittedAt:serverTimestamp(), notes:prompt("Additional notes (optional):", "") || "" });
                         toast("✅ Financial report uploaded successfully!");
                         loadFinancialReports();
                     } catch(error) { toast("Error: " + error.message, "error"); }
@@ -993,18 +905,16 @@ window.sendNotification = async function() {
             }).open();
         };
         
-        window.loadFinancialReports = async function(){ const tbody=document.getElementById('financialReportsList'); if(!tbody) return; tbody.innerHTML='<td colspan="9" style="text-align: center;">Loading...<\/td>'; try { const branchFilter=document.getElementById('reportBranchFilter')?.value||'all'; const statusFilter=document.getElementById('reportStatusFilter')?.value||'all'; const dateFilter=document.getElementById('reportDateFilter')?.value||''; const snapshot=await getDocs(query(collection(db,"financialReports"),orderBy("date","desc"))); let reports=[]; snapshot.forEach(doc=>{reports.push({id:doc.id,...doc.data()});}); let filtered=reports; if(branchFilter!=='all') filtered=filtered.filter(r=>r.branch===branchFilter); if(statusFilter!=='all') filtered=filtered.filter(r=>r.status===statusFilter); if(dateFilter) filtered=filtered.filter(r=>r.date===dateFilter); document.getElementById('totalReportsCount').innerText=filtered.length; document.getElementById('pendingReportsCount').innerText=filtered.filter(r=>r.status==='submitted').length; document.getElementById('approvedReportsCount').innerText=filtered.filter(r=>r.status==='approved').length; document.getElementById('totalIncomeAll').innerText=`E${filtered.reduce((sum,r)=>sum+(r.totalIncome||0),0).toFixed(2)}`; if(filtered.length===0){ tbody.innerHTML='<td colspan="9" style="text-align: center;">No reports found<\/td>'; return; } let html=''; filtered.forEach(report=>{ const statusBadge=report.status==='approved'?'<span class="badge badge-success">Approved</span>':(report.status==='rejected'?'<span class="badge badge-danger">Rejected</span>':'<span class="badge badge-warning">Pending</span>'); const surplusColor=(report.surplus||0)>=0?'var(--accent-green)':'var(--accent-red)'; html+=`<tr><td>${moment(report.date).format('MMM D, YYYY')}</td><td>${report.branch==='eswatini'?'🇸🇿 Eswatini':report.branch==='zambia'?'🇿🇲 Zambia':'🇮🇪 Ireland'}</td><td>${escapeHTML(report.userName||report.userEmail)}</td><td style="color:var(--accent-green);font-weight:bold;">E${(report.totalIncome||0).toFixed(2)}</td><td style="color:var(--accent-red);">E${(report.totalExpense||0).toFixed(2)}</td><td style="color:${surplusColor};font-weight:bold;">E${(report.surplus||0).toFixed(2)}</td><td>${report.approvedBy?escapeHTML(report.approvedBy):'-'}</td><td>${statusBadge}</td><td>${report.documentUrl?`<button class="btn btn-sm btn-primary" onclick="viewDoc('${report.documentUrl}','auto')"><i class="fas fa-eye"></i></button>`:'-'}</td></tr>`; }); tbody.innerHTML=html; } catch(error){ console.error("Error loading reports:",error); tbody.innerHTML='<td colspan="9" style="text-align: center; color: red;">Error loading reports<\/td>'; toast("Error loading financial reports", "error"); } };
+        window.loadFinancialReports = async function(){ const tbody=document.getElementById('financialReportsList'); if(!tbody) return; tbody.innerHTML='<td colspan="9"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try { const branchFilter=document.getElementById('reportBranchFilter')?.value||'all'; const statusFilter=document.getElementById('reportStatusFilter')?.value||'all'; const dateFilter=document.getElementById('reportDateFilter')?.value||''; const snapshot=await getDocs(query(collection(db,"financialReports"),orderBy("date","desc"))); let reports=[]; snapshot.forEach(doc=>{reports.push({id:doc.id,...doc.data()});}); let filtered=reports; if(branchFilter!=='all') filtered=filtered.filter(r=>r.branch===branchFilter); if(statusFilter!=='all') filtered=filtered.filter(r=>r.status===statusFilter); if(dateFilter) filtered=filtered.filter(r=>r.date===dateFilter); document.getElementById('totalReportsCount').innerText=filtered.length; document.getElementById('pendingReportsCount').innerText=filtered.filter(r=>r.status==='submitted').length; document.getElementById('approvedReportsCount').innerText=filtered.filter(r=>r.status==='approved').length; document.getElementById('totalIncomeAll').innerText=`E${filtered.reduce((sum,r)=>sum+(r.totalIncome||0),0).toFixed(2)}`; if(filtered.length===0){ tbody.innerHTML='<td colspan="9">No reports found<\/td>'; return; } let html=''; filtered.forEach(report=>{ const statusBadge=report.status==='approved'?'<span class="badge badge-success">Approved</span>':(report.status==='rejected'?'<span class="badge badge-danger">Rejected</span>':'<span class="badge badge-warning">Pending</span>'); const surplusColor=(report.surplus||0)>=0?'var(--accent-green)':'var(--accent-red)'; html+=`<tr><td>${moment(report.date).format('MMM D, YYYY')}</td><td>${report.branch==='eswatini'?'🇸🇿 Eswatini':report.branch==='zambia'?'🇿🇲 Zambia':'🇮🇪 Ireland'}</td><td>${escapeHTML(report.submittedBy)}</td><td style="color:var(--accent-green);font-weight:bold;">E${(report.totalIncome||0).toFixed(2)}</td><td style="color:var(--accent-red);">E${(report.totalExpense||0).toFixed(2)}</td><td style="color:${surplusColor};font-weight:bold;">E${(report.surplus||0).toFixed(2)}</td><td>${report.approvedBy?escapeHTML(report.approvedBy):'-'}</td><td>${statusBadge}</td><td>${report.documentUrl?`<button class="btn btn-sm btn-primary" onclick="viewDoc('${report.documentUrl}','auto')"><i class="fas fa-eye"></i></button>`:'-'}</td></tr>`; }); tbody.innerHTML=html; } catch(error){ console.error("Error loading reports:",error); tbody.innerHTML='<td colspan="9">Error loading reports<\/td>'; toast("Error loading financial reports", "error"); } };
         
         window.viewDoc = function(url,type){ const img=document.getElementById('docImagePreview'), pdf=document.getElementById('docPdfBtn'); if(url.toLowerCase().includes('.pdf')){ if(img) img.style.display='none'; if(pdf){ pdf.style.display='inline-flex'; pdf.href=url; } } else { if(img){ img.style.display='block'; img.src=url; } if(pdf) pdf.style.display='none'; } openModal('modalViewDoc'); };
         window.exportFinancialReports = function() { toast("Export feature - CSV export ready", "info"); };
         window.uploadMedia = function(){ window.uploadGalleryImage(); };
-        window.deleteRecord = async function(col,id){ if(!confirm("Delete permanently?")) return; showLoading(); try{ await deleteDoc(doc(db,col,id)); toast("Deleted"); if(col==='events') await loadEvents(); if(col==='gallery') await loadGallery(); if(col==='prayers'||col==='testimonies') await loadContent(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
-        window.viewFullReport = function(reportId) { toast("Report details feature - coming soon", "info"); };
+        window.deleteRecord = async function(col,id){ if(!confirm("Delete permanently?")) return; showLoading(); try{ await deleteDoc(doc(db,col,id)); toast("Deleted"); if(col==='events') await loadEvents(); if(col==='gallery') await loadGallery(); if(col==='prayers'||col==='testimonies') await loadContent(); if(col==='contactMessages') await loadContactMessages(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
         
-        // ==================== REAL-TIME ADMIN NOTIFICATIONS ====================
         function setupAdminRealtimeListeners() {
             const membershipsQuery = query(collection(db, "memberships"), where("status", "==", "pending"));
-            onSnapshot(membershipsQuery, (snapshot) => { snapshot.docChanges().forEach((change) => { if(change.type === "added"){ const data=change.doc.data(); showAdminToast("🆕 New Membership Application", `${data.fullName} applied for membership.`, "info"); const audio=new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); audio.play().catch(()=>{}); } }); });
+            onSnapshot(membershipsQuery, (snapshot) => { snapshot.docChanges().forEach((change) => { if(change.type === "added"){ const data=change.doc.data(); showAdminToast("🆕 New Membership Application", `${data.fullName} applied for membership.`, "info"); } }); });
             const claimsQuery = query(collection(db, "supportClaims"), where("status", "==", "pending"));
             onSnapshot(claimsQuery, (snapshot) => { snapshot.docChanges().forEach((change) => { if(change.type === "added"){ const data=change.doc.data(); showAdminToast("📝 New Support Claim", `${data.userName || data.userEmail} filed a ${data.planType} claim for E${data.requestedAmount}`, "info"); } }); });
             const depositsQuery = query(collection(db, "deposits"), where("status", "==", "pending"));
@@ -1013,7 +923,6 @@ window.sendNotification = async function() {
             onSnapshot(galleryQuery, (snapshot) => { snapshot.docChanges().forEach((change) => { if(change.type === "added"){ const data=change.doc.data(); showAdminToast("🖼️ New Gallery Upload", `${data.title} uploaded by ${data.userName || 'Anonymous'} awaiting approval`, "info"); } }); });
         }
         
-        // ==================== SWITCH VIEW ====================
         window.switchView = async (viewId, navElement) => {
             document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -1030,10 +939,10 @@ window.sendNotification = async function() {
                 else if(viewId === 'events') await loadEvents();
                 else if(viewId === 'content') await loadContent();
                 else if(viewId === 'financial_reports') await loadFinancialReports();
+                else if(viewId === 'contacts') await loadContactMessages();
             } catch(e) { console.error(`Error loading ${viewId}:`, e); toast(`Error loading ${viewId} data`, 'error'); }
         };
 
-        // ==================== AUTH ====================
         onAuthStateChanged(auth, async (user) => {
             showLoading();
             if (user) {
