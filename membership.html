@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Prayer Dome | Church Membership System</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -13,29 +14,45 @@
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         :root {
-            --accent-green: #22c55e;
-            --accent-green-dark: #16a34a;
+            --accent-green: #15803d;
+            --accent-green-light: #22c55e;
             --accent-gold: #d4af37;
-            --accent-red: #ef4444;
+            --accent-gold-dark: #b45309;
             --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
             --accent-purple: #8b5cf6;
             --bg-primary: #f8fafc;
             --bg-card: #ffffff;
-            --text-primary: #0f172a;
-            --text-secondary: #64748b;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
             --border-color: #e2e8f0;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            --shadow-glow: 0 10px 30px rgba(21, 128, 61, 0.15);
             --card-gradient: linear-gradient(135deg, #1a4d2e 0%, #064e3b 100%);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); transition: 0.3s; }
-        body.dark-mode { --bg-primary: #0f172a; --bg-card: #1e293b; --text-primary: #f8fafc; --border-color: #334155; }
+        body.dark-mode {
+            --bg-primary: #020617; 
+            --bg-card: #0f172a; 
+            --text-main: #f8fafc; 
+            --text-sub: #94a3b8; 
+            --border-color: #1e293b;
+        }
 
-        .header { background: var(--card-gradient); color: white; padding: 25px 20px; text-align: center; }
-        .header-logo { width: 55px; background: white; border-radius: 12px; padding: 5px; margin-bottom: 10px; }
-        .header h1 { font-size: 1.5rem; letter-spacing: 2px; font-weight: 900; }
-        .header p { font-size: 0.8rem; opacity: 0.9; margin-top: 5px; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-main); transition: 0.3s; min-height: 100vh; }
+
+        /* Luxury Font for Headings */
+        .luxury-font, h1, h2, h3, .form-title, .card-name, .section-h, .tab-btn { font-family: 'Playfair Display', serif; }
+
+        /* Header */
+        .header { background: var(--card-gradient); color: white; padding: 30px 20px; text-align: center; position: relative; overflow: hidden; }
+        .header::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.1; pointer-events: none; }
+        .header-logo { width: 60px; background: white; border-radius: 15px; padding: 5px; margin-bottom: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        .header h1 { font-size: 1.8rem; letter-spacing: 2px; font-weight: 900; font-family: 'Playfair Display', serif; }
+        .header p { font-size: 0.85rem; opacity: 0.9; margin-top: 8px; }
         
         .main-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
 
@@ -43,23 +60,24 @@
         .step-indicator {
             display: flex;
             justify-content: center;
-            gap: 30px;
+            gap: 40px;
             margin-bottom: 30px;
-            padding: 15px;
+            padding: 20px;
             background: var(--bg-card);
             border-radius: 60px;
             border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
         }
         .step {
             display: flex;
             align-items: center;
-            gap: 10px;
-            color: var(--text-secondary);
+            gap: 12px;
+            color: var(--text-sub);
             font-weight: 600;
         }
         .step-number {
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: var(--bg-primary);
             border: 2px solid var(--border-color);
@@ -67,14 +85,17 @@
             align-items: center;
             justify-content: center;
             font-weight: 800;
+            font-size: 1.1rem;
         }
         .step.active .step-number {
-            background: var(--accent-green);
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light));
             border-color: var(--accent-green);
             color: white;
+            box-shadow: 0 0 15px rgba(34,197,94,0.3);
         }
         .step.active .step-text {
             color: var(--accent-green);
+            font-weight: 800;
         }
         .step.completed .step-number {
             background: var(--accent-gold);
@@ -86,36 +107,37 @@
         .selection-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 25px;
             margin-bottom: 30px;
         }
         .selection-card {
             background: var(--bg-card);
-            border-radius: 28px;
-            padding: 40px 30px;
+            border-radius: 32px;
+            padding: 45px 30px;
             text-align: center;
             cursor: pointer;
             border: 2px solid var(--border-color);
             transition: all 0.3s ease;
-            animation: fadeInUp 0.4s ease;
+            box-shadow: var(--shadow);
         }
         .selection-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
             border-color: var(--accent-green);
-            box-shadow: 0 20px 35px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-glow);
         }
         .selection-card i {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
+            font-size: 4rem;
+            margin-bottom: 20px;
         }
         .selection-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-            color: var(--text-primary);
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            color: var(--text-main);
+            font-family: 'Playfair Display', serif;
         }
         .selection-card p {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
+            font-size: 0.9rem;
+            color: var(--text-sub);
         }
         .selection-card.existing i { color: var(--accent-blue); }
         .selection-card.new i { color: var(--accent-green); }
@@ -123,45 +145,48 @@
         .sub-selection-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 25px;
             margin-bottom: 30px;
         }
         .sub-selection-card {
             background: var(--bg-card);
-            border-radius: 24px;
-            padding: 30px;
+            border-radius: 28px;
+            padding: 35px;
             text-align: center;
             cursor: pointer;
             border: 2px solid var(--border-color);
             transition: all 0.3s ease;
         }
         .sub-selection-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-5px);
             border-color: var(--accent-gold);
+            box-shadow: var(--shadow);
         }
         .sub-selection-card i {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
+            font-size: 3rem;
+            margin-bottom: 15px;
         }
         .sub-selection-card i.myself { color: var(--accent-purple); }
         .sub-selection-card i.someone { color: var(--accent-gold); }
+        .sub-selection-card h3 { font-size: 1.3rem; margin-bottom: 8px; font-family: 'Playfair Display', serif; }
 
-        .card { background: var(--bg-card); border-radius: 24px; padding: 30px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .card { background: var(--bg-card); border-radius: 32px; padding: 35px; border: 1px solid var(--border-color); box-shadow: var(--shadow); margin-bottom: 20px; }
         
-        .form-title { font-family: 'Merriweather', serif; color: var(--accent-green); font-size: 1.5rem; margin-bottom: 10px; }
-        .form-subtitle { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 25px; line-height: 1.5; }
-        .section-h { font-weight: 800; font-size: 0.9rem; color: var(--accent-gold); margin: 25px 0 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; text-transform: uppercase; }
+        .form-title { color: var(--accent-green); font-size: 1.8rem; margin-bottom: 10px; font-family: 'Playfair Display', serif; font-weight: 800; }
+        .form-subtitle { font-size: 0.9rem; color: var(--text-sub); margin-bottom: 25px; line-height: 1.5; }
+        .section-h { font-weight: 800; font-size: 1rem; color: var(--accent-gold); margin: 30px 0 15px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-family: 'Playfair Display', serif; }
         
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 700; font-size: 0.8rem; }
-        input, select, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-family: inherit; font-size: 0.9rem; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-green); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.85rem; }
+        .form-group label i { margin-right: 6px; color: var(--accent-gold); }
+        input, select, textarea { width: 100%; padding: 14px; border-radius: 14px; border: 1.5px solid var(--border-color); background: var(--bg-primary); color: var(--text-main); font-family: inherit; font-size: 0.95rem; transition: 0.2s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-green); box-shadow: 0 0 0 3px rgba(34,197,94,0.1); }
         
-        .checkbox-group { display: flex; flex-wrap: wrap; gap: 15px; margin: 10px 0; }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 15px; margin: 15px 0; }
         .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; }
 
-        .sig-canvas { border: 2px dashed var(--border-color); border-radius: 15px; background: #fff; cursor: crosshair; touch-action: none; width: 100%; height: 150px; }
+        .sig-canvas { border: 2px dashed var(--border-color); border-radius: 18px; background: #fff; cursor: crosshair; touch-action: none; width: 100%; height: 150px; }
 
         .status-badge {
             display: inline-block;
@@ -174,23 +199,26 @@
         }
         .status-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
         .status-approved { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        .status-rejected { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
 
+        /* Photo Upload */
         .photo-upload-area {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
         .photo-preview {
-            width: 120px;
-            height: 120px;
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
             border: 4px solid var(--accent-gold);
             overflow: hidden;
             background: var(--bg-primary);
             position: relative;
             cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
         .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
         .photo-overlay {
@@ -198,30 +226,33 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.7);
             color: white;
             text-align: center;
-            font-size: 10px;
-            padding: 4px;
+            font-size: 11px;
+            padding: 5px;
             display: none;
+            transition: 0.3s;
         }
         .photo-preview:hover .photo-overlay { display: block; }
         .upload-btn-small {
-            background: var(--accent-green);
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light));
             color: white;
             border: none;
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-weight: 600;
+            padding: 10px 25px;
+            border-radius: 40px;
+            font-weight: 700;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
+            transition: 0.2s;
         }
+        .upload-btn-small:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
 
         /* Digital ID Card */
         .digital-id-card {
-            width: 350px; 
-            min-height: 550px;
-            border-radius: 25px; 
+            width: 360px; 
+            min-height: 580px;
+            border-radius: 28px; 
             margin: 0 auto;
             position: relative; 
             overflow: hidden; 
@@ -241,7 +272,7 @@
             left: -50%; 
             width: 200%; 
             height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.08), transparent);
             transform: rotate(45deg); 
             animation: shine 5s infinite;
         }
@@ -256,75 +287,86 @@
             overflow: hidden; 
             background: rgba(0,0,0,0.5);
             box-shadow: 0 8px 20px rgba(0,0,0,0.3); 
+            position: relative; 
+            z-index: 2;
         }
         .card-photo-circle img { width: 100%; height: 100%; object-fit: cover; }
         
-        .card-name { font-size: 1.2rem; font-weight: 800; text-transform: uppercase; margin-top: 12px; text-align: center; }
-        .card-id-num { color: var(--accent-gold); font-family: monospace; font-size: 14px; font-weight: 800; margin-bottom: 15px; text-align: center; }
+        .card-name { font-size: 1.3rem; font-weight: 800; text-transform: uppercase; margin-top: 15px; letter-spacing: 1px; text-align: center; font-family: 'Playfair Display', serif; }
+        .card-id-num { color: var(--accent-gold); font-family: monospace; font-size: 14px; font-weight: 800; margin-bottom: 15px; text-align: center; letter-spacing: 1px; }
         
         .card-data-grid { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
-            gap: 8px; 
+            gap: 10px; 
             width: 100%; 
-            background: rgba(255,255,255,0.1); 
-            padding: 10px; 
-            border-radius: 12px; 
+            background: rgba(255,255,255,0.12); 
+            padding: 12px; 
+            border-radius: 16px; 
             text-align: left; 
-            margin: 10px 0;
+            margin: 15px 0;
         }
-        .data-box label { font-size: 8px; opacity: 0.7; text-transform: uppercase; display: block; font-weight: 800; }
-        .data-box span { font-size: 10px; font-weight: 700; word-break: break-word; }
+        .data-box label { font-size: 8px; opacity: 0.8; text-transform: uppercase; display: block; font-weight: 800; letter-spacing: 1px; }
+        .data-box span { font-size: 11px; font-weight: 700; word-break: break-word; }
 
-        .card-barcode-wrap { background: white; width: 100%; padding: 6px; border-radius: 8px; margin-top: auto; min-height: 50px; display: flex; align-items: center; justify-content: center; }
-        .card-barcode-wrap svg { width: 100%; max-height: 45px; }
+        .card-barcode-wrap { background: white; width: 100%; padding: 8px; border-radius: 12px; margin-top: auto; min-height: 55px; display: flex; align-items: center; justify-content: center; }
+        .card-barcode-wrap svg { width: 100%; max-height: 50px; }
 
-        .benefit-card { background: var(--bg-primary); border-radius: 15px; padding: 20px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; border: 1px solid var(--border-color); }
-        .benefit-icon { width: 50px; height: 50px; background: var(--accent-gold); color: black; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        /* Benefits */
+        .benefit-card { background: var(--bg-primary); border-radius: 20px; padding: 20px; margin-bottom: 15px; display: flex; align-items: center; gap: 18px; border: 1px solid var(--border-color); transition: 0.3s; }
+        .benefit-card:hover { transform: translateX(8px); border-left: 4px solid var(--accent-gold); }
+        .benefit-icon { width: 55px; height: 55px; background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
 
-        .btn { padding: 15px 25px; border-radius: 50px; border: none; cursor: pointer; font-weight: 800; transition: 0.3s; width: 100%; }
-        .btn-primary { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); color: white; }
+        .btn { padding: 16px 28px; border-radius: 50px; border: none; cursor: pointer; font-weight: 800; transition: 0.3s; width: 100%; font-size: 1rem; }
+        .btn-primary { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); color: white; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: var(--shadow-glow); }
         .btn-retrieve { background: linear-gradient(135deg, var(--accent-blue), #2563eb); color: white; }
         .btn-back { background: transparent; border: 2px solid var(--border-color); color: var(--text-primary); }
+        .btn-back:hover { background: var(--bg-primary); transform: translateY(-2px); }
 
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.2); border-top-color: var(--accent-green); border-radius: 50%; animation: spin 1s linear infinite; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 5000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; backdrop-filter: blur(8px); }
+        .spinner { width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.2); border-top-color: var(--accent-green); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .toast-notification {
             position: fixed;
-            bottom: 20px;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--accent-green);
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light));
             color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
+            padding: 14px 28px;
+            border-radius: 60px;
             z-index: 10000;
             font-weight: 600;
             animation: slideUp 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        .toast-notification.error { background: var(--accent-red); }
-        .toast-notification.info { background: var(--accent-blue); }
+        .toast-notification.error { background: linear-gradient(135deg, var(--accent-red), #dc2626); }
+        .toast-notification.info { background: linear-gradient(135deg, var(--accent-blue), #2563eb); }
         @keyframes slideUp { 
-            from { opacity: 0; transform: translateX(-50%) translateY(20px); } 
+            from { opacity: 0; transform: translateX(-50%) translateY(30px); } 
             to { opacity: 1; transform: translateX(-50%) translateY(0); } 
         }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .tab-container { display: flex; gap: 8px; margin-bottom: 25px; background: var(--bg-card); padding: 8px; border-radius: 60px; border: 1px solid var(--border-color); }
+        .tab-btn { flex: 1; padding: 14px; border-radius: 50px; border: none; background: transparent; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 0.9rem; color: var(--text-sub); }
+        .tab-btn.active { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); color: white; box-shadow: 0 5px 15px rgba(34,197,94,0.3); }
 
         @media (max-width: 600px) { 
             .form-grid { grid-template-columns: 1fr; }
             .digital-id-card { width: 95%; min-height: auto; padding: 20px; }
             .card-photo-circle { width: 90px; height: 90px; margin-top: 10px; }
-            .selection-container { grid-template-columns: 1fr; }
-            .sub-selection-container { grid-template-columns: 1fr; }
-            .step-indicator { gap: 10px; }
+            .selection-container { grid-template-columns: 1fr; gap: 15px; }
+            .sub-selection-container { grid-template-columns: 1fr; gap: 15px; }
+            .step-indicator { gap: 15px; padding: 12px; }
             .step { flex-direction: column; text-align: center; gap: 5px; }
+            .step-number { width: 32px; height: 32px; font-size: 0.9rem; }
+            .step-text { font-size: 0.7rem; }
+            .tab-btn { padding: 10px; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -332,186 +374,237 @@
 
 <div class="loading-overlay" id="loader">
     <div class="spinner"></div>
-    <p style="margin-top:15px;">Processing...</p>
+    <p style="margin-top: 20px; font-weight: 600;">Processing...</p>
 </div>
 
 <div class="header">
     <img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" alt="Logo" class="header-logo">
     <h1>PRAYER DOME</h1>
-    <p>Church Membership Management System</p>
+    <p><i class="fas fa-id-card"></i> Church Membership Management System</p>
 </div>
 
 <div class="main-container">
-    <!-- Step Indicator -->
-    <div class="step-indicator" id="stepIndicator">
-        <div class="step" id="step1">
-            <div class="step-number">1</div>
-            <div class="step-text">Member Type</div>
-        </div>
-        <div class="step" id="step2">
-            <div class="step-number">2</div>
-            <div class="step-text">Registration Type</div>
-        </div>
-        <div class="step" id="step3">
-            <div class="step-number">3</div>
-            <div class="step-text">Complete Form</div>
-        </div>
+    <!-- Tab Navigation -->
+    <div class="tab-container">
+        <button class="tab-btn active" onclick="switchMainTab('membership')"><i class="fas fa-id-card"></i> Membership</button>
+        <button class="tab-btn" onclick="switchMainTab('benefits')"><i class="fas fa-gift"></i> Benefits</button>
+        <button class="tab-btn" onclick="switchMainTab('card')"><i class="fas fa-credit-card"></i> My ID Card</button>
     </div>
 
-    <!-- STEP 1: EXISTING OR NEW MEMBER -->
+    <!-- Step 1: EXISTING OR NEW MEMBER -->
     <div id="step1Container" class="card">
-        <h2 class="form-title" style="text-align: center;">Welcome to Membership Portal</h2>
+        <div class="step-indicator">
+            <div class="step active" id="step1Indicator">
+                <div class="step-number">1</div>
+                <div class="step-text">Member Type</div>
+            </div>
+            <div class="step" id="step2Indicator">
+                <div class="step-number">2</div>
+                <div class="step-text">Registration</div>
+            </div>
+            <div class="step" id="step3Indicator">
+                <div class="step-number">3</div>
+                <div class="step-text">Complete</div>
+            </div>
+        </div>
+        
+        <h2 class="form-title" style="text-align: center;"><i class="fas fa-id-card"></i> Welcome to Membership Portal</h2>
         <p class="form-subtitle" style="text-align: center;">Are you an existing member or a new member?</p>
         
         <div class="selection-container">
             <div class="selection-card existing" onclick="selectMemberCategory('existing')">
                 <i class="fas fa-id-card"></i>
                 <h3>Existing Member</h3>
-                <p>I already have a Membership ID</p>
+                <p><i class="fas fa-check-circle"></i> I already have a Membership ID</p>
             </div>
             <div class="selection-card new" onclick="selectMemberCategory('new')">
                 <i class="fas fa-user-plus"></i>
                 <h3>New Member</h3>
-                <p>I want to become a member</p>
+                <p><i class="fas fa-star"></i> I want to become a member</p>
             </div>
         </div>
     </div>
 
-    <!-- STEP 2: FOR EXISTING MEMBERS - ENTER ID -->
+    <!-- Step 2 Existing: ENTER MEMBERSHIP ID -->
     <div id="step2ExistingContainer" style="display: none;" class="card">
-        <button class="btn-back" style="width: auto; padding: 8px 20px; margin-bottom: 20px;" onclick="goBackToStep1()">
+        <div class="step-indicator">
+            <div class="step completed" id="step1Indicator2">
+                <div class="step-number"><i class="fas fa-check"></i></div>
+                <div class="step-text">Member Type</div>
+            </div>
+            <div class="step active" id="step2Indicator2">
+                <div class="step-number">2</div>
+                <div class="step-text">Retrieve</div>
+            </div>
+            <div class="step" id="step3Indicator2">
+                <div class="step-number">3</div>
+                <div class="step-text">Complete</div>
+            </div>
+        </div>
+        
+        <button class="btn-back" style="width: auto; padding: 10px 25px; margin-bottom: 25px;" onclick="goBackToStep1()">
             <i class="fas fa-arrow-left"></i> Back
         </button>
         
         <div style="text-align: center; padding: 20px;">
-            <i class="fas fa-id-card" style="font-size: 4rem; color: var(--accent-gold); margin-bottom: 20px;"></i>
-            <h3 style="margin-bottom: 15px;">Retrieve Your Membership</h3>
-            <p style="color: var(--text-secondary); margin-bottom: 25px;">Enter your Membership ID to link this account to your existing membership.</p>
+            <i class="fas fa-id-card" style="font-size: 5rem; color: var(--accent-gold); margin-bottom: 20px;"></i>
+            <h3 style="margin-bottom: 15px; font-family: 'Playfair Display', serif;">Retrieve Your Membership</h3>
+            <p style="color: var(--text-sub); margin-bottom: 30px;">Enter your Membership ID to link this account to your existing membership.</p>
             
             <div class="form-group">
-                <label>Membership ID</label>
-                <input type="text" id="retrieveMemberId" placeholder="e.g., PD20250001" style="text-align: center; font-size: 1.1rem;">
+                <label><i class="fas fa-qrcode"></i> Membership ID</label>
+                <input type="text" id="retrieveMemberId" placeholder="e.g., PD20250001" style="text-align: center; font-size: 1.2rem; letter-spacing: 1px;">
             </div>
             
             <button class="btn btn-retrieve" onclick="retrieveMembership()">
                 <i class="fas fa-search"></i> RETRIEVE MY MEMBERSHIP
             </button>
             
-            <div id="retrievedMemberInfo" style="margin-top: 30px; display: none; background: var(--bg-primary); border-radius: 20px; padding: 20px; border: 1px solid var(--border-color);">
+            <div id="retrievedMemberInfo" style="margin-top: 30px; display: none; background: var(--bg-primary); border-radius: 24px; padding: 25px; border: 2px solid var(--accent-gold);">
                 <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-                    <img id="retrievedPhoto" src="https://via.placeholder.com/80" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+                    <img id="retrievedPhoto" src="https://via.placeholder.com/80" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-gold);">
                     <div style="flex: 1;">
-                        <h4 id="retrievedName" style="color: var(--accent-green);">-</h4>
-                        <p id="retrievedId" style="font-family: monospace; color: var(--accent-gold);">-</p>
-                        <p id="retrievedBranch" style="font-size: 0.8rem;">-</p>
+                        <h4 id="retrievedName" style="color: var(--accent-green); font-family: 'Playfair Display', serif; font-size: 1.2rem;">-</h4>
+                        <p id="retrievedId" style="font-family: monospace; color: var(--accent-gold); font-size: 1rem;">-</p>
+                        <p id="retrievedBranch" style="font-size: 0.85rem;"><i class="fas fa-church"></i> -</p>
                     </div>
                 </div>
-                <button class="btn btn-primary" style="margin-top: 20px;" onclick="linkMembershipToAccount()">
+                <button class="btn btn-primary" style="margin-top: 25px;" onclick="linkMembershipToAccount()">
                     <i class="fas fa-link"></i> LINK TO MY ACCOUNT
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- STEP 2: FOR NEW MEMBERS - MYSELF OR SOMEONE ELSE -->
+    <!-- Step 2 New: MYSELF OR SOMEONE ELSE -->
     <div id="step2NewContainer" style="display: none;" class="card">
-        <button class="btn-back" style="width: auto; padding: 8px 20px; margin-bottom: 20px;" onclick="goBackToStep1()">
+        <div class="step-indicator">
+            <div class="step completed" id="step1IndicatorNew">
+                <div class="step-number"><i class="fas fa-check"></i></div>
+                <div class="step-text">Member Type</div>
+            </div>
+            <div class="step active" id="step2IndicatorNew">
+                <div class="step-number">2</div>
+                <div class="step-text">Who?</div>
+            </div>
+            <div class="step" id="step3IndicatorNew">
+                <div class="step-number">3</div>
+                <div class="step-text">Form</div>
+            </div>
+        </div>
+        
+        <button class="btn-back" style="width: auto; padding: 10px 25px; margin-bottom: 25px;" onclick="goBackToStep1()">
             <i class="fas fa-arrow-left"></i> Back
         </button>
         
-        <h2 class="form-title" style="text-align: center;">Who are you registering?</h2>
+        <h2 class="form-title" style="text-align: center;"><i class="fas fa-users"></i> Who are you registering?</h2>
         <p class="form-subtitle" style="text-align: center;">Select who this membership is for</p>
         
         <div class="sub-selection-container">
             <div class="sub-selection-card" onclick="selectRegistrationType('myself')">
-                <i class="fas fa-user myself" style="font-size: 3rem;"></i>
+                <i class="fas fa-user myself"></i>
                 <h3>Myself</h3>
-                <p>Register as yourself (linked to your account)</p>
+                <p><i class="fas fa-check"></i> Register as yourself</p>
             </div>
             <div class="sub-selection-card" onclick="selectRegistrationType('someone')">
-                <i class="fas fa-users someone" style="font-size: 3rem;"></i>
+                <i class="fas fa-users someone"></i>
                 <h3>Someone Else</h3>
-                <p>Register for a family member or friend</p>
+                <p><i class="fas fa-hand-holding-heart"></i> Register for family/friend</p>
             </div>
         </div>
     </div>
 
-    <!-- STEP 3: REGISTRATION FORM -->
+    <!-- Step 3: REGISTRATION FORM -->
     <div id="step3Container" style="display: none;" class="card">
-        <button class="btn-back" style="width: auto; padding: 8px 20px; margin-bottom: 20px;" onclick="goBackToStep2()">
+        <div class="step-indicator">
+            <div class="step completed" id="step1IndicatorForm">
+                <div class="step-number"><i class="fas fa-check"></i></div>
+                <div class="step-text">Member Type</div>
+            </div>
+            <div class="step completed" id="step2IndicatorForm">
+                <div class="step-number"><i class="fas fa-check"></i></div>
+                <div class="step-text">Who?</div>
+            </div>
+            <div class="step active" id="step3IndicatorForm">
+                <div class="step-number">3</div>
+                <div class="step-text">Form</div>
+            </div>
+        </div>
+        
+        <button class="btn-back" style="width: auto; padding: 10px 25px; margin-bottom: 25px;" onclick="goBackToStep2()">
             <i class="fas fa-arrow-left"></i> Back
         </button>
         
-        <h2 class="form-title" id="formTitle">New Member Registration</h2>
+        <h2 class="form-title" id="formTitle"><i class="fas fa-user-plus"></i> New Member Registration</h2>
         <p class="form-subtitle" id="formSubtitle">Please fill in all required information</p>
         
         <div class="photo-upload-area">
             <div class="photo-preview" onclick="uploadProfilePhoto()">
                 <img id="photoPreview" src="https://via.placeholder.com/150" alt="Profile Photo">
-                <div class="photo-overlay"><i class="fas fa-camera"></i> Tap to change</div>
+                <div class="photo-overlay"><i class="fas fa-camera"></i> Change Photo</div>
             </div>
             <button type="button" class="upload-btn-small" onclick="uploadProfilePhoto()">
                 <i class="fas fa-camera"></i> Upload Photo
             </button>
             <input type="hidden" id="uploadedPhotoUrl">
-            <p style="font-size: 0.7rem; color: var(--text-secondary);">Upload a clear photo for the ID card</p>
+            <p style="font-size: 0.75rem; color: var(--text-sub);"><i class="fas fa-info-circle"></i> Upload a clear photo for the ID card</p>
         </div>
         
         <form id="mForm">
-            <div class="section-h">Personal Details</div>
+            <div class="section-h"><i class="fas fa-user-circle"></i> Personal Details</div>
             <div class="form-grid">
-                <div class="form-group"><label>Full Name *</label><input type="text" id="fullName" required placeholder="e.g., John Doe"></div>
-                <div class="form-group"><label>Date of Birth *</label><input type="date" id="dob" required></div>
-                <div class="form-group"><label>Gender</label><select id="gender"><option value="Male">Male</option><option value="Female">Female</option></select></div>
-                <div class="form-group"><label>Identity No (NID/Passport) *</label><input type="text" id="idNo" required placeholder="National ID or Passport Number"></div>
-                <div class="form-group"><label>Phone Number</label><input type="tel" id="phone" placeholder="+268... (optional)"></div>
-                <div class="form-group"><label>Email</label><input type="email" id="email" placeholder="Email (optional)"></div>
+                <div class="form-group"><label><i class="fas fa-signature"></i> Full Name *</label><input type="text" id="fullName" required placeholder="e.g., John Doe"></div>
+                <div class="form-group"><label><i class="fas fa-calendar-alt"></i> Date of Birth *</label><input type="date" id="dob" required></div>
+                <div class="form-group"><label><i class="fas fa-venus-mars"></i> Gender</label><select id="gender"><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                <div class="form-group"><label><i class="fas fa-id-card"></i> Identity No (NID/Passport) *</label><input type="text" id="idNo" required placeholder="National ID or Passport Number"></div>
+                <div class="form-group"><label><i class="fas fa-phone-alt"></i> Phone Number</label><input type="tel" id="phone" placeholder="+268... (optional)"></div>
+                <div class="form-group"><label><i class="fas fa-envelope"></i> Email</label><input type="email" id="email" placeholder="Email (optional)"></div>
             </div>
 
-            <div class="section-h">Status & Occupation</div>
+            <div class="section-h"><i class="fas fa-briefcase"></i> Status & Occupation</div>
             <div class="form-grid">
-                <div class="form-group"><label>Marital Status</label><select id="marital"><option value="Single">Single</option><option value="Married">Married</option><option value="Divorced">Divorced</option><option value="Widowed">Widowed</option></select></div>
-                <div class="form-group"><label>Number of Dependants</label><input type="number" id="dependants" value="0"></div>
-                <div class="form-group"><label>Occupation</label><input type="text" id="job" placeholder="e.g., Teacher, Business"></div>
-                <div class="form-group"><label>Current Branch</label><select id="branch"><option value="Zambia - Chama">Zambia - Chama</option><option value="Eswatini - Manzini">Eswatini - Manzini</option><option value="Ireland - Cork">Ireland - Cork</option><option value="Online Global">Online Global</option></select></div>
+                <div class="form-group"><label><i class="fas fa-heart"></i> Marital Status</label><select id="marital"><option value="Single">Single</option><option value="Married">Married</option><option value="Divorced">Divorced</option><option value="Widowed">Widowed</option></select></div>
+                <div class="form-group"><label><i class="fas fa-child"></i> Number of Dependants</label><input type="number" id="dependants" value="0"></div>
+                <div class="form-group"><label><i class="fas fa-briefcase"></i> Occupation</label><input type="text" id="job" placeholder="e.g., Teacher, Business"></div>
+                <div class="form-group"><label><i class="fas fa-church"></i> Current Branch</label><select id="branch"><option value="Zambia - Chama">🇿🇲 Zambia - Chama</option><option value="Eswatini - Manzini">🇸🇿 Eswatini - Manzini</option><option value="Ireland - Cork">🇮🇪 Ireland - Cork</option><option value="Online Global">🌍 Online Global</option></select></div>
             </div>
 
-            <div class="section-h">Spiritual History</div>
+            <div class="section-h"><i class="fas fa-pray"></i> Spiritual History</div>
             <div class="form-grid">
-                <div class="form-group"><label>Born Again?</label><select id="bornAgain"><option value="Yes">Yes</option><option value="No">No</option></select></div>
-                <div class="form-group"><label>Date Born Again</label><input type="date" id="bornDate"></div>
-                <div class="form-group"><label>Water Baptised?</label><select id="waterBapt"><option value="Yes">Yes</option><option value="No">No</option></select></div>
-                <div class="form-group"><label>Date of Baptism</label><input type="date" id="baptDate"></div>
+                <div class="form-group"><label><i class="fas fa-cross"></i> Born Again?</label><select id="bornAgain"><option value="Yes">Yes</option><option value="No">No</option></select></div>
+                <div class="form-group"><label><i class="fas fa-calendar-day"></i> Date Born Again</label><input type="date" id="bornDate"></div>
+                <div class="form-group"><label><i class="fas fa-water"></i> Water Baptised?</label><select id="waterBapt"><option value="Yes">Yes</option><option value="No">No</option></select></div>
+                <div class="form-group"><label><i class="fas fa-calendar-day"></i> Date of Baptism</label><input type="date" id="baptDate"></div>
             </div>
             
             <div class="checkbox-group">
-                <label class="checkbox-item"><input type="checkbox" id="holySpirit"> Baptised with Holy Spirit?</label>
-                <label class="checkbox-item"><input type="checkbox" id="tongues"> Speak in Tongues?</label>
-                <label class="checkbox-item"><input type="checkbox" id="gifts"> Discovered Spiritual Gifts?</label>
+                <label class="checkbox-item"><input type="checkbox" id="holySpirit"> <i class="fas fa-dove"></i> Baptised with Holy Spirit?</label>
+                <label class="checkbox-item"><input type="checkbox" id="tongues"> <i class="fas fa-microphone-alt"></i> Speak in Tongues?</label>
+                <label class="checkbox-item"><input type="checkbox" id="gifts"> <i class="fas fa-gift"></i> Discovered Spiritual Gifts?</label>
             </div>
             <textarea id="giftNames" placeholder="If yes, name your spiritual gifts..." rows="2"></textarea>
 
-            <div class="section-h">Ministry Choice</div>
+            <div class="section-h"><i class="fas fa-hands-helping"></i> Ministry Choice</div>
             <div class="checkbox-group">
-                <label class="checkbox-item"><input type="checkbox" name="min" value="Usher"> Usher</label>
-                <label class="checkbox-item"><input type="checkbox" name="min" value="Instruments"> Instruments</label>
-                <label class="checkbox-item"><input type="checkbox" name="min" value="Praise"> Praise & Worship</label>
-                <label class="checkbox-item"><input type="checkbox" name="min" value="Compassionate"> Compassionate</label>
-                <label class="checkbox-item"><input type="checkbox" name="min" value="Intercessor"> Intercessor</label>
-                <label class="checkbox-item"><input type="checkbox" name="min" value="Preaching"> Preaching</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Usher"> 🚪 Usher</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Instruments"> 🎵 Instruments</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Praise"> 🎤 Praise & Worship</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Compassionate"> ❤️ Compassionate</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Intercessor"> 🙏 Intercessor</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Preaching"> 📖 Preaching</label>
             </div>
 
-            <div class="section-h">Commitment</div>
+            <div class="section-h"><i class="fas fa-handshake"></i> Commitment</div>
             <label class="checkbox-item" style="font-weight: bold;">
-                <input type="checkbox" id="titheCommit" required> I commit to give offerings and tithes to the church
+                <input type="checkbox" id="titheCommit" required> <i class="fas fa-check-circle"></i> I commit to give offerings and tithes to the church
             </label>
 
-            <div class="section-h">Signature</div>
-            <p style="font-size: 0.7rem; margin-bottom: 10px;">Sign in the box below to confirm your agreement.</p>
+            <div class="section-h"><i class="fas fa-pen-fancy"></i> Signature</div>
+            <p style="font-size: 0.75rem; margin-bottom: 12px;"><i class="fas fa-info-circle"></i> Sign in the box below to confirm your agreement.</p>
             <canvas id="sig-pad" class="sig-canvas"></canvas>
-            <button type="button" onclick="clearSig()" style="font-size: 10px; background:none; border:none; color:var(--accent-red); cursor:pointer;">Clear Signature</button>
+            <button type="button" onclick="clearSig()" style="font-size: 11px; background:none; border:none; color:var(--accent-red); cursor:pointer; margin-top: 8px;"><i class="fas fa-eraser"></i> Clear Signature</button>
 
-            <div style="margin-top: 30px;">
+            <div style="margin-top: 35px;">
                 <button type="button" class="btn btn-primary" id="submitBtn" onclick="registerNewMember()">
                     <i class="fas fa-save"></i> REGISTER MEMBERSHIP
                 </button>
@@ -519,16 +612,16 @@
         </form>
     </div>
 
-    <!-- BENEFITS SECTION (Hidden initially) -->
+    <!-- BENEFITS SECTION -->
     <div id="benefitsSection" style="display: none;">
-        <h2 style="text-align:center; margin-bottom:20px;">Member Benefits</h2>
+        <h2 class="form-title" style="text-align: center;"><i class="fas fa-gift"></i> Member Benefits</h2>
         <div class="benefit-card"><div class="benefit-icon"><i class="fas fa-id-card"></i></div><div><b>Digital Identity</b><p>Verification across all global branches instantly.</p></div></div>
         <div class="benefit-card"><div class="benefit-icon"><i class="fas fa-hand-holding-heart"></i></div><div><b>Welfare Support</b><p>Priority access to community support and educational funds.</p></div></div>
         <div class="benefit-card"><div class="benefit-icon"><i class="fas fa-shield-alt"></i></div><div><b>Pastoral Covering</b><p>Direct priority line for counseling and family deliverance.</p></div></div>
         <div class="benefit-card"><div class="benefit-icon"><i class="fas fa-certificate"></i></div><div><b>Leadership Training</b><p>Access to accredited spiritual growth and leadership courses.</p></div></div>
     </div>
 
-    <!-- CARD SECTION (Hidden initially) -->
+    <!-- CARD SECTION -->
     <div id="cardSection" style="display: none;">
         <div id="captureArea">
             <div class="digital-id-card" id="digitalCard">
@@ -550,34 +643,28 @@
                 <div class="card-id-num" id="idNumber">No Membership</div>
 
                 <div class="card-data-grid">
-                    <div class="data-box"><label>Branch</label><span id="idBranch">---</span></div>
-                    <div class="data-box"><label>Position</label><span id="idRole">MEMBER</span></div>
-                    <div class="data-box"><label>Marital</label><span id="idMarital">---</span></div>
-                    <div class="data-box"><label>Registered</label><span id="idDate">--/--/----</span></div>
+                    <div class="data-box"><label><i class="fas fa-church"></i> Branch</label><span id="idBranch">---</span></div>
+                    <div class="data-box"><label><i class="fas fa-user-tag"></i> Position</label><span id="idRole">MEMBER</span></div>
+                    <div class="data-box"><label><i class="fas fa-heart"></i> Marital</label><span id="idMarital">---</span></div>
+                    <div class="data-box"><label><i class="fas fa-calendar"></i> Registered</label><span id="idDate">--/--/----</span></div>
                 </div>
 
                 <div class="card-barcode-wrap">
                     <svg id="barcodeImg"></svg>
                 </div>
                 
-                <div id="statusBadge" class="status-badge status-pending">⚠️ NO MEMBERSHIP</div>
+                <div id="statusBadge" class="status-badge status-pending"><i class="fas fa-clock"></i> NO MEMBERSHIP</div>
             </div>
         </div>
-        <button class="btn btn-primary" style="margin-top:20px;" onclick="downloadID()">
+        <button class="btn btn-primary" style="margin-top: 25px;" onclick="downloadID()">
             <i class="fas fa-download"></i> SAVE ID TO GALLERY
         </button>
-    </div>
-
-    <!-- Tabs Footer -->
-    <div style="display: flex; gap: 10px; margin-top: 30px; justify-content: center;">
-        <button class="btn-back" style="width: auto; padding: 10px 25px;" onclick="showBenefits()">📖 Member Benefits</button>
-        <button class="btn-back" style="width: auto; padding: 10px 25px;" onclick="showCard()">🪪 My ID Card</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = { 
@@ -598,10 +685,6 @@
     let canvas, ctx, drawing = false;
     let uploadedPhotoUrl = null;
     let retrievedMembershipData = null;
-    let selectedMemberCategory = null;
-    let selectedRegistrationType = null;
-
-    // State variables
     let isExistingMember = false;
     let isRegisteringForSelf = true;
 
@@ -609,25 +692,22 @@
         currentUser = user;
         if (user) {
             await checkUserMembership();
-        } else {
-            window.location.href = 'account.html';
         }
         initSigPad();
     });
 
     async function checkUserMembership() {
+        if (!currentUser) return;
         try {
             const membershipRef = doc(db, "memberships", currentUser.uid);
             const membershipSnap = await getDoc(membershipRef);
-            
             if (membershipSnap.exists()) {
                 currentMemberData = membershipSnap.data();
-                showCardSection();
+                renderCard(currentMemberData);
+                switchMainTab('card');
                 showToast("Welcome back! Your membership is active.", "success");
             }
-        } catch (error) {
-            console.error("Error checking membership:", error);
-        }
+        } catch (error) { console.error("Error checking membership:", error); }
     }
 
     function initSigPad() {
@@ -672,33 +752,25 @@
 
     window.clearSig = () => {
         if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        showToast("Signature cleared", "info");
     };
-    
-    // Step 1: Select Existing or New Member
+
     window.selectMemberCategory = (category) => {
         isExistingMember = (category === 'existing');
         
         if (category === 'existing') {
-            // Show Step 2 for Existing Members
             document.getElementById('step1Container').style.display = 'none';
             document.getElementById('step2ExistingContainer').style.display = 'block';
             document.getElementById('step2NewContainer').style.display = 'none';
             document.getElementById('step3Container').style.display = 'none';
-            
-            // Update step indicators
-            updateStepIndicator(2);
         } else {
-            // Show Step 2 for New Members (Myself/Someone)
             document.getElementById('step1Container').style.display = 'none';
             document.getElementById('step2ExistingContainer').style.display = 'none';
             document.getElementById('step2NewContainer').style.display = 'block';
             document.getElementById('step3Container').style.display = 'none';
-            
-            updateStepIndicator(2);
         }
     };
 
-    // Step 2 New Member: Select Myself or Someone Else
     window.selectRegistrationType = (type) => {
         isRegisteringForSelf = (type === 'myself');
         
@@ -713,23 +785,15 @@
             formSubtitle.innerHTML = 'You are registering another person as a church member.';
         }
         
-        // Show registration form
         document.getElementById('step2NewContainer').style.display = 'none';
         document.getElementById('step3Container').style.display = 'block';
-        
-        updateStepIndicator(3);
     };
 
-    // Go Back functions
     window.goBackToStep1 = () => {
         document.getElementById('step1Container').style.display = 'block';
         document.getElementById('step2ExistingContainer').style.display = 'none';
         document.getElementById('step2NewContainer').style.display = 'none';
         document.getElementById('step3Container').style.display = 'none';
-        
-        updateStepIndicator(1);
-        
-        // Reset form
         document.getElementById('retrievedMemberInfo').style.display = 'none';
         document.getElementById('retrieveMemberId').value = '';
         retrievedMembershipData = null;
@@ -740,40 +804,18 @@
             document.getElementById('step1Container').style.display = 'none';
             document.getElementById('step2ExistingContainer').style.display = 'block';
             document.getElementById('step3Container').style.display = 'none';
-            updateStepIndicator(2);
         } else {
             document.getElementById('step1Container').style.display = 'none';
             document.getElementById('step2NewContainer').style.display = 'block';
             document.getElementById('step3Container').style.display = 'none';
-            updateStepIndicator(2);
         }
     };
 
-    function updateStepIndicator(step) {
-        const step1 = document.getElementById('step1');
-        const step2 = document.getElementById('step2');
-        const step3 = document.getElementById('step3');
-        
-        step1.classList.remove('active', 'completed');
-        step2.classList.remove('active', 'completed');
-        step3.classList.remove('active', 'completed');
-        
-        if (step >= 1) step1.classList.add('completed');
-        if (step >= 2) step2.classList.add('completed');
-        if (step >= 3) step3.classList.add('completed');
-        
-        if (step === 1) step1.classList.add('active');
-        else if (step === 2) step2.classList.add('active');
-        else if (step === 3) step3.classList.add('active');
-    }
-
-    // Cloudinary Photo Upload
     window.uploadProfilePhoto = () => {
         if (typeof cloudinary === 'undefined') {
             showToast("Cloudinary not loaded. Please refresh.", "error");
             return;
         }
-        
         const uploadWidget = cloudinary.createUploadWidget({
             cloudName: 'prayerdome',
             uploadPreset: 'profile_photos',
@@ -788,7 +830,6 @@
                 showToast("Upload failed. Please try again.", "error");
                 return;
             }
-            
             if (result && result.event === "success") {
                 const url = result.info.secure_url;
                 uploadedPhotoUrl = url;
@@ -800,7 +841,6 @@
         uploadWidget.open();
     };
 
-    // REGISTER NEW MEMBER
     window.registerNewMember = async () => {
         if (!currentUser) {
             showToast("Please login to your account first", "error");
@@ -816,7 +856,7 @@
         const requiredFields = ['fullName', 'dob', 'idNo'];
         for(let field of requiredFields) {
             if(!document.getElementById(field).value) {
-                showToast(`Please fill in ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`, "error");
+                showToast(`Please fill in ${field}`, "error");
                 return;
             }
         }
@@ -824,21 +864,17 @@
         showLoading("Registering new member...");
         
         try {
-            // Check if member already exists with same identity number
             const existingQuery = query(collection(db, "memberships"), where("identityNumber", "==", document.getElementById('idNo').value));
             const existingSnap = await getDocs(existingQuery);
-            
             if (!existingSnap.empty) {
                 showToast("A member with this Identity Number already exists!", "error");
                 hideLoading();
                 return;
             }
             
-            // Generate new Membership ID
             const year = new Date().getFullYear();
             const prefix = `PD${year}`;
             let maxNum = 0;
-            
             const allMemberships = await getDocs(collection(db, "memberships"));
             allMemberships.forEach(doc => {
                 const data = doc.data();
@@ -852,10 +888,9 @@
             const signatureData = canvas.toDataURL();
             const photoUrl = uploadedPhotoUrl || "https://via.placeholder.com/150";
             
-            // Determine which UID to use
-            let targetUid = currentUser.uid;
-            let registeredBy = currentUser.email;
-            let registeredFor = isRegisteringForSelf ? 'self' : 'other';
+            const targetUid = currentUser.uid;
+            const registeredBy = currentUser.email;
+            const registeredFor = isRegisteringForSelf ? 'self' : 'other';
             
             const memberData = {
                 membershipId: newMemberId,
@@ -891,8 +926,6 @@
             };
             
             await setDoc(doc(db, "memberships", targetUid), memberData);
-            
-            // Update user document
             await setDoc(doc(db, "users", targetUid), {
                 membershipId: newMemberId,
                 fullName: memberData.fullName,
@@ -901,7 +934,6 @@
                 role: 'member'
             }, { merge: true });
             
-            // Update Auth profile for self registration
             if (isRegisteringForSelf) {
                 await updateProfile(currentUser, {
                     displayName: memberData.fullName,
@@ -918,7 +950,7 @@
             showToast(message, "success");
             confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
             
-            showCardSection();
+            switchMainTab('card');
             
         } catch (error) {
             console.error("Registration error:", error);
@@ -928,10 +960,8 @@
         }
     };
 
-    // RETRIEVE EXISTING MEMBERSHIP
     window.retrieveMembership = async () => {
         const memberId = document.getElementById('retrieveMemberId').value.trim().toUpperCase();
-        
         if (!memberId) {
             showToast("Please enter your Membership ID", "error");
             return;
@@ -945,7 +975,7 @@
             const querySnapshot = await getDocs(q);
             
             if (querySnapshot.empty) {
-                showToast("Membership ID not found. Please check and try again.", "error");
+                showToast("Membership ID not found.", "error");
                 hideLoading();
                 return;
             }
@@ -957,7 +987,7 @@
             document.getElementById('retrievedPhoto').src = memberData.photoUrl || "https://via.placeholder.com/80";
             document.getElementById('retrievedName').innerText = memberData.fullName;
             document.getElementById('retrievedId').innerText = memberData.membershipId;
-            document.getElementById('retrievedBranch').innerText = memberData.branch || "Global";
+            document.getElementById('retrievedBranch').innerHTML = `<i class="fas fa-church"></i> ${memberData.branch || "Global"}`;
             document.getElementById('retrievedMemberInfo').style.display = 'block';
             
             showToast("Membership found! Click 'Link to My Account' to connect.", "success");
@@ -969,21 +999,19 @@
             hideLoading();
         }
     };
-
-    // LINK MEMBERSHIP TO CURRENT ACCOUNT
+    
     window.linkMembershipToAccount = async () => {
         if (!retrievedMembershipData) {
             showToast("No membership data to link", "error");
             return;
         }
-        
         if (!currentUser) {
             showToast("Please login to your account first", "error");
             window.location.href = 'account.html';
             return;
         }
         
-        showLoading("Linking membership to your account...");
+        showLoading("Linking membership...");
         
         try {
             if (retrievedMembershipData.uid && retrievedMembershipData.uid !== currentUser.uid) {
@@ -992,15 +1020,9 @@
                 return;
             }
             
-            const newMemberData = {
-                ...retrievedMembershipData,
-                uid: currentUser.uid,
-                linkedAt: serverTimestamp()
-            };
+            const newMemberData = { ...retrievedMembershipData, uid: currentUser.uid, linkedAt: serverTimestamp() };
             delete newMemberData.id;
-            
             await setDoc(doc(db, "memberships", currentUser.uid), newMemberData);
-            
             await setDoc(doc(db, "users", currentUser.uid), {
                 membershipId: retrievedMembershipData.membershipId,
                 fullName: retrievedMembershipData.fullName,
@@ -1015,16 +1037,14 @@
             
             currentMemberData = newMemberData;
             renderCard(newMemberData);
-            
-            showToast(`✅ Membership linked successfully! Welcome ${retrievedMembershipData.fullName}!`, "success");
+            showToast(`✅ Membership linked! Welcome ${retrievedMembershipData.fullName}!`, "success");
             confetti({ particleCount: 200, spread: 100 });
             
             document.getElementById('retrievedMemberInfo').style.display = 'none';
             document.getElementById('retrieveMemberId').value = '';
-            showCardSection();
+            switchMainTab('card');
             
         } catch (error) {
-            console.error("Link error:", error);
             showToast("Error: " + error.message, "error");
         } finally {
             hideLoading();
@@ -1032,31 +1052,20 @@
     };
 
     function renderCard(data) {
-        const photoEl = document.getElementById('idPhoto');
-        const photoUrl = data.photoUrl || "https://via.placeholder.com/150";
-        photoEl.src = photoUrl;
-        
+        document.getElementById('idPhoto').src = data.photoUrl || "https://via.placeholder.com/150";
         document.getElementById('idName').innerText = data.fullName || "MEMBER NAME";
         
         if (data.membershipId) {
             document.getElementById('idNumber').innerText = data.membershipId;
-            document.getElementById('statusBadge').innerHTML = '✓ ACTIVE MEMBER';
+            document.getElementById('statusBadge').innerHTML = '<i class="fas fa-check-circle"></i> ACTIVE MEMBER';
             document.getElementById('statusBadge').className = 'status-badge status-approved';
-            
             try {
-                JsBarcode("#barcodeImg", data.membershipId, { 
-                    format: "CODE128", 
-                    lineColor: "#000", 
-                    width: 2, 
-                    height: 40, 
-                    displayValue: false 
-                });
-            } catch(e) {
-                console.error("Barcode error:", e);
-            }
+                JsBarcode("#barcodeImg", data.membershipId, { format: "CODE128", lineColor: "#000", width: 2, height: 40, displayValue: false });
+            } catch(e) { console.error("Barcode error:", e); }
         } else {
             document.getElementById('idNumber').innerText = 'No Membership';
-            document.getElementById('statusBadge').innerHTML = '⚠️ NO MEMBERSHIP';
+            document.getElementById('statusBadge').innerHTML = '<i class="fas fa-clock"></i> NO MEMBERSHIP';
+            document.getElementById('statusBadge').className = 'status-badge status-pending';
         }
         
         document.getElementById('idBranch').innerText = data.branch || "Global";
@@ -1065,39 +1074,37 @@
         
         let date = new Date();
         if (data.createdAt) {
-            if (typeof data.createdAt.toDate === 'function') {
-                date = data.createdAt.toDate();
-            } else if (data.createdAt.seconds) {
-                date = new Date(data.createdAt.seconds * 1000);
-            }
+            if (typeof data.createdAt.toDate === 'function') date = data.createdAt.toDate();
+            else if (data.createdAt.seconds) date = new Date(data.createdAt.seconds * 1000);
         }
         document.getElementById('idDate').innerText = moment(date).format('DD/MM/YYYY');
     }
 
-    function showBenefits() {
-        document.getElementById('step1Container').style.display = 'none';
-        document.getElementById('step2ExistingContainer').style.display = 'none';
-        document.getElementById('step2NewContainer').style.display = 'none';
-        document.getElementById('step3Container').style.display = 'none';
-        document.getElementById('benefitsSection').style.display = 'block';
-        document.getElementById('cardSection').style.display = 'none';
-    }
-
-    function showCardSection() {
-        document.getElementById('step1Container').style.display = 'none';
-        document.getElementById('step2ExistingContainer').style.display = 'none';
-        document.getElementById('step2NewContainer').style.display = 'none';
-        document.getElementById('step3Container').style.display = 'none';
-        document.getElementById('benefitsSection').style.display = 'none';
-        document.getElementById('cardSection').style.display = 'block';
+    window.switchMainTab = (tab) => {
+        const membershipDiv = document.getElementById('step1Container');
+        const benefitsDiv = document.getElementById('benefitsSection');
+        const cardDiv = document.getElementById('cardSection');
         
-        if (currentMemberData) {
-            renderCard(currentMemberData);
+        if (tab === 'membership') {
+            membershipDiv.style.display = 'block';
+            benefitsDiv.style.display = 'none';
+            cardDiv.style.display = 'none';
+        } else if (tab === 'benefits') {
+            membershipDiv.style.display = 'none';
+            benefitsDiv.style.display = 'block';
+            cardDiv.style.display = 'none';
+        } else if (tab === 'card') {
+            membershipDiv.style.display = 'none';
+            benefitsDiv.style.display = 'none';
+            cardDiv.style.display = 'block';
+            if (currentMemberData) renderCard(currentMemberData);
         }
-    }
-
-    window.showBenefits = showBenefits;
-    window.showCard = showCardSection;
+        
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        if (tab === 'membership') document.querySelector('.tab-btn:first-child').classList.add('active');
+        else if (tab === 'benefits') document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        else if (tab === 'card') document.querySelectorAll('.tab-btn')[2].classList.add('active');
+    };
 
     window.downloadID = () => {
         const element = document.getElementById('captureArea');
@@ -1108,8 +1115,7 @@
             a.click();
             showToast("ID Card saved to gallery!", "success");
         }).catch(err => {
-            console.error("Download error:", err);
-            showToast("Error downloading ID. Please try again.", "error");
+            showToast("Error downloading ID.", "error");
         });
     };
     

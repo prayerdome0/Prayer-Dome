@@ -4,50 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Prayer Dome | Global Prayer Wall</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-    <!-- Cloudinary SDK -->
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         :root {
-            --accent-green: #22c55e; --accent-gold: #d4af37; --accent-blue: #3b82f6; --accent-red: #ef4444; --accent-purple: #8b5cf6;
-            --bg-primary: #f8fafc; --bg-secondary: #ffffff; --bg-card: #ffffff;
-            --text-primary: #0f172a; --text-secondary: #334155; --border-color: #e2e8f0;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 20px 35px -10px rgba(0, 0, 0, 0.1);
+            --accent-green: #15803d;
+            --accent-green-light: #22c55e;
+            --accent-gold: #d4af37;
+            --accent-gold-dark: #b45309;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --bg-primary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            --shadow-glow: 0 10px 30px rgba(21, 128, 61, 0.15);
+            --nav-bg: rgba(255, 255, 255, 0.85);
         }
 
-        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); transition: all 0.3s; min-height: 100vh; }
-        body.dark-mode { --bg-primary: #0f172a; --bg-secondary: #1e293b; --bg-card: #1e293b; --text-primary: #f8fafc; --text-secondary: #cbd5e1; --border-color: #334155; }
-
-        /* Header */
-        .prayer-header {
-            background: linear-gradient(135deg, var(--accent-green), #166534);
-            padding: 15px 25px;
-            color: white;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        body.dark-mode {
+            --bg-primary: #020617; 
+            --bg-card: #0f172a; 
+            --text-main: #f8fafc; 
+            --text-sub: #94a3b8; 
+            --border-color: #1e293b;
+            --nav-bg: rgba(15, 23, 42, 0.9);
         }
 
-        .header-left { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; color: white;}
-        .header-icon { width: 45px; height: 45px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
-        .header-title h1 { font-size: 1.4rem; font-weight: 800; }
-        .header-title p { font-size: 0.75rem; opacity: 0.9; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-main); transition: 0.3s; min-height: 100vh; }
 
-        .header-actions button {
-            background: rgba(255,255,255,0.2); border: none; padding: 10px 20px; border-radius: 40px; color: white; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; font-weight: 600;
-        }
-        .header-actions button:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+        /* Header - Same as index */
+        header { background: var(--bg-card); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); backdrop-filter: blur(10px); background: var(--nav-bg);}
+        .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-main);}
+        .logo-ring { width: 45px; height: 45px; background: linear-gradient(135deg, var(--accent-green), var(--accent-gold)); border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 3px; box-shadow: var(--shadow-glow); }
+        .logo-ring img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; background: white; padding: 4px;}
+        
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .theme-toggle-btn { background: var(--bg-primary); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 20px; cursor: pointer; transition: 0.2s; }
+        .theme-toggle-btn:hover { transform: scale(1.05); }
+
+        /* Luxury Font */
+        .luxury-font, h1, h2, h3, .prayer-actions .action-btn { font-family: 'Playfair Display', serif; }
 
         .main-container { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
 
@@ -59,14 +67,20 @@
             margin-bottom: 30px;
         }
         .stat-card {
-            background: var(--bg-card); border-radius: 24px; padding: 20px; text-align: center; border: 1px solid var(--border-color); box-shadow: var(--shadow); transition: 0.3s; animation: fadeInUp 0.5s ease;
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: 0.3s;
         }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
-        .stat-number { font-size: 2.2rem; font-weight: 800; color: var(--accent-green); }
-        .stat-label { font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; margin-top: 5px;}
+        .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-glow); }
+        .stat-number { font-size: 2.5rem; font-weight: 800; color: var(--accent-green); font-family: 'Playfair Display', serif; }
+        .stat-label { font-size: 0.85rem; color: var(--text-sub); font-weight: 600; margin-top: 5px; letter-spacing: 1px; }
 
-        /* Filter & Action Bar */
-        .wall-controls {
+        /* Filter Bar */
+        .filter-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -75,26 +89,50 @@
             margin-bottom: 30px;
             background: var(--bg-card);
             padding: 15px 25px;
-            border-radius: 24px;
+            border-radius: 60px;
             border: 1px solid var(--border-color);
             box-shadow: var(--shadow);
         }
-
         .filter-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
         .filter-btn {
-            padding: 8px 18px; border-radius: 40px; background: var(--bg-primary); border: 1px solid var(--border-color); cursor: pointer; font-weight: 600; transition: all 0.2s; color: var(--text-secondary);
+            padding: 10px 20px;
+            border-radius: 40px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.2s;
+            color: var(--text-sub);
+            font-size: 0.85rem;
         }
-        .filter-btn.active { background: linear-gradient(135deg, var(--accent-green), #16a34a); color: white; border-color: var(--accent-green); }
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light));
+            color: white;
+            border-color: var(--accent-green);
+        }
+        .filter-btn:hover { transform: translateY(-2px); }
 
         .submit-btn {
-            background: linear-gradient(135deg, var(--accent-gold), #b45309); color: white; border: none; padding: 12px 25px; border-radius: 40px; font-weight: 700; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 8px; font-size: 1rem; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark));
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
         }
         .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(212, 175, 55, 0.6); }
 
-        /* Prayer Grid (Masonry feel) */
+        /* Prayer Grid */
         .prayer-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
             gap: 25px;
             align-items: start;
         }
@@ -106,538 +144,807 @@
             border: 1px solid var(--border-color);
             box-shadow: var(--shadow);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            animation: slideInUp 0.5s ease forwards;
-            opacity: 0;
-            transform: translateY(30px);
+            animation: fadeInUp 0.5s ease forwards;
         }
+        .prayer-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-glow); border-color: var(--accent-gold);}
+        .prayer-card.answered { border: 2px solid var(--accent-gold); background: linear-gradient(135deg, rgba(212,175,55,0.05), var(--bg-card)); }
 
-        .prayer-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: var(--accent-green);}
-        
-        .prayer-card.answered {
-            border: 2px solid var(--accent-gold);
-            background: linear-gradient(180deg, rgba(212, 175, 55, 0.05) 0%, var(--bg-card) 100%);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .prayer-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
         .prayer-user { display: flex; align-items: center; gap: 12px; }
         .prayer-avatar {
-            width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-green), var(--accent-gold)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 1.2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-gold));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 1.2rem;
         }
-        .prayer-meta h4 { font-size: 1.1rem; color: var(--text-primary); margin-bottom: 2px; }
-        .prayer-meta p { font-size: 0.75rem; color: var(--text-secondary); }
+        .prayer-meta h4 { font-size: 1rem; font-weight: 800; color: var(--text-main); margin-bottom: 3px; }
+        .prayer-meta p { font-size: 0.7rem; color: var(--text-sub); }
 
-        .category-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
+        .category-badge {
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
         
-        .prayer-text { font-size: 1.05rem; line-height: 1.6; color: var(--text-primary); margin-bottom: 15px; word-wrap: break-word;}
+        .prayer-text {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--text-main);
+            margin: 15px 0;
+            word-wrap: break-word;
+            font-style: italic;
+        }
         
         .prayer-image {
-            width: 100%; max-height: 250px; object-fit: cover; border-radius: 16px; margin-bottom: 15px; border: 1px solid var(--border-color);
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
         }
 
-        .prayer-actions { display: flex; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 15px; flex-wrap: wrap;}
-        
+        /* Emoji Reactions */
+        .reactions {
+            display: flex;
+            gap: 12px;
+            margin: 15px 0;
+            padding: 10px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+        .reaction-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 40px;
+            padding: 6px 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1rem;
+        }
+        .reaction-btn:hover { transform: scale(1.05); background: rgba(34,197,94,0.1); }
+        .reaction-btn.active { background: rgba(34,197,94,0.2); border-color: var(--accent-green); }
+        .reaction-count { font-size: 0.7rem; font-weight: 600; color: var(--text-sub); }
+
+        /* Comments Section */
+        .comments-section {
+            margin-top: 15px;
+            padding-top: 10px;
+        }
+        .comment {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        .comment-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+        .comment-content { flex: 1; }
+        .comment-name { font-weight: 700; font-size: 0.8rem; color: var(--accent-green); }
+        .comment-text { font-size: 0.8rem; color: var(--text-main); margin-top: 3px; }
+        .comment-time { font-size: 0.6rem; color: var(--text-sub); margin-top: 3px; }
+
+        .add-comment {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .add-comment input {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-main);
+            font-size: 0.85rem;
+        }
+        .add-comment button {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light));
+            border: none;
+            border-radius: 30px;
+            padding: 8px 18px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .prayer-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
         .action-btn {
-            background: var(--bg-primary); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 30px; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 6px; flex: 1; justify-content: center;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-sub);
         }
-        
-        .action-btn:hover:not(:disabled) { background: rgba(34,197,94,0.1); color: var(--accent-green); border-color: var(--accent-green); }
-        
-        .action-btn.prayed {
-            background: linear-gradient(135deg, var(--accent-green), #16a34a); color: white; border: none; box-shadow: 0 4px 10px rgba(34,197,94,0.3);
-        }
-        
-        /* Pulse Animation for clicking Pray */
-        @keyframes pulsePray {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        .pulse-anim { animation: pulsePray 0.4s ease; }
+        .action-btn:hover { background: rgba(34,197,94,0.1); color: var(--accent-green); }
+        .action-btn.prayed { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); color: white; border: none; }
 
         /* Modals */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(8px); }
-        .modal-content { background: var(--bg-card); border-radius: 32px; padding: 35px; max-width: 550px; width: 90%; max-height: 90vh; overflow-y: auto; animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(8px);
+        }
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 32px;
+            padding: 35px;
+            max-width: 550px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalPop 0.4s ease;
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
 
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary); }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px 16px; border: 2px solid var(--border-color); border-radius: 16px; background: var(--bg-primary); color: var(--text-primary); font-family: inherit; font-size: 1rem; transition: 0.3s; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 700; color: var(--text-main); }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            background: var(--bg-primary);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 1rem;
+        }
         .form-group input:focus, .form-group textarea:focus { border-color: var(--accent-green); outline: none; }
         
-        .upload-area { border: 2px dashed var(--border-color); border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; background: var(--bg-primary); margin-bottom: 15px;}
-        .upload-area:hover { border-color: var(--accent-blue); background: rgba(59, 130, 246, 0.05); }
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            background: var(--bg-primary);
+            margin-bottom: 15px;
+        }
+        .upload-area:hover { border-color: var(--accent-gold); background: rgba(212,175,55,0.05); }
 
-        .btn-modern { padding: 14px 24px; border-radius: 40px; font-weight: 700; cursor: pointer; border: none; background: linear-gradient(135deg, var(--accent-green), #16a34a); color: white; transition: 0.3s; width: 100%; font-size: 1.05rem; }
-        .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(34,197,94,0.4); }
+        .btn-modern {
+            padding: 14px 24px;
+            border-radius: 40px;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light));
+            color: white;
+            transition: 0.3s;
+            width: 100%;
+            font-size: 1rem;
+        }
+        .btn-modern:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
 
-        /* Toasts & Loaders */
-        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 3000; }
-        .toast { background: var(--bg-card); padding: 15px 25px; border-radius: 40px; margin-bottom: 10px; box-shadow: var(--shadow-lg); border-left: 5px solid var(--accent-green); display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 1rem; animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+        }
+        .toast {
+            background: var(--bg-card);
+            padding: 12px 24px;
+            border-radius: 40px;
+            margin-bottom: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--accent-green);
+            animation: slideIn 0.3s ease;
+            font-weight: 600;
+        }
         .toast.error { border-left-color: var(--accent-red); }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
 
         .spinner { width: 50px; height: 50px; border: 4px solid var(--border-color); border-top-color: var(--accent-green); border-radius: 50%; animation: spin 1s linear infinite; margin: 40px auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes slideInUp { to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 600px) {
+            .prayer-grid { grid-template-columns: 1fr; }
+            .filter-bar { flex-direction: column; border-radius: 28px; }
+            .filter-buttons { justify-content: center; }
+            .modal-content { padding: 25px; }
+        }
     </style>
 </head>
 <body>
 
-    <header class="prayer-header">
-        <a href="index.html" class="header-left">
-            <div class="header-icon"><i class="fas fa-praying-hands"></i></div>
-            <div class="header-title">
-                <h1>Prayer Wall</h1>
-                <p>Global Community Intercession</p>
-            </div>
-        </a>
-        <div class="header-actions">
-            <button onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
-            <button onclick="openLoginModal()" id="loginBtnHeader"><i class="fas fa-user"></i> Sign In</button>
+<header>
+    <a href="index.html" class="brand">
+        <div class="logo-ring"><img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" alt="PD Logo"></div>
+        <div><h2 style="font-size: 1.1rem; font-weight: 900;">PRAYER DOME</h2></div>
+    </a>
+    <div class="header-right">
+        <button class="theme-toggle-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+    </div>
+</header>
+
+<div class="main-container">
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number" id="statActive">0</div>
+            <div class="stat-label"><i class="fas fa-pray"></i> ACTIVE PRAYERS</div>
         </div>
-    </header>
+        <div class="stat-card">
+            <div class="stat-number" id="statPrayed">0</div>
+            <div class="stat-label"><i class="fas fa-hands-praying"></i> PRAYERS OFFERED</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="statAnswered" style="color: var(--accent-gold);">0</div>
+            <div class="stat-label"><i class="fas fa-star-of-life"></i> ANSWERED</div>
+        </div>
+    </div>
 
-    <div class="toast-container" id="toastContainer"></div>
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all" onclick="filterPrayers('all')"><i class="fas fa-globe"></i> All</button>
+            <button class="filter-btn" data-filter="Sickness" onclick="filterPrayers('Sickness')"><i class="fas fa-thermometer-half"></i> Sickness</button>
+            <button class="filter-btn" data-filter="Healing" onclick="filterPrayers('Healing')"><i class="fas fa-heartbeat"></i> Healing</button>
+            <button class="filter-btn" data-filter="Provision" onclick="filterPrayers('Provision')"><i class="fas fa-money-bill-wave"></i> Provision</button>
+            <button class="filter-btn" data-filter="Family" onclick="filterPrayers('Family')"><i class="fas fa-users"></i> Family</button>
+            <button class="filter-btn" data-filter="Protection" onclick="filterPrayers('Protection')"><i class="fas fa-shield-alt"></i> Protection</button>
+            <button class="filter-btn" data-filter="Thanksgiving" onclick="filterPrayers('Thanksgiving')"><i class="fas fa-hands-clapping"></i> Thanksgiving</button>
+        </div>
+        <button class="submit-btn" onclick="openSubmitModal()">
+            <i class="fas fa-pen-fancy"></i> Submit Prayer
+        </button>
+    </div>
 
-    <div class="main-container">
+    <!-- Prayer Grid -->
+    <div class="prayer-grid" id="prayerGrid">
+        <div class="spinner"></div>
+    </div>
+</div>
+
+<!-- Submit Prayer Modal -->
+<div class="modal" id="submitModal">
+    <div class="modal-content">
+        <h2 style="color: var(--accent-green); margin-bottom: 5px; font-family: 'Playfair Display', serif;"><i class="fas fa-praying-hands"></i> Submit Prayer Request</h2>
+        <p style="color: var(--text-sub); margin-bottom: 20px;">Share your burden, and our global community will intercede with you.</p>
         
-        <!-- Stats -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number" id="statActive">0</div>
-                <div class="stat-label">Active Prayers</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="statPrayed">0</div>
-                <div class="stat-label">Total Prayers Offered</div>
-            </div>
-            <div class="stat-card" style="border-bottom: 4px solid var(--accent-gold);">
-                <div class="stat-number" id="statAnswered" style="color: var(--accent-gold);">0</div>
-                <div class="stat-label">Answered Prayers</div>
-            </div>
+        <div class="form-group">
+            <label><i class="fas fa-user"></i> Your Name</label>
+            <input type="text" id="pName" placeholder="Your name (or leave as Anonymous)">
         </div>
-
-        <!-- Controls -->
-        <div class="wall-controls">
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-filter="all" onclick="filterPrayers('all')">All Prayers</button>
-                <button class="filter-btn" data-filter="Healing" onclick="filterPrayers('Healing')">Healing</button>
-                <button class="filter-btn" data-filter="Provision" onclick="filterPrayers('Provision')">Provision</button>
-                <button class="filter-btn" data-filter="Family" onclick="filterPrayers('Family')">Family</button>
-                <button class="filter-btn" data-filter="Thanksgiving" onclick="filterPrayers('Thanksgiving')">Thanksgiving</button>
-            </div>
-            <button class="submit-btn" onclick="openSubmitModal()">
-                <i class="fas fa-plus-circle"></i> Submit Prayer
-            </button>
-        </div>
-
-        <!-- Prayer Grid -->
-        <div class="prayer-grid" id="prayerGrid">
-            <div style="grid-column: 1/-1;"><div class="spinner"></div></div>
-        </div>
-
-    </div>
-
-    <!-- Modals -->
-    <!-- Submit Prayer Modal -->
-    <div class="modal" id="submitModal">
-        <div class="modal-content">
-            <h2 style="color: var(--accent-green); margin-bottom: 5px;"><i class="fas fa-pen-fancy"></i> Write Your Prayer</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">Share your burden, and our global community will intercede with you.</p>
-            
-            <div class="form-group">
-                <label>Display Name</label>
-                <input type="text" id="pName" placeholder="Your name (or leave as Anonymous)">
-            </div>
-            
-            <div class="form-group">
-                <label>Category</label>
-                <select id="pCategory">
-                    <option value="General">General</option>
-                    <option value="Healing">Healing & Health</option>
-                    <option value="Provision">Provision & Finances</option>
-                    <option value="Protection">Protection & Safety</option>
-                    <option value="Family">Family & Relationships</option>
-                    <option value="Thanksgiving">Thanksgiving / Praise</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Your Prayer Request *</label>
-                <textarea id="pText" rows="4" placeholder="Lord, I pray for..." required></textarea>
-            </div>
-
-            <div class="upload-area" onclick="uploadPrayerImage()">
-                <i class="fas fa-camera" style="font-size: 24px; color: var(--accent-blue); margin-bottom: 10px;"></i>
-                <p style="font-weight: 600;">Attach a Photo (Optional)</p>
-                <p style="font-size: 0.75rem; color: var(--text-secondary);">Add a picture to personalize your request</p>
-            </div>
-            <div id="pImagePreview"></div>
-
-            <div style="display: flex; align-items: center; gap: 10px; margin: 20px 0;">
-                <input type="checkbox" id="pPublic" checked style="width: 20px; height: 20px;">
-                <label for="pPublic" style="margin: 0; font-weight: 500;">Make this prayer public</label>
-            </div>
-
-            <button class="btn-modern" onclick="submitPrayer()" id="submitBtn">Post Prayer Request</button>
-            <button class="btn-modern" style="background: var(--bg-primary); color: var(--text-primary); border: 2px solid var(--border-color); margin-top: 10px;" onclick="closeModal('submitModal')">Cancel</button>
-        </div>
-    </div>
-
-    <!-- Login Modal -->
-    <div class="modal" id="loginModal">
-        <div class="modal-content" style="max-width: 400px; text-align: center;">
-            <div style="width: 60px; height: 60px; background: rgba(34,197,94,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                <i class="fas fa-lock" style="font-size: 24px; color: var(--accent-green);"></i>
-            </div>
-            <h2 style="margin-bottom: 10px;">Sign In Required</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 25px;">Please sign in to submit or interact with prayers.</p>
-            
-            <div class="form-group" style="text-align: left;">
-                <input type="email" id="loginEmail" placeholder="Email Address">
-            </div>
-            <div class="form-group" style="text-align: left;">
-                <input type="password" id="loginPassword" placeholder="Password">
-            </div>
-            
-            <button class="btn-modern" onclick="loginUser()" style="margin-bottom: 15px;">Sign In</button>
-            <div style="margin: 15px 0; color: var(--text-secondary); font-size: 0.9rem;">or</div>
-            <button class="btn-modern" style="background: white; color: #333; border: 1px solid #ccc;" onclick="googleSignIn()">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" style="width: 18px; margin-right: 8px;"> Continue with Google
-            </button>
-            <button class="btn-modern" style="background: transparent; color: var(--text-secondary); margin-top: 15px;" onclick="closeModal('loginModal')">Cancel</button>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, increment, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-        // Firebase Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo",
-            authDomain: "prayer-dome.firebaseapp.com",
-            projectId: "prayer-dome",
-            storageBucket: "prayer-dome.firebasestorage.app",
-            messagingSenderId: "198295153196",
-            appId: "1:198295153196:web:1222b31948d7974ba3bf89"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        // State
-        let currentUser = null;
-        let allPrayers =[];
-        let currentFilter = 'all';
-        let uploadedImageUrl = null;
-
-        // Categories & Colors
-        const categoryStyles = {
-            Healing: { bg: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' },
-            Provision: { bg: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b' },
-            Protection: { bg: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' },
-            Family: { bg: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6' },
-            Thanksgiving: { bg: 'rgba(34, 197, 94, 0.1)', color: '#22c55e' },
-            General: { bg: 'rgba(100, 116, 139, 0.1)', color: '#64748b' }
-        };
-
-        // --- AUTH ---
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            const btn = document.getElementById('loginBtnHeader');
-            if(user) {
-                btn.innerHTML = `<i class="fas fa-sign-out-alt"></i> Sign Out`;
-                btn.onclick = () => { signOut(auth); showToast('Signed out'); };
-            } else {
-                btn.innerHTML = `<i class="fas fa-user"></i> Sign In`;
-                btn.onclick = openLoginModal;
-            }
-            renderPrayers(); // Re-render to update like button states
-        });
-
-        window.openLoginModal = () => { document.getElementById('loginModal').style.display = 'flex'; };
-        window.closeModal = (id) => { document.getElementById(id).style.display = 'none'; };
         
-        window.loginUser = async () => {
-            const e = document.getElementById('loginEmail').value;
-            const p = document.getElementById('loginPassword').value;
-            if(!e||!p) return showToast('Enter details', 'error');
-            try { await signInWithEmailAndPassword(auth, e, p); closeModal('loginModal'); showToast('Signed In!'); }
-            catch(err) { showToast(err.message, 'error'); }
-        };
+        <div class="form-group">
+            <label><i class="fas fa-tag"></i> Category</label>
+            <select id="pCategory">
+                <option value="Sickness">🤒 Sickness</option>
+                <option value="Healing">🩺 Healing & Health</option>
+                <option value="Provision">💰 Provision & Finances</option>
+                <option value="Protection">🛡️ Protection & Safety</option>
+                <option value="Family">👨‍👩‍👧 Family & Relationships</option>
+                <option value="Thanksgiving">🎉 Thanksgiving / Praise</option>
+            </select>
+        </div>
 
-        window.googleSignIn = async () => {
-            try { await signInWithPopup(auth, new GoogleAuthProvider()); closeModal('loginModal'); showToast('Signed In!'); }
-            catch(err) { showToast(err.message, 'error'); }
-        };
+        <div class="form-group">
+            <label><i class="fas fa-quote-left"></i> Your Prayer Request *</label>
+            <textarea id="pText" rows="4" placeholder="Lord, I pray for..." required></textarea>
+        </div>
 
-        // --- REAL-TIME DATA LOAD ---
-        function loadPrayers() {
-            const q = query(collection(db, "prayers"), orderBy("timestamp", "desc"));
-            onSnapshot(q, (snapshot) => {
-                allPrayers =[];
-                snapshot.forEach(doc => {
-                    allPrayers.push({ id: doc.id, ...doc.data() });
-                });
-                updateStats();
-                renderPrayers();
-            }, (error) => {
-                showToast("Error loading prayers", "error");
-                console.error(error);
-            });
+        <div class="upload-area" onclick="uploadPrayerImage()">
+            <i class="fas fa-camera" style="font-size: 28px; color: var(--accent-gold); margin-bottom: 10px;"></i>
+            <p style="font-weight: 700;">Attach a Photo (Optional)</p>
+            <p style="font-size: 0.75rem; color: var(--text-sub);">Add a picture to personalize your request</p>
+        </div>
+        <div id="pImagePreview"></div>
+
+        <button class="btn-modern" onclick="submitPrayer()" id="submitBtn">
+            <i class="fas fa-paper-plane"></i> Post Prayer Request
+        </button>
+        <button class="btn-modern" style="background: transparent; color: var(--text-main); border: 2px solid var(--border-color); margin-top: 12px;" onclick="closeModal('submitModal')">
+            Cancel
+        </button>
+    </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal" id="loginModal">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <i class="fas fa-lock" style="font-size: 48px; color: var(--accent-gold); margin-bottom: 20px;"></i>
+        <h2 style="margin-bottom: 10px; font-family: 'Playfair Display', serif;">Sign In Required</h2>
+        <p style="color: var(--text-sub); margin-bottom: 25px;">Please sign in to submit or interact with prayers.</p>
+        
+        <div class="form-group" style="text-align: left;">
+            <input type="email" id="loginEmail" placeholder="Email Address">
+        </div>
+        <div class="form-group" style="text-align: left;">
+            <input type="password" id="loginPassword" placeholder="Password">
+        </div>
+        
+        <button class="btn-modern" onclick="loginUser()" style="margin-bottom: 15px;">Sign In</button>
+        <div style="margin: 15px 0; color: var(--text-sub);">or</div>
+        <button class="btn-modern" style="background: white; color: #333; border: 1px solid #ccc;" onclick="googleSignIn()">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" style="width: 18px; margin-right: 8px;"> Continue with Google
+        </button>
+        <button class="btn-modern" style="background: transparent; color: var(--text-sub); margin-top: 15px;" onclick="closeModal('loginModal')">Cancel</button>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, increment, arrayUnion, arrayRemove, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo",
+        authDomain: "prayer-dome.firebaseapp.com",
+        projectId: "prayer-dome",
+        storageBucket: "prayer-dome.firebasestorage.app",
+        messagingSenderId: "198295153196",
+        appId: "1:198295153196:web:1222b31948d7974ba3bf89"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    let currentUser = null;
+    let allPrayers = [];
+    let currentFilter = 'all';
+    let uploadedImageUrl = null;
+
+    // Emoji reactions
+    const emojis = [
+        { code: '🙏', name: 'praying', icon: '🙏' },
+        { code: '❤️', name: 'love', icon: '❤️' },
+        { code: '🔥', name: 'fire', icon: '🔥' },
+        { code: '✝️', name: 'cross', icon: '✝️' },
+        { code: '🕊️', name: 'peace', icon: '🕊️' }
+    ];
+
+    const categoryStyles = {
+        Sickness: { bg: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', icon: '🤒' },
+        Healing: { bg: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', icon: '🩺' },
+        Provision: { bg: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', icon: '💰' },
+        Protection: { bg: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', icon: '🛡️' },
+        Family: { bg: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6', icon: '👨‍👩‍👧' },
+        Thanksgiving: { bg: 'rgba(212, 175, 55, 0.1)', color: '#d4af37', icon: '🎉' },
+        General: { bg: 'rgba(100, 116, 139, 0.1)', color: '#64748b', icon: '📝' }
+    };
+
+    // Auth
+    onAuthStateChanged(auth, (user) => {
+        currentUser = user;
+        const headerBtn = document.querySelector('.theme-toggle-btn');
+        if (user && headerBtn && !headerBtn.parentElement.querySelector('.user-greeting')) {
+            const greeting = document.createElement('span');
+            greeting.className = 'user-greeting';
+            greeting.style.fontSize = '0.8rem';
+            greeting.style.fontWeight = '600';
+            greeting.innerHTML = `<i class="fas fa-user-circle"></i> ${user.displayName?.split(' ')[0] || 'Member'}`;
+            headerBtn.parentElement.insertBefore(greeting, headerBtn);
         }
+        renderPrayers();
+    });
 
-        function updateStats() {
-            const active = allPrayers.filter(p => !p.answered && p.isPublic !== false).length;
-            const answered = allPrayers.filter(p => p.answered === true).length;
-            const totalPrayed = allPrayers.reduce((acc, curr) => acc + (curr.prayedCount || 0), 0);
+    window.openLoginModal = () => { document.getElementById('loginModal').style.display = 'flex'; };
+    window.closeModal = (id) => { document.getElementById(id).style.display = 'none'; };
+    
+    window.loginUser = async () => {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        if (!email || !password) return showToast('Enter email and password', 'error');
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            closeModal('loginModal');
+            showToast('Signed In!', 'success');
+        } catch(err) { showToast(err.message, 'error'); }
+    };
 
-            document.getElementById('statActive').innerText = active;
-            document.getElementById('statPrayed').innerText = totalPrayed;
-            document.getElementById('statAnswered').innerText = answered;
-        }
+    window.googleSignIn = async () => {
+        try {
+            await signInWithPopup(auth, new GoogleAuthProvider());
+            closeModal('loginModal');
+            showToast('Signed In!', 'success');
+        } catch(err) { showToast(err.message, 'error'); }
+    };
 
-        window.filterPrayers = function(cat) {
-            currentFilter = cat;
-            document.querySelectorAll('.filter-btn').forEach(b => {
-                b.classList.remove('active');
-                if(b.dataset.filter === cat) b.classList.add('active');
+    // Load Prayers
+    function loadPrayers() {
+        const q = query(collection(db, "prayers"), orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
+            allPrayers = [];
+            snapshot.forEach(doc => {
+                allPrayers.push({ id: doc.id, ...doc.data() });
             });
+            updateStats();
             renderPrayers();
-        };
+        });
+    }
 
-        function renderPrayers() {
-            const grid = document.getElementById('prayerGrid');
-            let filtered = allPrayers.filter(p => p.isPublic !== false);
+    function updateStats() {
+        const active = allPrayers.filter(p => !p.answered && p.isPublic !== false).length;
+        const answered = allPrayers.filter(p => p.answered === true).length;
+        const totalPrayed = allPrayers.reduce((acc, curr) => acc + (curr.prayedCount || 0), 0);
+        document.getElementById('statActive').innerText = active;
+        document.getElementById('statPrayed').innerText = totalPrayed;
+        document.getElementById('statAnswered').innerText = answered;
+    }
+
+    window.filterPrayers = (cat) => {
+        currentFilter = cat;
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.filter === cat) btn.classList.add('active');
+        });
+        renderPrayers();
+    };
+
+    function renderPrayers() {
+        const grid = document.getElementById('prayerGrid');
+        let filtered = allPrayers.filter(p => p.isPublic !== false);
+        if (currentFilter !== 'all') {
+            filtered = filtered.filter(p => p.category === currentFilter);
+        }
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px;"><i class="fas fa-praying-hands" style="font-size: 60px; opacity: 0.3;"></i><h3 style="margin-top: 20px;">No prayers in this category</h3><p style="color: var(--text-sub);">Be the first to submit a prayer request!</p></div>`;
+            return;
+        }
+        grid.innerHTML = filtered.map((p, index) => {
+            const dateStr = p.timestamp ? moment(p.timestamp.toDate()).fromNow() : 'Just now';
+            const nameStr = p.name || 'Anonymous';
+            const initial = nameStr.charAt(0).toUpperCase();
+            const style = categoryStyles[p.category] || categoryStyles.General;
+            const isOwner = currentUser && p.userId === currentUser.uid;
+            const hasPrayed = currentUser && p.prayedBy && p.prayedBy.includes(currentUser.uid);
+            const reactions = p.reactions || {};
+            const comments = p.comments || [];
             
-            if(currentFilter !== 'all') {
-                filtered = filtered.filter(p => p.category === currentFilter);
-            }
-
-            if(filtered.length === 0) {
-                grid.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 60px;">
-                        <i class="fas fa-praying-hands" style="font-size: 60px; color: var(--border-color); margin-bottom: 20px;"></i>
-                        <h3 style="color: var(--text-secondary);">No prayers in this category</h3>
-                    </div>`;
-                return;
-            }
-
-            grid.innerHTML = filtered.map((p, index) => {
-                const dateStr = p.timestamp ? moment(p.timestamp.toDate()).fromNow() : 'Just now';
-                const nameStr = p.name || 'Anonymous';
-                const initial = nameStr.charAt(0).toUpperCase();
-                const style = categoryStyles[p.category] || categoryStyles.General;
-                
-                const isOwner = currentUser && p.userId === currentUser.uid;
-                const hasPrayed = currentUser && p.prayedBy && p.prayedBy.includes(currentUser.uid);
-                
-                return `
-                    <div class="prayer-card ${p.answered ? 'answered' : ''}" style="animation-delay: ${index * 0.05}s">
-                        <div class="prayer-header">
-                            <div class="prayer-user">
-                                <div class="prayer-avatar">${initial}</div>
-                                <div class="prayer-meta">
-                                    <h4>${escapeHtml(nameStr)}</h4>
-                                    <p>${dateStr}</p>
-                                </div>
-                            </div>
-                            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
-                                <span class="category-badge" style="background: ${style.bg}; color: ${style.color};">${p.category || 'General'}</span>
-                                ${p.answered ? `<span class="category-badge" style="background: var(--accent-gold); color: white;"><i class="fas fa-star"></i> Answered</span>` : ''}
+            return `
+                <div class="prayer-card ${p.answered ? 'answered' : ''}" style="animation-delay: ${index * 0.05}s">
+                    <div class="prayer-header">
+                        <div class="prayer-user">
+                            <div class="prayer-avatar">${initial}</div>
+                            <div class="prayer-meta">
+                                <h4>${escapeHtml(nameStr)}</h4>
+                                <p><i class="far fa-clock"></i> ${dateStr}</p>
                             </div>
                         </div>
-                        
-                        <div class="prayer-text">${escapeHtml(p.text)}</div>
-                        
-                        ${p.imageUrl ? `<img src="${p.imageUrl}" class="prayer-image" loading="lazy">` : ''}
-                        
-                        <div class="prayer-actions">
-                            <button class="action-btn ${hasPrayed ? 'prayed' : ''}" onclick="togglePray('${p.id}', this)" ${p.answered ? 'disabled' : ''}>
-                                <i class="fas fa-pray"></i> <span class="pray-count">${p.prayedCount || 0}</span> Prayed
-                            </button>
-                            <button class="action-btn" onclick="sharePrayer('${escapeHtml(p.text).replace(/'/g, "\\'")}')">
-                                <i class="fas fa-share"></i> Share
-                            </button>
-                            
-                            ${isOwner && !p.answered ? `
-                                <button class="action-btn" style="flex: 0 0 auto; color: var(--accent-gold);" onclick="markAnswered('${p.id}')" title="Mark Answered">
-                                    <i class="fas fa-check-circle"></i>
-                                </button>
-                                <button class="action-btn" style="flex: 0 0 auto; color: var(--accent-red);" onclick="deletePrayer('${p.id}')" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            ` : ''}
+                        <div>
+                            <span class="category-badge" style="background: ${style.bg}; color: ${style.color};">${style.icon} ${p.category || 'General'}</span>
+                            ${p.answered ? `<span class="category-badge" style="background: var(--accent-gold); color: white; margin-top: 5px; display: inline-block;"><i class="fas fa-check-circle"></i> Answered</span>` : ''}
                         </div>
                     </div>
-                `;
-            }).join('');
-        }
-
-        // --- ACTIONS ---
-        window.openSubmitModal = function() {
-            if(!currentUser) {
-                showToast('Please sign in to submit a prayer', 'info');
-                openLoginModal();
-                return;
-            }
-            document.getElementById('pName').value = currentUser.displayName || 'Anonymous';
-            uploadedImageUrl = null;
-            document.getElementById('pImagePreview').innerHTML = '';
-            document.getElementById('submitModal').style.display = 'flex';
-        };
-
-        window.uploadPrayerImage = function() {
-            cloudinary.createUploadWidget({
-                cloudName: 'prayerdome',
-                uploadPreset: 'gallery_uploads', // Using standard unsigned preset
-                folder: 'prayers',
-                clientAllowedFormats:['jpg', 'jpeg', 'png', 'webp'],
-                maxFileSize: 5000000
-            }, (error, result) => {
-                if (!error && result && result.event === "success") {
-                    uploadedImageUrl = result.info.secure_url;
-                    document.getElementById('pImagePreview').innerHTML = `
-                        <div style="position:relative; margin-top: 15px; border-radius: 12px; overflow:hidden;">
-                            <img src="${uploadedImageUrl}" style="width:100%; height: 150px; object-fit:cover;">
-                            <button onclick="removeImage(event)" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer;"><i class="fas fa-times"></i></button>
+                    
+                    <div class="prayer-text"><i class="fas fa-quote-left" style="color: var(--accent-gold); opacity: 0.5; margin-right: 5px;"></i> ${escapeHtml(p.text)}</div>
+                    
+                    ${p.imageUrl ? `<img src="${p.imageUrl}" class="prayer-image" loading="lazy">` : ''}
+                    
+                    <!-- Emoji Reactions -->
+                    <div class="reactions">
+                        ${emojis.map(emoji => `
+                            <button class="reaction-btn ${reactions[emoji.name]?.includes(currentUser?.uid) ? 'active' : ''}" onclick="toggleReaction('${p.id}', '${emoji.name}', '${emoji.code}')">
+                                ${emoji.code} <span class="reaction-count">${reactions[emoji.name]?.length || 0}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                    
+                    <!-- Comments Section -->
+                    <div class="comments-section" id="comments-${p.id}">
+                        ${comments.slice(0, 3).map(c => `
+                            <div class="comment">
+                                <div class="comment-avatar">${c.name?.charAt(0)?.toUpperCase() || 'A'}</div>
+                                <div class="comment-content">
+                                    <div class="comment-name">${escapeHtml(c.name)}</div>
+                                    <div class="comment-text">${escapeHtml(c.text)}</div>
+                                    <div class="comment-time">${moment(c.timestamp?.toDate()).fromNow()}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                        ${comments.length > 3 ? `<div style="text-align: center; margin-top: 8px;"><button class="filter-btn" style="padding: 4px 12px; font-size: 0.7rem;" onclick="loadMoreComments('${p.id}')">View all ${comments.length} comments</button></div>` : ''}
+                        <div class="add-comment">
+                            <input type="text" id="comment-${p.id}" placeholder="Write a prayer of support..." onkeypress="if(event.key==='Enter') addComment('${p.id}')">
+                            <button onclick="addComment('${p.id}')"><i class="fas fa-paper-plane"></i></button>
                         </div>
-                    `;
-                    showToast('Image attached successfully!');
-                }
-            }).open();
-        };
+                    </div>
+                    
+                    <div class="prayer-actions">
+                        <button class="action-btn ${hasPrayed ? 'prayed' : ''}" onclick="togglePray('${p.id}', this)" ${p.answered ? 'disabled' : ''}>
+                            <i class="fas fa-pray"></i> <span>${p.prayedCount || 0}</span> Prayed
+                        </button>
+                        <button class="action-btn" onclick="sharePrayer('${escapeHtml(p.text).replace(/'/g, "\\'")}')">
+                            <i class="fas fa-share-alt"></i> Share
+                        </button>
+                        ${isOwner && !p.answered ? `
+                            <button class="action-btn" style="color: var(--accent-gold);" onclick="markAnswered('${p.id}')" title="Mark Answered">
+                                <i class="fas fa-check-double"></i> Answer
+                            </button>
+                            <button class="action-btn" style="color: var(--accent-red);" onclick="deletePrayer('${p.id}')" title="Delete">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Toggle Reaction (Emoji)
+    window.toggleReaction = async (prayerId, reactionName, emojiCode) => {
+        if (!currentUser) {
+            showToast('Sign in to react', 'info');
+            openLoginModal();
+            return;
+        }
+        const prayerRef = doc(db, "prayers", prayerId);
+        const prayerDoc = await getDoc(prayerRef);
+        if (!prayerDoc.exists()) return;
+        const currentReactions = prayerDoc.data().reactions || {};
+        const users = currentReactions[reactionName] || [];
+        if (users.includes(currentUser.uid)) {
+            await updateDoc(prayerRef, {
+                [`reactions.${reactionName}`]: arrayRemove(currentUser.uid)
+            });
+        } else {
+            await updateDoc(prayerRef, {
+                [`reactions.${reactionName}`]: arrayUnion(currentUser.uid)
+            });
+        }
+    };
 
-        window.removeImage = function(e) {
-            e.stopPropagation();
+    // Add Comment
+    window.addComment = async (prayerId) => {
+        if (!currentUser) {
+            showToast('Sign in to comment', 'info');
+            openLoginModal();
+            return;
+        }
+        const input = document.getElementById(`comment-${prayerId}`);
+        const text = input.value.trim();
+        if (!text) return;
+        input.value = '';
+        
+        const prayerRef = doc(db, "prayers", prayerId);
+        const newComment = {
+            id: Date.now().toString(),
+            userId: currentUser.uid,
+            name: currentUser.displayName || currentUser.email?.split('@')[0] || 'Anonymous',
+            text: text,
+            timestamp: serverTimestamp()
+        };
+        await updateDoc(prayerRef, {
+            comments: arrayUnion(newComment)
+        });
+        showToast('💬 Comment added!', 'success');
+    };
+
+    window.loadMoreComments = async (prayerId) => {
+        const prayer = allPrayers.find(p => p.id === prayerId);
+        if (!prayer) return;
+        const comments = prayer.comments || [];
+        if (comments.length === 0) return;
+        let commentsHtml = comments.map(c => `
+            <div class="comment">
+                <div class="comment-avatar">${c.name?.charAt(0)?.toUpperCase() || 'A'}</div>
+                <div class="comment-content">
+                    <div class="comment-name">${escapeHtml(c.name)}</div>
+                    <div class="comment-text">${escapeHtml(c.text)}</div>
+                    <div class="comment-time">${moment(c.timestamp?.toDate()).fromNow()}</div>
+                </div>
+            </div>
+        `).join('');
+        
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 500px;">
+                <h3 style="color: var(--accent-green); margin-bottom: 20px;"><i class="fas fa-comments"></i> All Comments</h3>
+                <div style="max-height: 400px; overflow-y: auto;">
+                    ${commentsHtml || '<p>No comments yet</p>'}
+                </div>
+                <button class="btn-modern" style="margin-top: 20px;" onclick="this.closest('.modal').remove()">Close</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+    };
+
+    window.openSubmitModal = () => {
+        if (!currentUser) {
+            showToast('Please sign in to submit a prayer', 'info');
+            openLoginModal();
+            return;
+        }
+        document.getElementById('pName').value = currentUser.displayName || 'Anonymous';
+        uploadedImageUrl = null;
+        document.getElementById('pImagePreview').innerHTML = '';
+        document.getElementById('submitModal').style.display = 'flex';
+    };
+
+    window.uploadPrayerImage = () => {
+        if (typeof cloudinary === 'undefined') {
+            showToast("Cloudinary not loaded", "error");
+            return;
+        }
+        cloudinary.createUploadWidget({
+            cloudName: 'prayerdome',
+            uploadPreset: 'gallery_uploads',
+            folder: 'prayers',
+            clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
+            maxFileSize: 5000000
+        }, (error, result) => {
+            if (!error && result && result.event === "success") {
+                uploadedImageUrl = result.info.secure_url;
+                document.getElementById('pImagePreview').innerHTML = `
+                    <div style="position:relative; margin-top: 15px; border-radius: 16px; overflow:hidden;">
+                        <img src="${uploadedImageUrl}" style="width:100%; height: 140px; object-fit:cover;">
+                        <button onclick="removeImage(event)" style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:28px; height:28px; cursor:pointer;"><i class="fas fa-times"></i></button>
+                    </div>
+                `;
+                showToast('Image attached!', 'success');
+            }
+        }).open();
+    };
+
+    window.removeImage = (e) => {
+        e.stopPropagation();
+        uploadedImageUrl = null;
+        document.getElementById('pImagePreview').innerHTML = '';
+    };
+
+    window.submitPrayer = async () => {
+        const name = document.getElementById('pName').value || 'Anonymous';
+        const category = document.getElementById('pCategory').value;
+        const text = document.getElementById('pText').value.trim();
+        if (!text) return showToast('Please write your prayer request', 'error');
+
+        const btn = document.getElementById('submitBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        btn.disabled = true;
+
+        try {
+            await addDoc(collection(db, "prayers"), {
+                userId: currentUser.uid,
+                name: name,
+                category: category,
+                text: text,
+                imageUrl: uploadedImageUrl,
+                isPublic: true,
+                timestamp: serverTimestamp(),
+                prayedCount: 0,
+                prayedBy: [],
+                reactions: {},
+                comments: [],
+                answered: false
+            });
+            closeModal('submitModal');
+            document.getElementById('pText').value = '';
             uploadedImageUrl = null;
-            document.getElementById('pImagePreview').innerHTML = '';
-        };
-
-        window.submitPrayer = async function() {
-            const name = document.getElementById('pName').value || 'Anonymous';
-            const category = document.getElementById('pCategory').value;
-            const text = document.getElementById('pText').value.trim();
-            const isPublic = document.getElementById('pPublic').checked;
-
-            if(!text) return showToast('Please write your prayer request', 'error');
-
-            const btn = document.getElementById('submitBtn');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-            btn.disabled = true;
-
-            try {
-                await addDoc(collection(db, "prayers"), {
-                    userId: currentUser.uid,
-                    name: name,
-                    category: category,
-                    text: text,
-                    imageUrl: uploadedImageUrl,
-                    isPublic: isPublic,
-                    timestamp: serverTimestamp(),
-                    prayedCount: 0,
-                    prayedBy:[],
-                    answered: false
-                });
-
-                closeModal('submitModal');
-                document.getElementById('pText').value = '';
-                uploadedImageUrl = null;
-                showToast('🙏 Prayer Request Submitted Globally!', 'success');
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-            } catch(e) {
-                showToast(e.message, 'error');
-            } finally {
-                btn.innerHTML = 'Post Prayer Request';
-                btn.disabled = false;
-            }
-        };
-
-        window.togglePray = async function(id, btnElement) {
-            if(!currentUser) {
-                showToast('Sign in to join in prayer', 'info');
-                openLoginModal();
-                return;
-            }
-
-            const prayer = allPrayers.find(p => p.id === id);
-            if(!prayer) return;
-
-            const isPrayed = prayer.prayedBy && prayer.prayedBy.includes(currentUser.uid);
-            const pRef = doc(db, "prayers", id);
-
-            try {
-                // Optimistic UI update
-                btnElement.classList.add('pulse-anim');
-                setTimeout(() => btnElement.classList.remove('pulse-anim'), 400);
-
-                if(isPrayed) {
-                    await updateDoc(pRef, { prayedBy: arrayRemove(currentUser.uid), prayedCount: increment(-1) });
-                } else {
-                    await updateDoc(pRef, { prayedBy: arrayUnion(currentUser.uid), prayedCount: increment(1) });
-                    showToast('🙏 Amen! You stood in agreement.', 'success');
-                }
-            } catch(e) { console.error(e); }
-        };
-
-        window.markAnswered = async function(id) {
-            if(confirm("Testify to God's goodness? Mark this prayer as answered?")) {
-                try {
-                    await updateDoc(doc(db, "prayers", id), { answered: true, answeredAt: serverTimestamp() });
-                    showToast('✨ Praise God! Prayer marked as answered.', 'success');
-                    confetti({ particleCount: 150, spread: 100, colors:['#d4af37', '#ffffff'] });
-                } catch(e) { showToast(e.message, 'error'); }
-            }
-        };
-
-        window.deletePrayer = async function(id) {
-            if(confirm("Remove this prayer request permanently?")) {
-                try {
-                    await deleteDoc(doc(db, "prayers", id));
-                    showToast('Prayer removed', 'success');
-                } catch(e) { showToast(e.message, 'error'); }
-            }
-        };
-
-        window.sharePrayer = function(text) {
-            const shareData = {
-                title: 'Prayer Dome Request',
-                text: `Join me in prayer: "${text.substring(0, 100)}..."\n\nPray with us on Prayer Dome.`,
-                url: window.location.href
-            };
-            if(navigator.share) {
-                navigator.share(shareData).catch(e=>{});
-            } else {
-                navigator.clipboard.writeText(shareData.text + " " + shareData.url);
-                showToast('Link copied to clipboard!');
-            }
-        };
-
-        // --- UTILS ---
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+            showToast('🙏 Prayer Request Submitted!', 'success');
+            confetti({ particleCount: 100, spread: 70 });
+        } catch(e) {
+            showToast(e.message, 'error');
+        } finally {
+            btn.innerHTML = 'Post Prayer Request';
+            btn.disabled = false;
         }
+    };
 
-        window.showToast = function(msg, type='success') {
-            const cont = document.getElementById('toastContainer');
-            const t = document.createElement('div');
-            t.className = `toast ${type}`;
-            t.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':'fa-info-circle'}"></i> ${msg}`;
-            cont.appendChild(t);
-            setTimeout(() => t.remove(), 3500);
+    window.togglePray = async (id, btnElement) => {
+        if (!currentUser) {
+            showToast('Sign in to pray', 'info');
+            openLoginModal();
+            return;
         }
+        const prayer = allPrayers.find(p => p.id === id);
+        if (!prayer) return;
+        const isPrayed = prayer.prayedBy?.includes(currentUser.uid);
+        const pRef = doc(db, "prayers", id);
+        btnElement.classList.add('pulse-anim');
+        setTimeout(() => btnElement.classList.remove('pulse-anim'), 400);
+        if (isPrayed) {
+            await updateDoc(pRef, { prayedBy: arrayRemove(currentUser.uid), prayedCount: increment(-1) });
+        } else {
+            await updateDoc(pRef, { prayedBy: arrayUnion(currentUser.uid), prayedCount: increment(1) });
+            showToast('🙏 You prayed for them!', 'success');
+        }
+    };
 
-        window.toggleDarkMode = function() { document.body.classList.toggle('dark-mode'); }
+    window.markAnswered = async (id) => {
+        if (confirm("Mark this prayer as answered?")) {
+            await updateDoc(doc(db, "prayers", id), { answered: true, answeredAt: serverTimestamp() });
+            showToast('✨ Marked as answered!', 'success');
+            confetti({ particleCount: 150, spread: 100 });
+        }
+    };
 
-        // Init
-        loadPrayers();
+    window.deletePrayer = async (id) => {
+        if (confirm("Delete this prayer request?")) {
+            await deleteDoc(doc(db, "prayers", id));
+            showToast('Prayer removed', 'success');
+        }
+    };
 
-    </script>
+    window.sharePrayer = (text) => {
+        if (navigator.share) {
+            navigator.share({ title: 'Prayer Request', text: `Pray for me: "${text.substring(0, 100)}..."` });
+        } else {
+            navigator.clipboard.writeText(`Pray for me: "${text.substring(0, 100)}..." - Prayer Dome`);
+            showToast('Copied to clipboard!', 'success');
+        }
+    };
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    window.showToast = (msg, type = 'success') => {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3500);
+    };
+
+    window.toggleDarkMode = () => { document.body.classList.toggle('dark-mode'); };
+
+    loadPrayers();
+</script>
 </body>
 </html>

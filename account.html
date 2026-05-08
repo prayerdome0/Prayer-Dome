@@ -6,7 +6,7 @@
     <title>Prayer Dome | Global Membership & Profile</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 
@@ -15,13 +15,16 @@
             --accent-green: #15803d;
             --accent-green-light: #22c55e;
             --accent-gold: #d4af37;
+            --accent-gold-dark: #b45309;
             --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
             --bg-primary: #f8fafc;
             --bg-card: #ffffff;
             --text-main: #0f172a;
             --text-sub: #64748b;
             --border: #e2e8f0;
             --shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            --shadow-lg: 0 20px 35px -10px rgba(0,0,0,0.1);
         }
 
         body.dark-mode {
@@ -32,24 +35,147 @@
             --border: #1e293b;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg-primary); color: var(--text-main); transition: 0.3s; padding-bottom: 50px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-primary); 
+            color: var(--text-main); 
+            transition: 0.3s; 
+            padding-bottom: 50px;
+            overflow-x: hidden;
+        }
 
-        .auth-header { background: var(--bg-card); padding: 15px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .logo-ring { width: 45px; height: 45px; background: linear-gradient(135deg, var(--accent-green), var(--accent-gold)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 22px; }
+        /* Luxury Font */
+        .luxury-font, h1, h2, h3, .tab, .btn, .membership-badge, .stat-number { 
+            font-family: 'Playfair Display', serif; 
+        }
 
-        .container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
-        .auth-card { background: var(--bg-card); border-radius: 32px; padding: 35px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+        /* Header with Logo */
+        .auth-header { 
+            background: var(--bg-card); 
+            padding: 12px 25px; 
+            border-bottom: 1px solid var(--border); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.9);
+        }
+        body.dark-mode .auth-header { background: rgba(15,23,42,0.95); }
+        
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-main);
+        }
+        .logo-ring { 
+            width: 45px; 
+            height: 45px; 
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-gold)); 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(21,128,61,0.3);
+        }
+        .logo-ring img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            background: white;
+            padding: 5px;
+        }
+        .brand-text h1 { 
+            font-size: 1.2rem; 
+            font-weight: 900; 
+            letter-spacing: 1px;
+            font-family: 'Playfair Display', serif;
+        }
+        .brand-text p { 
+            font-size: 0.6rem; 
+            opacity: 0.7; 
+            letter-spacing: 1px;
+        }
 
-        .tabs { display: flex; background: var(--bg-primary); padding: 5px; border-radius: 50px; margin-bottom: 30px; }
-        .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; border-radius: 50px; font-weight: 700; transition: 0.3s; color: var(--text-main); opacity: 0.5; }
-        .tab.active { background: var(--bg-card); box-shadow: 0 4px 10px rgba(0,0,0,0.1); opacity: 1; color: var(--accent-green); }
+        .theme-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: var(--text-main);
+        }
+        .theme-btn:hover {
+            transform: scale(1.05);
+            background: rgba(34,197,94,0.1);
+        }
+
+        .container { max-width: 800px; margin: 40px auto; padding: 0 20px; animation: fadeInUp 0.5s ease; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-card { 
+            background: var(--bg-card); 
+            border-radius: 32px; 
+            padding: 40px; 
+            border: 1px solid var(--border); 
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .auth-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+
+        .tabs { 
+            display: flex; 
+            background: var(--bg-primary); 
+            padding: 6px; 
+            border-radius: 60px; 
+            margin-bottom: 35px;
+            gap: 5px;
+        }
+        .tab { 
+            flex: 1; 
+            padding: 14px; 
+            text-align: center; 
+            cursor: pointer; 
+            border-radius: 50px; 
+            font-weight: 700; 
+            transition: 0.3s; 
+            color: var(--text-main); 
+            opacity: 0.6;
+            font-size: 1rem;
+        }
+        .tab.active { 
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); 
+            box-shadow: 0 4px 15px rgba(34,197,94,0.3); 
+            opacity: 1; 
+            color: white;
+        }
 
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .form-group { margin-bottom: 20px; position: relative; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.85rem; }
-        input, select, textarea { width: 100%; padding: 14px 18px; border-radius: 16px; border: 2px solid var(--border); background: var(--bg-primary); color: var(--text-main); outline: none; font-size: 0.95rem; }
-        input:focus { border-color: var(--accent-green); }
+        .form-group { margin-bottom: 22px; position: relative; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.85rem; color: var(--text-main); }
+        .form-group label i { margin-right: 6px; color: var(--accent-gold); }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 14px 18px; 
+            border-radius: 16px; 
+            border: 2px solid var(--border); 
+            background: var(--bg-primary); 
+            color: var(--text-main); 
+            outline: none; 
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        input:focus { border-color: var(--accent-green); box-shadow: 0 0 0 3px rgba(34,197,94,0.1); }
         .full-width { grid-column: span 2; }
 
         .password-wrapper { position: relative; }
@@ -70,12 +196,26 @@
         .country-code { width: 100px; flex-shrink: 0; }
         .phone-number { flex: 1; }
 
-        .btn { padding: 14px 28px; border-radius: 50px; border: none; font-weight: 800; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; gap: 10px; justify-content: center; width: 100%; }
+        .btn { 
+            padding: 15px 28px; 
+            border-radius: 50px; 
+            border: none; 
+            font-weight: 800; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 10px; 
+            justify-content: center; 
+            width: 100%;
+            font-size: 1rem;
+        }
         .btn-primary { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(34,197,94,0.4); }
         .btn-danger { background: linear-gradient(135deg, var(--accent-red), #dc2626); color: white; }
         .btn-google { background: white; border: 2px solid var(--border); color: var(--text-main); }
+        .btn-google:hover { background: var(--bg-primary); transform: translateY(-2px); }
         .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text-main); }
-        .btn-sm { padding: 8px 16px; font-size: 0.8rem; width: auto; }
 
         .verification-badge {
             display: inline-flex;
@@ -93,61 +233,139 @@
         .verification-badge.unverified { background: rgba(239,68,68,0.1); color: #ef4444; }
         .verification-badge.unverified:hover { background: rgba(239,68,68,0.2); transform: scale(1.02); }
 
-        .verify-modal {
+        /* Modern Modal */
+        .modern-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px);
             z-index: 10000;
             display: none;
             align-items: center;
             justify-content: center;
+            animation: fadeIn 0.3s ease;
         }
-        .verify-modal-content {
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modern-modal-content {
             background: var(--bg-card);
-            border-radius: 32px;
-            padding: 35px;
-            max-width: 450px;
+            border-radius: 40px;
+            padding: 40px;
+            max-width: 480px;
             width: 90%;
             text-align: center;
-            animation: modalPop 0.3s ease;
+            animation: modalSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        @keyframes modalPop {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(212,175,55,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .modal-icon i { font-size: 2.5rem; color: var(--accent-gold); }
         .spam-tip {
-            background: rgba(212,175,55,0.1);
+            background: rgba(212,175,55,0.08);
             border-left: 4px solid var(--accent-gold);
             padding: 12px 15px;
-            border-radius: 12px;
-            margin: 15px 0;
+            border-radius: 16px;
+            margin: 20px 0;
             font-size: 0.8rem;
             text-align: left;
         }
 
+        /* Profile Section */
         .profile-hero { text-align: center; margin-bottom: 30px; }
-        .avatar-frame { width: 140px; height: 140px; border-radius: 50%; border: 4px solid var(--accent-gold); margin: 0 auto 15px; position: relative; cursor: pointer; overflow: hidden; background: var(--bg-primary); }
+        .avatar-frame { 
+            width: 140px; 
+            height: 140px; 
+            border-radius: 50%; 
+            border: 4px solid var(--accent-gold); 
+            margin: 0 auto 15px; 
+            position: relative; 
+            cursor: pointer; 
+            overflow: hidden; 
+            background: var(--bg-primary);
+            transition: transform 0.3s;
+        }
+        .avatar-frame:hover { transform: scale(1.02); }
         .avatar-frame img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-        .camera-overlay { position: absolute; bottom: 10px; right: 10px; background: var(--accent-green); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid white; color: white; }
+        .camera-overlay { 
+            position: absolute; 
+            bottom: 10px; 
+            right: 10px; 
+            background: var(--accent-green); 
+            width: 36px; 
+            height: 36px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            border: 2px solid white; 
+            color: white;
+            transition: 0.2s;
+        }
+        .camera-overlay:hover { transform: scale(1.1); }
         
-        .membership-badge { background: linear-gradient(135deg, var(--accent-green), #064e3b); color: white; padding: 12px 24px; border-radius: 30px; margin: 15px auto; font-weight: 800; display: inline-block; }
-        .profile-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 25px 0; }
-        .stat-item { background: var(--bg-primary); padding: 15px 10px; border-radius: 20px; text-align: center; border: 1px solid var(--border); }
-        .stat-number { font-size: 1.5rem; font-weight: 800; color: var(--accent-green); }
-        .stat-label { font-size: 0.7rem; color: var(--text-sub); margin-top: 4px; }
+        .membership-badge { 
+            background: linear-gradient(135deg, var(--accent-green), #064e3b); 
+            color: white; 
+            padding: 12px 24px; 
+            border-radius: 40px; 
+            margin: 15px auto; 
+            font-weight: 800; 
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+        .profile-stat-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 12px; 
+            margin: 25px 0; 
+        }
+        .stat-item { 
+            background: var(--bg-primary); 
+            padding: 15px 10px; 
+            border-radius: 20px; 
+            text-align: center; 
+            border: 1px solid var(--border);
+            transition: 0.3s;
+        }
+        .stat-item:hover { transform: translateY(-3px); border-color: var(--accent-gold); }
+        .stat-number { font-size: 1.6rem; font-weight: 800; color: var(--accent-green); }
+        .stat-label { font-size: 0.7rem; color: var(--text-sub); margin-top: 4px; font-weight: 600; }
         .spiritual-card { background: var(--bg-primary); border-radius: 24px; padding: 20px; margin: 20px 0; border: 1px solid var(--border); }
         .progress-bar { height: 8px; background: var(--border); border-radius: 10px; overflow: hidden; margin: 10px 0; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-green), var(--accent-gold)); border-radius: 10px; transition: width 0.5s ease; }
-        .ministry-tag { display: inline-block; background: rgba(34,197,94,0.1); color: var(--accent-green); padding: 6px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; margin: 4px; }
+        .ministry-tag { 
+            display: inline-block; 
+            background: rgba(34,197,94,0.1); 
+            color: var(--accent-green); 
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            font-size: 0.7rem; 
+            font-weight: 600; 
+            margin: 4px;
+        }
+
+        /* Toast */
         .toast-box { position: fixed; top: 20px; right: 20px; z-index: 2000; }
-        .toast { background: var(--bg-card); padding: 15px 25px; border-radius: 40px; margin-bottom: 10px; border-left: 5px solid var(--accent-green); animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 12px; font-weight: 600; }
+        .toast { background: var(--bg-card); padding: 14px 24px; border-radius: 50px; margin-bottom: 10px; border-left: 5px solid var(--accent-green); animation: slideInRight 0.3s ease; display: flex; align-items: center; gap: 12px; font-weight: 600; box-shadow: var(--shadow-lg); }
         .toast.error { border-left-color: var(--accent-red); }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        .age-warning { color: #ef4444; font-size: 0.75rem; font-weight: bold; display: none; }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         /* Loading Spinner */
         .spinner-overlay {
@@ -156,26 +374,25 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 10000;
             flex-direction: column;
             gap: 15px;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(8px);
         }
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255,255,255,0.3);
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.2);
             border-top-color: var(--accent-green);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Delete Account Button */
         .delete-account-btn {
             margin-top: 20px;
             background: rgba(239,68,68,0.1);
@@ -193,6 +410,10 @@
             .profile-stat-grid { grid-template-columns: repeat(2, 1fr); }
             .phone-wrapper { flex-direction: column; }
             .country-code { width: 100%; }
+            .auth-card { padding: 25px; }
+            .modern-modal-content { padding: 30px; }
+            .brand-text h1 { font-size: 1rem; }
+            .brand-text p { display: none; }
         }
     </style>
 </head>
@@ -201,53 +422,66 @@
     <div class="toast-box" id="toastContainer"></div>
 
     <header class="auth-header">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <div class="logo-ring"><i class="fas fa-church"></i></div>
-            <h1 style="font-size: 1.2rem; font-weight: 900;">PRAYER DOME</h1>
-        </div>
-        <button onclick="toggleDarkMode()" style="background:none; border:none; color:inherit; font-size: 1.4rem; cursor:pointer;"><i class="fas fa-moon"></i></button>
+        <a href="index.html" class="logo-area">
+            <div class="logo-ring">
+                <img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" alt="Prayer Dome Logo">
+            </div>
+            <div class="brand-text">
+                <h1>PRAYER DOME</h1>
+                <p>A HOUSE OF PRAYER FOR ALL NATIONS</p>
+            </div>
+        </a>
+        <button class="theme-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
     </header>
 
     <div class="container">
         <div id="authTabs" class="tabs">
             <div class="tab active" onclick="switchTab('login')">SIGN IN</div>
-            <div class="tab" onclick="switchTab('register')">REGISTER</div>
+            <div class="tab" onclick="switchTab('register')">CREATE ACCOUNT</div>
         </div>
 
         <!-- LOGIN SCREEN -->
         <div id="loginForm" class="auth-card">
-            <h2 style="margin-bottom: 30px; text-align: center;">Welcome Back</h2>
+            <h2 style="margin-bottom: 10px; text-align: center; font-family: 'Playfair Display', serif;"><i class="fas fa-sign-in-alt"></i> Welcome Back</h2>
+            <p style="text-align: center; color: var(--text-sub); margin-bottom: 30px;">Sign in to continue your spiritual journey</p>
             <form onsubmit="handleLogin(event)">
-                <div class="form-group"><label>Email Address</label><input type="email" id="lEmail" required></div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email Address</label>
+                    <input type="email" id="lEmail" required placeholder="your@email.com">
+                </div>
                 <div class="form-group password-wrapper">
-                    <label>Password</label>
-                    <input type="password" id="lPass" required>
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" id="lPass" required placeholder="Enter your password">
                     <button type="button" class="toggle-password" onclick="togglePassword('lPass', this)"><i class="fas fa-eye"></i></button>
                 </div>
                 <button type="submit" class="btn btn-primary">Sign In <i class="fas fa-arrow-right"></i></button>
             </form>
             <div style="text-align: center; margin: 20px 0;">
-                <a href="#" onclick="resetPassword()" style="color: var(--accent-green); font-size: 0.85rem;">Forgot Password?</a>
+                <a href="#" onclick="openResetModal()" style="color: var(--accent-green); font-size: 0.85rem; text-decoration: none; font-weight: 600;">Forgot Password?</a>
             </div>
-            <div style="text-align: center; margin: 25px 0; color: var(--text-sub); font-size: 0.8rem;">OR CONTINUE WITH</div>
+            <div style="text-align: center; margin: 25px 0; color: var(--text-sub); font-size: 0.8rem; position: relative;">
+                <span style="background: var(--bg-card); padding: 0 15px;">OR CONTINUE WITH</span>
+            </div>
             <button class="btn btn-google" onclick="handleGoogle()"><i class="fab fa-google"></i> Sign in with Google</button>
         </div>
 
         <!-- REGISTRATION SCREEN -->
         <div id="registerForm" class="auth-card" style="display: none;">
-            <h2 style="margin-bottom: 25px; text-align: center;">Join the Family</h2>
+            <h2 style="margin-bottom: 10px; text-align: center; font-family: 'Playfair Display', serif;"><i class="fas fa-user-plus"></i> Join the Family</h2>
+            <p style="text-align: center; color: var(--text-sub); margin-bottom: 25px;">Create your account to access all features</p>
+            
             <div style="text-align: center; margin-bottom: 20px;">
                 <div class="avatar-frame"><img id="regPreview" src="https://via.placeholder.com/150"></div>
-                <button type="button" onclick="uploadPhoto('register')" class="btn btn-outline" style="width: auto; padding: 8px 20px;">Upload Photo</button>
+                <button type="button" onclick="uploadPhoto('register')" class="btn btn-outline" style="width: auto; padding: 8px 20px; margin-top: 10px;"><i class="fas fa-camera"></i> Upload Photo</button>
                 <input type="hidden" id="uploadedPhoto">
             </div>
 
             <form onsubmit="handleRegister(event)">
                 <div class="form-grid">
-                    <div class="form-group full-width"><label>Full Name *</label><input type="text" id="rName" required></div>
-                    <div class="form-group"><label>Email Address *</label><input type="email" id="rEmail" required></div>
+                    <div class="form-group full-width"><label><i class="fas fa-user"></i> Full Name *</label><input type="text" id="rName" required placeholder="John Doe"></div>
+                    <div class="form-group"><label><i class="fas fa-envelope"></i> Email Address *</label><input type="email" id="rEmail" required placeholder="your@email.com"></div>
                     <div class="form-group">
-                        <label>Phone Number *</label>
+                        <label><i class="fas fa-phone-alt"></i> Phone Number *</label>
                         <div class="phone-wrapper">
                             <select id="rCountryCode" class="country-code">
                                 <option value="+1">+1 (USA)</option>
@@ -263,17 +497,17 @@
                             <input type="tel" id="rPhone" class="phone-number" placeholder="71234567" required>
                         </div>
                     </div>
-                    <div class="form-group"><label>Date of Birth *</label><input type="date" id="rDob" onchange="checkAge(this.value)" required><p id="ageWarn" class="age-warning">⚠️ Must be 13+ years old</p></div>
-                    <div class="form-group"><label>Gender</label><select id="rGender"><option>Male</option><option>Female</option><option>Prefer not to say</option></select></div>
-                    <div class="form-group"><label>Your Branch</label><select id="rBranch"><option>Chama, Zambia</option><option>Manzini, Eswatini</option><option>Cork, Ireland</option><option>Online Global</option></select></div>
-                    <div class="form-group"><label>Ministry Interest</label><select id="rMinistry"><option>Worship</option><option>Intercessor</option><option>Usher</option><option>Outreach</option><option>Children</option><option>Technical</option></select></div>
-                    <div class="form-group password-wrapper"><label>Password *</label><input type="password" id="rPass" minlength="6" required><button type="button" class="toggle-password" onclick="togglePassword('rPass', this)"><i class="fas fa-eye"></i></button></div>
-                    <div class="form-group password-wrapper"><label>Confirm Password *</label><input type="password" id="rConfirm" required><button type="button" class="toggle-password" onclick="togglePassword('rConfirm', this)"><i class="fas fa-eye"></i></button></div>
+                    <div class="form-group"><label><i class="fas fa-calendar-alt"></i> Date of Birth *</label><input type="date" id="rDob" onchange="checkAge(this.value)" required><p id="ageWarn" class="age-warning">⚠️ Must be 13+ years old</p></div>
+                    <div class="form-group"><label><i class="fas fa-venus-mars"></i> Gender</label><select id="rGender"><option>Male</option><option>Female</option><option>Prefer not to say</option></select></div>
+                    <div class="form-group"><label><i class="fas fa-church"></i> Your Branch</label><select id="rBranch"><option>Chama, Zambia</option><option>Manzini, Eswatini</option><option>Cork, Ireland</option><option>Online Global</option></select></div>
+                    <div class="form-group"><label><i class="fas fa-hands-helping"></i> Ministry Interest</label><select id="rMinistry"><option>Worship</option><option>Intercessor</option><option>Usher</option><option>Outreach</option><option>Children</option><option>Technical</option></select></div>
+                    <div class="form-group password-wrapper"><label><i class="fas fa-lock"></i> Password *</label><input type="password" id="rPass" minlength="6" required placeholder="Min. 6 characters"><button type="button" class="toggle-password" onclick="togglePassword('rPass', this)"><i class="fas fa-eye"></i></button></div>
+                    <div class="form-group password-wrapper"><label><i class="fas fa-lock"></i> Confirm Password *</label><input type="password" id="rConfirm" required><button type="button" class="toggle-password" onclick="togglePassword('rConfirm', this)"><i class="fas fa-eye"></i></button></div>
                 </div>
-                <div class="form-group full-width"><label>How did you hear about us?</label><select id="rReferral"><option>Social Media</option><option>Friend/Family</option><option>Radio/TV</option><option>Church Event</option><option>Online Search</option></select></div>
-                <button type="submit" id="regBtn" class="btn btn-primary">Register Membership <i class="fas fa-user-plus"></i></button>
+                <div class="form-group full-width"><label><i class="fas fa-share-alt"></i> How did you hear about us?</label><select id="rReferral"><option>Social Media</option><option>Friend/Family</option><option>Radio/TV</option><option>Church Event</option><option>Online Search</option></select></div>
+                <button type="submit" id="regBtn" class="btn btn-primary">Create Account <i class="fas fa-user-plus"></i></button>
             </form>
-            <div style="text-align: center; margin: 25px 0; color: var(--text-sub);">OR REGISTER WITH</div>
+            <div style="text-align: center; margin: 25px 0; color: var(--text-sub); font-size: 0.8rem;">OR REGISTER WITH</div>
             <button class="btn btn-google" onclick="handleGoogle()"><i class="fab fa-google"></i> Continue with Google</button>
         </div>
 
@@ -285,7 +519,7 @@
                         <img id="pPhoto" src="https://via.placeholder.com/150">
                         <div class="camera-overlay"><i class="fas fa-camera"></i></div>
                     </div>
-                    <h2 id="pNameDisplay">User Name</h2>
+                    <h2 id="pNameDisplay" style="font-family: 'Playfair Display', serif;">User Name</h2>
                     <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
                         <p id="pRoleDisplay" style="color: var(--accent-gold); font-weight: 800;"></p>
                         <span id="emailVerifiedBadge" class="verification-badge unverified" onclick="verifyEmail()"><i class="fas fa-envelope"></i> <span id="emailStatusText">Verify Email</span></span>
@@ -316,7 +550,7 @@
                 </button>
             </div>
             <div id="profileEdit" style="display: none;">
-                <h3 style="margin-bottom: 20px;">Edit Profile</h3>
+                <h3 style="margin-bottom: 20px; font-family: 'Playfair Display', serif;">Edit Profile</h3>
                 <div class="form-group">
                     <label>Profile Photo</label>
                     <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
@@ -363,34 +597,60 @@
         </div>
     </div>
 
+    <!-- Password Reset Modal -->
+    <div id="resetModal" class="modern-modal">
+        <div class="modern-modal-content">
+            <div class="modal-icon">
+                <i class="fas fa-key"></i>
+            </div>
+            <h2 style="font-family: 'Playfair Display', serif; margin-bottom: 10px;">Reset Password</h2>
+            <p style="color: var(--text-sub); margin-bottom: 20px;">Enter your email address and we'll send you a link to reset your password.</p>
+            <div class="form-group">
+                <input type="email" id="resetEmail" placeholder="your@email.com" style="text-align: center;">
+            </div>
+            <div class="spam-tip">
+                <i class="fas fa-envelope-open-text"></i>
+                <strong>📧 What to expect:</strong><br>
+                • Check your inbox for a password reset link<br>
+                • Also check your <strong>Spam/Junk folder</strong><br>
+                • The link expires in 1 hour
+            </div>
+            <button class="btn btn-primary" onclick="sendPasswordReset()" style="margin-bottom: 12px;">Send Reset Link</button>
+            <button class="btn btn-outline" onclick="closeModal('resetModal')">Cancel</button>
+        </div>
+    </div>
+
     <!-- Email Verification Modal -->
-    <div id="emailVerifyModal" class="verify-modal">
-        <div class="verify-modal-content">
-            <i class="fas fa-envelope" style="font-size: 3rem; color: var(--accent-green);"></i>
-            <h2>Verify Your Email</h2>
+    <div id="emailVerifyModal" class="modern-modal">
+        <div class="modern-modal-content">
+            <div class="modal-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <h2 style="font-family: 'Playfair Display', serif;">Verify Your Email</h2>
             <p>We've sent a verification email to <strong id="verifyEmailAddress"></strong></p>
             <div class="spam-tip">
                 <i class="fas fa-envelope-open-text"></i>
                 <strong>📧 Didn't receive the email?</strong><br>
                 • Check your <strong>Spam/Junk folder</strong><br>
                 • Add <strong>noreply@prayerdome.net</strong> to your contacts<br>
-                • Wait a few minutes and check again<br>
-                • Click the link in the email to verify your account
+                • Wait a few minutes and check again
             </div>
-            <button class="btn btn-primary" onclick="sendEmailVerificationCode()">Resend Verification Email</button>
-            <button class="btn btn-outline" style="margin-top: 10px;" onclick="closeModal('emailVerifyModal')">Close</button>
+            <button class="btn btn-primary" onclick="sendEmailVerificationCode()">Resend Email</button>
+            <button class="btn btn-outline" style="margin-top: 12px;" onclick="closeModal('emailVerifyModal')">Close</button>
         </div>
     </div>
 
-    <!-- Delete Account Confirmation Modal -->
-    <div id="deleteAccountModal" class="verify-modal">
-        <div class="verify-modal-content">
-            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--accent-red);"></i>
-            <h2>Delete Account</h2>
+    <!-- Delete Account Modal -->
+    <div id="deleteAccountModal" class="modern-modal">
+        <div class="modern-modal-content">
+            <div class="modal-icon">
+                <i class="fas fa-exclamation-triangle" style="color: var(--accent-red);"></i>
+            </div>
+            <h2 style="font-family: 'Playfair Display', serif;">Delete Account</h2>
             <p>Are you sure you want to permanently delete your account?</p>
             <p style="font-size: 0.85rem; color: var(--text-sub); margin-top: 10px;">This action cannot be undone. All your data will be permanently removed.</p>
-            <div style="margin: 20px 0;">
-                <label>Type "DELETE" to confirm:</label>
+            <div style="margin: 25px 0;">
+                <label>Type <strong style="color: var(--accent-red);">"DELETE"</strong> to confirm:</label>
                 <input type="text" id="deleteConfirmText" placeholder="DELETE" style="margin-top: 10px; text-align: center;">
             </div>
             <div style="display: flex; gap: 12px;">
@@ -399,7 +659,7 @@
             </div>
         </div>
     </div>
-
+    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, GoogleAuthProvider, signInWithPopup, sendEmailVerification, sendPasswordResetEmail, deleteUser } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -421,6 +681,13 @@
 
         let currentUserData = null;
         let currentPhotoUrl = "";
+
+        // Email validation - only real email providers
+        function isValidEmail(email) {
+            const validDomains = ['gmail.com', 'outlook.com', 'hotmail.com', 'yahoo.com', 'icloud.com', 'aol.com', 'protonmail.com', 'mail.com', 'yandex.com', 'gmx.com'];
+            const domain = email.split('@')[1];
+            return validDomains.includes(domain);
+        }
 
         // Helper Functions
         window.showToast = (msg, type) => {
@@ -461,12 +728,44 @@
             document.getElementById(id).style.display = 'none';
         };
 
+        window.openResetModal = () => {
+            document.getElementById('resetModal').style.display = 'flex';
+        };
+
+        window.sendPasswordReset = async () => {
+            const email = document.getElementById('resetEmail').value.trim();
+            if (!email) {
+                showToast("Please enter your email address", "error");
+                return;
+            }
+            if (!isValidEmail(email)) {
+                showToast("Please use a valid email address (gmail.com, outlook.com, etc.)", "error");
+                return;
+            }
+            
+            showLoading();
+            try {
+                await sendPasswordResetEmail(auth, email);
+                closeModal('resetModal');
+                document.getElementById('resetEmail').value = '';
+                showToast("✅ Password reset email sent! Check your inbox.", "success");
+                confetti({ particleCount: 100, spread: 70 });
+            } catch (e) {
+                if (e.code === 'auth/user-not-found') {
+                    showToast("No account found with this email address", "error");
+                } else {
+                    showToast(e.message, "error");
+                }
+            } finally {
+                hideLoading();
+            }
+        };
+
         window.showDeleteAccountModal = () => {
             document.getElementById('deleteConfirmText').value = '';
             document.getElementById('deleteAccountModal').style.display = 'flex';
         };
 
-        // Delete Account Function
         window.deleteAccount = async () => {
             const confirmText = document.getElementById('deleteConfirmText').value;
             if (confirmText !== 'DELETE') {
@@ -503,7 +802,6 @@
             }
         };
 
-        // EMAIL VERIFICATION
         window.verifyEmail = async () => {
             if (!auth.currentUser) return showToast("Please login first", "error");
             
@@ -515,11 +813,7 @@
             }
             
             try {
-                const actionCodeSettings = {
-                    url: window.location.href,
-                    handleCodeInApp: false
-                };
-                await sendEmailVerification(auth.currentUser, actionCodeSettings);
+                await sendEmailVerification(auth.currentUser);
                 document.getElementById('verifyEmailAddress').innerText = auth.currentUser.email;
                 document.getElementById('emailVerifyModal').style.display = 'flex';
                 showToast("Verification email sent! Check your spam folder.", "success");
@@ -530,11 +824,7 @@
 
         window.sendEmailVerificationCode = async () => {
             try {
-                const actionCodeSettings = {
-                    url: window.location.href,
-                    handleCodeInApp: false
-                };
-                await sendEmailVerification(auth.currentUser, actionCodeSettings);
+                await sendEmailVerification(auth.currentUser);
                 showToast("Verification email resent! Check spam folder.", "success");
             } catch (e) {
                 showToast(e.message, "error");
@@ -585,19 +875,10 @@
             }
         }
 
-        // Password Reset
         window.resetPassword = async () => {
-            const email = prompt("Enter your email address to reset password:");
-            if (!email) return;
-            try {
-                await sendPasswordResetEmail(auth, email);
-                showToast("Password reset email sent! Check your spam folder.", "success");
-            } catch (e) {
-                showToast(e.message, "error");
-            }
+            openResetModal();
         };
 
-        // Google Login
         window.handleGoogle = async () => {
             try {
                 const res = await signInWithPopup(auth, googleProvider);
@@ -612,12 +893,12 @@
                     });
                 }
                 showToast("Signed in with Google!", "success");
+                confetti({ particleCount: 100, spread: 70 });
             } catch (e) { 
                 showToast(e.message, "error"); 
             }
         };
         
-        // Register
         window.handleRegister = async (e) => {
             e.preventDefault();
             const name = document.getElementById('rName').value;
@@ -629,7 +910,14 @@
             const fullPhone = `${countryCode}${phoneNum}`;
             const photoUrl = document.getElementById('uploadedPhoto').value || "https://via.placeholder.com/150";
             
+            // Validate email domain
+            if (!isValidEmail(email)) {
+                showToast("Please use a valid email address (gmail.com, outlook.com, etc.)", "error");
+                return;
+            }
+            
             if(pass !== confirm) return showToast("Passwords don't match", "error");
+            if(pass.length < 6) return showToast("Password must be at least 6 characters", "error");
             
             showLoading();
             try {
@@ -654,34 +942,50 @@
                 showToast("Registration successful! Please verify your email. Check spam folder!", "success");
                 confetti({ particleCount: 150, spread: 70 });
             } catch (e) { 
-                showToast(e.message, "error"); 
+                if (e.code === 'auth/email-already-in-use') {
+                    showToast("Email already registered. Please sign in instead.", "error");
+                } else {
+                    showToast(e.message, "error");
+                }
             } finally {
                 hideLoading();
             }
         };
         
-        // Login
         window.handleLogin = async (e) => {
             e.preventDefault();
+            const email = document.getElementById('lEmail').value;
+            const password = document.getElementById('lPass').value;
+            
+            if (!isValidEmail(email)) {
+                showToast("Please use a valid email address", "error");
+                return;
+            }
+            
             showLoading();
             try {
-                await signInWithEmailAndPassword(auth, document.getElementById('lEmail').value, document.getElementById('lPass').value);
+                await signInWithEmailAndPassword(auth, email, password);
                 showToast("Welcome back!", "success");
+                confetti({ particleCount: 80, spread: 60 });
             } catch (e) { 
-                showToast("Invalid Credentials", "error"); 
+                if (e.code === 'auth/user-not-found') {
+                    showToast("No account found with this email", "error");
+                } else if (e.code === 'auth/wrong-password') {
+                    showToast("Incorrect password", "error");
+                } else {
+                    showToast("Invalid Credentials", "error");
+                }
             } finally {
                 hideLoading();
             }
         };
 
-        // Save Profile - FIXED
         window.saveProfile = async () => {
             const countryCode = document.getElementById('eCountryCode').value;
             const phoneNum = document.getElementById('ePhone').value;
             const fullPhone = `${countryCode}${phoneNum}`;
             const ministries = Array.from(document.querySelectorAll('#ministryCheckboxes input:checked')).map(cb => cb.value);
             
-            // Get the current photo URL from the image element or stored variable
             const currentPhoto = document.getElementById('pPhoto').src;
             const finalPhotoUrl = currentPhotoUrl || currentPhoto;
             
@@ -699,10 +1003,7 @@
             
             showLoading();
             try {
-                // Update Firestore first
                 await updateDoc(doc(db, "users", auth.currentUser.uid), updates);
-                
-                // Update Firebase Auth profile
                 await updateProfile(auth.currentUser, { 
                     displayName: updates.fullName,
                     photoURL: finalPhotoUrl
@@ -720,7 +1021,6 @@
             }
         };
 
-        // Load Profile Data
         async function loadProfileData(user) {
             const userSnap = await getDoc(doc(db, "users", user.uid));
             const memberSnap = await getDoc(doc(db, "memberships", user.uid));
@@ -739,7 +1039,6 @@
                 document.getElementById('pLevel').innerText = data.quizLevel || 1;
                 document.getElementById('pBioDisplay').innerHTML = data.bio || "No bio added yet.";
                 
-                // Calculate days active
                 if (data.createdAt?.toDate) {
                     const days = Math.floor((Date.now() - data.createdAt.toDate().getTime()) / (1000 * 60 * 60 * 24));
                     document.getElementById('pDaysActive').innerText = days;
@@ -759,7 +1058,6 @@
                 document.getElementById('spiritualLevel').innerHTML = level;
                 document.getElementById('spiritualProgress').style.width = `${progress}%`;
                 
-                // Populate edit form
                 document.getElementById('eName').value = data.fullName || "";
                 const phoneFull = data.phone || "";
                 let countryCode = "+268";
@@ -777,7 +1075,6 @@
                 document.getElementById('eInterests').value = data.interests || "";
                 document.getElementById('editPhotoPreview').src = photoUrl;
                 
-                // Set ministry checkboxes
                 document.querySelectorAll('#ministryCheckboxes input').forEach(cb => {
                     cb.checked = ministries.includes(cb.value);
                 });
@@ -803,7 +1100,6 @@
             }
         }
 
-        // Photo Upload with Cloudinary - FIXED
         window.uploadPhoto = async (context) => {
             if (typeof cloudinary === 'undefined') {
                 showToast("Cloudinary not loaded. Please refresh the page.", "error");
@@ -837,14 +1133,11 @@
                     else if (context === 'profile') {
                         showLoading();
                         try {
-                            // Update Firestore
                             await updateDoc(doc(db, "users", auth.currentUser.uid), { 
                                 photoURL: url,
                                 updatedAt: serverTimestamp()
                             });
-                            // Update Auth profile
                             await updateProfile(auth.currentUser, { photoURL: url });
-                            // Update UI
                             document.getElementById('pPhoto').src = url;
                             document.getElementById('editPhotoPreview').src = url;
                             currentPhotoUrl = url;
@@ -870,7 +1163,6 @@
             uploadPhoto('profile');
         };
         
-        // Auth Observer
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('authTabs').style.display = 'none';
@@ -916,8 +1208,7 @@
             }
         };
         
-        // Close modals on outside click
-        document.querySelectorAll('.verify-modal').forEach(modal => {
+        document.querySelectorAll('.modern-modal').forEach(modal => {
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
         });
         
