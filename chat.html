@@ -21,7 +21,6 @@
             --accent-blue: #3b82f6;
             --accent-red: #ef4444;
             --accent-purple: #8b5cf6;
-            --accent-pink: #ec4899;
             --bg-primary: #f8fafc;
             --bg-card: #ffffff;
             --text-main: #0f172a;
@@ -39,7 +38,7 @@
             --border-color: #334155;
         }
         
-        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-main); transition: 0.3s; height: 100vh; overflow: hidden; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-main); transition: 0.3s; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
         .luxury-font, h1, h2, h3 { font-family: 'Playfair Display', serif; }
         
@@ -51,10 +50,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
+            flex-shrink: 0;
         }
         
         .logo-area {
@@ -99,6 +95,7 @@
             padding: 8px 20px;
             border-bottom: 1px solid var(--border-color);
             gap: 5px;
+            flex-shrink: 0;
         }
         .main-tab {
             flex: 1;
@@ -124,14 +121,16 @@
         }
         
         /* Tab Content */
-        .tab-content { display: none; height: calc(100vh - 125px); overflow: hidden; }
-        .tab-content.active { display: flex; }
+        .tab-content { display: none; flex: 1; overflow: hidden; }
+        .tab-content.active { display: flex; flex-direction: column; }
         
         /* CHATS TAB */
         .chats-container {
             display: flex;
             width: 100%;
             height: 100%;
+            flex: 1;
+            overflow: hidden;
         }
         .rooms-sidebar {
             width: 320px;
@@ -184,10 +183,21 @@
             justify-content: center;
             font-size: 1.3rem;
             flex-shrink: 0;
+            position: relative;
+        }
+        .online-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #22c55e;
+            border-radius: 50%;
+            border: 2px solid white;
         }
         .room-item.active .room-avatar { background: rgba(255,255,255,0.2); }
         .room-info { flex: 1; }
-        .room-name { font-weight: 800; }
+        .room-name { font-weight: 800; display: flex; align-items: center; gap: 5px; }
         .room-preview { font-size: 0.7rem; opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .room-time { font-size: 0.6rem; opacity: 0.5; }
         .room-badge {
@@ -198,6 +208,14 @@
             font-size: 0.7rem;
             font-weight: 700;
         }
+        .admin-badge {
+            background: var(--accent-gold);
+            color: #000;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
         
         /* Chat Area */
         .chat-area {
@@ -205,6 +223,7 @@
             display: flex;
             flex-direction: column;
             background: var(--bg-primary);
+            overflow: hidden;
         }
         .chat-area-header {
             padding: 15px 20px;
@@ -213,9 +232,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
         .chat-area-title h2 { font-size: 1.1rem; }
         .chat-area-title p { font-size: 0.7rem; color: var(--text-sub); }
+        .chat-actions { display: flex; gap: 8px; }
         
         .messages-area {
             flex: 1;
@@ -259,7 +280,7 @@
             border-top-left-radius: 18px;
             border-top-right-radius: 4px;
         }
-        .message-name { font-size: 0.7rem; font-weight: 700; margin-bottom: 3px; color: var(--accent-gold); }
+        .message-name { font-size: 0.7rem; font-weight: 700; margin-bottom: 3px; color: var(--accent-gold); display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
         .message.sent .message-name { color: rgba(255,255,255,0.8); }
         .message-text { font-size: 0.9rem; line-height: 1.5; word-break: break-word; }
         .message-media {
@@ -270,6 +291,9 @@
             cursor: pointer;
         }
         .message-time { font-size: 0.6rem; margin-top: 5px; opacity: 0.6; display: flex; gap: 8px; align-items: center; }
+        .delivery-status { font-size: 0.7rem; margin-left: 5px; }
+        .delivered { color: var(--accent-green); }
+        .read { color: var(--accent-blue); }
         
         .chat-input-area {
             padding: 15px 20px;
@@ -279,6 +303,7 @@
             gap: 10px;
             align-items: center;
             flex-wrap: wrap;
+            flex-shrink: 0;
         }
         .media-buttons {
             display: flex;
@@ -318,10 +343,20 @@
         }
         .chat-send:hover { transform: scale(1.05); }
         
+        /* Typing Indicator */
+        .typing-indicator {
+            padding: 5px 20px;
+            font-size: 0.7rem;
+            color: var(--accent-gold);
+            font-style: italic;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        
         /* STATUS TAB */
         .status-container {
-            width: 100%;
-            height: 100%;
+            flex: 1;
             overflow-y: auto;
             padding: 20px;
         }
@@ -348,6 +383,7 @@
             justify-content: center;
             font-size: 1.5rem;
         }
+        .status-stats { font-size: 0.7rem; margin-top: 5px; opacity: 0.8; }
         .status-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -375,15 +411,16 @@
         }
         .status-name { font-weight: 700; font-size: 0.8rem; }
         .status-time { font-size: 0.6rem; color: var(--text-sub); }
+        .viewers-count { font-size: 0.6rem; color: var(--accent-gold); margin-top: 3px; }
         
         /* SETTINGS TAB */
         .settings-container {
-            width: 100%;
-            height: 100%;
+            flex: 1;
             overflow-y: auto;
             padding: 20px;
             max-width: 600px;
             margin: 0 auto;
+            width: 100%;
         }
         .settings-card {
             background: var(--bg-card);
@@ -437,23 +474,6 @@
         }
         .toggle-switch.active .toggle-slider { left: 25px; }
         
-        /* Footer */
-        .chat-footer {
-            background: var(--bg-card);
-            border-top: 1px solid var(--border-color);
-            padding: 8px 20px;
-            text-align: center;
-            font-size: 0.7rem;
-            color: var(--text-sub);
-            position: sticky;
-            bottom: 0;
-            z-index: 99;
-        }
-        .chat-footer a {
-            color: var(--accent-green);
-            text-decoration: none;
-        }
-        
         /* Modals */
         .modal-overlay {
             position: fixed;
@@ -481,6 +501,15 @@
         @keyframes modalPop {
             from { transform: scale(0.9); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
+        }
+        
+        .viewers-modal { max-width: 400px; }
+        .viewer-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
         }
         
         .status-view-modal {
@@ -577,6 +606,7 @@
             <div class="rooms-sidebar" id="roomsSidebar">
                 <div class="rooms-header">
                     <h3><i class="fas fa-comment-dots"></i> Conversations</h3>
+                    <button class="header-btn" style="margin-top: 10px; width: 100%;" onclick="startPrivateChat()"><i class="fas fa-user-plus"></i> New Private Chat</button>
                 </div>
                 <div class="room-search">
                     <input type="text" id="roomSearch" placeholder="🔍 Search rooms or people..." onkeyup="filterRooms()">
@@ -590,6 +620,7 @@
                         <h2 id="currentRoomName">🌍 General Fellowship</h2>
                         <p id="currentRoomDesc">Welcome all believers - share encouragement and prayer</p>
                     </div>
+                    <div class="chat-actions" id="chatActions"></div>
                 </div>
                 
                 <div class="messages-area" id="messagesArea">
@@ -597,6 +628,10 @@
                         <i class="fas fa-comments" style="font-size: 48px; opacity: 0.3;"></i>
                         <p>Select a conversation to start chatting</p>
                     </div>
+                </div>
+                
+                <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                    <i class="fas fa-ellipsis-h"></i> Someone is typing...
                 </div>
                 
                 <div class="chat-input-area">
@@ -621,6 +656,7 @@
                 <div>
                     <h3>My Status</h3>
                     <p>Tap to add a photo or video that disappears in 24 hours</p>
+                    <div class="status-stats" id="myStatusStats"></div>
                 </div>
             </div>
             
@@ -734,16 +770,14 @@
         </div>
     </div>
     
-    <!-- Footer -->
-    <div class="chat-footer">
-        <p><i class="fas fa-church"></i> Prayer Dome | A House of Prayer for All Nations | <a href="index.html">Home</a></p>
-    </div>
-    
     <!-- Status View Modal -->
     <div id="statusViewModal" class="status-view-modal">
         <div class="status-view-header">
             <div><strong id="statusViewName">User</strong><br><span id="statusViewTime" style="font-size: 0.7rem;"></span></div>
-            <button onclick="closeStatusView()" style="background: none; border: none; color: white; font-size: 1.5rem;">&times;</button>
+            <div>
+                <button onclick="viewStatusViewers()" style="background: none; border: none; color: white; margin-right: 15px;"><i class="fas fa-eye"></i></button>
+                <button onclick="closeStatusView()" style="background: none; border: none; color: white; font-size: 1.5rem;">&times;</button>
+            </div>
         </div>
         <div class="status-view-media" id="statusViewMedia"></div>
         <div style="padding: 20px; text-align: center;">
@@ -765,10 +799,31 @@
             </div>
         </div>
     </div>
-
+    
+    <!-- Viewers Modal -->
+    <div id="viewersModal" class="modal-overlay">
+        <div class="modal-content viewers-modal">
+            <h3 style="color: var(--accent-green); margin-bottom: 20px;"><i class="fas fa-eye"></i> Status Viewers</h3>
+            <div id="viewersList"></div>
+            <button class="header-btn" style="margin-top: 20px; width: 100%;" onclick="closeModal('viewersModal')">Close</button>
+        </div>
+    </div>
+    
+    <!-- New Private Chat Modal -->
+    <div id="newChatModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="color: var(--accent-green); margin-bottom: 20px;"><i class="fas fa-user-plus"></i> Start New Chat</h3>
+            <div class="form-group">
+                <input type="text" id="searchUser" class="chat-input" placeholder="Search by name or email..." onkeyup="searchUsers()" style="width: 100%;">
+            </div>
+            <div id="userSearchResults" style="max-height: 300px; overflow-y: auto;"></div>
+            <button class="header-btn" style="margin-top: 20px; width: 100%;" onclick="closeModal('newChatModal')">Cancel</button>
+        </div>
+    </div>
+    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, updateDoc, getDoc, setDoc, deleteDoc, where, getDocs, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, updateDoc, getDoc, setDoc, deleteDoc, where, getDocs, increment, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
@@ -795,6 +850,9 @@
         let recordedBlob = null;
         let pendingMedia = null;
         let isRecording = false;
+        let isAdmin = false;
+        let typingTimeout = null;
+        let currentStatusId = null;
         
         // Rooms configuration
         const groupRooms = {
@@ -814,6 +872,7 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
+                await checkAdminStatus();
                 await loadUserProfile();
                 await loadPrivateChats();
                 buildRoomList();
@@ -821,10 +880,31 @@
                 loadStatuses();
                 startStatusCleanup();
                 joinRoom('general');
+                updateUserOnlineStatus(true);
+                
+                // Set up presence listener
+                setInterval(() => updateUserOnlineStatus(true), 30000);
             } else {
                 window.location.href = 'account.html';
             }
         });
+        
+        async function checkAdminStatus() {
+            try {
+                const memberDoc = await getDoc(doc(db, "memberships", currentUser.uid));
+                isAdmin = memberDoc.exists() && (memberDoc.data().role === 'admin');
+                if (isAdmin) {
+                    const actionsDiv = document.getElementById('chatActions');
+                    if (actionsDiv) {
+                        actionsDiv.innerHTML = '<button class="header-btn" onclick="showAdminPanel()" style="background: var(--accent-gold); color: black;"><i class="fas fa-shield-alt"></i> Admin</button>';
+                    }
+                }
+            } catch(e) { console.error(e); }
+        }
+        
+        window.showAdminPanel = () => {
+            alert("Admin Panel\n\nFeatures:\n• Delete any message (long press)\n• Remove users\n• Moderate chat rooms");
+        };
 
         async function loadUserProfile() {
             try {
@@ -837,6 +917,7 @@
                         photoURL: currentUser.photoURL || null,
                         online: true,
                         lastSeen: serverTimestamp(),
+                        role: 'member',
                         settings: {
                             notifications: true,
                             sound: true,
@@ -844,11 +925,18 @@
                             showOnline: true
                         }
                     });
+                } else {
+                    // Update online status
+                    await updateDoc(userRef, { online: true, lastSeen: serverTimestamp() });
                 }
-                const nameEl = document.getElementById('profileName');
-                if (nameEl) {
-                    nameEl.innerHTML = userDoc.exists() ? userDoc.data().displayName : (currentUser.displayName || 'Believer');
-                }
+                document.getElementById('profileName').innerHTML = userDoc.exists() ? userDoc.data().displayName : (currentUser.displayName || 'Believer');
+            } catch(e) { console.error(e); }
+        }
+        
+        async function updateUserOnlineStatus(isOnline) {
+            if (!currentUser) return;
+            try {
+                await setDoc(doc(db, "users", currentUser.uid), { online: isOnline, lastSeen: serverTimestamp() }, { merge: true });
             } catch(e) { console.error(e); }
         }
 
@@ -858,20 +946,91 @@
                 const q = query(chatsRef, where("participants", "array-contains", currentUser.uid));
                 const snapshot = await getDocs(q);
                 privateChats = [];
-                snapshot.forEach(doc => {
-                    privateChats.push({ id: doc.id, ...doc.data() });
-                });
+                for (const doc of snapshot.docs) {
+                    const chat = { id: doc.id, ...doc.data() };
+                    const otherId = chat.participants.find(p => p !== currentUser.uid);
+                    if (otherId) {
+                        const userRef = doc(db, "users", otherId);
+                        const userSnap = await getDoc(userRef);
+                        chat.otherName = userSnap.exists() ? userSnap.data().displayName : 'User';
+                        chat.otherPhoto = userSnap.exists() ? userSnap.data().photoURL : null;
+                        chat.otherOnline = userSnap.exists() ? userSnap.data().online : false;
+                    }
+                    privateChats.push(chat);
+                }
+                buildRoomList();
             } catch(e) { console.error(e); }
         }
         
+        window.startPrivateChat = () => {
+            document.getElementById('newChatModal').style.display = 'flex';
+            document.getElementById('searchUser').value = '';
+            document.getElementById('userSearchResults').innerHTML = '';
+        };
+        
+        window.searchUsers = async () => {
+            const search = document.getElementById('searchUser').value.toLowerCase().trim();
+            if (search.length < 2) return;
+            
+            const usersRef = collection(db, "users");
+            const q = query(usersRef, where("displayName", ">=", search), where("displayName", "<=", search + '\uf8ff'));
+            const snapshot = await getDocs(q);
+            
+            const resultsDiv = document.getElementById('userSearchResults');
+            let html = '';
+            snapshot.forEach(doc => {
+                const user = doc.data();
+                if (doc.id !== currentUser.uid) {
+                    html += `
+                        <div class="room-item" onclick="createPrivateChat('${doc.id}', '${escapeHtml(user.displayName)}')">
+                            <div class="room-avatar">${user.displayName?.charAt(0).toUpperCase() || 'U'}</div>
+                            <div class="room-info">
+                                <div class="room-name">${escapeHtml(user.displayName)}</div>
+                                <div class="room-preview">${user.email || ''}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            resultsDiv.innerHTML = html || '<div style="text-align: center; padding: 20px;">No users found</div>';
+        };
+        
+        window.createPrivateChat = async (otherId, otherName) => {
+            closeModal('newChatModal');
+            
+            // Check if chat already exists
+            const existingChat = privateChats.find(chat => chat.participants.includes(otherId));
+            if (existingChat) {
+                joinRoom(existingChat.id, 'private');
+                return;
+            }
+            
+            // Create new private chat
+            const chatId = `private_${currentUser.uid}_${otherId}`;
+            const chatData = {
+                participants: [currentUser.uid, otherId],
+                createdAt: serverTimestamp(),
+                createdBy: currentUser.uid
+            };
+            await setDoc(doc(db, "privateChats", chatId), chatData);
+            await loadPrivateChats();
+            joinRoom(chatId, 'private');
+        };
+
         function buildRoomList() {
             allRooms = [];
             for (const [key, room] of Object.entries(groupRooms)) {
                 allRooms.push({ id: key, name: room.name, icon: room.icon, type: 'group', unread: 0 });
             }
             for (const chat of privateChats) {
-                const otherId = chat.participants?.find(p => p !== currentUser?.uid);
-                allRooms.push({ id: chat.id, name: chat.otherName || 'User', type: 'private', unread: 0, otherId: otherId });
+                allRooms.push({ 
+                    id: chat.id, 
+                    name: chat.otherName || 'User', 
+                    type: 'private', 
+                    unread: 0, 
+                    otherId: chat.participants.find(p => p !== currentUser?.uid),
+                    online: chat.otherOnline
+                });
             }
             renderRoomList();
         }
@@ -881,9 +1040,15 @@
             if (!container) return;
             container.innerHTML = allRooms.map(room => `
                 <div class="room-item ${currentRoom === room.id ? 'active' : ''}" onclick="joinRoom('${room.id}', '${room.type}')">
-                    <div class="room-avatar">${room.type === 'group' ? room.icon : '👤'}</div>
+                    <div class="room-avatar">
+                        ${room.type === 'group' ? room.icon : '👤'}
+                        ${room.online ? '<span class="online-dot"></span>' : ''}
+                    </div>
                     <div class="room-info">
-                        <div class="room-name">${escapeHtml(room.name)}</div>
+                        <div class="room-name">
+                            ${escapeHtml(room.name)}
+                            ${isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
+                        </div>
                         <div class="room-preview">${room.type === 'group' ? 'Tap to join conversation' : 'Private chat'}</div>
                     </div>
                     ${room.unread > 0 ? `<div class="room-badge">${room.unread}</div>` : ''}
@@ -931,13 +1096,60 @@
                 const messages = [];
                 snapshot.forEach(doc => messages.push({ id: doc.id, ...doc.data() }));
                 renderMessages(messages);
+                
+                // Mark messages as delivered
+                messages.forEach(msg => {
+                    if (msg.userId !== currentUser.uid && msg.delivered !== true) {
+                        updateDoc(doc(db, collectionPath, roomId, "messages", msg.id), { delivered: true });
+                    }
+                });
             });
+            
+            // Setup typing listener
+            setupTypingListener(roomId, type);
             
             const sidebar = document.getElementById('roomsSidebar');
             if (window.innerWidth <= 768 && sidebar) {
                 sidebar.classList.remove('open');
             }
         };
+        
+        function setupTypingListener(roomId, type) {
+            const typingRef = collection(db, type === 'group' ? `groupMessages_${roomId}` : `privateMessages_${roomId}`, roomId, "typing");
+            onSnapshot(typingRef, (snapshot) => {
+                const typingUsers = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.userId !== currentUser.uid && data.isTyping && (Date.now() - data.timestamp?.toDate()) < 3000) {
+                        typingUsers.push(data.userName);
+                    }
+                });
+                const indicator = document.getElementById('typingIndicator');
+                if (typingUsers.length > 0) {
+                    indicator.style.display = 'block';
+                    indicator.innerHTML = `<i class="fas fa-ellipsis-h"></i> ${typingUsers.join(', ')} is typing...`;
+                } else {
+                    indicator.style.display = 'none';
+                }
+            });
+        }
+        
+        // Send typing indicator
+        document.getElementById('messageInput')?.addEventListener('input', async () => {
+            if (!currentUser) return;
+            const collectionPath = currentChatType === 'group' ? `groupMessages_${currentRoom}` : `privateMessages_${currentRoom}`;
+            const typingRef = doc(db, collectionPath, currentRoom, "typing", currentUser.uid);
+            await setDoc(typingRef, {
+                userId: currentUser.uid,
+                userName: currentUser.displayName?.split(' ')[0] || 'Someone',
+                isTyping: true,
+                timestamp: serverTimestamp()
+            });
+            if (typingTimeout) clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(async () => {
+                await setDoc(typingRef, { isTyping: false, timestamp: serverTimestamp() });
+            }, 1000);
+        });
 
         function renderMessages(messages) {
             const container = document.getElementById('messagesArea');
@@ -952,11 +1164,20 @@
             
             container.innerHTML = messages.map(msg => {
                 const isOwn = currentUser && msg.userId === currentUser.uid;
+                let statusIcon = '';
+                if (isOwn) {
+                    if (msg.read) statusIcon = '<span class="delivery-status read"><i class="fas fa-check-double"></i><i class="fas fa-check-double"></i></span>';
+                    else if (msg.delivered) statusIcon = '<span class="delivery-status delivered"><i class="fas fa-check-double"></i></span>';
+                    else statusIcon = '<span class="delivery-status"><i class="fas fa-check"></i></span>';
+                }
                 return `
                     <div class="message ${isOwn ? 'sent' : 'received'}">
                         <div class="message-avatar">${(msg.userName || 'A').charAt(0).toUpperCase()}</div>
                         <div class="message-bubble">
-                            <div class="message-name">${escapeHtml(msg.userName || 'Anonymous')}</div>
+                            <div class="message-name">
+                                ${escapeHtml(msg.userName || 'Anonymous')}
+                                ${isAdmin && !isOwn ? '<span class="admin-badge" style="cursor: pointer;" onclick="deleteMessage(\'' + msg.id + '\')">Delete</span>' : ''}
+                            </div>
                             ${msg.text ? `<div class="message-text">${escapeHtml(msg.text)}</div>` : ''}
                             ${msg.mediaUrl ? `
                                 ${msg.mediaType === 'image' ? `<img src="${msg.mediaUrl}" class="message-media" onclick="viewMedia('${msg.mediaUrl}')">` : ''}
@@ -964,12 +1185,23 @@
                                 ${msg.mediaType === 'document' ? `<a href="${msg.mediaUrl}" target="_blank" class="message-media" style="display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 12px; text-decoration: none; color: var(--text-main);"><i class="fas fa-file-pdf"></i> ${msg.mediaName || 'Document'}</a>` : ''}
                                 ${msg.mediaType === 'audio' ? `<audio src="${msg.mediaUrl}" controls style="margin-top: 8px;"></audio>` : ''}
                             ` : ''}
-                            <div class="message-time">${msg.timestamp ? moment(msg.timestamp.toDate()).format('h:mm A') : 'Just now'}</div>
+                            <div class="message-time">
+                                ${msg.timestamp ? moment(msg.timestamp.toDate()).format('h:mm A') : 'Just now'}
+                                ${statusIcon}
+                            </div>
                         </div>
                     </div>
                 `;
             }).join('');
             container.scrollTop = container.scrollHeight;
+            
+            // Mark messages as read
+            messages.forEach(async (msg) => {
+                if (!isOwn && !msg.read && currentUser) {
+                    const collectionPath = currentChatType === 'group' ? `groupMessages_${currentRoom}` : `privateMessages_${currentRoom}`;
+                    await updateDoc(doc(db, collectionPath, currentRoom, "messages", msg.id), { read: true });
+                }
+            });
         }
 
         window.sendMessage = async () => {
@@ -983,7 +1215,9 @@
                 userId: currentUser.uid,
                 userName: currentUser.displayName || currentUser.email?.split('@')[0] || 'Anonymous',
                 text: text || '',
-                timestamp: serverTimestamp()
+                timestamp: serverTimestamp(),
+                delivered: false,
+                read: false
             };
             
             if (pendingMedia) {
@@ -998,7 +1232,17 @@
                 if (input) input.value = '';
             } catch(e) { console.error(e); showToast("Error sending message", "error"); }
         };
+        
+        window.deleteMessage = async (messageId) => {
+            if (!isAdmin && !confirm("Delete this message?")) return;
+            const collectionPath = currentChatType === 'group' ? `groupMessages_${currentRoom}` : `privateMessages_${currentRoom}`;
+            await deleteDoc(doc(db, collectionPath, currentRoom, "messages", messageId));
+            showToast("Message deleted", "success");
+        };
 
+        // Media upload functions
+        let pendingMedia1 = null;
+        
         window.uploadPhoto = () => {
             const input = document.createElement('input');
             input.type = 'file';
@@ -1009,7 +1253,7 @@
                     showToast("Uploading image...", "info");
                     const url = await uploadToCloudinary(file);
                     if (url) {
-                        pendingMedia = { url: url, type: 'image', name: file.name };
+                        pendingMedia1 = { url: url, type: 'image', name: file.name };
                         const msgInput = document.getElementById('messageInput');
                         if (msgInput) {
                             msgInput.placeholder = 'Add a caption (optional)...';
@@ -1032,7 +1276,7 @@
                     showToast("Uploading video...", "info");
                     const url = await uploadToCloudinary(file);
                     if (url) {
-                        pendingMedia = { url: url, type: 'video', name: file.name };
+                        pendingMedia1 = { url: url, type: 'video', name: file.name };
                         showToast("Video ready! Send your message.", "success");
                     }
                 }
@@ -1050,7 +1294,7 @@
                     showToast("Uploading document...", "info");
                     const url = await uploadToCloudinary(file);
                     if (url) {
-                        pendingMedia = { url: url, type: 'document', name: file.name };
+                        pendingMedia1 = { url: url, type: 'document', name: file.name };
                         showToast("Document ready! Send your message.", "success");
                     }
                 }
@@ -1080,8 +1324,7 @@
         
         // Voice Recording
         window.startVoiceRecording = () => {
-            const modal = document.getElementById('voiceModal');
-            if (modal) modal.style.display = 'flex';
+            document.getElementById('voiceModal').style.display = 'flex';
             setupRecording();
         };
         
@@ -1091,14 +1334,10 @@
                 mediaRecorder = new MediaRecorder(stream);
                 audioChunks = [];
                 
-                mediaRecorder.ondataavailable = (event) => {
-                    audioChunks.push(event.data);
-                };
-                
+                mediaRecorder.ondataavailable = (event) => { audioChunks.push(event.data); };
                 mediaRecorder.onstop = () => {
                     recordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const statusEl = document.getElementById('recordingStatus');
-                    if (statusEl) statusEl.innerHTML = 'Recording complete! Press Send.';
+                    document.getElementById('recordingStatus').innerHTML = 'Recording complete! Press Send.';
                 };
                 
                 const recordBtn = document.getElementById('recordBtn');
@@ -1109,21 +1348,17 @@
                             isRecording = false;
                             recordBtn.style.background = 'var(--accent-green)';
                             recordBtn.innerHTML = '<i class="fas fa-check"></i>';
-                            const statusEl = document.getElementById('recordingStatus');
-                            if (statusEl) statusEl.innerHTML = 'Recording complete!';
+                            document.getElementById('recordingStatus').innerHTML = 'Recording complete!';
                         } else {
                             mediaRecorder.start();
                             isRecording = true;
                             recordBtn.style.background = 'var(--accent-red)';
                             recordBtn.innerHTML = '<i class="fas fa-stop"></i>';
-                            const statusEl = document.getElementById('recordingStatus');
-                            if (statusEl) statusEl.innerHTML = 'Recording... Click stop when done';
+                            document.getElementById('recordingStatus').innerHTML = 'Recording... Click stop when done';
                         }
                     };
                 }
-            } catch(e) {
-                showToast("Microphone access denied", "error");
-            }
+            } catch(e) { showToast("Microphone access denied", "error"); }
         }
         
         window.sendVoiceMessage = async () => {
@@ -1131,15 +1366,14 @@
             showToast("Uploading voice message...", "info");
             const url = await uploadToCloudinary(recordedBlob);
             if (url) {
-                pendingMedia = { url: url, type: 'audio', name: 'Voice message' };
+                pendingMedia1 = { url: url, type: 'audio', name: 'Voice message' };
                 await sendMessage();
                 closeVoiceModal();
             }
         };
         
         window.closeVoiceModal = () => {
-            const modal = document.getElementById('voiceModal');
-            if (modal) modal.style.display = 'none';
+            document.getElementById('voiceModal').style.display = 'none';
             if (mediaRecorder && isRecording) {
                 mediaRecorder.stop();
                 isRecording = false;
@@ -1165,7 +1399,7 @@
                             mediaType: file.type.startsWith('video') ? 'video' : 'image',
                             timestamp: serverTimestamp(),
                             expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-                            views: 0
+                            viewers: []
                         });
                         showToast("Status added! Will disappear in 24 hours.", "success");
                         loadStatuses();
@@ -1182,20 +1416,32 @@
             const q = query(collection(db, "statuses"), where("expiresAt", ">", now));
             const snapshot = await getDocs(q);
             
-            const statuses = [];
+            const myStatuses = [];
+            const otherStatuses = [];
             snapshot.forEach(doc => {
                 const data = doc.data();
-                if (data.userId !== currentUser?.uid) {
-                    statuses.push({ id: doc.id, ...data });
+                if (data.userId === currentUser?.uid) {
+                    myStatuses.push({ id: doc.id, ...data });
+                } else {
+                    otherStatuses.push({ id: doc.id, ...data });
                 }
             });
             
-            if (statuses.length === 0) {
+            // Update my status stats
+            const myStatusStats = document.getElementById('myStatusStats');
+            if (myStatusStats && myStatuses.length > 0) {
+                const totalViews = myStatuses.reduce((sum, s) => sum + (s.viewers?.length || 0), 0);
+                myStatusStats.innerHTML = `<i class="fas fa-eye"></i> ${totalViews} views • ${myStatuses.length} active`;
+            } else if (myStatusStats) {
+                myStatusStats.innerHTML = 'No active status';
+            }
+            
+            if (otherStatuses.length === 0 && myStatuses.length === 0) {
                 container.innerHTML = '<div style="text-align: center; grid-column: 1/-1; padding: 40px;">No status updates from friends</div>';
                 return;
             }
             
-            container.innerHTML = statuses.map(status => `
+            container.innerHTML = otherStatuses.map(status => `
                 <div class="status-item" onclick="viewStatus('${status.id}', '${status.mediaUrl}', '${status.mediaType}', '${escapeHtml(status.userName)}', '${status.timestamp?.toDate()}')">
                     ${status.mediaType === 'image' ? `<img src="${status.mediaUrl}" loading="lazy">` : `<video src="${status.mediaUrl}"></video>`}
                     <div class="status-info">
@@ -1206,25 +1452,57 @@
             `).join('');
         }
         
-        window.viewStatus = (id, url, type, name, time) => {
-            const nameEl = document.getElementById('statusViewName');
-            const timeEl = document.getElementById('statusViewTime');
+        window.viewStatus = async (id, url, type, name, time) => {
+            currentStatusId = id;
+            document.getElementById('statusViewName').innerHTML = name;
+            document.getElementById('statusViewTime').innerHTML = moment(time).format('MMMM D, h:mm A');
             const mediaDiv = document.getElementById('statusViewMedia');
-            const modal = document.getElementById('statusViewModal');
+            mediaDiv.innerHTML = type === 'image' ? `<img src="${url}">` : `<video src="${url}" controls autoplay></video>`;
+            document.getElementById('statusViewModal').style.display = 'flex';
             
-            if (nameEl) nameEl.innerHTML = name;
-            if (timeEl) timeEl.innerHTML = moment(time).format('MMMM D, h:mm A');
-            if (mediaDiv) mediaDiv.innerHTML = type === 'image' ? `<img src="${url}">` : `<video src="${url}" controls autoplay></video>`;
-            if (modal) modal.style.display = 'flex';
-            
-            try {
-                updateDoc(doc(db, "statuses", id), { views: increment(1) });
-            } catch(e) { console.error(e); }
+            // Add viewer if not already viewed
+            const statusRef = doc(db, "statuses", id);
+            const statusDoc = await getDoc(statusRef);
+            if (statusDoc.exists()) {
+                const viewers = statusDoc.data().viewers || [];
+                if (!viewers.some(v => v.userId === currentUser.uid)) {
+                    await updateDoc(statusRef, {
+                        viewers: arrayUnion({
+                            userId: currentUser.uid,
+                            userName: currentUser.displayName,
+                            viewedAt: serverTimestamp()
+                        })
+                    });
+                }
+            }
+        };
+        
+        window.viewStatusViewers = async () => {
+            if (!currentStatusId) return;
+            const statusRef = doc(db, "statuses", currentStatusId);
+            const statusDoc = await getDoc(statusRef);
+            if (statusDoc.exists()) {
+                const viewers = statusDoc.data().viewers || [];
+                const viewersList = document.getElementById('viewersList');
+                if (viewers.length === 0) {
+                    viewersList.innerHTML = '<div style="text-align: center; padding: 20px;">No one has viewed this status yet</div>';
+                } else {
+                    viewersList.innerHTML = viewers.map(v => `
+                        <div class="viewer-item">
+                            <div class="room-avatar" style="width: 40px; height: 40px;">${v.userName?.charAt(0).toUpperCase() || 'U'}</div>
+                            <div>
+                                <div><strong>${escapeHtml(v.userName)}</strong></div>
+                                <div style="font-size: 0.7rem; color: var(--text-sub);">${moment(v.viewedAt?.toDate()).fromNow()}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                document.getElementById('viewersModal').style.display = 'flex';
+            }
         };
         
         window.closeStatusView = () => {
-            const modal = document.getElementById('statusViewModal');
-            if (modal) modal.style.display = 'none';
+            document.getElementById('statusViewModal').style.display = 'none';
         };
         
         window.replyToStatus = () => {
@@ -1287,19 +1565,11 @@
             localStorage.setItem('chat_settings', JSON.stringify(settings));
         }
         
-        async function updateUserOnlineStatus(show) {
-            if (!currentUser) return;
-            try {
-                await setDoc(doc(db, "users", currentUser.uid), { showOnline: show }, { merge: true });
-            } catch(e) { console.error(e); }
-        }
-        
         window.editProfile = () => {
             const newName = prompt("Enter your display name:", currentUser?.displayName || 'Believer');
             if (newName && newName.trim()) {
                 updateDoc(doc(db, "users", currentUser.uid), { displayName: newName.trim() });
-                const nameEl = document.getElementById('profileName');
-                if (nameEl) nameEl.innerHTML = newName.trim();
+                document.getElementById('profileName').innerHTML = newName.trim();
                 showToast("Profile updated!", "success");
             }
         };
@@ -1321,51 +1591,30 @@
             input.click();
         };
         
-        window.blockedUsers = () => {
-            showToast("Blocked users feature coming soon", "info");
-        };
-        
-        window.clearMediaCache = () => {
-            if (confirm("Clear all cached media? This will free up space.")) {
-                showToast("Cache cleared!", "success");
-            }
-        };
-        
-        window.showAbout = () => {
-            alert("Prayer Dome Chat v2.0\n\nA Christian community chat platform\n\nConnect, share, and grow together in faith.");
-        };
-        
-        window.viewMedia = (url) => {
-            window.open(url, '_blank');
-        };
+        window.blockedUsers = () => { showToast("Blocked users feature coming soon", "info"); };
+        window.clearMediaCache = () => { if (confirm("Clear all cached media?")) showToast("Cache cleared!", "success"); };
+        window.showAbout = () => { alert("Prayer Dome Chat v2.0\n\nA Christian community chat platform\n\nConnect, share, and grow together in faith."); };
+        window.viewMedia = (url) => { window.open(url, '_blank'); };
         
         window.switchMainTab = (tab) => {
             document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             
             if (tab === 'chats') {
-                const firstTab = document.querySelector('.main-tab:first-child');
-                if (firstTab) firstTab.classList.add('active');
-                const chatsTab = document.getElementById('tab-chats');
-                if (chatsTab) chatsTab.classList.add('active');
+                document.querySelector('.main-tab:first-child').classList.add('active');
+                document.getElementById('tab-chats').classList.add('active');
             } else if (tab === 'status') {
-                const tabs = document.querySelectorAll('.main-tab');
-                if (tabs[1]) tabs[1].classList.add('active');
-                const statusTab = document.getElementById('tab-status');
-                if (statusTab) statusTab.classList.add('active');
+                document.querySelectorAll('.main-tab')[1].classList.add('active');
+                document.getElementById('tab-status').classList.add('active');
                 loadStatuses();
             } else if (tab === 'settings') {
-                const tabs = document.querySelectorAll('.main-tab');
-                if (tabs[2]) tabs[2].classList.add('active');
-                const settingsTab = document.getElementById('tab-settings');
-                if (settingsTab) settingsTab.classList.add('active');
+                document.querySelectorAll('.main-tab')[2].classList.add('active');
+                document.getElementById('tab-settings').classList.add('active');
             }
         };
         
         window.logout = async () => {
-            if (currentUser) {
-                await updateDoc(doc(db, "users", currentUser.uid), { online: false, lastSeen: serverTimestamp() });
-            }
+            await updateDoc(doc(db, "users", currentUser.uid), { online: false, lastSeen: serverTimestamp() });
             await signOut(auth);
             window.location.href = 'index.html';
         };
@@ -1377,6 +1626,10 @@
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
+        
+        window.closeModal = (id) => {
+            document.getElementById(id).style.display = 'none';
+        };
         
         function escapeHtml(str) {
             if (!str) return '';
@@ -1393,8 +1646,7 @@
         const sidebarToggle = document.getElementById('sidebarToggle');
         if (sidebarToggle) {
             sidebarToggle.addEventListener('click', () => {
-                const sidebar = document.getElementById('roomsSidebar');
-                if (sidebar) sidebar.classList.toggle('open');
+                document.getElementById('roomsSidebar').classList.toggle('open');
             });
         }
         
