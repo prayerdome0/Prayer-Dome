@@ -11,6 +11,8 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -64,7 +66,7 @@
         .location-detective:hover { background: rgba(21, 128, 61, 0.2); transform: scale(1.02); }
         .location-detective span { max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Notification Panel - Enhanced */
+        /* Notification Panel */
         .notification-panel {
             position: fixed;
             top: -100%;
@@ -126,21 +128,22 @@
         .glass-card { background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: 32px; border: 1px solid rgba(255,255,255,0.2); box-shadow: var(--shadow); margin: 0 20px 30px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; z-index: 5; overflow: hidden;}
         .dark-mode .glass-card { border: 1px solid rgba(255,255,255,0.05); }
 
-        /* Founder Card */
+        /* Founder Card - Increased Photo Size */
         .founder-card { padding: 35px; display: flex; flex-direction: column; align-items: center; text-align: center; margin-top: -40px; background: var(--glass-bg);}
-        .founder-img-wrapper { width: 110px; height: 110px; border-radius: 50%; border: 4px solid var(--accent-gold); padding: 3px; background: var(--bg-primary); margin-bottom: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);}
+        .founder-img-wrapper { width: 150px; height: 150px; border-radius: 50%; border: 4px solid var(--accent-gold); padding: 3px; background: var(--bg-primary); margin-bottom: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
         .founder-img-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
         .founder-name { font-size: 1.6rem; font-weight: 900; color: var(--accent-green); margin-bottom: 5px; font-family: 'Playfair Display', serif; }
         .founder-title { font-size: 0.8rem; font-weight: 800; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 15px; }
         .founder-bio { color: var(--text-sub); font-size: 0.95rem; line-height: 1.7; max-width: 600px; margin: 0 auto; }
 
-        /* Daily Devotional */
+        /* Daily Devotional - Morning/Afternoon/Evening */
         .devotional-container { position: relative; overflow: hidden; padding: 35px; }
         .devotional-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 12px; }
         .devotional-header h2 { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 12px; color: var(--accent-green); font-family: 'Playfair Display', serif; }
         .devotional-header h2 i { font-size: 1.8rem; color: var(--accent-gold); }
-        .hour-indicator { background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark)); padding: 8px 20px; border-radius: 40px; color: white; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; animation: glowPulse 2s infinite; box-shadow: 0 4px 15px rgba(212,175,55,0.3); }
-        @keyframes glowPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.02); } }
+        .time-indicator { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); padding: 8px 20px; border-radius: 40px; color: white; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; animation: pulseGlow 2s infinite; box-shadow: 0 4px 15px rgba(34,197,94,0.3); }
+        .timezone-info { font-size: 0.7rem; color: var(--accent-gold); margin-top: 5px; }
+        @keyframes pulseGlow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.02); } }
         
         .verse-card { background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(212,175,55,0.05)); border-radius: 28px; padding: 35px; margin-bottom: 25px; border-left: 6px solid var(--accent-gold); transition: all 0.5s ease; animation: fadeSlideIn 0.6s ease; position: relative; overflow: hidden; }
         .verse-card::before { content: '"'; position: absolute; bottom: -20px; right: 20px; font-size: 120px; opacity: 0.1; font-family: 'Playfair Display', serif; color: var(--accent-gold); }
@@ -163,11 +166,11 @@
         .prayer-title i { font-size: 1.8rem; color: var(--accent-gold); }
         .prayer-text { font-size: 1rem; font-style: italic; color: var(--text-main); line-height: 1.8; }
         
-        .next-hour-timer { text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px dashed var(--border-color); font-size: 0.8rem; color: var(--text-sub); display: flex; align-items: center; justify-content: center; gap: 12px; }
-        .countdown-badge { background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark)); padding: 5px 15px; border-radius: 30px; font-weight: 800; color: white; font-family: monospace; }
+        .next-update-timer { text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px dashed var(--border-color); font-size: 0.8rem; color: var(--text-sub); display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .update-badge { background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark)); padding: 5px 15px; border-radius: 30px; font-weight: 800; color: white; font-family: monospace; }
 
-        /* Portal Grid - 3x3 Grid (9 items) */
-        .portal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 0 20px; margin: 30px 0; }
+        /* Portal Grid */
+        .portal-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 0 20px; margin: 30px 0; }
         .portal-item { text-align: center; text-decoration: none; color: inherit; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: block; }
         .portal-icon { width: 75px; height: 75px; background: var(--bg-card); border-radius: 25px; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 1.8rem; color: var(--accent-green); box-shadow: var(--shadow); border: 2px solid var(--border-color); transition: all 0.3s ease; position: relative; overflow: hidden; }
         .portal-icon::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition: left 0.5s; }
@@ -260,6 +263,7 @@
             .devotional-header h2 { font-size: 1.2rem; }
             .location-detective span { max-width: 120px; }
             .reviews-grid { grid-template-columns: 1fr; }
+            .founder-img-wrapper { width: 110px; height: 110px; }
         }
     </style>
 </head>
@@ -307,7 +311,7 @@
 </div>
 
 <main>
-    <!-- Founder Card -->
+    <!-- Founder Card with Larger Photo -->
     <div class="founder-card glass-card">
         <div class="founder-img-wrapper">
             <img src="https://i.ibb.co/RTbNh1hB/founder-2.jpg" alt="Pastor Seedwell K. Masuku">
@@ -319,14 +323,19 @@
         </div>
     </div>
 
-    <!-- Enhanced Daily Devotional -->
+    <!-- Daily Devotional - Morning/Afternoon/Evening based on local time -->
     <div class="glass-card devotional-container">
         <div class="devotional-header">
             <h2><i class="fas fa-book-open"></i> Daily Devotional</h2>
-            <div class="hour-indicator" id="hourIndicator">
-                <i class="fas fa-clock"></i>
-                <span id="currentHourText">Loading...</span>
+            <div class="time-indicator" id="timeIndicator">
+                <i class="fas fa-sun" id="timeIcon"></i>
+                <span id="currentTimeText">Loading...</span>
             </div>
+        </div>
+        
+        <!-- Timezone Info -->
+        <div class="timezone-info" id="timezoneInfo">
+            <i class="fas fa-globe"></i> Loading your timezone...
         </div>
         
         <div id="dailyContent">
@@ -346,20 +355,20 @@
             <div class="prayer-card">
                 <div class="prayer-title">
                     <i class="fas fa-praying-hands"></i>
-                    <span>PRAYER FOR TODAY</span>
+                    <span>PRAYER FOR THIS TIME</span>
                 </div>
                 <div class="prayer-text" id="dailyPrayer">Loading prayer...</div>
             </div>
         </div>
         
-        <div class="next-hour-timer">
+        <div class="next-update-timer">
             <i class="fas fa-hourglass-half"></i>
             <span>Next devotional in</span>
-            <span class="countdown-badge" id="nextHourCountdown">--:--</span>
+            <span class="update-badge" id="nextUpdateCountdown">--:--</span>
         </div>
     </div>
 
-    <!-- Portal Grid - 3x3 with all pages -->
+    <!-- Portal Grid -->
     <div class="portal-grid">
         <a href="/bible.html" class="portal-item"><div class="portal-icon"><i class="fas fa-bible"></i></div><span>Bible</span></a>
         <a href="/gallery.html" class="portal-item"><div class="portal-icon"><i class="fas fa-camera"></i></div><span>Gallery</span></a>
@@ -373,6 +382,7 @@
         <a href="/about.html" class="portal-item"><div class="portal-icon"><i class="fas fa-church"></i></div><span>About</span></a>
         <a href="/contact.html" class="portal-item"><div class="portal-icon"><i class="fas fa-envelope"></i></div><span>Contact</span></a>
         <a href="/team.html" class="portal-item"><div class="portal-icon"><i class="fas fa-users"></i></div><span>Team</span></a>
+        <a href="/chat.html" class="portal-item"><div class="portal-icon"><i class="fas fa-comments"></i></div><span>Chat</span></a>
     </div>
 
     <!-- Upcoming Events -->
@@ -486,6 +496,7 @@
         <a href="/bible.html" class="nav-link"><i class="fas fa-book-open"></i><span>Bible</span></a>
         <a href="/prayer.html" class="nav-link"><i class="fas fa-hands-praying"></i><span>Pray</span></a>
         <a href="/give.html" class="nav-link"><i class="fas fa-donate"></i><span>Give</span></a>
+        <a href="/chat.html" class="nav-link"><i class="fas fa-comments"></i><span>Chat</span></a>
         <a href="/account.html" class="nav-link"><i class="fas fa-user-circle"></i><span>Account</span></a>
     </nav>
     
@@ -520,7 +531,9 @@
     let notifications = [];
     let unreadCount = 0;
     let currentRating = 5;
-    let nextHourTimer = null;
+    let nextUpdateTimer = null;
+    let userTimeZone = null;
+    let userLocation = null;
 
     // Typing Animation Messages
     const encouragingMessages = [
@@ -572,75 +585,156 @@
         typeEffect();
     }
 
-    // Daily Devotional
-    const yearlyVerses = [
-        { verse: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future.", ref: "Jeremiah 29:11", commentary: "God has a purpose for your life. Even when circumstances seem uncertain, His plans are good. Trust that He is working behind the scenes.", prayer: "Lord, I trust Your plans for my life. Help me to walk in faith, knowing that You are leading me to a future filled with hope. Amen." },
-        { verse: "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.", ref: "Joshua 1:9", commentary: "Fear is a natural response to the unknown, but God commands us to be strong. He promises His presence in every situation.", prayer: "Father, when fear rises, remind me of Your presence. Give me courage to face today with boldness. Amen." },
-        { verse: "I can do all things through Christ who strengthens me.", ref: "Philippians 4:13", commentary: "Your limitations are not God's limitations. Through Christ, you have supernatural strength to accomplish what seems impossible.", prayer: "Jesus, I draw strength from You today. Help me to do what I cannot do alone. Amen." }
+    // ==================== ENHANCED MORNING/AFTERNOON/EVENING DEVOTIONAL ====================
+    const morningDevotionals = [
+        { verse: "Let the morning bring me word of your unfailing love, for I have put my trust in you. Show me the way I should go, for to you I entrust my life.", ref: "Psalm 143:8", commentary: "As the sun rises, God's mercies are new every morning. Start your day by inviting His presence. Before checking your phone or emails, take a moment to acknowledge the God who created this day just for you. His love never fails, and His guidance is available for every decision you'll make today.", prayer: "Heavenly Father, thank You for this new morning. As the sun rises, let Your love rise in my heart. Guide my steps today, give me wisdom for every decision, and let Your peace rule in my heart. I commit this day into Your hands. In Jesus' name, Amen." },
+        { verse: "Because of the Lord's great love we are not consumed, for his compassions never fail. They are new every morning; great is your faithfulness.", ref: "Lamentations 3:22-23", commentary: "No matter what happened yesterday, today is a fresh start. God's mercies are renewed every single morning. You don't have to carry yesterday's guilt, shame, or failures into today. God has already wiped the slate clean. Receive His forgiveness and step into this day with confidence.", prayer: "Lord, thank You for new mercies this morning. I release yesterday's burdens into Your hands. Fill me with Your peace and joy. Help me to walk in forgiveness - both receiving it and giving it. Let this day be marked by Your faithfulness. Amen." },
+        { verse: "Wake up, sleeper, rise from the dead, and Christ will shine on you.", ref: "Ephesians 5:14", commentary: "God is calling you to wake up spiritually. There may be areas of your life where you've been asleep - dreams deferred, passions dormant, callings ignored. Today is the day to rise up. Christ's light is shining on you, inviting you into greater purpose and impact.", prayer: "Father, wake me up spiritually. Revive my passion for Your Kingdom. Shine Your light on the areas of my life that need awakening. Give me courage to pursue the dreams You've placed in my heart. I rise up today in Your strength. Amen." }
+    ];
+    
+    const afternoonDevotionals = [
+        { verse: "But seek first his kingdom and his righteousness, and all these things will be given to you as well.", ref: "Matthew 6:33", commentary: "Midday is a perfect time to pause and realign your priorities. In the busyness of the day, it's easy to get distracted by urgent tasks that aren't truly important. Take a moment now to put God first. When you seek His kingdom above all else, everything else falls into place.", prayer: "Lord, in the middle of this day, I pause to seek You first. Forgive me for the times I've put other things before You. Realign my priorities. Help me to focus on what truly matters for eternity. I trust that as I seek You, You will provide everything I need. Amen." },
+        { verse: "Come to me, all you who are weary and burdened, and I will give you rest.", ref: "Matthew 11:28", commentary: "The afternoon can bring fatigue - physically, emotionally, and spiritually. Jesus invites you to come to Him right now, not later. You don't have to power through on your own strength. His rest is available in the middle of your busy day. Take a deep breath, release your burdens to Him.", prayer: "Jesus, I come to You right now. I'm feeling weary and burdened. I release my stress, my worries, and my exhaustion into Your hands. Give me supernatural rest and refreshment. Renew my strength so I can finish this day well. Thank You for carrying my burdens. Amen." },
+        { verse: "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God.", ref: "Philippians 4:6", commentary: "Anxiety often peaks in the afternoon when we start worrying about what's left undone or what might go wrong. God's prescription for anxiety is prayer - not just any prayer, but prayer mixed with thanksgiving. Take a moment now to thank God for what He's already done, then present your concerns to Him.", prayer: "Father, I bring my anxieties to You right now. Instead of worrying, I choose to pray. Thank You for Your faithfulness in the past. I present my current concerns to You - You are bigger than every problem. Fill me with Your peace that surpasses all understanding. Amen." }
+    ];
+    
+    const eveningDevotionals = [
+        { verse: "Do not let the sun go down while you are still angry.", ref: "Ephesians 4:26", commentary: "As the day ends, it's time to examine your heart. Is there any unforgiveness, bitterness, or anger you're holding onto? The Bible instructs us to resolve these before sunset. Unforgiveness is like drinking poison and expecting the other person to die. Release it tonight so you can sleep in peace.", prayer: "Lord, search my heart. Show me anyone I need to forgive. I release every offense, every hurt, and every disappointment into Your hands. Help me to forgive as You have forgiven me. Cleanse my heart and give me peaceful rest tonight. Amen." },
+        { verse: "When you lie down, you will not be afraid; when you lie down, your sleep will be sweet.", ref: "Proverbs 3:24", commentary: "God desires for you to have sweet, restful sleep. Fear and worry are enemies of rest. Tonight, before you close your eyes, declare God's protection over your life, your family, and your home. Trust that the One who never sleeps is watching over you.", prayer: "Father, I thank You that I can lie down without fear. I place myself and my family under Your protection tonight. Guard our minds from nightmares and anxiety. Let our sleep be sweet and refreshing. We trust You completely. In Jesus' name, Amen." },
+        { verse: "I will both lie down in peace, and sleep; for You alone, O Lord, make me dwell in safety.", ref: "Psalm 4:8", commentary: "Peace is not the absence of problems - it's the presence of God. Even if your circumstances haven't changed, you can lie down in peace because your trust is in the Lord. He is your safety, your protector, your refuge. Nothing can touch you outside of His will.", prayer: "Lord, I lie down in peace tonight because my trust is in You. You alone are my safety. I thank You that no weapon formed against me shall prosper. I release every worry into Your hands. Watch over me and my loved ones through the night. I rest in Your love. Amen." }
     ];
 
-    function getDailyVerse(dayOfYear, hour) {
-        const index = ((dayOfYear - 1) * 24 + hour) % yearlyVerses.length;
-        return yearlyVerses[index];
+    // Get devotional based on time of day (local time zone)
+    function getDevotionalByTime(hour) {
+        if (hour >= 5 && hour < 12) {
+            // Morning (5 AM - 11:59 AM)
+            const randomIndex = Math.floor(Math.random() * morningDevotionals.length);
+            return { ...morningDevotionals[randomIndex], period: 'morning', icon: 'fa-sun', name: 'Morning Devotional' };
+        } else if (hour >= 12 && hour < 17) {
+            // Afternoon (12 PM - 4:59 PM)
+            const randomIndex = Math.floor(Math.random() * afternoonDevotionals.length);
+            return { ...afternoonDevotionals[randomIndex], period: 'afternoon', icon: 'fa-cloud-sun', name: 'Afternoon Devotional' };
+        } else {
+            // Evening/Night (5 PM - 4:59 AM)
+            const randomIndex = Math.floor(Math.random() * eveningDevotionals.length);
+            return { ...eveningDevotionals[randomIndex], period: 'evening', icon: 'fa-moon', name: 'Evening Devotional' };
+        }
+    }
+
+    // Get user timezone and location
+    async function getUserTimeZone() {
+        try {
+            // Try to get from IP API first
+            const ipResponse = await fetch('https://ipapi.co/json/');
+            const ipData = await ipResponse.json();
+            if (ipData.timezone) {
+                userTimeZone = ipData.timezone;
+                userLocation = `${ipData.city || ''}, ${ipData.country_name || ''}`;
+                document.getElementById('timezoneInfo').innerHTML = `<i class="fas fa-globe"></i> Your timezone: ${userTimeZone} | ${userLocation}`;
+                return userTimeZone;
+            }
+        } catch (error) {
+            console.log('IP geolocation failed, using browser timezone');
+        }
+        
+        // Fallback to browser timezone
+        userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        document.getElementById('timezoneInfo').innerHTML = `<i class="fas fa-globe"></i> Your timezone: ${userTimeZone}`;
+        return userTimeZone;
     }
 
     function updateDevotional() {
-        const now = moment();
-        const hour = now.hour();
-        const dayOfYear = now.dayOfYear();
-        const verse = getDailyVerse(dayOfYear, hour);
+        const now = new Date();
+        const hour = now.getHours();
+        const devotional = getDevotionalByTime(hour);
         
-        const hourNames = ['Midnight', '1 AM', '2 AM', '3 AM', '4 AM', '5 AM', '6 AM', '7 AM', '8 AM', '9 AM', '10 AM', '11 AM', 
-                          '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM', '6 PM', '7 PM', '8 PM', '9 PM', '10 PM', '11 PM'];
+        // Update icon based on time of day
+        const timeIcon = document.getElementById('timeIcon');
+        const timeText = document.getElementById('currentTimeText');
         
-        const hourText = document.getElementById('currentHourText');
-        if (hourText) hourText.innerHTML = `<i class="fas fa-clock"></i> ${hourNames[hour]} Devotional`;
+        if (devotional.period === 'morning') {
+            timeIcon.className = 'fas fa-sun';
+            timeText.innerHTML = 'Morning Devotional 🌅';
+        } else if (devotional.period === 'afternoon') {
+            timeIcon.className = 'fas fa-cloud-sun';
+            timeText.innerHTML = 'Afternoon Devotional ☀️';
+        } else {
+            timeIcon.className = 'fas fa-moon';
+            timeText.innerHTML = 'Evening Devotional 🌙';
+        }
         
+        // Animate the verse card
         const animationArea = document.getElementById('verseAnimationArea');
         if (animationArea) {
             animationArea.style.animation = 'none';
             setTimeout(() => animationArea.style.animation = 'fadeSlideIn 0.6s ease', 10);
         }
         
+        // Update content
         const scriptureEl = document.getElementById('dailyScripture');
         const refEl = document.getElementById('dailyRef');
         const messageEl = document.getElementById('dailyMessage');
         const prayerEl = document.getElementById('dailyPrayer');
         
-        if (scriptureEl) scriptureEl.innerHTML = `"${verse.verse}"`;
-        if (refEl) refEl.innerHTML = `<i class="fas fa-bible"></i> — ${verse.ref}`;
-        if (messageEl) messageEl.innerHTML = verse.commentary;
-        if (prayerEl) prayerEl.innerHTML = verse.prayer;
+        if (scriptureEl) scriptureEl.innerHTML = `"${devotional.verse}"`;
+        if (refEl) refEl.innerHTML = `<i class="fas fa-bible"></i> — ${devotional.ref}`;
+        if (messageEl) messageEl.innerHTML = devotional.commentary;
+        if (prayerEl) prayerEl.innerHTML = devotional.prayer;
         
         updateCountdownTimer();
     }
 
     function updateCountdownTimer() {
-        if (nextHourTimer) clearInterval(nextHourTimer);
+        if (nextUpdateTimer) clearInterval(nextUpdateTimer);
+        
         function updateTimer() {
             const now = new Date();
-            const nextHour = new Date(now);
-            nextHour.setHours(now.getHours() + 1, 0, 0, 0);
-            const diff = nextHour - now;
-            const minutes = Math.floor(diff / 60000);
+            const hour = now.getHours();
+            let nextUpdateHour;
+            
+            // Determine next update time based on current time
+            if (hour < 12) {
+                nextUpdateHour = 12; // Next update at noon
+            } else if (hour < 17) {
+                nextUpdateHour = 17; // Next update at 5 PM
+            } else {
+                nextUpdateHour = 5; // Next update at 5 AM tomorrow
+            }
+            
+            let nextUpdate = new Date(now);
+            nextUpdate.setHours(nextUpdateHour, 0, 0, 0);
+            
+            if (nextUpdate <= now) {
+                nextUpdate.setDate(nextUpdate.getDate() + 1);
+            }
+            
+            const diff = nextUpdate - now;
+            const hours = Math.floor(diff / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
             const seconds = Math.floor((diff % 60000) / 1000);
-            const timerEl = document.getElementById('nextHourCountdown');
-            if (timerEl) timerEl.innerHTML = `${minutes}m ${seconds}s`;
+            
+            const timerEl = document.getElementById('nextUpdateCountdown');
+            if (timerEl) timerEl.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
         }
+        
         updateTimer();
-        nextHourTimer = setInterval(updateTimer, 1000);
+        nextUpdateTimer = setInterval(updateTimer, 1000);
     }
 
-    function startHourlyDevotional() {
+    function startDailyDevotional() {
         updateDevotional();
-        const now = new Date();
-        const nextHour = new Date(now);
-        nextHour.setHours(now.getHours() + 1, 0, 0, 0);
-        const delay = nextHour - now;
-        setTimeout(() => {
-            updateDevotional();
-            setInterval(updateDevotional, 60 * 60 * 1000);
-        }, delay);
+        // Check every minute for period changes
+        setInterval(() => {
+            const now = new Date();
+            const hour = now.getHours();
+            const currentDevotional = getDevotionalByTime(hour);
+            // Simple check if period changed
+            const storedPeriod = localStorage.getItem('lastDevotionalPeriod');
+            if (storedPeriod !== currentDevotional.period) {
+                updateDevotional();
+                localStorage.setItem('lastDevotionalPeriod', currentDevotional.period);
+            }
+        }, 60000); // Check every minute
     }
 
     // Location Tracking
@@ -1014,7 +1108,8 @@
 
     // Initialize
     startTypingAnimation();
-    startHourlyDevotional();
+    getUserTimeZone();
+    startDailyDevotional();
     loadUpcomingEvents();
     loadRecentTestimonies();
     loadReviews();

@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Prayer Dome | Christian Community Chat</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --accent-green: #15803d;
+            --accent-green-light: #22c55e;
+            --accent-gold: #d4af37;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            --bg-primary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 35px -10px rgba(0, 0, 0, 0.1);
+        }
+        
+        body.dark-mode {
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-sub: #cbd5e1;
+            --border-color: #334155;
+        }
+        
+        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-main); transition: 0.3s; height: 100vh; overflow: hidden; }
+        
+        .luxury-font, h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        
+        /* Header */
+        .chat-header {
+            background: var(--bg-card);
+            padding: 12px 25px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+        .logo-ring { 
+            width: 48px; 
+            height: 48px; 
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-gold)); 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(21,128,61,0.3);
+        }
+        .logo-ring img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; background: white; padding: 5px; }
+        .brand-text h1 { font-size: 1.3rem; font-weight: 900; }
+        .brand-text p { font-size: 0.6rem; opacity: 0.7; }
+        
+        .header-actions { display: flex; gap: 12px; }
+        .header-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 8px 14px;
+            cursor: pointer;
+            color: var(--text-main);
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .header-btn:hover { transform: scale(1.05); background: rgba(34,197,94,0.1); }
+        
+        /* Main Tabs */
+        .main-tabs {
+            display: flex;
+            background: var(--bg-card);
+            padding: 8px 20px;
+            border-bottom: 1px solid var(--border-color);
+            gap: 5px;
+        }
+        .main-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: 0.2s;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .main-tab.active {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light));
+            color: white;
+            box-shadow: 0 4px 12px rgba(34,197,94,0.3);
+        }
+        
+        /* Tab Content */
+        .tab-content { display: none; height: calc(100vh - 125px); overflow: hidden; }
+        .tab-content.active { display: flex; }
+        
+        /* CHATS TAB */
+        .chats-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+        .rooms-sidebar {
+            width: 320px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .rooms-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .rooms-header h3 { color: var(--accent-green); }
+        .room-search {
+            padding: 10px;
+        }
+        .room-search input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-main);
+        }
+        .room-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        .room-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 5px;
+        }
+        .room-item:hover { background: rgba(34,197,94,0.08); }
+        .room-item.active { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); color: white; }
+        .room-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-gold));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .room-item.active .room-avatar { background: rgba(255,255,255,0.2); }
+        .room-info { flex: 1; }
+        .room-name { font-weight: 800; }
+        .room-preview { font-size: 0.7rem; opacity: 0.7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .room-time { font-size: 0.6rem; opacity: 0.5; }
+        .room-badge {
+            background: var(--accent-red);
+            color: white;
+            border-radius: 20px;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-primary);
+        }
+        .chat-area-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-card);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-area-title h2 { font-size: 1.1rem; }
+        .chat-area-title p { font-size: 0.7rem; color: var(--text-sub); }
+        
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .message {
+            display: flex;
+            gap: 10px;
+            max-width: 80%;
+            animation: fadeInUp 0.3s ease;
+        }
+        .message.sent { margin-left: auto; flex-direction: row-reverse; }
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-gold));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .message-bubble {
+            background: var(--bg-card);
+            padding: 10px 15px;
+            border-radius: 18px;
+            border-top-left-radius: 4px;
+            box-shadow: var(--shadow);
+            max-width: 100%;
+        }
+        .message.sent .message-bubble {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light));
+            color: white;
+            border-top-left-radius: 18px;
+            border-top-right-radius: 4px;
+        }
+        .message-name { font-size: 0.7rem; font-weight: 700; margin-bottom: 3px; color: var(--accent-gold); }
+        .message.sent .message-name { color: rgba(255,255,255,0.8); }
+        .message-text { font-size: 0.9rem; line-height: 1.5; word-break: break-word; }
+        .message-media {
+            max-width: 250px;
+            max-height: 200px;
+            border-radius: 12px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        .message-time { font-size: 0.6rem; margin-top: 5px; opacity: 0.6; display: flex; gap: 8px; align-items: center; }
+        
+        .chat-input-area {
+            padding: 15px 20px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .media-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        .media-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: var(--accent-gold);
+        }
+        .media-btn:hover { transform: scale(1.05); background: rgba(212,175,55,0.1); }
+        .chat-input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 30px;
+            background: var(--bg-primary);
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        .chat-input:focus { outline: none; border-color: var(--accent-green); }
+        .chat-send {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light));
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .chat-send:hover { transform: scale(1.05); }
+        
+        /* STATUS TAB */
+        .status-container {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .my-status-card {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-gold));
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .my-status-card:hover { transform: scale(1.01); }
+        .my-status-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .status-item {
+            background: var(--bg-card);
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 2px solid var(--accent-gold);
+            position: relative;
+        }
+        .status-item:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .status-item img, .status-item video {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+        }
+        .status-info {
+            padding: 10px;
+            text-align: center;
+        }
+        .status-name { font-weight: 700; font-size: 0.8rem; }
+        .status-time { font-size: 0.6rem; color: var(--text-sub); }
+        
+        /* SETTINGS TAB */
+        .settings-container {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .settings-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .settings-item:last-child { border-bottom: none; }
+        .settings-item:hover { background: rgba(34,197,94,0.05); padding-left: 10px; }
+        .settings-item-left { display: flex; align-items: center; gap: 15px; }
+        .settings-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(34,197,94,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-green);
+            font-size: 1.2rem;
+        }
+        .toggle-switch {
+            width: 50px;
+            height: 26px;
+            background: var(--border-color);
+            border-radius: 30px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .toggle-switch.active { background: var(--accent-green); }
+        .toggle-slider {
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 3px;
+            transition: 0.3s;
+        }
+        .toggle-switch.active .toggle-slider { left: 25px; }
+        
+        /* Footer */
+        .chat-footer {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+            padding: 8px 20px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            position: sticky;
+            bottom: 0;
+            z-index: 99;
+        }
+        .chat-footer a {
+            color: var(--accent-green);
+            text-decoration: none;
+        }
+        
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(8px);
+        }
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 28px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalPop 0.3s ease;
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .status-view-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: none;
+            flex-direction: column;
+            z-index: 2100;
+        }
+        .status-view-header {
+            padding: 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+        }
+        .status-view-media {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .status-view-media img, .status-view-media video {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 20px;
+        }
+        
+        .toast-message {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-green);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            z-index: 3000;
+            font-weight: 600;
+            animation: toastSlide 0.3s ease;
+        }
+        @keyframes toastSlide {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
+        @media (max-width: 768px) {
+            .rooms-sidebar { width: 280px; position: fixed; left: -280px; height: 100%; z-index: 150; transition: 0.3s; background: var(--bg-card); }
+            .rooms-sidebar.open { left: 0; }
+            .message { max-width: 90%; }
+            .media-buttons { gap: 5px; }
+            .media-btn { width: 35px; height: 35px; }
+            .main-tab span { display: none; }
+            .main-tab i { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="chat-header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="header-btn" id="sidebarToggle" style="display: none;"><i class="fas fa-bars"></i></button>
+            <div class="logo-area" onclick="window.location.href='index.html'">
+                <div class="logo-ring">
+                    <img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" alt="Logo">
+                </div>
+                <div class="brand-text">
+                    <h1>PRAYER DOME</h1>
+                    <p>COMMUNITY CHAT</p>
+                </div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="index.html" class="header-btn"><i class="fas fa-home"></i></a>
+            <button class="header-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+        </div>
+    </header>
+    
+    <!-- Main Tabs -->
+    <div class="main-tabs">
+        <button class="main-tab active" onclick="switchMainTab('chats')"><i class="fas fa-comments"></i><span> Chats</span></button>
+        <button class="main-tab" onclick="switchMainTab('status')"><i class="fas fa-circle"></i><span> Status</span></button>
+        <button class="main-tab" onclick="switchMainTab('settings')"><i class="fas fa-cog"></i><span> Settings</span></button>
+    </div>
+    
+    <!-- CHATS TAB -->
+    <div id="tab-chats" class="tab-content active">
+        <div class="chats-container">
+            <div class="rooms-sidebar" id="roomsSidebar">
+                <div class="rooms-header">
+                    <h3><i class="fas fa-comment-dots"></i> Conversations</h3>
+                </div>
+                <div class="room-search">
+                    <input type="text" id="roomSearch" placeholder="🔍 Search rooms or people..." onkeyup="filterRooms()">
+                </div>
+                <div class="room-list" id="roomList"></div>
+            </div>
+            
+            <div class="chat-area">
+                <div class="chat-area-header">
+                    <div class="chat-area-title">
+                        <h2 id="currentRoomName">🌍 General Fellowship</h2>
+                        <p id="currentRoomDesc">Welcome all believers - share encouragement and prayer</p>
+                    </div>
+                </div>
+                
+                <div class="messages-area" id="messagesArea">
+                    <div style="text-align: center; padding: 40px;">
+                        <i class="fas fa-comments" style="font-size: 48px; opacity: 0.3;"></i>
+                        <p>Select a conversation to start chatting</p>
+                    </div>
+                </div>
+                
+                <div class="chat-input-area">
+                    <div class="media-buttons">
+                        <button class="media-btn" onclick="uploadPhoto()" title="Send Photo"><i class="fas fa-image"></i></button>
+                        <button class="media-btn" onclick="uploadVideo()" title="Send Video"><i class="fas fa-video"></i></button>
+                        <button class="media-btn" onclick="uploadDocument()" title="Send Document"><i class="fas fa-file-alt"></i></button>
+                        <button class="media-btn" onclick="startVoiceRecording()" title="Voice Message"><i class="fas fa-microphone"></i></button>
+                    </div>
+                    <input type="text" id="messageInput" class="chat-input" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMessage()">
+                    <button class="chat-send" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- STATUS TAB -->
+    <div id="tab-status" class="tab-content">
+        <div class="status-container">
+            <div class="my-status-card" onclick="addStatus()">
+                <div class="my-status-avatar"><i class="fas fa-plus"></i></div>
+                <div>
+                    <h3>My Status</h3>
+                    <p>Tap to add a photo or video that disappears in 24 hours</p>
+                </div>
+            </div>
+            
+            <h3 style="margin: 20px 0 10px;"><i class="fas fa-users"></i> Friends' Status</h3>
+            <div id="statusGrid" class="status-grid">
+                <div style="text-align: center; grid-column: 1/-1; padding: 40px;">Loading statuses...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SETTINGS TAB -->
+    <div id="tab-settings" class="tab-content">
+        <div class="settings-container">
+            <div class="settings-card">
+                <h3 style="margin-bottom: 15px;"><i class="fas fa-user-circle"></i> Profile</h3>
+                <div class="settings-item" onclick="editProfile()">
+                    <div class="settings-item-left">
+                        <div class="settings-icon"><i class="fas fa-user"></i></div>
+                        <div>
+                            <div><strong>Display Name</strong></div>
+                            <div id="profileName" style="font-size: 0.8rem; color: var(--text-sub);">Loading...</div>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="settings-item" onclick="changePhoto()">
+                    <div class="settings-item-left">
+                        <div class="settings-icon"><i class="fas fa-camera"></i></div>
+                        <div><strong>Profile Photo</strong></div>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            
+            <div class="settings-card">
+                <h3 style="margin-bottom: 15px;"><i class="fas fa-bell"></i> Notifications</h3>
+                <div class="settings-item">
+                    <div class="settings-item-left">
+                        <div class="settings-icon"><i class="fas fa-bell"></i></div>
+                        <div><strong>Push Notifications</strong></div>
+                    </div>
+                    <div class="toggle-switch" id="notifToggle" onclick="toggleNotification()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-item-left">
+                        <div class="settings-icon"><i class="fas fa-volume-up"></i></div>
+                        <div><strong>Message Sounds</strong></div>
+                    </div>
+                    <div class="toggle-switch" id="soundToggle" onclick="toggleSound()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-card">
+                <h3 style="margin-bottom: 15px;"><i class="fas fa-shield-alt"></i> Privacy & Safety</h3>
+                <div class="settings-item">
+                    <div class="settings-item-left">
+                        <div class="settings-icon"><i class="fas fa-eye"></i></div>
+                        <div><strong>Read Receipts</strong></div>
+                    </div>
+                    <div class="toggle-switch" id="readReceiptToggle" onclick="toggleReadReceipts()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-item-left">
+                        <div class="settings-icon"><i class="fas fa-user-secret"></i></div>
+                        <div><strong>Show Online Status</strong></div>
+                    </div>
+                    <div class="toggle-switch" id="onlineToggle" onclick="toggleOnlineStatus()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                <div class="settings-item" onclick="blockedUsers()">
+                    <div class="settings-item-left">
+                        <div class="settings-icon"><i class="fas fa-ban"></i></div>
+                        <div><strong>Blocked Users</strong></div>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            
+            <div class="settings-card">
+                <h3 style="margin-bottom: 15px;"><i class="fas fa-database"></i> Data & Storage</h3>
+                <div class="settings-item" onclick="clearMediaCache()">
+                    <div class="settings-item-left">
+                        <div class="settings-icon"><i class="fas fa-trash-alt"></i></div>
+                        <div><strong>Clear Media Cache</strong></div>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            
+            <div class="settings-card">
+                <h3 style="margin-bottom: 15px;"><i class="fas fa-info-circle"></i> About</h3>
+                <div class="settings-item" onclick="showAbout()">
+                    <div class="settings-item-left">
+                        <div class="settings-icon"><i class="fas fa-church"></i></div>
+                        <div><strong>Prayer Dome Chat</strong></div>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            
+            <button class="header-btn" style="width: 100%; margin-top: 20px; background: var(--accent-red); color: white; border: none;" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="chat-footer">
+        <p><i class="fas fa-church"></i> Prayer Dome | A House of Prayer for All Nations | <a href="index.html">Home</a></p>
+    </div>
+    
+    <!-- Status View Modal -->
+    <div id="statusViewModal" class="status-view-modal">
+        <div class="status-view-header">
+            <div><strong id="statusViewName">User</strong><br><span id="statusViewTime" style="font-size: 0.7rem;"></span></div>
+            <button onclick="closeStatusView()" style="background: none; border: none; color: white; font-size: 1.5rem;">&times;</button>
+        </div>
+        <div class="status-view-media" id="statusViewMedia"></div>
+        <div style="padding: 20px; text-align: center;">
+            <button onclick="replyToStatus()" class="header-btn" style="background: var(--accent-green); color: white;"><i class="fas fa-reply"></i> Reply</button>
+        </div>
+    </div>
+    
+    <!-- Voice Recording Modal -->
+    <div id="voiceModal" class="modal-overlay">
+        <div class="modal-content" style="text-align: center;">
+            <h3><i class="fas fa-microphone"></i> Voice Message</h3>
+            <div style="margin: 20px 0;">
+                <button id="recordBtn" style="width: 80px; height: 80px; border-radius: 50%; background: var(--accent-red); color: white; border: none; font-size: 2rem; cursor: pointer;"><i class="fas fa-microphone"></i></button>
+            </div>
+            <div id="recordingStatus">Press to start recording</div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="header-btn" style="flex: 1;" onclick="sendVoiceMessage()">Send</button>
+                <button class="header-btn" style="flex: 1;" onclick="closeVoiceModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, updateDoc, getDoc, setDoc, deleteDoc, where, getDocs, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo",
+            authDomain: "prayer-dome.firebaseapp.com",
+            projectId: "prayer-dome",
+            storageBucket: "prayer-dome.firebasestorage.app",
+            messagingSenderId: "198295153196",
+            appId: "1:198295153196:web:1222b31948d7974ba3bf89"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const storage = getStorage(app);
+
+        let currentUser = null;
+        let currentRoom = 'general';
+        let currentChatType = 'group';
+        let messagesUnsubscribe = null;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordedBlob = null;
+        let pendingMedia = null;
+        let isRecording = false;
+        
+        // Rooms configuration
+        const groupRooms = {
+            general: { name: "🌍 General Fellowship", desc: "Welcome all believers", icon: "🌍", type: "group" },
+            prayer: { name: "🙏 Prayer Warriors", desc: "Share prayer requests", icon: "🙏", type: "group" },
+            testimony: { name: "✨ Testimonies", desc: "Share what God has done", icon: "✨", type: "group" },
+            bible: { name: "📖 Bible Study", desc: "Discuss Scripture", icon: "📖", type: "group" },
+            worship: { name: "🎵 Worship & Praise", desc: "Share worship songs", icon: "🎵", type: "group" },
+            youth: { name: "🔥 Youth Connect", desc: "Ages 13-25", icon: "🔥", type: "group" },
+            women: { name: "👩 Women of Faith", desc: "Sisters in Christ", icon: "👩", type: "group" },
+            men: { name: "👨 Men of Valor", desc: "Brothers in Christ", icon: "👨", type: "group" }
+        };
+        
+        let privateChats = [];
+        let allRooms = [];
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await loadUserProfile();
+                await loadPrivateChats();
+                buildRoomList();
+                loadSettings();
+                loadStatuses();
+                startStatusCleanup();
+                joinRoom('general');
+            } else {
+                window.location.href = 'account.html';
+            }
+        });
+
+        async function loadUserProfile() {
+            try {
+                const userRef = doc(db, "users", currentUser.uid);
+                const userDoc = await getDoc(userRef);
+                if (!userDoc.exists()) {
+                    await setDoc(userRef, {
+                        displayName: currentUser.displayName || currentUser.email?.split('@')[0] || 'Believer',
+                        email: currentUser.email,
+                        photoURL: currentUser.photoURL || null,
+                        online: true,
+                        lastSeen: serverTimestamp(),
+                        settings: {
+                            notifications: true,
+                            sound: true,
+                            readReceipts: true,
+                            showOnline: true
+                        }
+                    });
+                }
+                const nameEl = document.getElementById('profileName');
+                if (nameEl) {
+                    nameEl.innerHTML = userDoc.exists() ? userDoc.data().displayName : (currentUser.displayName || 'Believer');
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        async function loadPrivateChats() {
+            try {
+                const chatsRef = collection(db, "privateChats");
+                const q = query(chatsRef, where("participants", "array-contains", currentUser.uid));
+                const snapshot = await getDocs(q);
+                privateChats = [];
+                snapshot.forEach(doc => {
+                    privateChats.push({ id: doc.id, ...doc.data() });
+                });
+            } catch(e) { console.error(e); }
+        }
+        
+        function buildRoomList() {
+            allRooms = [];
+            for (const [key, room] of Object.entries(groupRooms)) {
+                allRooms.push({ id: key, name: room.name, icon: room.icon, type: 'group', unread: 0 });
+            }
+            for (const chat of privateChats) {
+                const otherId = chat.participants?.find(p => p !== currentUser?.uid);
+                allRooms.push({ id: chat.id, name: chat.otherName || 'User', type: 'private', unread: 0, otherId: otherId });
+            }
+            renderRoomList();
+        }
+
+        function renderRoomList() {
+            const container = document.getElementById('roomList');
+            if (!container) return;
+            container.innerHTML = allRooms.map(room => `
+                <div class="room-item ${currentRoom === room.id ? 'active' : ''}" onclick="joinRoom('${room.id}', '${room.type}')">
+                    <div class="room-avatar">${room.type === 'group' ? room.icon : '👤'}</div>
+                    <div class="room-info">
+                        <div class="room-name">${escapeHtml(room.name)}</div>
+                        <div class="room-preview">${room.type === 'group' ? 'Tap to join conversation' : 'Private chat'}</div>
+                    </div>
+                    ${room.unread > 0 ? `<div class="room-badge">${room.unread}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        window.filterRooms = () => {
+            const search = document.getElementById('roomSearch')?.value.toLowerCase() || '';
+            const filtered = allRooms.filter(room => room.name.toLowerCase().includes(search));
+            const container = document.getElementById('roomList');
+            if (!container) return;
+            container.innerHTML = filtered.map(room => `
+                <div class="room-item ${currentRoom === room.id ? 'active' : ''}" onclick="joinRoom('${room.id}', '${room.type}')">
+                    <div class="room-avatar">${room.type === 'group' ? room.icon : '👤'}</div>
+                    <div class="room-info">
+                        <div class="room-name">${escapeHtml(room.name)}</div>
+                        <div class="room-preview">${room.type === 'group' ? 'Tap to join conversation' : 'Private chat'}</div>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        window.joinRoom = async (roomId, type = 'group') => {
+            currentRoom = roomId;
+            currentChatType = type;
+            
+            document.querySelectorAll('.room-item').forEach(el => el.classList.remove('active'));
+            const activeItem = document.querySelector(`.room-item[onclick*="${roomId}"]`);
+            if (activeItem) activeItem.classList.add('active');
+            
+            const room = groupRooms[roomId] || { name: 'Private Chat', desc: 'Private conversation' };
+            const roomNameEl = document.getElementById('currentRoomName');
+            const roomDescEl = document.getElementById('currentRoomDesc');
+            if (roomNameEl) roomNameEl.innerHTML = room.name || 'Private Chat';
+            if (roomDescEl) roomDescEl.innerHTML = room.desc || 'Private conversation with a believer';
+            
+            if (messagesUnsubscribe) messagesUnsubscribe();
+            
+            const collectionPath = type === 'group' ? `groupMessages_${roomId}` : `privateMessages_${roomId}`;
+            const messagesRef = collection(db, collectionPath, roomId, "messages");
+            const q = query(messagesRef, orderBy("timestamp", "asc"));
+            
+            messagesUnsubscribe = onSnapshot(q, (snapshot) => {
+                const messages = [];
+                snapshot.forEach(doc => messages.push({ id: doc.id, ...doc.data() }));
+                renderMessages(messages);
+            });
+            
+            const sidebar = document.getElementById('roomsSidebar');
+            if (window.innerWidth <= 768 && sidebar) {
+                sidebar.classList.remove('open');
+            }
+        };
+
+        function renderMessages(messages) {
+            const container = document.getElementById('messagesArea');
+            if (!container) return;
+            if (messages.length === 0) {
+                container.innerHTML = `<div style="text-align: center; padding: 40px;">
+                    <i class="fas fa-comments" style="font-size: 48px; opacity: 0.3;"></i>
+                    <p>No messages yet. Start the conversation!</p>
+                </div>`;
+                return;
+            }
+            
+            container.innerHTML = messages.map(msg => {
+                const isOwn = currentUser && msg.userId === currentUser.uid;
+                return `
+                    <div class="message ${isOwn ? 'sent' : 'received'}">
+                        <div class="message-avatar">${(msg.userName || 'A').charAt(0).toUpperCase()}</div>
+                        <div class="message-bubble">
+                            <div class="message-name">${escapeHtml(msg.userName || 'Anonymous')}</div>
+                            ${msg.text ? `<div class="message-text">${escapeHtml(msg.text)}</div>` : ''}
+                            ${msg.mediaUrl ? `
+                                ${msg.mediaType === 'image' ? `<img src="${msg.mediaUrl}" class="message-media" onclick="viewMedia('${msg.mediaUrl}')">` : ''}
+                                ${msg.mediaType === 'video' ? `<video src="${msg.mediaUrl}" class="message-media" controls onclick="event.stopPropagation()"></video>` : ''}
+                                ${msg.mediaType === 'document' ? `<a href="${msg.mediaUrl}" target="_blank" class="message-media" style="display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 12px; text-decoration: none; color: var(--text-main);"><i class="fas fa-file-pdf"></i> ${msg.mediaName || 'Document'}</a>` : ''}
+                                ${msg.mediaType === 'audio' ? `<audio src="${msg.mediaUrl}" controls style="margin-top: 8px;"></audio>` : ''}
+                            ` : ''}
+                            <div class="message-time">${msg.timestamp ? moment(msg.timestamp.toDate()).format('h:mm A') : 'Just now'}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        window.sendMessage = async () => {
+            const input = document.getElementById('messageInput');
+            const text = input?.value.trim() || '';
+            if (!text && !pendingMedia) return;
+            
+            const collectionPath = currentChatType === 'group' ? `groupMessages_${currentRoom}` : `privateMessages_${currentRoom}`;
+            
+            const messageData = {
+                userId: currentUser.uid,
+                userName: currentUser.displayName || currentUser.email?.split('@')[0] || 'Anonymous',
+                text: text || '',
+                timestamp: serverTimestamp()
+            };
+            
+            if (pendingMedia) {
+                messageData.mediaUrl = pendingMedia.url;
+                messageData.mediaType = pendingMedia.type;
+                messageData.mediaName = pendingMedia.name;
+                pendingMedia = null;
+            }
+            
+            try {
+                await addDoc(collection(db, collectionPath, currentRoom, "messages"), messageData);
+                if (input) input.value = '';
+            } catch(e) { console.error(e); showToast("Error sending message", "error"); }
+        };
+
+        window.uploadPhoto = () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    showToast("Uploading image...", "info");
+                    const url = await uploadToCloudinary(file);
+                    if (url) {
+                        pendingMedia = { url: url, type: 'image', name: file.name };
+                        const msgInput = document.getElementById('messageInput');
+                        if (msgInput) {
+                            msgInput.placeholder = 'Add a caption (optional)...';
+                            msgInput.focus();
+                        }
+                        showToast("Image ready! Type caption and send.", "success");
+                    }
+                }
+            };
+            input.click();
+        };
+        
+        window.uploadVideo = () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'video/*';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    showToast("Uploading video...", "info");
+                    const url = await uploadToCloudinary(file);
+                    if (url) {
+                        pendingMedia = { url: url, type: 'video', name: file.name };
+                        showToast("Video ready! Send your message.", "success");
+                    }
+                }
+            };
+            input.click();
+        };
+        
+        window.uploadDocument = () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.pdf,.doc,.docx,.txt';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    showToast("Uploading document...", "info");
+                    const url = await uploadToCloudinary(file);
+                    if (url) {
+                        pendingMedia = { url: url, type: 'document', name: file.name };
+                        showToast("Document ready! Send your message.", "success");
+                    }
+                }
+            };
+            input.click();
+        };
+        
+        async function uploadToCloudinary(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', 'gallery_uploads');
+            formData.append('folder', 'chat_media');
+            
+            try {
+                const response = await fetch('https://api.cloudinary.com/v1_1/prayerdome/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                return data.secure_url;
+            } catch(e) {
+                console.error(e);
+                showToast("Upload failed", "error");
+                return null;
+            }
+        }
+        
+        // Voice Recording
+        window.startVoiceRecording = () => {
+            const modal = document.getElementById('voiceModal');
+            if (modal) modal.style.display = 'flex';
+            setupRecording();
+        };
+        
+        async function setupRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    recordedBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const statusEl = document.getElementById('recordingStatus');
+                    if (statusEl) statusEl.innerHTML = 'Recording complete! Press Send.';
+                };
+                
+                const recordBtn = document.getElementById('recordBtn');
+                if (recordBtn) {
+                    recordBtn.onclick = () => {
+                        if (isRecording) {
+                            mediaRecorder.stop();
+                            isRecording = false;
+                            recordBtn.style.background = 'var(--accent-green)';
+                            recordBtn.innerHTML = '<i class="fas fa-check"></i>';
+                            const statusEl = document.getElementById('recordingStatus');
+                            if (statusEl) statusEl.innerHTML = 'Recording complete!';
+                        } else {
+                            mediaRecorder.start();
+                            isRecording = true;
+                            recordBtn.style.background = 'var(--accent-red)';
+                            recordBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                            const statusEl = document.getElementById('recordingStatus');
+                            if (statusEl) statusEl.innerHTML = 'Recording... Click stop when done';
+                        }
+                    };
+                }
+            } catch(e) {
+                showToast("Microphone access denied", "error");
+            }
+        }
+        
+        window.sendVoiceMessage = async () => {
+            if (!recordedBlob) return;
+            showToast("Uploading voice message...", "info");
+            const url = await uploadToCloudinary(recordedBlob);
+            if (url) {
+                pendingMedia = { url: url, type: 'audio', name: 'Voice message' };
+                await sendMessage();
+                closeVoiceModal();
+            }
+        };
+        
+        window.closeVoiceModal = () => {
+            const modal = document.getElementById('voiceModal');
+            if (modal) modal.style.display = 'none';
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+            }
+        };
+        
+        // STATUS FEATURE
+        window.addStatus = () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*,video/*';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    showToast("Uploading status...", "info");
+                    const url = await uploadToCloudinary(file);
+                    if (url) {
+                        const statusRef = collection(db, "statuses");
+                        await addDoc(statusRef, {
+                            userId: currentUser.uid,
+                            userName: currentUser.displayName || 'Anonymous',
+                            mediaUrl: url,
+                            mediaType: file.type.startsWith('video') ? 'video' : 'image',
+                            timestamp: serverTimestamp(),
+                            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+                            views: 0
+                        });
+                        showToast("Status added! Will disappear in 24 hours.", "success");
+                        loadStatuses();
+                    }
+                }
+            };
+            input.click();
+        };
+        
+        async function loadStatuses() {
+            const container = document.getElementById('statusGrid');
+            if (!container) return;
+            const now = new Date();
+            const q = query(collection(db, "statuses"), where("expiresAt", ">", now));
+            const snapshot = await getDocs(q);
+            
+            const statuses = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.userId !== currentUser?.uid) {
+                    statuses.push({ id: doc.id, ...data });
+                }
+            });
+            
+            if (statuses.length === 0) {
+                container.innerHTML = '<div style="text-align: center; grid-column: 1/-1; padding: 40px;">No status updates from friends</div>';
+                return;
+            }
+            
+            container.innerHTML = statuses.map(status => `
+                <div class="status-item" onclick="viewStatus('${status.id}', '${status.mediaUrl}', '${status.mediaType}', '${escapeHtml(status.userName)}', '${status.timestamp?.toDate()}')">
+                    ${status.mediaType === 'image' ? `<img src="${status.mediaUrl}" loading="lazy">` : `<video src="${status.mediaUrl}"></video>`}
+                    <div class="status-info">
+                        <div class="status-name">${escapeHtml(status.userName)}</div>
+                        <div class="status-time">${moment(status.timestamp?.toDate()).fromNow()}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        window.viewStatus = (id, url, type, name, time) => {
+            const nameEl = document.getElementById('statusViewName');
+            const timeEl = document.getElementById('statusViewTime');
+            const mediaDiv = document.getElementById('statusViewMedia');
+            const modal = document.getElementById('statusViewModal');
+            
+            if (nameEl) nameEl.innerHTML = name;
+            if (timeEl) timeEl.innerHTML = moment(time).format('MMMM D, h:mm A');
+            if (mediaDiv) mediaDiv.innerHTML = type === 'image' ? `<img src="${url}">` : `<video src="${url}" controls autoplay></video>`;
+            if (modal) modal.style.display = 'flex';
+            
+            try {
+                updateDoc(doc(db, "statuses", id), { views: increment(1) });
+            } catch(e) { console.error(e); }
+        };
+        
+        window.closeStatusView = () => {
+            const modal = document.getElementById('statusViewModal');
+            if (modal) modal.style.display = 'none';
+        };
+        
+        window.replyToStatus = () => {
+            closeStatusView();
+            switchMainTab('chats');
+            showToast("Type your reply in the chat", "info");
+        };
+        
+        function startStatusCleanup() {
+            setInterval(async () => {
+                const now = new Date();
+                const expiredQuery = query(collection(db, "statuses"), where("expiresAt", "<", now));
+                const expired = await getDocs(expiredQuery);
+                expired.forEach(doc => deleteDoc(doc.ref));
+            }, 60 * 60 * 1000);
+        }
+        
+        // Settings Functions
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('chat_settings') || '{}');
+            const notifToggle = document.getElementById('notifToggle');
+            const soundToggle = document.getElementById('soundToggle');
+            const readReceiptToggle = document.getElementById('readReceiptToggle');
+            const onlineToggle = document.getElementById('onlineToggle');
+            
+            if (notifToggle && settings.notifications !== false) notifToggle.classList.add('active');
+            if (soundToggle && settings.sound !== false) soundToggle.classList.add('active');
+            if (readReceiptToggle && settings.readReceipts !== false) readReceiptToggle.classList.add('active');
+            if (onlineToggle && settings.showOnline !== false) onlineToggle.classList.add('active');
+        }
+        
+        window.toggleNotification = () => {
+            const toggle = document.getElementById('notifToggle');
+            if (toggle) toggle.classList.toggle('active');
+            saveSetting('notifications', toggle?.classList.contains('active'));
+        };
+        
+        window.toggleSound = () => {
+            const toggle = document.getElementById('soundToggle');
+            if (toggle) toggle.classList.toggle('active');
+            saveSetting('sound', toggle?.classList.contains('active'));
+        };
+        
+        window.toggleReadReceipts = () => {
+            const toggle = document.getElementById('readReceiptToggle');
+            if (toggle) toggle.classList.toggle('active');
+            saveSetting('readReceipts', toggle?.classList.contains('active'));
+        };
+        
+        window.toggleOnlineStatus = () => {
+            const toggle = document.getElementById('onlineToggle');
+            if (toggle) toggle.classList.toggle('active');
+            saveSetting('showOnline', toggle?.classList.contains('active'));
+            updateUserOnlineStatus(toggle?.classList.contains('active'));
+        };
+        
+        function saveSetting(key, value) {
+            const settings = JSON.parse(localStorage.getItem('chat_settings') || '{}');
+            settings[key] = value;
+            localStorage.setItem('chat_settings', JSON.stringify(settings));
+        }
+        
+        async function updateUserOnlineStatus(show) {
+            if (!currentUser) return;
+            try {
+                await setDoc(doc(db, "users", currentUser.uid), { showOnline: show }, { merge: true });
+            } catch(e) { console.error(e); }
+        }
+        
+        window.editProfile = () => {
+            const newName = prompt("Enter your display name:", currentUser?.displayName || 'Believer');
+            if (newName && newName.trim()) {
+                updateDoc(doc(db, "users", currentUser.uid), { displayName: newName.trim() });
+                const nameEl = document.getElementById('profileName');
+                if (nameEl) nameEl.innerHTML = newName.trim();
+                showToast("Profile updated!", "success");
+            }
+        };
+        
+        window.changePhoto = () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const url = await uploadToCloudinary(file);
+                    if (url) {
+                        await updateDoc(doc(db, "users", currentUser.uid), { photoURL: url });
+                        showToast("Profile photo updated!", "success");
+                    }
+                }
+            };
+            input.click();
+        };
+        
+        window.blockedUsers = () => {
+            showToast("Blocked users feature coming soon", "info");
+        };
+        
+        window.clearMediaCache = () => {
+            if (confirm("Clear all cached media? This will free up space.")) {
+                showToast("Cache cleared!", "success");
+            }
+        };
+        
+        window.showAbout = () => {
+            alert("Prayer Dome Chat v2.0\n\nA Christian community chat platform\n\nConnect, share, and grow together in faith.");
+        };
+        
+        window.viewMedia = (url) => {
+            window.open(url, '_blank');
+        };
+        
+        window.switchMainTab = (tab) => {
+            document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'chats') {
+                const firstTab = document.querySelector('.main-tab:first-child');
+                if (firstTab) firstTab.classList.add('active');
+                const chatsTab = document.getElementById('tab-chats');
+                if (chatsTab) chatsTab.classList.add('active');
+            } else if (tab === 'status') {
+                const tabs = document.querySelectorAll('.main-tab');
+                if (tabs[1]) tabs[1].classList.add('active');
+                const statusTab = document.getElementById('tab-status');
+                if (statusTab) statusTab.classList.add('active');
+                loadStatuses();
+            } else if (tab === 'settings') {
+                const tabs = document.querySelectorAll('.main-tab');
+                if (tabs[2]) tabs[2].classList.add('active');
+                const settingsTab = document.getElementById('tab-settings');
+                if (settingsTab) settingsTab.classList.add('active');
+            }
+        };
+        
+        window.logout = async () => {
+            if (currentUser) {
+                await updateDoc(doc(db, "users", currentUser.uid), { online: false, lastSeen: serverTimestamp() });
+            }
+            await signOut(auth);
+            window.location.href = 'index.html';
+        };
+        
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast-message';
+            toast.innerHTML = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+        
+        window.toggleDarkMode = () => {
+            document.body.classList.toggle('dark-mode');
+        };
+        
+        // Mobile sidebar toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                const sidebar = document.getElementById('roomsSidebar');
+                if (sidebar) sidebar.classList.toggle('open');
+            });
+        }
+        
+        if (window.innerWidth <= 768 && sidebarToggle) {
+            sidebarToggle.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
