@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Prayer Dome | Live Stream & Broadcast Hub</title>
+    <title>Prayer Dome | Live Stream - Real Time Broadcast</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://unpkg.com/@cloudinary/url-gen@1.8.0/dist/cloudinary-core.js"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -102,7 +103,7 @@
         @keyframes pulseRed { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
         /* Main Video Section */
-        .main-video-section { max-width: 1200px; margin: 0 auto 20px; background: #000; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .main-video-section { max-width: 1400px; margin: 0 auto 20px; background: #000; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
         /* Video Theme/Title at Top */
         .video-theme {
@@ -110,31 +111,36 @@
             padding: 15px 25px;
             text-align: center;
         }
-        .video-theme h2 {
-            font-size: 1.3rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            margin: 0;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-        .video-theme p {
-            font-size: 0.8rem;
-            opacity: 0.9;
-            margin-top: 5px;
-        }
+        .video-theme h2 { font-size: 1.3rem; font-weight: 800; letter-spacing: 1px; margin: 0; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .video-theme p { font-size: 0.8rem; opacity: 0.9; margin-top: 5px; }
         
         /* Video Player Container */
-        .video-container { position: relative; background: #000; min-height: 400px; display: flex; align-items: center; justify-content: center; }
-        .video-container video { width: 100%; height: auto; max-height: 60vh; object-fit: contain; background: #000; }
+        .video-container { position: relative; background: #000; min-height: 450px; display: flex; align-items: center; justify-content: center; }
+        .video-container video { width: 100%; height: auto; max-height: 70vh; object-fit: contain; background: #000; }
         
         /* Placeholder when no stream */
-        .placeholder {
-            text-align: center;
-            padding: 80px 20px;
-        }
+        .placeholder { text-align: center; padding: 80px 20px; }
         .placeholder i { font-size: 4rem; color: var(--accent-gold); margin-bottom: 20px; }
         .placeholder h3 { margin-bottom: 10px; }
+        
+        /* Quality Selector */
+        .quality-selector {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 20px;
+            padding: 8px 15px;
+            z-index: 10;
+        }
+        .quality-selector select {
+            background: transparent;
+            border: 1px solid var(--accent-gold);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
         
         /* Scrolling News/Description Ticker */
         .news-ticker {
@@ -154,12 +160,9 @@
             color: var(--accent-gold);
         }
         .news-ticker-content i { margin: 0 15px; color: var(--accent-green-light); }
-        @keyframes scrollTicker {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
+        @keyframes scrollTicker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
         
-        /* Broadcaster Controls */
+        /* Broadcaster Controls (for the person streaming) */
         .broadcaster-controls {
             position: absolute;
             bottom: 20px;
@@ -184,9 +187,37 @@
         .control-btn.cam-off { background: var(--accent-red); }
         .control-btn.end-stream { background: var(--accent-red); width: auto; border-radius: 40px; padding: 0 20px; }
 
-        /* Chat and Comments Section - Below Video */
+        /* RTMP Info Panel (for broadcaster) */
+        .rtmp-info-panel {
+            background: linear-gradient(135deg, #1a1a2e, #0a0a0a);
+            border: 2px solid var(--accent-gold);
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .rtmp-info-panel h4 { color: var(--accent-gold); margin-bottom: 10px; font-size: 0.9rem; }
+        .rtmp-url {
+            background: var(--bg-dark);
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+        .copy-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* Chat Section */
         .chat-section {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 20px auto;
             background: var(--card-bg);
             border-radius: 20px;
@@ -208,7 +239,6 @@
         .chat-header h3 i { color: var(--accent-gold); }
         .chat-stats { display: flex; gap: 15px; font-size: 0.75rem; color: var(--text-sub); }
         
-        /* Reaction Strip */
         .reaction-strip {
             display: flex;
             gap: 8px;
@@ -228,9 +258,8 @@
         }
         .reaction-btn:hover { transform: scale(1.1); background: var(--accent-gold); color: #000; }
         
-        /* Chat Messages Area */
         .chat-messages {
-            height: 350px;
+            height: 400px;
             overflow-y: auto;
             padding: 15px;
             display: flex;
@@ -264,7 +293,6 @@
         .message-text { font-size: 0.85rem; color: var(--text-main); margin-top: 3px; word-wrap: break-word; }
         .message-time { font-size: 0.6rem; color: var(--text-sub); margin-top: 3px; }
         
-        /* Chat Input */
         .chat-input-area {
             display: flex;
             gap: 10px;
@@ -285,7 +313,7 @@
             background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light));
             border: none;
             border-radius: 30px;
-            padding: 0 20px;
+            padding: 0 25px;
             color: white;
             font-weight: 700;
             cursor: pointer;
@@ -300,7 +328,7 @@
 
         /* Admin/Broadcaster Panel */
         .admin-panel {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 20px auto;
             background: linear-gradient(135deg, #0a0a0a, var(--card-bg));
             border: 2px solid var(--accent-gold);
@@ -320,43 +348,6 @@
             margin-bottom: 15px;
         }
         
-        .broadcaster-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin: 20px 0;
-        }
-        .broadcaster-tag {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 8px 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .remove-broadcaster {
-            background: none;
-            border: none;
-            color: var(--accent-red);
-            cursor: pointer;
-        }
-        
-        .btn-live {
-            background: linear-gradient(135deg, var(--accent-red), #b91c1c);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 50px;
-            font-weight: 800;
-            cursor: pointer;
-            width: 100%;
-            font-size: 1rem;
-            transition: 0.3s;
-        }
-        .btn-live:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(239,68,68,0.4); }
-        .btn-green { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); }
-        
         .invite-section {
             display: flex;
             gap: 10px;
@@ -365,7 +356,6 @@
         .invite-section input { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-dark); color: white; }
         .invite-section button { background: var(--accent-blue); color: white; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-weight: 700; }
         
-        /* Live Preview Area */
         .live-preview-area {
             margin-top: 20px;
             display: none;
@@ -382,6 +372,20 @@
             margin-top: 15px;
             justify-content: center;
         }
+        
+        .btn-live {
+            background: linear-gradient(135deg, var(--accent-red), #b91c1c);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+        .btn-live:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(239,68,68,0.4); }
         
         /* Past Videos Grid */
         .section-title {
@@ -409,7 +413,7 @@
         }
         .video-card:hover { transform: translateY(-5px); border-color: var(--accent-gold); }
         .thumb { width: 100%; aspect-ratio: 16/9; background: #000; overflow: hidden; }
-        .thumb video { width: 100%; height: 100%; object-fit: cover; }
+        .thumb video, .thumb img { width: 100%; height: 100%; object-fit: cover; }
         .card-body { padding: 15px; }
 
         /* Toast */
@@ -422,9 +426,10 @@
             .video-container video { max-height: 40vh; }
             .broadcaster-controls { bottom: 10px; right: 10px; }
             .control-btn { width: 35px; height: 35px; font-size: 0.9rem; }
-            .chat-messages { height: 280px; }
+            .chat-messages { height: 300px; }
             .video-theme h2 { font-size: 1rem; }
             .invite-section { flex-direction: column; }
+            .quality-selector { bottom: 10px; left: 10px; }
         }
     </style>
 </head>
@@ -443,12 +448,12 @@
     <div class="permission-card">
         <div class="permission-icon"><i class="fas fa-video"></i></div>
         <h2 style="margin-bottom: 10px;">Camera & Microphone Access</h2>
-        <p style="color: var(--text-sub); margin-bottom: 25px;">Prayer Dome needs access to your camera and microphone for live streaming and chat features.</p>
+        <p style="color: var(--text-sub); margin-bottom: 25px;">Prayer Dome needs access to your camera and microphone for live streaming.</p>
         <button class="permission-btn" onclick="requestPermissions()">
             <i class="fas fa-check-circle"></i> Allow Access
         </button>
         <button class="permission-btn" style="background: transparent; border: 2px solid var(--border); margin-top: 10px;" onclick="skipPermissions()">
-            <i class="fas fa-eye-slash"></i> Continue with Chat Only
+            <i class="fas fa-eye-slash"></i> Continue as Viewer
         </button>
     </div>
 </div>
@@ -465,45 +470,50 @@
     </div>
     <div class="status-indicator">
         <i class="fas fa-microphone-alt"></i>
-        <span id="micStatus">Microphone Ready</span>
+        <span id="micStatus">Ready</span>
     </div>
 </div>
 
 <!-- MAIN VIDEO SECTION -->
 <div class="main-video-section">
-    <!-- Video Theme/Title at Top -->
     <div class="video-theme" id="videoTheme">
         <h2 id="currentVideoTitle">Prayer Dome Broadcast</h2>
         <p id="currentVideoDesc">Join us in worship and the Word of God</p>
     </div>
     
-    <!-- Video Player Container -->
     <div class="video-container" id="playerContainer">
         <div class="placeholder">
             <i class="fas fa-satellite-dish"></i>
             <h3>No Live Stream Currently</h3>
             <p>Next service: Sunday 9:00 AM</p>
-            <button class="permission-btn" style="margin-top: 20px;" onclick="refreshLive()">
+            <button class="permission-btn" style="margin-top: 20px;" onclick="checkLiveStatus()">
                 <i class="fas fa-sync-alt"></i> Check for Live
             </button>
         </div>
+        <div class="quality-selector" id="qualitySelector" style="display: none;">
+            <select id="qualitySelect" onchange="changeQuality(this.value)">
+                <option value="auto">Auto</option>
+                <option value="1080p">1080p</option>
+                <option value="720p">720p</option>
+                <option value="480p">480p</option>
+                <option value="360p">360p</option>
+            </select>
+        </div>
     </div>
     
-    <!-- Scrolling News/Description Ticker -->
     <div class="news-ticker" id="newsTicker">
         <div class="news-ticker-content" id="tickerContent">
             <i class="fas fa-church"></i> PRAYER DOME LIVE STREAM 
             <i class="fas fa-star-of-life"></i> "A HOUSE OF PRAYER FOR ALL NATIONS" 
-            <i class="fas fa-cross"></i> JOIN US EVERY SUNDAY 9:00 AM & WEDNESDAY 6:00 PM 
-            <i class="fas fa-praying-hands"></i> EXPERIENCE THE POWER OF THE HOLY SPIRIT
+            <i class="fas fa-cross"></i> JOIN US EVERY SUNDAY 9:00 AM & WEDNESDAY 6:00 PM
         </div>
     </div>
 </div>
 
-<!-- CHAT SECTION - Below Video -->
+<!-- CHAT SECTION -->
 <div class="chat-section">
     <div class="chat-header">
-        <h3><i class="fas fa-comments"></i> Live Chat & Comments</h3>
+        <h3><i class="fas fa-comments"></i> Live Chat</h3>
         <div class="chat-stats">
             <span><i class="fas fa-comment"></i> <span id="chatCount">0</span> messages</span>
             <span><i class="fas fa-user"></i> <span id="viewerCountChat">0</span> online</span>
@@ -524,7 +534,7 @@
     </div>
     
     <div class="chat-messages" id="chatMessages">
-        <div style="text-align: center; color: var(--text-sub); padding: 40px;">💬 Join the conversation! Be the first to send a message.</div>
+        <div style="text-align: center; color: var(--text-sub); padding: 40px;">💬 Join the conversation!</div>
     </div>
     
     <div class="chat-input-area">
@@ -535,21 +545,31 @@
 
 <!-- ADMIN/BROADCASTER PANEL -->
 <div id="adminPanel" class="admin-panel">
-    <h3><i class="fas fa-broadcast-tower"></i> Broadcast Control Center</h3>
+    <h3><i class="fas fa-broadcast-tower"></i> Live Stream Control Center</h3>
     
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
         <input type="text" id="broadcastTitle" class="admin-input" placeholder="Stream Title (e.g., Sunday Glory Service)">
         <input type="text" id="broadcastDesc" class="admin-input" placeholder="Stream Description">
     </div>
     
-    <!-- Invite Someone to Join Live -->
-    <div class="invite-section">
-        <input type="email" id="inviteEmail" placeholder="Enter email to invite as co-host/broadcaster">
-        <button onclick="inviteToLive()"><i class="fas fa-envelope"></i> Invite to Join Live</button>
+    <!-- RTMP Info for OBS/Streamlabs -->
+    <div class="rtmp-info-panel" id="rtmpInfo" style="display: none;">
+        <h4><i class="fas fa-link"></i> Stream to Cloudinary (Use with OBS / Streamlabs)</h4>
+        <div class="rtmp-url">
+            <strong>RTMP URL:</strong> <span id="rtmpUrl">Loading...</span>
+        </div>
+        <div class="rtmp-url">
+            <strong>Stream Key:</strong> <span id="streamKey">Loading...</span>
+        </div>
+        <button class="copy-btn" onclick="copyRTMPInfo()"><i class="fas fa-copy"></i> Copy RTMP Info</button>
+        <p style="font-size: 0.7rem; margin-top: 10px; color: var(--text-sub);">
+            <i class="fas fa-info-circle"></i> Use these details in OBS Studio, Streamlabs, or any RTMP encoder to start streaming.
+        </p>
     </div>
     
-    <div id="broadcasterList" class="broadcaster-list">
-        <p style="color: var(--text-sub);">No invited broadcasters yet</p>
+    <div class="invite-section">
+        <input type="email" id="inviteEmail" placeholder="Enter email to invite as co-host">
+        <button onclick="inviteToLive()"><i class="fas fa-envelope"></i> Invite to Join</button>
     </div>
     
     <div id="streamControls">
@@ -580,7 +600,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, getDocs, deleteDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, getDocs, deleteDoc, arrayUnion, arrayRemove, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
@@ -602,13 +622,27 @@
     let isAdmin = false;
     let isBroadcaster = false;
     let mediaStream = null;
-    let mediaRecorder = null;
-    let recordedChunks = [];
+    let currentStreamDocId = null;
     let chatUnsubscribe = null;
     let viewerCountUnsubscribe = null;
-    let currentStreamDocId = null;
     let permissionsGranted = false;
-    let streamInterval = null;
+    let hlsPlayer = null;
+    let currentStreamUrl = null;
+
+    // Cloudinary Configuration
+    const CLOUD_NAME = 'prayerdome';
+    
+    function generateStreamId() {
+        return `live_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    function getCloudinaryHLSUrl(streamId) {
+        return `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/hls/${streamId}.m3u8`;
+    }
+    
+    function getCloudinaryRTMPUrl(streamId) {
+        return `rtmp://api.cloudinary.com/v2/${CLOUD_NAME}/live/${streamId}`;
+    }
 
     // Permission handling
     window.requestPermissions = async () => {
@@ -619,22 +653,19 @@
             document.getElementById('permissionModal').style.display = 'none';
             showToast("Camera and microphone access granted!", "success");
             document.getElementById('micStatus').innerHTML = '<i class="fas fa-microphone"></i> Ready';
-            document.getElementById('micStatus').style.color = '#22c55e';
         } catch (error) {
-            console.error("Permission denied:", error);
-            showToast("Camera/Microphone access denied. You can still use chat.", "error");
+            showToast("Camera/Microphone access denied. You can still watch.", "error");
             permissionsGranted = false;
             document.getElementById('permissionModal').style.display = 'none';
             document.getElementById('micStatus').innerHTML = '<i class="fas fa-microphone-slash"></i> No Access';
-            document.getElementById('micStatus').style.color = '#ef4444';
         }
     };
 
     window.skipPermissions = () => {
         permissionsGranted = false;
         document.getElementById('permissionModal').style.display = 'none';
-        showToast("Continuing with chat only. Camera access not enabled.", "info");
-        document.getElementById('micStatus').innerHTML = '<i class="fas fa-microphone-slash"></i> Disabled';
+        showToast("Continuing as viewer only.", "info");
+        document.getElementById('micStatus').innerHTML = '<i class="fas fa-eye"></i> Viewer Mode';
     };
 
     // Auth check
@@ -653,7 +684,6 @@
             
             if (isAdmin || isBroadcaster) {
                 document.getElementById('adminPanel').style.display = 'block';
-                loadBroadcasters();
             }
         }
         checkLiveStatus();
@@ -666,89 +696,7 @@
         });
     });
 
-    async function loadBroadcasters() {
-        const broadcastersRef = doc(db, "broadcasters", "assigned");
-        const docSnap = await getDoc(broadcastersRef);
-        let emails = [];
-        if (docSnap.exists()) emails = docSnap.data().emails || [];
-        
-        const container = document.getElementById('broadcasterList');
-        if (emails.length === 0) {
-            container.innerHTML = '<p style="color: var(--text-sub);">No invited broadcasters yet</p>';
-        } else {
-            container.innerHTML = emails.map(email => `
-                <div class="broadcaster-tag">
-                    <i class="fas fa-user"></i> ${email}
-                    ${isAdmin ? `<button class="remove-broadcaster" onclick="removeBroadcaster('${email}')"><i class="fas fa-times"></i></button>` : ''}
-                </div>
-            `).join('');
-        }
-    }
-    
-    window.inviteToLive = async () => {
-        if (!isAdmin && !isBroadcaster) {
-            showToast("Only broadcasters can invite others", "error");
-            return;
-        }
-        
-        const email = document.getElementById('inviteEmail').value.trim();
-        if (!email) {
-            showToast("Enter an email address", "error");
-            return;
-        }
-        
-        showToast(`Sending invitation to ${email}...`, "info");
-        
-        // Send invitation via Firebase
-        try {
-            await addDoc(collection(db, "liveInvitations"), {
-                inviterId: currentUser.uid,
-                inviterEmail: currentUser.email,
-                inviteeEmail: email,
-                status: 'pending',
-                createdAt: serverTimestamp(),
-                streamId: currentStreamDocId || null
-            });
-            
-            // Also add to broadcasters list if admin
-            if (isAdmin) {
-                const broadcastersRef = doc(db, "broadcasters", "assigned");
-                await setDoc(broadcastersRef, {
-                    emails: arrayUnion(email)
-                }, { merge: true });
-            }
-            
-            showToast(`✅ Invitation sent to ${email}! They can now join as co-host.`, "success");
-            document.getElementById('inviteEmail').value = '';
-            loadBroadcasters();
-            
-            // Send notification in chat
-            if (currentStreamDocId) {
-                await addDoc(collection(db, "liveChat"), {
-                    userId: currentUser.uid,
-                    name: currentUser.displayName || currentUser.email,
-                    message: `📢 Invited ${email} to join the live stream!`,
-                    timestamp: serverTimestamp(),
-                    isReaction: false,
-                    isSystem: true
-                });
-            }
-        } catch (error) {
-            showToast("Error sending invitation: " + error.message, "error");
-        }
-    };
-    
-    window.removeBroadcaster = async (email) => {
-        if (!isAdmin) return;
-        const broadcastersRef = doc(db, "broadcasters", "assigned");
-        await updateDoc(broadcastersRef, {
-            emails: arrayRemove(email)
-        });
-        showToast(`Removed ${email} from broadcasters`, "success");
-        loadBroadcasters();
-    };
-
-    // Start Live Stream
+    // Start Live Stream with Cloudinary
     window.startLiveStream = async () => {
         if (!permissionsGranted) {
             showToast("Please grant camera/microphone access first", "error");
@@ -764,25 +712,25 @@
             return;
         }
         
-        showToast("Starting live stream...", "info");
+        showToast("Preparing live stream...", "info");
         
         try {
-            mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            // Generate unique stream ID
+            const streamId = generateStreamId();
+            const rtmpUrl = getCloudinaryRTMPUrl(streamId);
+            const hlsUrl = getCloudinaryHLSUrl(streamId);
             
+            // Get local media for preview
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             const videoElement = document.getElementById('localVideo');
             videoElement.srcObject = mediaStream;
             document.getElementById('livePreviewArea').style.display = 'block';
             document.getElementById('goLiveBtn').style.display = 'none';
             
-            // Setup recording for storage
-            mediaRecorder = new MediaRecorder(mediaStream);
-            recordedChunks = [];
-            
-            mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0) recordedChunks.push(event.data);
-            };
-            
-            mediaRecorder.start(30000); // Save every 30 seconds
+            // Show RTMP info for OBS
+            document.getElementById('rtmpInfo').style.display = 'block';
+            document.getElementById('rtmpUrl').innerText = rtmpUrl;
+            document.getElementById('streamKey').innerText = streamId;
             
             // Create stream document in Firestore
             const streamRef = await addDoc(collection(db, "activeStreams"), {
@@ -792,6 +740,9 @@
                 broadcasterName: currentUser.displayName || currentUser.email,
                 startTime: serverTimestamp(),
                 isLive: true,
+                streamId: streamId,
+                hlsUrl: hlsUrl,
+                rtmpUrl: rtmpUrl,
                 viewers: {}
             });
             currentStreamDocId = streamRef.id;
@@ -801,80 +752,47 @@
                 isLive: true,
                 title: title,
                 description: description,
-                streamId: currentStreamDocId,
+                streamId: streamId,
+                hlsUrl: hlsUrl,
                 startedBy: currentUser.email,
                 startTime: serverTimestamp(),
-                viewers: 0,
-                tickerMessage: `🔴 LIVE NOW: ${title} - ${description} | Join us in prayer and worship! 🙏`
+                viewers: 0
             });
             
-            // Update ticker
-            updateTicker(`🔴 LIVE NOW: ${title} - ${description} | Join us in prayer and worship! 🙏`);
-            
-            showToast("🔴 LIVE STREAM STARTED!", "success");
+            showToast(`🔴 LIVE STREAM READY!\nUse the RTMP info in OBS to start broadcasting.`, "success");
             confetti({ particleCount: 150, spread: 100 });
             
-            // Set up periodic recording saving
-            if (streamInterval) clearInterval(streamInterval);
-            streamInterval = setInterval(async () => {
-                if (mediaRecorder && mediaRecorder.state === 'recording' && recordedChunks.length > 0) {
-                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
-                    const storageRef = ref(storage, `streams/${currentStreamDocId}/segment_${Date.now()}.webm`);
-                    await uploadBytes(storageRef, blob);
-                    recordedChunks = [];
-                }
-            }, 30000);
+            // Add system message to chat
+            await addDoc(collection(db, "liveChat"), {
+                userId: 'system',
+                name: 'System',
+                message: `🔴 ${currentUser.displayName || currentUser.email} started a live stream: "${title}"`,
+                timestamp: serverTimestamp(),
+                isReaction: false,
+                isSystem: true
+            });
             
         } catch (error) {
             console.error("Stream start error:", error);
             showToast("Cannot start stream. Check permissions.", "error");
             document.getElementById('goLiveBtn').style.display = 'block';
             document.getElementById('livePreviewArea').style.display = 'none';
+            document.getElementById('rtmpInfo').style.display = 'none';
         }
     };
 
-    // END LIVE STREAM - Working properly
+    // End Live Stream
     window.stopLiveStream = async () => {
-        if (!confirm("Are you sure you want to end this live stream? The recording will be saved.")) {
+        if (!confirm("Are you sure you want to end this live stream?")) {
             return;
         }
         
         showToast("Ending live stream...", "info");
         
-        // Stop recording
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-            
-            // Save final recording
-            if (recordedChunks.length > 0) {
-                const blob = new Blob(recordedChunks, { type: 'video/webm' });
-                const storageRef = ref(storage, `recordings/live_${Date.now()}.webm`);
-                await uploadBytes(storageRef, blob);
-                const videoUrl = await getDownloadURL(storageRef);
-                
-                await addDoc(collection(db, "liveRecordings"), {
-                    title: document.getElementById('broadcastTitle').value || 'Live Service',
-                    description: document.getElementById('broadcastDesc').value || '',
-                    videoUrl: videoUrl,
-                    startedBy: currentUser?.email || 'Admin',
-                    startTime: serverTimestamp(),
-                    createdAt: serverTimestamp(),
-                    duration: Math.floor((Date.now() - (currentStreamDocId ? 0 : Date.now())) / 1000)
-                });
-                showToast("Recording saved successfully!", "success");
-            }
-        }
-        
         // Stop media tracks
         if (mediaStream) {
             mediaStream.getTracks().forEach(track => track.stop());
             mediaStream = null;
-        }
-        
-        // Clear recording interval
-        if (streamInterval) {
-            clearInterval(streamInterval);
-            streamInterval = null;
         }
         
         // Update stream document
@@ -883,6 +801,21 @@
                 isLive: false,
                 endedAt: serverTimestamp()
             });
+            
+            // Save the HLS stream URL as a recording
+            const streamDoc = await getDoc(doc(db, "activeStreams", currentStreamDocId));
+            if (streamDoc.exists()) {
+                const streamData = streamDoc.data();
+                await addDoc(collection(db, "liveRecordings"), {
+                    title: streamData.title || 'Live Service',
+                    description: streamData.description || '',
+                    hlsUrl: streamData.hlsUrl,
+                    startedBy: streamData.broadcasterName || streamData.broadcasterId,
+                    startTime: streamData.startTime,
+                    createdAt: serverTimestamp(),
+                    duration: Math.floor((Date.now() - (streamData.startTime?.toDate() || Date.now())) / 1000)
+                });
+            }
         }
         
         // Update live status to offline
@@ -895,7 +828,7 @@
         await addDoc(collection(db, "liveChat"), {
             userId: 'system',
             name: 'System',
-            message: `🔴 The live stream has ended. Thank you for joining! The recording will be available soon.`,
+            message: `🔴 The live stream has ended. Thank you for watching!`,
             timestamp: serverTimestamp(),
             isReaction: false,
             isSystem: true
@@ -904,17 +837,21 @@
         // Reset UI
         document.getElementById('livePreviewArea').style.display = 'none';
         document.getElementById('goLiveBtn').style.display = 'block';
+        document.getElementById('rtmpInfo').style.display = 'none';
         const localVideo = document.getElementById('localVideo');
         if (localVideo) localVideo.srcObject = null;
         
-        // Reset ticker
-        updateTicker("📡 Prayer Dome Live - Next service: Sunday 9:00 AM | Join us for powerful worship and prayer!");
-        
-        showToast("Stream ended. Recording saved.", "success");
+        showToast("Stream ended.", "success");
         loadPastVideos();
-        
-        // Clear current stream ID
         currentStreamDocId = null;
+    };
+
+    window.copyRTMPInfo = () => {
+        const rtmpUrl = document.getElementById('rtmpUrl').innerText;
+        const streamKey = document.getElementById('streamKey').innerText;
+        const fullInfo = `RTMP URL: ${rtmpUrl}\nStream Key: ${streamKey}`;
+        navigator.clipboard.writeText(fullInfo);
+        showToast("RTMP info copied to clipboard!", "success");
     };
 
     window.toggleMicrophone = () => {
@@ -925,7 +862,6 @@
                 const btn = document.getElementById('toggleMicBtn');
                 btn.style.background = audioTrack.enabled ? 'var(--accent-green)' : 'var(--accent-red)';
                 btn.innerHTML = audioTrack.enabled ? '<i class="fas fa-microphone"></i>' : '<i class="fas fa-microphone-slash"></i>';
-                showToast(audioTrack.enabled ? "Microphone ON" : "Microphone OFF", "info");
             }
         }
     };
@@ -938,11 +874,99 @@
                 const btn = document.getElementById('toggleCamBtn');
                 btn.style.background = videoTrack.enabled ? 'var(--accent-green)' : 'var(--accent-red)';
                 btn.innerHTML = videoTrack.enabled ? '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash"></i>';
-                showToast(videoTrack.enabled ? "Camera ON" : "Camera OFF", "info");
             }
         }
     };
+
+    // Play HLS Stream using HLS.js
+    function playHLSStream(url) {
+        const videoContainer = document.getElementById('playerContainer');
+        const videoElement = document.createElement('video');
+        videoElement.controls = true;
+        videoElement.autoplay = true;
+        videoElement.style.width = '100%';
+        videoElement.style.maxHeight = '70vh';
+        
+        videoContainer.innerHTML = '';
+        videoContainer.appendChild(videoElement);
+        document.getElementById('qualitySelector').style.display = 'block';
+        
+        if (Hls.isSupported()) {
+            hlsPlayer = new Hls();
+            hlsPlayer.loadSource(url);
+            hlsPlayer.attachMedia(videoElement);
+            hlsPlayer.on(Hls.Events.MANIFEST_PARSED, () => {
+                videoElement.play();
+            });
+        } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+            videoElement.src = url;
+            videoElement.addEventListener('loadedmetadata', () => {
+                videoElement.play();
+            });
+        }
+        
+        currentStreamUrl = url;
+    }
     
+    window.changeQuality = (quality) => {
+        if (hlsPlayer && currentStreamUrl) {
+            // HLS.js supports quality switching
+            const levels = hlsPlayer.levels;
+            if (quality === 'auto') {
+                hlsPlayer.currentLevel = -1;
+            } else {
+                const qualityMap = { '360p': 0, '480p': 1, '720p': 2, '1080p': 3 };
+                const level = qualityMap[quality] || -1;
+                if (level < levels.length) {
+                    hlsPlayer.currentLevel = level;
+                }
+            }
+            showToast(`Quality switched to ${quality}`, "info");
+        }
+    };
+
+    window.inviteToLive = async () => {
+        const email = document.getElementById('inviteEmail').value.trim();
+        if (!email) {
+            showToast("Enter an email address", "error");
+            return;
+        }
+        
+        showToast(`Sending invitation to ${email}...`, "info");
+        
+        try {
+            await addDoc(collection(db, "liveInvitations"), {
+                inviterId: currentUser.uid,
+                inviterEmail: currentUser.email,
+                inviteeEmail: email,
+                status: 'pending',
+                createdAt: serverTimestamp(),
+                streamId: currentStreamDocId
+            });
+            
+            if (isAdmin) {
+                const broadcastersRef = doc(db, "broadcasters", "assigned");
+                await setDoc(broadcastersRef, {
+                    emails: arrayUnion(email)
+                }, { merge: true });
+            }
+            
+            showToast(`✅ Invitation sent to ${email}!`, "success");
+            document.getElementById('inviteEmail').value = '';
+            
+            await addDoc(collection(db, "liveChat"), {
+                userId: currentUser.uid,
+                name: currentUser.displayName || currentUser.email,
+                message: `📢 Invited ${email} to join the live stream!`,
+                timestamp: serverTimestamp(),
+                isReaction: false,
+                isSystem: true
+            });
+        } catch (error) {
+            showToast("Error sending invitation: " + error.message, "error");
+        }
+    };
+
     // Chat Functions
     window.sendMessage = async () => {
         const input = document.getElementById('chatInput');
@@ -964,7 +988,6 @@
             isReaction: false
         });
         
-        // Update viewer activity
         const liveStatusRef = doc(db, "liveStatus", "current");
         await updateDoc(liveStatusRef, {
             [`viewers.${currentUser.uid}`]: serverTimestamp()
@@ -1019,7 +1042,7 @@
             document.getElementById('chatCount').innerText = messages.length;
         });
     }
-
+    
     function loadViewerCount() {
         const liveStatusRef = doc(db, "liveStatus", "current");
         if (viewerCountUnsubscribe) viewerCountUnsubscribe();
@@ -1042,20 +1065,12 @@
         });
     }
 
-    function updateTicker(message) {
-        const ticker = document.getElementById('tickerContent');
-        if (ticker) {
-            ticker.innerHTML = `<i class="fas fa-broadcast-tower"></i> ${message} <i class="fas fa-star-of-life"></i>`;
-        }
-    }
-
     function updateUIFromStatus(status) {
         const isLive = status.isLive || false;
         const liveDot = document.getElementById('liveDot');
         const liveText = document.getElementById('liveStatusText');
         const videoTitle = document.getElementById('currentVideoTitle');
         const videoDesc = document.getElementById('currentVideoDesc');
-        const playerContainer = document.getElementById('playerContainer');
         
         if (isLive) {
             liveDot.classList.add('live');
@@ -1063,22 +1078,9 @@
             videoTitle.innerText = status.title || 'Live Service';
             videoDesc.innerText = status.description || 'Join us in worship and the Word.';
             
-            if (status.tickerMessage) {
-                updateTicker(status.tickerMessage);
-            } else {
-                updateTicker(`🔴 LIVE NOW: ${status.title || 'Prayer Dome Service'} - Join us in worship! 🙏`);
+            if (status.hlsUrl) {
+                playHLSStream(status.hlsUrl);
             }
-            
-            playerContainer.innerHTML = `
-                <div style="position: relative; background: #000;">
-                    <div class="placeholder" style="text-align: center; padding: 60px;">
-                        <i class="fas fa-video" style="font-size: 4rem; color: var(--accent-red); margin-bottom: 20px; animation: pulseRed 1s infinite;"></i>
-                        <h3>🔴 LIVE STREAM IN PROGRESS</h3>
-                        <p>${escapeHtml(status.title || 'Prayer Dome Service')}</p>
-                        <p style="margin-top: 10px; opacity: 0.7;">Broadcaster: ${status.startedBy || 'Admin'}</p>
-                    </div>
-                </div>
-            `;
             
             loadChat();
             loadViewerCount();
@@ -1088,31 +1090,29 @@
             videoTitle.innerText = 'Prayer Dome Broadcast';
             videoDesc.innerText = 'No live stream at the moment. Check back during service times.';
             
-            updateTicker("📡 Prayer Dome Live - Next service: Sunday 9:00 AM | Join us for powerful worship and prayer!");
-            
-            playerContainer.innerHTML = `
-                <div class="placeholder">
-                    <i class="fas fa-satellite-dish"></i>
-                    <h3>No Live Stream Currently</h3>
-                    <p style="margin-top: 10px;">Next service: Sunday 9:00 AM</p>
-                    <button class="permission-btn" style="margin-top: 20px;" onclick="refreshLive()">
-                        <i class="fas fa-sync-alt"></i> Check for Live
-                    </button>
-                </div>
-            `;
+            const playerContainer = document.getElementById('playerContainer');
+            if (!playerContainer.querySelector('.placeholder')) {
+                playerContainer.innerHTML = `
+                    <div class="placeholder">
+                        <i class="fas fa-satellite-dish"></i>
+                        <h3>No Live Stream Currently</h3>
+                        <p>Next service: Sunday 9:00 AM</p>
+                        <button class="permission-btn" style="margin-top: 20px;" onclick="checkLiveStatus()">
+                            <i class="fas fa-sync-alt"></i> Check for Live
+                        </button>
+                    </div>
+                `;
+            }
+            document.getElementById('qualitySelector').style.display = 'none';
             
             if (chatUnsubscribe) chatUnsubscribe();
             if (viewerCountUnsubscribe) viewerCountUnsubscribe();
         }
     }
 
-    async function checkLiveStatus() {
+    window.checkLiveStatus = async () => {
         const liveDoc = await getDoc(doc(db, "liveStatus", "current"));
         if (liveDoc.exists()) updateUIFromStatus(liveDoc.data());
-    }
-
-    window.refreshLive = () => {
-        checkLiveStatus();
         showToast("Checking for live stream...", "info");
     };
 
@@ -1130,14 +1130,15 @@
             grid.innerHTML = snapshot.docs.map(doc => {
                 const rec = doc.data();
                 return `
-                    <div class="video-card" onclick="playRecording('${rec.videoUrl}')">
+                    <div class="video-card" onclick="playRecording('${rec.hlsUrl}')">
                         <div class="thumb">
-                            <video src="${rec.videoUrl}" style="width:100%; height:100%; object-fit:cover;"></video>
+                            <video src="${rec.hlsUrl}" style="width:100%; height:100%; object-fit:cover;"></video>
                         </div>
                         <div class="card-body">
                             <h4>${escapeHtml(rec.title || 'Service Recording')}</h4>
                             <p><i class="far fa-calendar-alt"></i> ${moment(rec.createdAt?.toDate()).format('MMMM D, YYYY')}</p>
                             <p><i class="fas fa-user"></i> ${escapeHtml(rec.startedBy || 'Admin')}</p>
+                            <p><i class="fas fa-clock"></i> ${rec.duration ? Math.floor(rec.duration / 60) + ' min' : 'Recording'}</p>
                         </div>
                     </div>
                 `;
@@ -1150,12 +1151,22 @@
 
     window.playRecording = (url) => {
         const playerContainer = document.getElementById('playerContainer');
-        playerContainer.innerHTML = `
-            <video controls autoplay style="width: 100%; max-height: 70vh;">
-                <source src="${url}" type="video/webm">
-                Your browser does not support the video tag.
-            </video>
-        `;
+        const videoElement = document.createElement('video');
+        videoElement.controls = true;
+        videoElement.autoplay = true;
+        videoElement.style.width = '100%';
+        videoElement.style.maxHeight = '70vh';
+        
+        if (Hls.isSupported() && url.includes('.m3u8')) {
+            const hls = new Hls();
+            hls.loadSource(url);
+            hls.attachMedia(videoElement);
+        } else {
+            videoElement.src = url;
+        }
+        
+        playerContainer.innerHTML = '';
+        playerContainer.appendChild(videoElement);
         showToast("Playing recording", "success");
     };
 
@@ -1172,7 +1183,7 @@
         toast.className = `toast ${type === 'error' ? 'error' : ''}`;
         toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
         container.appendChild(toast);
-        setTimeout(() => toast.remove(), 3500);
+        setTimeout(() => toast.remove(), 4000);
     }
 
     // Make functions global
@@ -1182,12 +1193,13 @@
     window.toggleCamera = toggleCamera;
     window.sendMessage = sendMessage;
     window.sendReaction = sendReaction;
-    window.refreshLive = refreshLive;
+    window.checkLiveStatus = checkLiveStatus;
     window.playRecording = playRecording;
     window.requestPermissions = requestPermissions;
     window.skipPermissions = skipPermissions;
     window.inviteToLive = inviteToLive;
-    window.removeBroadcaster = removeBroadcaster;
+    window.copyRTMPInfo = copyRTMPInfo;
+    window.changeQuality = changeQuality;
 </script>
 </body>
 </html>
