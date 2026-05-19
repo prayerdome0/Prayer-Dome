@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Prayer Dome | A House of Prayer for All Nations</title>
     
     <link rel="manifest" href="/manifest.json">
@@ -11,8 +11,6 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -136,7 +134,7 @@
         .founder-title { font-size: 0.8rem; font-weight: 800; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 15px; }
         .founder-bio { color: var(--text-sub); font-size: 0.95rem; line-height: 1.7; max-width: 600px; margin: 0 auto; }
 
-        /* Daily Devotional - Morning/Afternoon/Evening */
+        /* Daily Devotional - Enhanced */
         .devotional-container { position: relative; overflow: hidden; padding: 35px; }
         .devotional-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 12px; }
         .devotional-header h2 { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 12px; color: var(--accent-green); font-family: 'Playfair Display', serif; }
@@ -323,7 +321,7 @@
         </div>
     </div>
 
-    <!-- Daily Devotional - Morning/Afternoon/Evening based on local time -->
+    <!-- Daily Devotional - Dynamic Morning/Afternoon/Evening -->
     <div class="glass-card devotional-container">
         <div class="devotional-header">
             <h2><i class="fas fa-book-open"></i> Daily Devotional</h2>
@@ -333,7 +331,6 @@
             </div>
         </div>
         
-        <!-- Timezone Info -->
         <div class="timezone-info" id="timezoneInfo">
             <i class="fas fa-globe"></i> Loading your timezone...
         </div>
@@ -430,7 +427,6 @@
             <div class="loading-spinner"></div>
         </div>
         
-        <!-- Add Review Form -->
         <div class="add-review-card" id="addReviewForm" style="display: none;">
             <div class="add-review-title"><i class="fas fa-pen-fancy"></i> Share Your Experience</div>
             <div class="form-group">
@@ -450,7 +446,7 @@
             </div>
             <div class="form-group">
                 <label><i class="fas fa-camera"></i> Your Photo (Optional)</label>
-                <button type="button" class="upload-btn-small" onclick="uploadReviewPhoto()"><i class="fas fa-cloud-upload-alt"></i> Upload Photo</button>
+                <button type="button" class="btn-submit-review" onclick="uploadReviewPhoto()" style="width: auto; padding: 8px 20px;"><i class="fas fa-cloud-upload-alt"></i> Upload Photo</button>
                 <input type="hidden" id="reviewPhotoUrl">
                 <div id="reviewPhotoPreview" style="margin-top:10px;"></div>
             </div>
@@ -513,6 +509,9 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp, Timestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    
+    // Import devotional system
+    import { getDailyDevotional, getNextUpdateTime, formatCountdown } from './devotional-data.js';
 
     const firebaseConfig = {
         apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo",
@@ -531,11 +530,97 @@
     let notifications = [];
     let unreadCount = 0;
     let currentRating = 5;
-    let nextUpdateTimer = null;
-    let userTimeZone = null;
+    let countdownInterval = null;
     let userLocation = null;
 
-    // Typing Animation Messages
+    // ==================== DEVOTIONAL SYSTEM ====================
+    
+    function updateDevotionalUI() {
+        const devotional = getDailyDevotional();
+        
+        // Update icon and time text
+        const timeIcon = document.getElementById('timeIcon');
+        const timeText = document.getElementById('currentTimeText');
+        if (timeIcon && timeText) {
+            timeIcon.className = `fas ${devotional.periodIcon || 'fa-sun'}`;
+            timeText.innerHTML = devotional.periodName;
+        }
+        
+        // Update content with animation
+        const verseCard = document.getElementById('verseAnimationArea');
+        if (verseCard) {
+            verseCard.style.animation = 'none';
+            setTimeout(() => verseCard.style.animation = 'fadeSlideIn 0.6s ease', 10);
+        }
+        
+        const scriptureEl = document.getElementById('dailyScripture');
+        const refEl = document.getElementById('dailyRef');
+        const messageEl = document.getElementById('dailyMessage');
+        const prayerEl = document.getElementById('dailyPrayer');
+        
+        if (scriptureEl) scriptureEl.innerHTML = `"${devotional.text || devotional.verse}"`;
+        if (refEl) refEl.innerHTML = `<i class="fas fa-bible"></i> — ${devotional.verse}`;
+        if (messageEl) messageEl.innerHTML = devotional.message;
+        if (prayerEl) prayerEl.innerHTML = devotional.prayer;
+        
+        // Store for reference
+        localStorage.setItem('lastDevotionalPeriod', devotional.period);
+        localStorage.setItem('lastDevotionalDate', new Date().toDateString());
+    }
+    
+    function startCountdownTimer() {
+        if (countdownInterval) clearInterval(countdownInterval);
+        
+        function updateTimer() {
+            const remainingMs = getNextUpdateTime();
+            const timerEl = document.getElementById('nextUpdateCountdown');
+            if (timerEl) timerEl.innerHTML = formatCountdown(remainingMs);
+        }
+        
+        updateTimer();
+        countdownInterval = setInterval(updateTimer, 1000);
+    }
+    
+    async function getUserTimezone() {
+        try {
+            const response = await fetch('https://ipapi.co/json/');
+            const data = await response.json();
+            const timezoneSpan = document.getElementById('timezoneInfo');
+            if (timezoneSpan && data.timezone) {
+                timezoneSpan.innerHTML = `<i class="fas fa-globe"></i> Your timezone: ${data.timezone} | ${data.city || ''}, ${data.country_name || ''}`;
+            }
+            return data.timezone;
+        } catch (error) {
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const timezoneSpan = document.getElementById('timezoneInfo');
+            if (timezoneSpan) timezoneSpan.innerHTML = `<i class="fas fa-globe"></i> Your timezone: ${timezone}`;
+            return timezone;
+        }
+    }
+    
+    function initDevotionalSystem() {
+        getUserTimezone();
+        updateDevotionalUI();
+        
+        // Check for period changes every minute
+        setInterval(() => {
+            const now = new Date();
+            const lastPeriod = localStorage.getItem('lastDevotionalPeriod');
+            const lastDate = localStorage.getItem('lastDevotionalDate');
+            const currentDevotional = getDailyDevotional();
+            
+            if (lastPeriod !== currentDevotional.period || lastDate !== now.toDateString()) {
+                updateDevotionalUI();
+                localStorage.setItem('lastDevotionalPeriod', currentDevotional.period);
+                localStorage.setItem('lastDevotionalDate', now.toDateString());
+            }
+        }, 60000);
+        
+        startCountdownTimer();
+    }
+
+    // ==================== TYPING ANIMATION ====================
+    
     const encouragingMessages = [
         "<i class='fas fa-fire'></i> Welcome to Prayer Dome!",
         "<i class='fas fa-church'></i> A House of Prayer for All Nations",
@@ -585,159 +670,8 @@
         typeEffect();
     }
 
-    // ==================== ENHANCED MORNING/AFTERNOON/EVENING DEVOTIONAL ====================
-    const morningDevotionals = [
-        { verse: "Let the morning bring me word of your unfailing love, for I have put my trust in you. Show me the way I should go, for to you I entrust my life.", ref: "Psalm 143:8", commentary: "As the sun rises, God's mercies are new every morning. Start your day by inviting His presence. Before checking your phone or emails, take a moment to acknowledge the God who created this day just for you. His love never fails, and His guidance is available for every decision you'll make today.", prayer: "Heavenly Father, thank You for this new morning. As the sun rises, let Your love rise in my heart. Guide my steps today, give me wisdom for every decision, and let Your peace rule in my heart. I commit this day into Your hands. In Jesus' name, Amen." },
-        { verse: "Because of the Lord's great love we are not consumed, for his compassions never fail. They are new every morning; great is your faithfulness.", ref: "Lamentations 3:22-23", commentary: "No matter what happened yesterday, today is a fresh start. God's mercies are renewed every single morning. You don't have to carry yesterday's guilt, shame, or failures into today. God has already wiped the slate clean. Receive His forgiveness and step into this day with confidence.", prayer: "Lord, thank You for new mercies this morning. I release yesterday's burdens into Your hands. Fill me with Your peace and joy. Help me to walk in forgiveness - both receiving it and giving it. Let this day be marked by Your faithfulness. Amen." },
-        { verse: "Wake up, sleeper, rise from the dead, and Christ will shine on you.", ref: "Ephesians 5:14", commentary: "God is calling you to wake up spiritually. There may be areas of your life where you've been asleep - dreams deferred, passions dormant, callings ignored. Today is the day to rise up. Christ's light is shining on you, inviting you into greater purpose and impact.", prayer: "Father, wake me up spiritually. Revive my passion for Your Kingdom. Shine Your light on the areas of my life that need awakening. Give me courage to pursue the dreams You've placed in my heart. I rise up today in Your strength. Amen." }
-    ];
+    // ==================== LOCATION TRACKING ====================
     
-    const afternoonDevotionals = [
-        { verse: "But seek first his kingdom and his righteousness, and all these things will be given to you as well.", ref: "Matthew 6:33", commentary: "Midday is a perfect time to pause and realign your priorities. In the busyness of the day, it's easy to get distracted by urgent tasks that aren't truly important. Take a moment now to put God first. When you seek His kingdom above all else, everything else falls into place.", prayer: "Lord, in the middle of this day, I pause to seek You first. Forgive me for the times I've put other things before You. Realign my priorities. Help me to focus on what truly matters for eternity. I trust that as I seek You, You will provide everything I need. Amen." },
-        { verse: "Come to me, all you who are weary and burdened, and I will give you rest.", ref: "Matthew 11:28", commentary: "The afternoon can bring fatigue - physically, emotionally, and spiritually. Jesus invites you to come to Him right now, not later. You don't have to power through on your own strength. His rest is available in the middle of your busy day. Take a deep breath, release your burdens to Him.", prayer: "Jesus, I come to You right now. I'm feeling weary and burdened. I release my stress, my worries, and my exhaustion into Your hands. Give me supernatural rest and refreshment. Renew my strength so I can finish this day well. Thank You for carrying my burdens. Amen." },
-        { verse: "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God.", ref: "Philippians 4:6", commentary: "Anxiety often peaks in the afternoon when we start worrying about what's left undone or what might go wrong. God's prescription for anxiety is prayer - not just any prayer, but prayer mixed with thanksgiving. Take a moment now to thank God for what He's already done, then present your concerns to Him.", prayer: "Father, I bring my anxieties to You right now. Instead of worrying, I choose to pray. Thank You for Your faithfulness in the past. I present my current concerns to You - You are bigger than every problem. Fill me with Your peace that surpasses all understanding. Amen." }
-    ];
-    
-    const eveningDevotionals = [
-        { verse: "Do not let the sun go down while you are still angry.", ref: "Ephesians 4:26", commentary: "As the day ends, it's time to examine your heart. Is there any unforgiveness, bitterness, or anger you're holding onto? The Bible instructs us to resolve these before sunset. Unforgiveness is like drinking poison and expecting the other person to die. Release it tonight so you can sleep in peace.", prayer: "Lord, search my heart. Show me anyone I need to forgive. I release every offense, every hurt, and every disappointment into Your hands. Help me to forgive as You have forgiven me. Cleanse my heart and give me peaceful rest tonight. Amen." },
-        { verse: "When you lie down, you will not be afraid; when you lie down, your sleep will be sweet.", ref: "Proverbs 3:24", commentary: "God desires for you to have sweet, restful sleep. Fear and worry are enemies of rest. Tonight, before you close your eyes, declare God's protection over your life, your family, and your home. Trust that the One who never sleeps is watching over you.", prayer: "Father, I thank You that I can lie down without fear. I place myself and my family under Your protection tonight. Guard our minds from nightmares and anxiety. Let our sleep be sweet and refreshing. We trust You completely. In Jesus' name, Amen." },
-        { verse: "I will both lie down in peace, and sleep; for You alone, O Lord, make me dwell in safety.", ref: "Psalm 4:8", commentary: "Peace is not the absence of problems - it's the presence of God. Even if your circumstances haven't changed, you can lie down in peace because your trust is in the Lord. He is your safety, your protector, your refuge. Nothing can touch you outside of His will.", prayer: "Lord, I lie down in peace tonight because my trust is in You. You alone are my safety. I thank You that no weapon formed against me shall prosper. I release every worry into Your hands. Watch over me and my loved ones through the night. I rest in Your love. Amen." }
-    ];
-
-    // Get devotional based on time of day (local time zone)
-    function getDevotionalByTime(hour) {
-        if (hour >= 5 && hour < 12) {
-            // Morning (5 AM - 11:59 AM)
-            const randomIndex = Math.floor(Math.random() * morningDevotionals.length);
-            return { ...morningDevotionals[randomIndex], period: 'morning', icon: 'fa-sun', name: 'Morning Devotional' };
-        } else if (hour >= 12 && hour < 17) {
-            // Afternoon (12 PM - 4:59 PM)
-            const randomIndex = Math.floor(Math.random() * afternoonDevotionals.length);
-            return { ...afternoonDevotionals[randomIndex], period: 'afternoon', icon: 'fa-cloud-sun', name: 'Afternoon Devotional' };
-        } else {
-            // Evening/Night (5 PM - 4:59 AM)
-            const randomIndex = Math.floor(Math.random() * eveningDevotionals.length);
-            return { ...eveningDevotionals[randomIndex], period: 'evening', icon: 'fa-moon', name: 'Evening Devotional' };
-        }
-    }
-
-    // Get user timezone and location
-    async function getUserTimeZone() {
-        try {
-            // Try to get from IP API first
-            const ipResponse = await fetch('https://ipapi.co/json/');
-            const ipData = await ipResponse.json();
-            if (ipData.timezone) {
-                userTimeZone = ipData.timezone;
-                userLocation = `${ipData.city || ''}, ${ipData.country_name || ''}`;
-                document.getElementById('timezoneInfo').innerHTML = `<i class="fas fa-globe"></i> Your timezone: ${userTimeZone} | ${userLocation}`;
-                return userTimeZone;
-            }
-        } catch (error) {
-            console.log('IP geolocation failed, using browser timezone');
-        }
-        
-        // Fallback to browser timezone
-        userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        document.getElementById('timezoneInfo').innerHTML = `<i class="fas fa-globe"></i> Your timezone: ${userTimeZone}`;
-        return userTimeZone;
-    }
-
-    function updateDevotional() {
-        const now = new Date();
-        const hour = now.getHours();
-        const devotional = getDevotionalByTime(hour);
-        
-        // Update icon based on time of day
-        const timeIcon = document.getElementById('timeIcon');
-        const timeText = document.getElementById('currentTimeText');
-        
-        if (devotional.period === 'morning') {
-            timeIcon.className = 'fas fa-sun';
-            timeText.innerHTML = 'Morning Devotional 🌅';
-        } else if (devotional.period === 'afternoon') {
-            timeIcon.className = 'fas fa-cloud-sun';
-            timeText.innerHTML = 'Afternoon Devotional ☀️';
-        } else {
-            timeIcon.className = 'fas fa-moon';
-            timeText.innerHTML = 'Evening Devotional 🌙';
-        }
-        
-        // Animate the verse card
-        const animationArea = document.getElementById('verseAnimationArea');
-        if (animationArea) {
-            animationArea.style.animation = 'none';
-            setTimeout(() => animationArea.style.animation = 'fadeSlideIn 0.6s ease', 10);
-        }
-        
-        // Update content
-        const scriptureEl = document.getElementById('dailyScripture');
-        const refEl = document.getElementById('dailyRef');
-        const messageEl = document.getElementById('dailyMessage');
-        const prayerEl = document.getElementById('dailyPrayer');
-        
-        if (scriptureEl) scriptureEl.innerHTML = `"${devotional.verse}"`;
-        if (refEl) refEl.innerHTML = `<i class="fas fa-bible"></i> — ${devotional.ref}`;
-        if (messageEl) messageEl.innerHTML = devotional.commentary;
-        if (prayerEl) prayerEl.innerHTML = devotional.prayer;
-        
-        updateCountdownTimer();
-    }
-
-    function updateCountdownTimer() {
-        if (nextUpdateTimer) clearInterval(nextUpdateTimer);
-        
-        function updateTimer() {
-            const now = new Date();
-            const hour = now.getHours();
-            let nextUpdateHour;
-            
-            // Determine next update time based on current time
-            if (hour < 12) {
-                nextUpdateHour = 12; // Next update at noon
-            } else if (hour < 17) {
-                nextUpdateHour = 17; // Next update at 5 PM
-            } else {
-                nextUpdateHour = 5; // Next update at 5 AM tomorrow
-            }
-            
-            let nextUpdate = new Date(now);
-            nextUpdate.setHours(nextUpdateHour, 0, 0, 0);
-            
-            if (nextUpdate <= now) {
-                nextUpdate.setDate(nextUpdate.getDate() + 1);
-            }
-            
-            const diff = nextUpdate - now;
-            const hours = Math.floor(diff / 3600000);
-            const minutes = Math.floor((diff % 3600000) / 60000);
-            const seconds = Math.floor((diff % 60000) / 1000);
-            
-            const timerEl = document.getElementById('nextUpdateCountdown');
-            if (timerEl) timerEl.innerHTML = `${hours}h ${minutes}m ${seconds}s`;
-        }
-        
-        updateTimer();
-        nextUpdateTimer = setInterval(updateTimer, 1000);
-    }
-
-    function startDailyDevotional() {
-        updateDevotional();
-        // Check every minute for period changes
-        setInterval(() => {
-            const now = new Date();
-            const hour = now.getHours();
-            const currentDevotional = getDevotionalByTime(hour);
-            // Simple check if period changed
-            const storedPeriod = localStorage.getItem('lastDevotionalPeriod');
-            if (storedPeriod !== currentDevotional.period) {
-                updateDevotional();
-                localStorage.setItem('lastDevotionalPeriod', currentDevotional.period);
-            }
-        }, 60000); // Check every minute
-    }
-
-    // Location Tracking
     const branches = {
         chama: { name: "Chama, Zambia", lat: -11.214, lon: 33.155, el: 'dist-chama', card: 'card-chama' },
         eswatini: { name: "Manzini, Eswatini", lat: -26.305, lon: 31.136, el: 'dist-eswatini', card: 'card-eswatini' },
@@ -799,7 +733,8 @@
         document.getElementById('locationText').innerHTML = `<i class="fas fa-globe-africa"></i> Global Network`;
     }
     
-    // Load Events and Testimonies
+    // ==================== LOAD EVENTS & TESTIMONIES ====================
+    
     async function loadUpcomingEvents() {
         try {
             const now = new Date();
@@ -834,7 +769,8 @@
         } catch (error) { console.error("Error loading testimonies:", error); }
     }
     
-    // Load Reviews
+    // ==================== LOAD REVIEWS ====================
+    
     async function loadReviews() {
         try {
             const reviewsQuery = query(collection(db, "reviews"), orderBy("timestamp", "desc"), limit(10));
@@ -862,7 +798,8 @@
         } catch (error) { console.error("Error loading reviews:", error); }
     }
 
-    // Submit Review
+    // ==================== SUBMIT REVIEW ====================
+    
     window.submitReview = async () => {
         if (!currentUser) {
             showToast("Please login to submit a review", "error");
@@ -948,7 +885,8 @@
         });
     }
 
-    // Notification functions with delete capability
+    // ==================== NOTIFICATION FUNCTIONS ====================
+    
     async function loadNotifications() {
         if (!currentUser) return;
         try {
@@ -1037,15 +975,8 @@
         panel.classList.toggle('open');
     };
 
-    // Auth and role checks
-    async function checkFinanceRole(user) {
-        if (!user) return false;
-        try {
-            const memberDoc = await getDoc(doc(db, "memberships", user.uid));
-            return memberDoc.data()?.role === 'finance' || memberDoc.data()?.role === 'admin';
-        } catch { return false; }
-    }
-
+    // ==================== AUTH AND ROLE CHECKS ====================
+    
     async function checkAndShowAdminTab(user) {
         if (!user) return;
         try {
@@ -1068,6 +999,8 @@
         } catch (error) { console.error("Error checking admin status:", error); }
     }
 
+    // ==================== UTILITY FUNCTIONS ====================
+    
     function escapeHtml(str) {
         if (!str) return '';
         const div = document.createElement('div');
@@ -1084,12 +1017,14 @@
         setTimeout(() => toast.remove(), 3500);
     }
 
-    function toggleDarkMode() {
+    window.toggleDarkMode = function() {
         document.body.classList.toggle('dark-mode');
         const btn = document.querySelector('.theme-toggle-btn i');
         if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
-    }
+    };
 
+    // ==================== INITIALIZATION ====================
+    
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
         if (user) {
@@ -1106,16 +1041,15 @@
         }
     });
 
-    // Initialize
+    // Initialize everything
     startTypingAnimation();
-    getUserTimeZone();
-    startDailyDevotional();
+    initDevotionalSystem();
     loadUpcomingEvents();
     loadRecentTestimonies();
     loadReviews();
     setupRatingStars();
     
-    window.toggleDarkMode = toggleDarkMode;
+    // Make functions global
     window.toggleNotificationPanel = toggleNotificationPanel;
     window.deleteNotification = deleteNotification;
     window.deleteAllNotifications = deleteAllNotifications;
