@@ -377,6 +377,8 @@
         <div class="nav-menu">
             <div class="nav-item active" onclick="switchView('dashboard', this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
             <div class="nav-item" onclick="switchView('members', this)"><i class="fas fa-users"></i> Members CRM</div>
+            <div class="nav-item" onclick="switchView('announcements', this)"><i class="fas fa-bullhorn"></i> Notices</div>
+            <div class="nav-item" onclick="switchView('care', this)"><i class="fas fa-hand-holding-heart"></i> Member Care</div>
             <div class="nav-item" onclick="switchView('gallery', this)"><i class="fas fa-images"></i> Gallery Management</div>
             <div class="nav-item" onclick="switchView('finance', this)"><i class="fas fa-coins"></i> Financials</div>
             <div class="nav-item" onclick="switchView('support', this)"><i class="fas fa-hand-holding-heart"></i> Support Claims</div>
@@ -476,6 +478,42 @@
                     </div>
                     <div class="table-responsive">
                         <table><thead> <tr><th>Member</th><th>ID</th><th>Contact</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th> </tr></thead><tbody id="listMembers"> <tr><td colspan="7" style="text-align: center;"><div class="spinner" style="width:30px;height:30px;"></div></td></tr> </tbody> </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOTICES / ANNOUNCEMENTS VIEW -->
+            <div id="view-announcements" class="section-view">
+                <div class="page-title"><span><i class="fas fa-bullhorn"></i> Portal Notices (Announcements)</span><button class="btn btn-primary" onclick="openModal('modalAnnouncement')"><i class="fas fa-plus"></i> New Notice</button></div>
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-list"></i> Published Notices <span style="font-weight: 400; font-size: 0.7rem; color: var(--text-sub);">— shown live in the member portal "Notices" tab</span></h3>
+                        <button class="btn btn-outline btn-sm" onclick="loadAnnouncements()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table><thead> <tr><th>Date</th><th>Notice</th><th>Category</th><th>Pinned</th><th>Actions</th> </tr></thead><tbody id="listAnnouncements"> <tr><td colspan="5" style="text-align: center;"><div class="spinner" style="width:30px;height:30px;"></div></td></tr> </tbody> </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MEMBER CARE REQUESTS VIEW -->
+            <div id="view-care" class="section-view">
+                <div class="page-title"><i class="fas fa-hand-holding-heart"></i> Member Care Requests</div>
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                            <select id="filterCareStatus" class="form-control" style="width: 150px; padding: 8px 12px;" onchange="loadCareRequests()">
+                                <option value="all">All Requests</option>
+                                <option value="pending">⏳ Pending</option>
+                                <option value="in-progress">🔵 In Progress</option>
+                                <option value="resolved">✅ Resolved</option>
+                            </select>
+                            <span style="font-size: 0.75rem; color: var(--text-sub);">Open cases: <span class="badge badge-warning" id="openCareCount">0</span></span>
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="loadCareRequests()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table><thead> <tr><th>Date</th><th>Member</th><th>Type</th><th>Request</th><th>Contact</th><th>Status</th><th>Actions</th> </tr></thead><tbody id="listCareRequests"> <tr><td colspan="7" style="text-align: center;"><div class="spinner" style="width:30px;height:30px;"></div></td></tr> </tbody> </table>
                     </div>
                 </div>
             </div>
@@ -625,6 +663,7 @@
                     <div>
                         <div class="form-group"><label>Branch</label><select id="fullMemberBranch" class="form-control"><option>Zambia - Chama</option><option>Eswatini - Manzini</option><option>Ireland - Cork</option><option>Online Global</option></select></div>
                         <div class="form-group"><label>Role</label><select id="fullMemberRole" class="form-control"><option value="member">Member</option><option value="finance">Finance</option><option value="admin">Admin</option><option value="pastor">Pastor</option><option value="worship">Worship</option><option value="usher">Usher</option></select></div>
+                        <div class="form-group"><label>Recognition Badge</label><select id="fullMemberBadge" class="form-control"><option value="">— None —</option><option value="star">⭐ Star Member</option><option value="prayerwarrior">🙏 Prayer Warrior</option><option value="compassion">❤️ Compassion Award</option><option value="worship">🎵 Worship Excellence</option><option value="leadership">👑 Leadership Excellence</option><option value="faithful">🕊️ Faithful Servant</option><option value="volunteer">🤝 Volunteer of the Month</option></select></div>
                         <div class="form-group"><label>Status</label><select id="fullMemberStatus" class="form-control"><option value="pending">Pending</option><option value="approved">Active</option><option value="suspended">Suspended</option><option value="rejected">Rejected</option></select></div>
                         <div class="form-group"><label>Wallet Balance</label><input type="text" id="fullMemberWallet" class="form-control" readonly></div>
                         <div class="form-group"><label>Member Since</label><input type="text" id="fullMemberJoined" class="form-control" readonly></div>
@@ -643,6 +682,19 @@
     <div id="modalViewDoc" class="modal-overlay"><div class="modal-card" style="max-width: 700px;"><div class="modal-header"><h2>Document Viewer</h2><button class="modal-close" onclick="closeModal('modalViewDoc')"><i class="fas fa-times"></i></button></div><div class="modal-body"><img id="docImagePreview" style="max-width:100%; display:none;"><a id="docPdfBtn" href="#" target="_blank" class="btn btn-primary" style="display:none;">Open PDF</a></div></div></div>
 
     <div id="modalEvent" class="modal-overlay"><div class="modal-card"><div class="modal-header"><h2>Create Event</h2><button class="modal-close" onclick="closeModal('modalEvent')"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="form-group"><label>Title</label><input type="text" id="evTitle" class="form-control"></div><div class="form-group"><label>Date & Time</label><input type="datetime-local" id="evDate" class="form-control"></div><div class="form-group"><label>Location</label><input type="text" id="evLocation" class="form-control"></div><div class="form-group"><label>Category</label><select id="evCategory" class="form-control"><option>Service</option><option>Prayer</option><option>Conference</option></select></div><div class="form-group"><label>Description</label><textarea id="evDesc" class="form-control" rows="3"></textarea></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalEvent')">Cancel</button><button class="btn btn-primary" onclick="saveEvent()">Publish</button></div></div></div>
+
+    <div id="modalAnnouncement" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header"><h2><i class="fas fa-bullhorn"></i> Publish Portal Notice</h2><button class="modal-close" onclick="closeModal('modalAnnouncement')"><i class="fas fa-times"></i></button></div>
+            <div class="modal-body">
+                <div class="form-group"><label>Title</label><input type="text" id="annTitle" class="form-control" placeholder="e.g. Night of Prayer this Friday" maxlength="120"></div>
+                <div class="form-group"><label>Category</label><select id="annCategory" class="form-control"><option value="general">📢 General</option><option value="urgent">⚠️ Urgent</option><option value="event">📅 Event</option></select></div>
+                <div class="form-group"><label>Message</label><textarea id="annBody" class="form-control" rows="5" placeholder="Write the announcement that members will see in the portal Notices tab..." maxlength="2000"></textarea></div>
+                <label style="display: flex; align-items: center; gap: 10px; font-size: 0.85rem; cursor: pointer;"><input type="checkbox" id="annPinned"> <i class="fas fa-thumbtack" style="color: var(--accent-gold);"></i> Pin to top of members' notices</label>
+            </div>
+            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalAnnouncement')">Cancel</button><button class="btn btn-primary" onclick="saveAnnouncement()"><i class="fas fa-paper-plane"></i> Publish</button></div>
+        </div>
+    </div>
 
     <input type="hidden" id="editMemberId">
 
@@ -790,6 +842,7 @@
                 document.getElementById('fullMemberMarital').value=member.maritalStatus||member.marital||'Single'; 
                 document.getElementById('fullMemberBranch').value=member.branch||'Zambia - Chama'; 
                 document.getElementById('fullMemberRole').value=member.role||'member'; 
+                document.getElementById('fullMemberBadge').value=member.badge||''; 
                 document.getElementById('fullMemberStatus').value=member.status||'pending'; 
                 document.getElementById('fullMemberWallet').value=walletDoc.exists()?`E${walletDoc.data().balance.toFixed(2)}`:'E0.00'; 
                 document.getElementById('fullMemberJoined').value=member.createdAt?moment(member.createdAt.toDate()).format('MMMM D, YYYY'):'N/A'; 
@@ -815,7 +868,7 @@
             if(!uid) return; 
             const gifts=document.getElementById('fullMemberGifts').value.split(',').map(g=>g.trim()).filter(g=>g); 
             const ministries=document.getElementById('fullMemberMinistries').value.split(',').map(m=>m.trim()).filter(m=>m); 
-            const data={ fullName:document.getElementById('fullMemberName').value, phone:document.getElementById('fullMemberPhone').value, idNumber:document.getElementById('fullMemberIdNumber').value, dateOfBirth:document.getElementById('fullMemberDob').value, gender:document.getElementById('fullMemberGender').value, maritalStatus:document.getElementById('fullMemberMarital').value, branch:document.getElementById('fullMemberBranch').value, role:document.getElementById('fullMemberRole').value, status:document.getElementById('fullMemberStatus').value, bio:document.getElementById('fullMemberBio').value, spiritualGifts:gifts, ministries:ministries, adminNotes:document.getElementById('fullMemberAdminNotes').value, updatedAt:serverTimestamp(), updatedBy:adminUser?.email || adminUser?.uid }; 
+            const data={ fullName:document.getElementById('fullMemberName').value, phone:document.getElementById('fullMemberPhone').value, idNumber:document.getElementById('fullMemberIdNumber').value, dateOfBirth:document.getElementById('fullMemberDob').value, gender:document.getElementById('fullMemberGender').value, maritalStatus:document.getElementById('fullMemberMarital').value, branch:document.getElementById('fullMemberBranch').value, role:document.getElementById('fullMemberRole').value, badge:document.getElementById('fullMemberBadge').value, status:document.getElementById('fullMemberStatus').value, bio:document.getElementById('fullMemberBio').value, spiritualGifts:gifts, ministries:ministries, adminNotes:document.getElementById('fullMemberAdminNotes').value, updatedAt:serverTimestamp(), updatedBy:adminUser?.email || adminUser?.uid }; 
             showLoading(); 
             try{ 
                 await updateDoc(doc(db,"memberships",uid),data); 
@@ -958,6 +1011,21 @@
         
         window.loadEvents = async function(){ const tbody=document.getElementById('listEvents'); if(tbody) tbody.innerHTML='<td colspan="5"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try{ const snap=await getDocs(query(collection(db,"events"),orderBy("date","desc"))); let html=''; snap.forEach(d=>{ const data=d.data(); html+=`<tr><td>${data.date?moment(data.date.toDate()).format('MMM D, YYYY HH:mm'):'N/A'}</td><td><strong>${escapeHTML(data.title)}</strong></td><td>${escapeHTML(data.location)}</td><td>${data.category}</td><td><button class="btn btn-sm btn-danger" onclick="deleteRecord('events','${d.id}')">Delete</button></td></tr>`; }); if(tbody) tbody.innerHTML=html||'<td colspan="5">No events<\/td>'; } catch(e){ console.error(e); } };
         window.saveEvent = async function(){ const title=document.getElementById('evTitle').value, date=document.getElementById('evDate').value; if(!title||!date) return toast("Title and date required","error"); showLoading(); try{ await addDoc(collection(db,"events"),{title:title,date:new Date(date),location:document.getElementById('evLocation').value,category:document.getElementById('evCategory').value,description:document.getElementById('evDesc').value,attendeeCount:0,createdAt:serverTimestamp(),createdBy:adminUser?.uid}); closeModal('modalEvent'); toast("Event published!"); await loadEvents(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
+
+        /* ===== Portal Notices (Announcements) Management ===== */
+        window.loadAnnouncements = async function(){ const tbody=document.getElementById('listAnnouncements'); if(tbody) tbody.innerHTML='<td colspan="5"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try{ const snap=await getDocs(query(collection(db,"announcements"),orderBy("createdAt","desc"),limit(100))); const items=[]; snap.forEach(d=>items.push({id:d.id,...d.data()})); items.sort((a,b)=>(b.pinned===true)-(a.pinned===true)); let html=''; items.forEach(a=>{ const cat=a.category==='urgent'?'<span class="badge badge-danger">⚠️ Urgent</span>':a.category==='event'?'<span class="badge badge-warning">📅 Event</span>':'<span class="badge badge-info">📢 General</span>'; const pin=a.pinned?'<span class="badge badge-warning"><i class="fas fa-thumbtack"></i> Pinned</span>':'<span style="color:var(--text-sub);font-size:0.7rem;">—</span>'; html+=`<tr><td style="white-space:nowrap;">${a.createdAt?moment(a.createdAt.toDate()).format('MMM D, YYYY HH:mm'):'N/A'}</td><td style="white-space:normal;"><strong>${escapeHTML(a.title||'')}</strong><p style="font-size:0.7rem;color:var(--text-sub);white-space:normal;margin-top:2px;">${escapeHTML((a.body||'').substring(0,80))}${(a.body||'').length>80?'...':''}</p></td><td>${cat}</td><td>${pin}</td><td style="white-space:nowrap;"><button class="btn btn-sm btn-outline" onclick="toggleAnnouncementPin('${a.id}', ${a.pinned===true})"><i class="fas fa-thumbtack"></i> ${a.pinned?'Unpin':'Pin'}</button><button class="btn btn-sm btn-danger" onclick="deleteRecord('announcements','${a.id}')"><i class="fas fa-trash"></i></button></td></tr>`; }); if(tbody) tbody.innerHTML=html||'<td colspan="5">No notices published yet<\/td>'; } catch(e){ console.error(e); toast("Error loading notices","error"); } };
+
+        window.saveAnnouncement = async function(){ const title=document.getElementById('annTitle').value.trim(), body=document.getElementById('annBody').value.trim(); if(!title||!body) return toast("Title and message are required","error"); showLoading(); try{ await addDoc(collection(db,"announcements"),{ title:title, body:body, category:document.getElementById('annCategory').value, pinned:document.getElementById('annPinned').checked, createdAt:serverTimestamp(), createdBy:adminUser?.email }); await logAdminActivity('announcement_published',{ title:title }); document.getElementById('annTitle').value=''; document.getElementById('annBody').value=''; document.getElementById('annPinned').checked=false; closeModal('modalAnnouncement'); toast("Notice published to the member portal!"); await loadAnnouncements(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
+
+        window.toggleAnnouncementPin = async function(id, currentlyPinned){ showLoading(); try{ await updateDoc(doc(db,"announcements",id),{ pinned:!currentlyPinned }); toast(!currentlyPinned?"📌 Notice pinned":"Notice unpinned"); await loadAnnouncements(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
+
+        /* ===== Member Care Requests Management ===== */
+        let careRequestsCache = {};
+        window.loadCareRequests = async function(){ const tbody=document.getElementById('listCareRequests'); const statusFilter=document.getElementById('filterCareStatus')?.value||'all'; if(tbody) tbody.innerHTML='<td colspan="7"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try{ const snap=await getDocs(query(collection(db,"memberCareRequests"),orderBy("createdAt","desc"),limit(100))); careRequestsCache={}; let html='', openCount=0, total=0; snap.forEach(d=>{ const r=d.data(); total++; if(r.status!=='resolved') openCount++; if(statusFilter!=='all'&&r.status!==statusFilter) return; careRequestsCache[d.id]=r; const badge=r.status==='resolved'?'<span class="badge badge-success">Resolved</span>':r.status==='in-progress'?'<span class="badge badge-info">In Progress</span>':'<span class="badge badge-warning">Pending</span>'; let actions=''; if(r.status!=='resolved'){ if(r.status==='pending') actions+=`<button class="btn btn-sm btn-primary" onclick="setCareStatus('${d.id}','in-progress')">Start</button>`; actions+=`<button class="btn btn-sm btn-success" onclick="setCareStatus('${d.id}','resolved')">Resolve</button>`; } else { actions+=`<button class="btn btn-sm btn-outline" onclick="setCareStatus('${d.id}','pending')">Reopen</button>`; } actions+=`<button class="btn btn-sm btn-gold" onclick="noteCareRequest('${d.id}')"><i class="fas fa-reply"></i></button><button class="btn btn-sm btn-danger" onclick="deleteRecord('memberCareRequests','${d.id}')"><i class="fas fa-trash"></i></button>`; html+=`<tr><td style="white-space:nowrap;">${r.createdAt?moment(r.createdAt.toDate()).format('MMM D, YYYY'):'N/A'}</td><td><div><h4 style="margin:0;font-size:0.85rem;">${escapeHTML(r.memberName||'Member')}</h4><p style="font-size:0.65rem;color:var(--accent-gold);margin:0;">${escapeHTML(r.membershipId||r.email||'')}</p></div></td><td style="font-size:0.75rem;">${escapeHTML(r.type||'Other')}</td><td style="max-width:240px;white-space:normal;"><strong style="font-size:0.8rem;">${escapeHTML(r.subject||'')}</strong><p style="font-size:0.7rem;color:var(--text-sub);white-space:normal;margin-top:3px;">${escapeHTML((r.message||'').substring(0,90))}${(r.message||'').length>90?'...':''}</p></td><td style="font-size:0.75rem;">${escapeHTML(r.phone||'—')}</td><td>${badge}</td><td style="white-space:nowrap;">${actions}</td></tr>`; }); const openEl=document.getElementById('openCareCount'); if(openEl) openEl.innerText=statusFilter==='all'?openCount:Array.from(document.querySelectorAll('#listCareRequests tr')).length; if(tbody&&total===0) tbody.innerHTML='<td colspan="7">No care requests submitted yet<\/td>'; else if(tbody&&html==='') tbody.innerHTML='<td colspan="7">No requests match this filter<\/td>'; else if(tbody) tbody.innerHTML=html; } catch(e){ console.error(e); toast("Error loading care requests","error"); } };
+
+        window.setCareStatus = async function(id, status){ showLoading(); try{ await updateDoc(doc(db,"memberCareRequests",id),{ status:status, updatedAt:serverTimestamp(), statusBy:adminUser?.email }); await logAdminActivity('care_request_'+status,{ requestId:id }); toast(status==='resolved'?"Request marked resolved ✅":status==='in-progress'?"Request in progress":"Request reopened"); await loadCareRequests(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
+
+        window.noteCareRequest = async function(id){ const r=careRequestsCache[id]; const note=prompt("Response note to the member (visible in their portal):", r?.adminNotes||''); if(note===null) return; showLoading(); try{ await updateDoc(doc(db,"memberCareRequests",id),{ adminNotes:note.trim(), updatedAt:serverTimestamp() }); await logAdminActivity('care_request_note',{ requestId:id }); toast("Response saved — member can see it in their portal"); await loadCareRequests(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
         
         window.loadContent = async function(){ const col=document.getElementById('contentFilter').value, tbody=document.getElementById('listContent'); if(tbody) tbody.innerHTML='<td colspan="4"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try{ const snap=await getDocs(query(collection(db,col),orderBy("timestamp","desc"),limit(30))); if(snap.empty){ if(tbody) tbody.innerHTML=`<td colspan="4">No ${col}<\/td>`; return; } let html=''; snap.forEach(d=>{ const data=d.data(); const text=data.text||data.content||''; html+=`<tr><td>${data.timestamp?moment(data.timestamp.toDate()).format('MMM D, YYYY'):'N/A'}</td><td><strong>${escapeHTML(data.name||data.author||'Anonymous')}</strong></td><td title="${escapeHTML(text)}">${escapeHTML(text).substring(0,50)}...</td><td><button class="btn btn-sm btn-danger" onclick="deleteRecord('${col}','${d.id}')">Delete</button></td></tr>`; }); if(tbody) tbody.innerHTML=html; } catch(e){ console.error(e); } };
         
@@ -1029,7 +1097,7 @@
         window.viewDoc = function(url,type){ const img=document.getElementById('docImagePreview'), pdf=document.getElementById('docPdfBtn'); if(url.toLowerCase().includes('.pdf')){ if(img) img.style.display='none'; if(pdf){ pdf.style.display='inline-flex'; pdf.href=url; } } else { if(img){ img.style.display='block'; img.src=url; } if(pdf) pdf.style.display='none'; } openModal('modalViewDoc'); };
         window.exportFinancialReports = function() { toast("Export feature - CSV export ready", "info"); };
         window.uploadMedia = function(){ window.uploadGalleryImage(); };
-        window.deleteRecord = async function(col,id){ if(!confirm("Delete permanently?")) return; showLoading(); try{ await deleteDoc(doc(db,col,id)); toast("Deleted"); if(col==='events') await loadEvents(); if(col==='gallery') await loadGallery(); if(col==='prayers'||col==='testimonies') await loadContent(); if(col==='contactMessages') await loadContactMessages(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
+        window.deleteRecord = async function(col,id){ if(!confirm("Delete permanently?")) return; showLoading(); try{ await deleteDoc(doc(db,col,id)); toast("Deleted"); if(col==='events') await loadEvents(); if(col==='gallery') await loadGallery(); if(col==='prayers'||col==='testimonies') await loadContent(); if(col==='contactMessages') await loadContactMessages(); if(col==='announcements') await loadAnnouncements(); if(col==='memberCareRequests') await loadCareRequests(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
         
         function setupAdminRealtimeListeners() {
             const membershipsQuery = query(collection(db, "memberships"), where("status", "==", "pending"));
@@ -1052,6 +1120,8 @@
             try {
                 if(viewId === 'dashboard') await loadDashboardStats();
                 else if(viewId === 'members') { await loadDashboardStats(); filterMembers(); }
+                else if(viewId === 'announcements') await loadAnnouncements();
+                else if(viewId === 'care') await loadCareRequests();
                 else if(viewId === 'gallery') await loadGallery();
                 else if(viewId === 'finance') await loadFinances();
                 else if(viewId === 'support') await loadSupport();

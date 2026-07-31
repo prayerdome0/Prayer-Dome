@@ -488,6 +488,48 @@
             .step-text { font-size: 0.7rem; }
             .tab-btn { padding: 10px; font-size: 0.75rem; }
         }
+
+        /* ===== Notices (Announcements) ===== */
+        .notice-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 18px 20px; margin-bottom: 14px; box-shadow: var(--shadow); transition: transform 0.25s, box-shadow 0.25s; position: relative; overflow: hidden; }
+        .notice-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, var(--accent-green), var(--accent-green-light)); }
+        .notice-card.cat-urgent::before { background: linear-gradient(180deg, var(--accent-red), #f87171); }
+        .notice-card.cat-event::before { background: linear-gradient(180deg, var(--accent-gold), #fbbf24); }
+        .notice-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+        .notice-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+        .notice-cat { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 3px 10px; border-radius: 20px; background: rgba(34,197,94,0.12); color: var(--accent-green); }
+        .notice-card.cat-urgent .notice-cat { background: rgba(239,68,68,0.12); color: var(--accent-red); }
+        .notice-card.cat-event .notice-cat { background: rgba(212,175,55,0.15); color: var(--accent-gold); }
+        .pinned-tag { font-size: 0.65rem; font-weight: 800; color: var(--accent-gold); display: inline-flex; align-items: center; gap: 4px; }
+        .notice-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 800; color: var(--text-main); }
+        .notice-body { font-size: 0.85rem; color: var(--text-sub); line-height: 1.6; white-space: pre-line; }
+        .notice-date { font-size: 0.65rem; color: var(--text-sub); margin-top: 10px; display: flex; align-items: center; gap: 5px; opacity: 0.85; }
+
+        /* ===== Care Requests ===== */
+        .care-form-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 24px; padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow); }
+        .care-type-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px; }
+        .care-type { border: 2px solid var(--border-color); border-radius: 16px; padding: 12px 8px; text-align: center; cursor: pointer; font-size: 0.75rem; font-weight: 700; color: var(--text-sub); transition: 0.25s; background: var(--bg-primary); }
+        .care-type i { display: block; font-size: 1.2rem; margin-bottom: 6px; color: var(--accent-gold); }
+        .care-type:hover { border-color: var(--accent-green-light); transform: translateY(-2px); }
+        .care-type.selected { border-color: var(--accent-green); background: rgba(34,197,94,0.08); color: var(--accent-green); box-shadow: 0 5px 15px rgba(34,197,94,0.15); }
+        .req-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 18px; padding: 16px 18px; margin-bottom: 12px; box-shadow: var(--shadow); }
+        .req-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+        .req-type { font-weight: 800; font-size: 0.85rem; color: var(--accent-green); display: flex; align-items: center; gap: 6px; }
+        .req-subject { font-weight: 700; font-size: 0.85rem; color: var(--text-main); }
+        .req-message { font-size: 0.8rem; color: var(--text-sub); line-height: 1.55; margin-top: 4px; white-space: pre-line; }
+        .req-meta { font-size: 0.65rem; color: var(--text-sub); margin-top: 8px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .care-status { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; padding: 4px 12px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
+        .care-status-pending { background: rgba(212,175,55,0.15); color: #b8960f; }
+        .care-status-in-progress { background: rgba(59,130,246,0.12); color: var(--accent-blue); }
+        .care-status-resolved { background: rgba(34,197,94,0.12); color: var(--accent-green); }
+        .req-admin-note { margin-top: 10px; background: rgba(34,197,94,0.06); border-left: 3px solid var(--accent-green); border-radius: 10px; padding: 10px 12px; font-size: 0.75rem; color: var(--text-main); }
+
+        /* ===== Recognition Badge Spotlight ===== */
+        .badge-spotlight { margin-top: 22px; background: linear-gradient(135deg, #1a2e1f, #0f172a); color: white; border-radius: 24px; padding: 22px; text-align: center; border: 2px solid var(--accent-gold); box-shadow: 0 15px 35px -10px rgba(212,175,55,0.35); position: relative; overflow: hidden; }
+        .badge-spotlight::after { content: ''; position: absolute; top: 0; left: -80%; width: 50%; height: 100%; background: linear-gradient(105deg, transparent, rgba(212,175,55,0.25), transparent); transform: skewX(-20deg); animation: badgeSheen 4s ease infinite; }
+        @keyframes badgeSheen { 0%, 60% { left: -80%; } 100% { left: 140%; } }
+        .badge-icon { font-size: 2.4rem; display: block; margin-bottom: 8px; filter: drop-shadow(0 4px 8px rgba(212,175,55,0.5)); }
+        .badge-label { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 800; color: var(--accent-gold); letter-spacing: 0.5px; }
+        .badge-sub { font-size: 0.68rem; opacity: 0.75; margin-top: 4px; letter-spacing: 1.5px; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -508,6 +550,8 @@
     <div class="tab-container">
         <button class="tab-btn active" onclick="switchMainTab('membership')"><i class="fas fa-id-card"></i> Membership</button>
         <button class="tab-btn" onclick="switchMainTab('benefits')"><i class="fas fa-gift"></i> Benefits</button>
+        <button class="tab-btn" onclick="switchMainTab('notices')"><i class="fas fa-bullhorn"></i> Notices</button>
+        <button class="tab-btn" onclick="switchMainTab('care')"><i class="fas fa-hand-holding-heart"></i> Care</button>
         <button class="tab-btn" onclick="switchMainTab('card')"><i class="fas fa-credit-card"></i> My ID Card</button>
     </div>
 
@@ -741,6 +785,59 @@
         <div class="benefit-card"><div class="benefit-icon"><i class="fas fa-certificate"></i></div><div><b>Leadership Training</b><p>Access to accredited spiritual growth and leadership courses.</p></div></div>
     </div>
 
+    <!-- NOTICES SECTION (Admin-managed announcements) -->
+    <div id="announcementsSection" style="display: none;">
+        <h2 class="form-title" style="text-align: center;"><i class="fas fa-bullhorn"></i> Church Notices</h2>
+        <p class="form-subtitle" style="text-align: center; margin-bottom: 25px;">Official announcements from the Prayer Dome administration</p>
+        <div id="announcementsList">
+            <div class="card" style="text-align: center; padding: 40px;">
+                <div class="spinner" style="margin: 0 auto 15px;"></div>
+                <p style="color: var(--text-sub);">Loading notices...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CARE SECTION (Pastoral care & welfare requests, managed by admin) -->
+    <div id="careSection" style="display: none;">
+        <h2 class="form-title" style="text-align: center;"><i class="fas fa-hand-holding-heart"></i> Member Care & Welfare</h2>
+        <p class="form-subtitle" style="text-align: center; margin-bottom: 25px;">Request pastoral care, counseling or welfare support — our team responds from the admin desk</p>
+
+        <div class="care-form-card">
+            <h3 style="margin-bottom: 15px; font-family: 'Playfair Display', serif;"><i class="fas fa-plus-circle" style="color: var(--accent-green);"></i> New Care Request</h3>
+            <div class="care-type-grid" id="careTypeGrid">
+                <div class="care-type selected" data-type="Pastoral Counseling" onclick="selectCareType(this)"><i class="fas fa-praying-hands"></i> Pastoral Counseling</div>
+                <div class="care-type" data-type="Welfare Support" onclick="selectCareType(this)"><i class="fas fa-hand-holding-heart"></i> Welfare Support</div>
+                <div class="care-type" data-type="Home / Hospital Visit" onclick="selectCareType(this)"><i class="fas fa-hospital-user"></i> Home / Hospital Visit</div>
+                <div class="care-type" data-type="Prayer & Follow-up" onclick="selectCareType(this)"><i class="fas fa-pray"></i> Prayer & Follow-up</div>
+                <div class="care-type" data-type="Other" onclick="selectCareType(this)"><i class="fas fa-comment-dots"></i> Other</div>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-heading"></i> Subject *</label>
+                <input type="text" id="careSubject" placeholder="e.g., Need counseling for my family" maxlength="100">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-align-left"></i> Describe your request *</label>
+                <textarea id="careMessage" rows="4" placeholder="Share as much detail as you are comfortable with. This is only visible to church administration." maxlength="1000"></textarea>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-phone-alt"></i> Callback Phone (optional)</label>
+                <input type="tel" id="carePhone" placeholder="Number our team can call you back on">
+            </div>
+            <p style="font-size: 0.7rem; color: var(--text-sub); margin-bottom: 15px;"><i class="fas fa-lock"></i> Confidential — visible only to Prayer Dome administrators.</p>
+            <button type="button" class="btn btn-primary" id="careSubmitBtn" onclick="submitCareRequest()">
+                <i class="fas fa-paper-plane"></i> SUBMIT REQUEST
+            </button>
+        </div>
+
+        <h3 style="margin: 10px 0 15px; font-family: 'Playfair Display', serif;"><i class="fas fa-history" style="color: var(--accent-green);"></i> My Care Requests</h3>
+        <div id="myCareRequestsList">
+            <div class="card" style="text-align: center; padding: 30px; color: var(--text-sub);">
+                <i class="fas fa-inbox" style="font-size: 2rem; opacity: 0.4; margin-bottom: 10px;"></i>
+                <p>You have not submitted any care requests yet.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- CARD SECTION -->
     <div id="cardSection" style="display: none;">
         <div id="captureArea">
@@ -779,12 +876,17 @@
         <button class="btn btn-primary" style="margin-top: 25px;" onclick="downloadID()">
             <i class="fas fa-download"></i> SAVE ID TO GALLERY
         </button>
+        <div class="badge-spotlight" id="badgeSpotlight" style="display: none;">
+            <span class="badge-icon" id="badgeIcon">🏅</span>
+            <div class="badge-label" id="badgeLabel">STAR MEMBER</div>
+            <div class="badge-sub">Recognition awarded by Prayer Dome Administration</div>
+        </div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp, updateDoc, addDoc, onSnapshot, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = { 
@@ -808,16 +910,150 @@
     let isExistingMember = false;
     let isRegisteringForSelf = true;
 
+    // Recognition badges that admins can award to members (shown on the portal)
+    const MEMBER_BADGES = {
+        star: { icon: '⭐', label: 'Star Member' },
+        prayerwarrior: { icon: '🙏', label: 'Prayer Warrior' },
+        compassion: { icon: '❤️', label: 'Compassion Award' },
+        worship: { icon: '🎵', label: 'Worship Excellence' },
+        leadership: { icon: '👑', label: 'Leadership Excellence' },
+        faithful: { icon: '🕊️', label: 'Faithful Servant' },
+        volunteer: { icon: '🤝', label: 'Volunteer of the Month' }
+    };
+
+    function escapeHtmlPortal(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
         if (user) {
             await checkUserMembership();
+            initPortalExtras();
         } else {
             // User not logged in, they need to login first
             window.location.href = 'account.html';
         }
         initSigPad();
     });
+
+    // Live admin-managed content: notices + member care requests
+    function initPortalExtras() {
+        // --- Notices (published from the admin console) ---
+        const annList = document.getElementById('announcementsList');
+        try {
+            onSnapshot(query(collection(db, "announcements"), orderBy("createdAt", "desc"), limit(50)), (snap) => {
+                const items = [];
+                snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+                items.sort((a, b) => (b.pinned === true) - (a.pinned === true)); // pinned first, keep date order within groups
+                if (!annList) return;
+                if (items.length === 0) {
+                    annList.innerHTML = `<div class="card" style="text-align: center; padding: 40px; color: var(--text-sub);">
+                        <i class="fas fa-bullhorn" style="font-size: 2rem; opacity: 0.4; margin-bottom: 10px;"></i>
+                        <p>No notices posted yet. Check back soon!</p></div>`;
+                    return;
+                }
+                annList.innerHTML = items.map(a => {
+                    const cat = a.category === 'urgent' ? 'urgent' : a.category === 'event' ? 'event' : 'general';
+                    const catLabel = cat === 'urgent' ? '⚠️ Urgent' : cat === 'event' ? '📅 Event' : '📢 General';
+                    const date = a.createdAt ? moment(a.createdAt.toDate()).format('MMMM D, YYYY • h:mm A') : '';
+                    return `<div class="notice-card cat-${cat}">
+                        <div class="notice-head">
+                            <span class="notice-cat">${catLabel}</span>
+                            ${a.pinned ? '<span class="pinned-tag"><i class="fas fa-thumbtack"></i> PINNED</span>' : ''}
+                        </div>
+                        <div class="notice-title">${escapeHtmlPortal(a.title || '')}</div>
+                        <div class="notice-body">${escapeHtmlPortal(a.body || '')}</div>
+                        <div class="notice-date"><i class="far fa-clock"></i> ${date}${a.createdBy ? ` &nbsp;•&nbsp; <i class="fas fa-user-shield"></i> ${escapeHtmlPortal(String(a.createdBy).split('@')[0])}` : ''}</div>
+                    </div>`;
+                }).join('');
+            }, (err) => {
+                console.error("Notices listener error:", err);
+                if (annList) annList.innerHTML = '<div class="card" style="text-align:center;padding:30px;color:var(--text-sub);">Could not load notices right now.</div>';
+            });
+        } catch(e) { console.error(e); }
+
+        // --- My care requests (live status updates from admin) ---
+        const careList = document.getElementById('myCareRequestsList');
+        try {
+            onSnapshot(query(collection(db, "memberCareRequests"), where("uid", "==", currentUser.uid)), (snap) => {
+                const items = [];
+                snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+                items.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+                if (!careList) return;
+                if (items.length === 0) {
+                    careList.innerHTML = `<div class="card" style="text-align:center;padding:30px;color:var(--text-sub);">
+                        <i class="fas fa-inbox" style="font-size:2rem;opacity:0.4;margin-bottom:10px;"></i>
+                        <p>You have not submitted any care requests yet.</p></div>`;
+                    return;
+                }
+                careList.innerHTML = items.map(r => {
+                    const st = r.status === 'resolved' ? 'resolved' : r.status === 'in-progress' ? 'in-progress' : 'pending';
+                    const stLabel = st === 'resolved' ? '<i class="fas fa-check-circle"></i> Resolved' : st === 'in-progress' ? '<i class="fas fa-spinner"></i> In Progress' : '<i class="fas fa-clock"></i> Pending';
+                    const date = r.createdAt ? moment(r.createdAt.toDate()).format('MMM D, YYYY h:mm A') : '';
+                    return `<div class="req-card">
+                        <div class="req-head">
+                            <span class="req-type"><i class="fas fa-hand-holding-heart"></i> ${escapeHtmlPortal(r.type || 'Request')}</span>
+                            <span class="care-status care-status-${st}">${stLabel}</span>
+                        </div>
+                        <div class="req-subject">${escapeHtmlPortal(r.subject || '')}</div>
+                        <div class="req-message">${escapeHtmlPortal(r.message || '')}</div>
+                        <div class="req-meta">
+                            <span><i class="far fa-clock"></i> ${date}</span>
+                            ${r.phone ? `<span><i class="fas fa-phone-alt"></i> ${escapeHtmlPortal(r.phone)}</span>` : ''}
+                        </div>
+                        ${r.adminNotes ? `<div class="req-admin-note"><i class="fas fa-reply"></i> <strong>Response from admin:</strong> ${escapeHtmlPortal(r.adminNotes)}</div>` : ''}
+                    </div>`;
+                }).join('');
+            }, (err) => console.error("Care requests listener error:", err));
+        } catch(e) { console.error(e); }
+    }
+
+    window.selectCareType = (el) => {
+        document.querySelectorAll('.care-type').forEach(t => t.classList.remove('selected'));
+        el.classList.add('selected');
+    };
+
+    window.submitCareRequest = async () => {
+        if (!currentUser) { showToast("Please login first", "error"); window.location.href = 'account.html'; return; }
+        const type = document.querySelector('.care-type.selected')?.dataset.type || 'Other';
+        const subject = document.getElementById('careSubject').value.trim();
+        const message = document.getElementById('careMessage').value.trim();
+        const phone = document.getElementById('carePhone').value.trim();
+        if (!subject || !message) { showToast("Please fill in the subject and describe your request.", "error"); return; }
+        const btn = document.getElementById('careSubmitBtn');
+        if (btn) btn.disabled = true;
+        showLoading("Submitting your request...");
+        try {
+            await addDoc(collection(db, "memberCareRequests"), {
+                uid: currentUser.uid,
+                memberName: currentMemberData?.fullName || currentUser.displayName || currentUser.email?.split('@')[0] || 'Member',
+                membershipId: currentMemberData?.membershipId || '',
+                email: currentUser.email || '',
+                phone: phone || currentMemberData?.phone || '',
+                type: type,
+                subject: subject,
+                message: message,
+                status: 'pending',
+                adminNotes: '',
+                createdAt: serverTimestamp()
+            });
+            document.getElementById('careSubject').value = '';
+            document.getElementById('careMessage').value = '';
+            document.getElementById('carePhone').value = '';
+            showToast("✅ Request submitted! Our team will follow up with you soon.", "success");
+            confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 } });
+        } catch (e) {
+            console.error("Care request error:", e);
+            showToast("Error submitting request: " + e.message, "error");
+        } finally {
+            if (btn) btn.disabled = false;
+            hideLoading();
+        }
+    };
 
     async function checkUserMembership() {
         if (!currentUser) return;
@@ -1271,39 +1507,58 @@
         }
         const idDate = document.getElementById('idDate');
         if (idDate) idDate.innerText = moment(date).format('DD/MM/YYYY');
+
+        // Recognition badge (awarded by admin)
+        const spotlight = document.getElementById('badgeSpotlight');
+        if (spotlight) {
+            const badge = data.badge ? MEMBER_BADGES[data.badge] : null;
+            if (badge && data.status === 'approved') {
+                document.getElementById('badgeIcon').innerText = badge.icon;
+                document.getElementById('badgeLabel').innerText = badge.label.toUpperCase();
+                spotlight.style.display = 'block';
+            } else {
+                spotlight.style.display = 'none';
+            }
+        }
     }
 
+    const portalTabs = {
+        benefits: 'benefitsSection',
+        notices: 'announcementsSection',
+        care: 'careSection',
+        card: 'cardSection'
+    };
+    const wizardIds = ['step1Container', 'step2ExistingContainer', 'step2NewContainer', 'step3Container'];
+    let lastWizardId = 'step1Container';
+
     window.switchMainTab = (tab) => {
-        const membershipDiv = document.getElementById('step1Container');
-        const benefitsDiv = document.getElementById('benefitsSection');
-        const cardDiv = document.getElementById('cardSection');
-        
+        // Remember current wizard position, then hide wizard + all tab sections
+        wizardIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (window.getComputedStyle(el).display !== 'none') lastWizardId = id;
+            el.style.display = 'none';
+        });
+        Object.values(portalTabs).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'none';
+        });
+
         if (tab === 'membership') {
-            if (membershipDiv) membershipDiv.style.display = 'block';
-            if (benefitsDiv) benefitsDiv.style.display = 'none';
-            if (cardDiv) cardDiv.style.display = 'none';
-        } else if (tab === 'benefits') {
-            if (membershipDiv) membershipDiv.style.display = 'none';
-            if (benefitsDiv) benefitsDiv.style.display = 'block';
-            if (cardDiv) cardDiv.style.display = 'none';
-        } else if (tab === 'card') {
-            if (membershipDiv) membershipDiv.style.display = 'none';
-            if (benefitsDiv) benefitsDiv.style.display = 'none';
-            if (cardDiv) cardDiv.style.display = 'block';
-            if (currentMemberData) renderCard(currentMemberData);
+            const el = document.getElementById(lastWizardId);
+            if (el) el.style.display = 'block';
+        } else {
+            const target = document.getElementById(portalTabs[tab]);
+            if (target) target.style.display = 'block';
         }
-        
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        if (tab === 'membership') {
-            const firstBtn = document.querySelector('.tab-btn:first-child');
-            if (firstBtn) firstBtn.classList.add('active');
-        } else if (tab === 'benefits') {
-            const btns = document.querySelectorAll('.tab-btn');
-            if (btns[1]) btns[1].classList.add('active');
-        } else if (tab === 'card') {
-            const btns = document.querySelectorAll('.tab-btn');
-            if (btns[2]) btns[2].classList.add('active');
-        }
+        if (tab === 'card' && currentMemberData) renderCard(currentMemberData);
+
+        const tabOrder = ['membership', 'benefits', 'notices', 'care', 'card'];
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        const idx = tabOrder.indexOf(tab);
+        if (buttons[idx]) buttons[idx].classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     window.downloadID = () => {
