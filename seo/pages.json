@@ -1,0 +1,205 @@
+{
+  "_comment": "Single source of truth for Prayer Dome SEO metadata. Edit here, then run: python3 seo/apply-seo.py",
+  "_site": {
+    "baseUrl": "https://prayerdome.net",
+    "siteName": "Prayer Dome",
+    "twitter": "@prayerdome",
+    "defaultImage": "https://prayerdome.net/assets/og-image.png",
+    "logo": "https://i.ibb.co/TB5Fx4tb/logo-0.png"
+  },
+  "pages": {
+    "index.html": {
+      "path": "/",
+      "title": "Prayer Dome | Daily Prayer, Bible Study & Christian Community",
+      "description": "Prayer Dome helps believers pray, study the Bible, join daily devotionals, watch live services, attend church events and grow spiritually together.",
+      "keywords": "prayer dome, online church, daily prayer, bible study, christian community, devotional, prayer wall, live church service",
+      "schema": "church",
+      "priority": "1.0",
+      "changefreq": "daily"
+    },
+    "bible.html": {
+      "path": "/bible",
+      "title": "Holy Bible Reader Online | Notes, Bookmarks & Audio | Prayer Dome",
+      "description": "Read the Holy Bible free online. Search any verse, highlight and save personal notes, bookmark favourites, follow reading plans and listen to the audio Bible.",
+      "keywords": "read bible online, bible search, audio bible, bible reading plan, bible notes, bookmark verses, daily verse",
+      "schema": "webapp",
+      "priority": "0.9",
+      "changefreq": "weekly"
+    },
+    "prayer.html": {
+      "path": "/prayer",
+      "title": "Global Prayer Wall | Share & Answer Prayer Requests | Prayer Dome",
+      "description": "Post a prayer request and let believers around the world pray with you. Public, private or anonymous requests, live prayer counters and answered-prayer testimonies.",
+      "keywords": "prayer wall, prayer request, online prayer, pray for me, answered prayer, intercession",
+      "schema": "webpage",
+      "priority": "0.9",
+      "changefreq": "daily"
+    },
+    "ai-prayer.html": {
+      "path": "/ai-prayer",
+      "title": "AI Prayer Assistant | Scriptures & Prayer Points For What You Face",
+      "description": "Tell the Prayer Dome assistant what you are facing — fear, grief, provision, healing, anxiety — and receive matching scriptures, guided prayer points and encouragement instantly.",
+      "keywords": "ai prayer assistant, prayer points, scriptures for fear, bible verses for anxiety, what does the bible say, christian ai, guided prayer",
+      "schema": "webapp",
+      "priority": "0.9",
+      "changefreq": "weekly"
+    },
+    "live.html": {
+      "path": "/live",
+      "title": "Live Service | Watch Church Online Live | Prayer Dome",
+      "description": "Join Prayer Dome live services, prayer sessions, Bible studies and special church events in real time. Watch, listen, engage and worship together wherever you are.",
+      "keywords": "live church service, watch church online, live prayer, online bible study, church livestream, sunday service online",
+      "schema": "broadcast",
+      "priority": "0.9",
+      "changefreq": "daily"
+    },
+    "video.html": {
+      "path": "/video",
+      "title": "Live Stream & Sermon Archive | Prayer Dome",
+      "description": "Watch Prayer Dome live broadcasts and catch up on the sermon archive. Live chat, prayer requests during the stream and past services on demand.",
+      "keywords": "church live stream, sermon archive, watch sermons online, live chat church",
+      "schema": "webpage",
+      "priority": "0.7",
+      "changefreq": "daily"
+    },
+    "chat.html": {
+      "path": "/chat",
+      "title": "Christian Community Chat & Prayer Support Rooms | Prayer Dome",
+      "description": "Chat with believers, join church group chats and prayer support rooms, message a pastor, share voice notes, photos and Bible verses in the Prayer Dome community.",
+      "keywords": "christian chat, prayer support room, church group chat, talk to a pastor, christian community online",
+      "schema": "webpage",
+      "priority": "0.8",
+      "changefreq": "daily"
+    },
+    "give.html": {
+      "path": "/give",
+      "title": "Give Online | Tithes, Offerings & Mobile Money | Prayer Dome",
+      "description": "Support the ministry with a secure online gift. Give tithes, offerings and seed by mobile money, card or bank transfer, one-off or recurring.",
+      "keywords": "give online, church giving, tithes and offerings, mobile money donation, donate to church, online offering",
+      "schema": "donate",
+      "priority": "0.8",
+      "changefreq": "monthly"
+    },
+    "events.html": {
+      "path": "/events",
+      "title": "Church Events Calendar | Services & Gatherings | Prayer Dome",
+      "description": "See what is coming up at Prayer Dome — Sunday services, prayer nights, Bible studies, conferences and special gatherings. Register and add events to your calendar.",
+      "keywords": "church events, church calendar, prayer meeting, sunday service times, christian conference, church gathering",
+      "schema": "webpage",
+      "priority": "0.8",
+      "changefreq": "weekly"
+    },
+    "event.html": {
+      "path": "/event",
+      "title": "Event Details & Registration | Prayer Dome",
+      "description": "Full details for Prayer Dome services, prayer nights, conferences and special gatherings, with online registration.",
+      "keywords": "church event registration, event details, prayer dome event",
+      "schema": "webpage",
+      "priority": "0.6",
+      "changefreq": "weekly"
+    },
+    "testimony.html": {
+      "path": "/testimony",
+      "title": "Testimonies | Healing, Breakthrough, Salvation & Provision | Prayer Dome",
+      "description": "Read and share real testimonies of healing, breakthrough, salvation and provision. Give God the glory and encourage someone's faith today.",
+      "keywords": "christian testimonies, healing testimony, breakthrough testimony, salvation story, answered prayer testimony",
+      "schema": "webpage",
+      "priority": "0.8",
+      "changefreq": "weekly"
+    },
+    "quiz.html": {
+      "path": "/quiz",
+      "title": "Bible Quiz | Test Your Bible Knowledge Free | Prayer Dome",
+      "description": "Play the Prayer Dome Bible quiz. Hundreds of questions across the Old and New Testament, with scores, streaks and leaderboards.",
+      "keywords": "bible quiz, bible trivia, bible questions and answers, christian quiz game, test bible knowledge",
+      "schema": "webpage",
+      "priority": "0.7",
+      "changefreq": "weekly"
+    },
+    "gallery.html": {
+      "path": "/gallery",
+      "title": "Photo Gallery | Church Moments & Memories | Prayer Dome",
+      "description": "Browse photos from Prayer Dome services, conferences, outreaches and celebrations. Relive the moments God has given us together.",
+      "keywords": "church photo gallery, church pictures, worship photos, church outreach photos",
+      "schema": "webpage",
+      "priority": "0.6",
+      "changefreq": "weekly"
+    },
+    "membership.html": {
+      "path": "/membership",
+      "title": "Church Membership | Join Prayer Dome",
+      "description": "Become a Prayer Dome member. Get your digital membership card, join a cell group and a ministry, and grow with the family.",
+      "keywords": "church membership, join church, become a member, digital membership card, cell group",
+      "schema": "webpage",
+      "priority": "0.7",
+      "changefreq": "monthly"
+    },
+    "about.html": {
+      "path": "/about",
+      "title": "About Prayer Dome | Our Vision, Mission & Beliefs",
+      "description": "Prayer Dome is a house of prayer for all nations. Learn about our vision, mission, statement of faith and the story of how the ministry began.",
+      "keywords": "about prayer dome, church vision and mission, statement of faith, house of prayer, church history",
+      "schema": "aboutpage",
+      "priority": "0.7",
+      "changefreq": "monthly"
+    },
+    "team.html": {
+      "path": "/team",
+      "title": "Our Team | Pastors, Worship & Ministry Leaders | Prayer Dome",
+      "description": "Meet the pastors, worship leaders and ministry teams serving the Prayer Dome family.",
+      "keywords": "church pastors, church leadership team, worship leaders, ministry leaders",
+      "schema": "webpage",
+      "priority": "0.6",
+      "changefreq": "monthly"
+    },
+    "contact.html": {
+      "path": "/contact",
+      "title": "Contact Prayer Dome | Get in Touch, Visit or Request Prayer",
+      "description": "Contact the Prayer Dome team. Send a message, request prayer, find our service times or plan your first visit.",
+      "keywords": "contact church, church address, service times, request prayer, plan a visit",
+      "schema": "contactpage",
+      "priority": "0.7",
+      "changefreq": "monthly"
+    },
+    "support.html": {
+      "path": "/support",
+      "title": "Support & Member Wallet | Prayer Dome",
+      "description": "Manage your Prayer Dome wallet, giving history and support requests, and get help from the ministry team.",
+      "keywords": "church support, member wallet, giving history, help centre",
+      "schema": "webpage",
+      "priority": "0.5",
+      "changefreq": "monthly"
+    },
+    "account.html": {
+      "path": "/account",
+      "title": "My Account | Sign In or Create Your Prayer Dome Profile",
+      "description": "Sign in to Prayer Dome to save prayer requests, keep your Bible notes and bookmarks, track devotional reading and manage your member profile.",
+      "keywords": "prayer dome login, create account, member profile, sign in church app",
+      "schema": "webpage",
+      "priority": "0.6",
+      "changefreq": "monthly",
+      "noindex": true
+    },
+    "finance.html": {
+      "path": "/finance",
+      "title": "Financial Reports | Prayer Dome",
+      "description": "Prayer Dome financial transparency reports.",
+      "schema": "webpage",
+      "noindex": true
+    },
+    "admin.html": {
+      "path": "/admin",
+      "title": "Admin Control Hub | Prayer Dome",
+      "description": "Prayer Dome administrator dashboard.",
+      "schema": "webpage",
+      "noindex": true
+    },
+    "Chat.html": {
+      "path": "/Chat.html",
+      "title": "Chat | Prayer Dome",
+      "description": "Prayer Dome chat (legacy page).",
+      "schema": "webpage",
+      "noindex": true
+    }
+  }
+}

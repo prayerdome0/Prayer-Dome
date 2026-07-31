@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Firebase
+.firebase/
+firebase-debug.log
+*-debug.log
+.firebaserc
+
+# Vercel
+.vercel/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+serviceAccountKey.json
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
