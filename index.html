@@ -364,6 +364,8 @@
             .founder-img-wrapper { width: 110px; height: 110px; }
         }
     </style>
+    <link rel="stylesheet" href="/assets/pd-brand.css">
+    <script src="/assets/pd-motion.js" defer></script>
 </head>
 <body>
 
@@ -410,7 +412,7 @@
 
 <main>
     <!-- Founder Card with Larger Photo -->
-    <div class="founder-card glass-card">
+    <div class="founder-card glass-card pd-reveal">
         <div class="founder-img-wrapper">
             <img src="https://i.ibb.co/RTbNh1hB/founder-2.jpg" alt="Pastor Seedwell K. Masuku">
         </div>
@@ -466,37 +468,39 @@
     </div>
 
     <!-- Portal Grid -->
-    <div class="portal-grid">
-        <a href="/bible.html" class="portal-item"><div class="portal-icon"><i class="fas fa-bible"></i></div><span>Bible</span></a>
-        <a href="/ai-prayer.html" class="portal-item"><div class="portal-icon"><i class="fas fa-wand-magic-sparkles"></i></div><span>Assistant</span></a>
-        <a href="/gallery.html" class="portal-item"><div class="portal-icon"><i class="fas fa-camera"></i></div><span>Gallery</span></a>
-        <a href="/give.html" class="portal-item"><div class="portal-icon"><i class="fas fa-heart"></i></div><span>Give</span></a>
-        <a href="/live.html" class="portal-item"><div class="portal-icon"><i class="fas fa-tower-broadcast"></i></div><span>Live</span></a>
-        <a href="/quiz.html" class="portal-item"><div class="portal-icon"><i class="fas fa-brain"></i></div><span>Quiz</span></a>
-        <a href="/membership.html" class="portal-item"><div class="portal-icon"><i class="fas fa-id-card"></i></div><span>Membership</span></a>
-        <a href="/support.html" class="portal-item"><div class="portal-icon"><i class="fas fa-hand-holding-heart"></i></div><span>Support</span></a>
-        <a href="/testimony.html" class="portal-item"><div class="portal-icon"><i class="fas fa-star"></i></div><span>Testimony</span></a>
-        <a href="/events.html" class="portal-item"><div class="portal-icon"><i class="fas fa-calendar-alt"></i></div><span>Events</span></a>
-        <a href="/about.html" class="portal-item"><div class="portal-icon"><i class="fas fa-church"></i></div><span>About</span></a>
-        <a href="/contact.html" class="portal-item"><div class="portal-icon"><i class="fas fa-envelope"></i></div><span>Contact</span></a>
-        <a href="/team.html" class="portal-item"><div class="portal-icon"><i class="fas fa-users"></i></div><span>Team</span></a>
-        <a href="/chat.html" class="portal-item"><div class="portal-icon"><i class="fas fa-comments"></i></div><span>Chat</span></a>
+    <div class="portal-grid" data-pd-stagger="55">
+        <a href="/bible.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-bible"></i></div><span>Bible</span></a>
+        <a href="/ai-prayer.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-wand-magic-sparkles"></i></div><span>Assistant</span></a>
+        <a href="/sermons.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-microphone-lines"></i></div><span>Sermons</span></a>
+        <a href="/translate.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-language"></i></div><span>Translate</span></a>
+        <a href="/gallery.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-camera"></i></div><span>Gallery</span></a>
+        <a href="/give.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-heart"></i></div><span>Give</span></a>
+        <a href="/live.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-tower-broadcast"></i></div><span>Live</span></a>
+        <a href="/quiz.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-brain"></i></div><span>Quiz</span></a>
+        <a href="/membership.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-id-card"></i></div><span>Membership</span></a>
+        <a href="/support.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-hand-holding-heart"></i></div><span>Support</span></a>
+        <a href="/testimony.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-star"></i></div><span>Testimony</span></a>
+        <a href="/events.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-calendar-alt"></i></div><span>Events</span></a>
+        <a href="/about.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-church"></i></div><span>About</span></a>
+        <a href="/contact.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-envelope"></i></div><span>Contact</span></a>
+        <a href="/team.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-users"></i></div><span>Team</span></a>
+        <a href="/chat.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-comments"></i></div><span>Chat</span></a>
     </div>
 
     <!-- Upcoming Events -->
-    <div class="section-label"><i class="fas fa-calendar-alt"></i> Upcoming Events</div>
+    <div class="section-label pd-reveal"><i class="fas fa-calendar-alt"></i> Upcoming Events</div>
     <div id="upcomingEvents" style="margin-bottom: 30px;">
         <div class="loading-spinner"></div>
     </div>
 
     <!-- Recent Testimonies -->
-    <div class="section-label"><i class="fas fa-star"></i> Recent Testimonies</div>
+    <div class="section-label pd-reveal"><i class="fas fa-star"></i> Recent Testimonies</div>
     <div id="recentTestimonies" style="margin-bottom: 30px;">
         <div class="loading-spinner"></div>
     </div>
 
     <!-- Branch Tracker -->
-    <div class="section-label"><i class="fas fa-map-marked-alt"></i> Church Locations</div>
+    <div class="section-label pd-reveal"><i class="fas fa-map-marked-alt"></i> Church Locations</div>
     <div class="branch-grid">
         <div class="branch-card" id="card-chama">
             <div class="branch-info">
@@ -522,8 +526,8 @@
     </div>
 
     <!-- Reviews Section -->
-    <div class="section-label"><i class="fas fa-comment-dots"></i> Member Reviews</div>
-    <div class="reviews-section">
+    <div class="section-label pd-reveal"><i class="fas fa-comment-dots"></i> Member Reviews</div>
+    <div class="reviews-section pd-reveal">
         <div class="reviews-grid" id="reviewsGrid">
             <div class="loading-spinner"></div>
         </div>
@@ -592,8 +596,8 @@
         <a href="/" class="nav-link active"><i class="fas fa-home"></i><span>Home</span></a>
         <a href="/bible.html" class="nav-link"><i class="fas fa-book-open"></i><span>Bible</span></a>
         <a href="/prayer.html" class="nav-link"><i class="fas fa-hands-praying"></i><span>Pray</span></a>
+        <a href="/sermons.html" class="nav-link"><i class="fas fa-microphone-lines"></i><span>Sermons</span></a>
         <a href="/ai-prayer.html" class="nav-link"><i class="fas fa-wand-magic-sparkles"></i><span>Assistant</span></a>
-        <a href="/chat.html" class="nav-link"><i class="fas fa-comments"></i><span>Chat</span></a>
         <a href="/account.html" class="nav-link"><i class="fas fa-user-circle"></i><span>Account</span></a>
     </nav>
     

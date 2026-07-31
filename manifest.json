@@ -1,18 +1,25 @@
 {
-  "name": "Prayer Dome — Daily Prayer, Bible & Christian Community",
+  "name": "Prayer Dome \u2014 Daily Prayer, Bible & Christian Community",
   "short_name": "Prayer Dome",
   "description": "Pray, study the Bible, join daily devotionals, watch live services and grow with the Prayer Dome community.",
   "id": "/",
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "portrait-primary",
   "background_color": "#15803d",
   "theme_color": "#15803d",
   "lang": "en",
   "dir": "ltr",
-  "categories": ["lifestyle", "education", "social"],
+  "categories": [
+    "lifestyle",
+    "education",
+    "social"
+  ],
   "prefer_related_applications": false,
   "icons": [
     {
@@ -58,6 +65,18 @@
       "short_name": "Live",
       "description": "Watch the live broadcast",
       "url": "/live.html?source=shortcut"
+    },
+    {
+      "name": "Sermons",
+      "short_name": "Sermons",
+      "url": "/sermons",
+      "description": "Listen to narrated Bible stories and sermons"
+    },
+    {
+      "name": "Translate",
+      "short_name": "Translate",
+      "url": "/translate",
+      "description": "Scripture in English, Tumbuka and siSwati"
     }
   ]
 }

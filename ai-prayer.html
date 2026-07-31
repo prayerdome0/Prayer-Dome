@@ -181,9 +181,11 @@
 
         .luxury-font, h1, h2, h3 { font-family: 'Playfair Display', serif; }
 
-        /* Hero */
-        .hero { background: linear-gradient(135deg, var(--accent-green), #064e3b); padding: 45px 20px 55px; color: white; text-align: center; position: relative; overflow: hidden; border-radius: 0 0 42px 42px; }
-        .hero::after { content: ''; position: absolute; inset: 0; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.2; pointer-events: none; }
+        /* Hero — dawn photograph with a gradient veil over it */
+        .hero { position: relative; padding: 62px 20px 72px; color: white; text-align: center; overflow: hidden; border-radius: 0 0 42px 42px; background: var(--pd-grad-horizon, linear-gradient(160deg,#312e81,#0f766e 55%,#f59e0b)); }
+        .hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+        .hero-veil { position: absolute; inset: 0; z-index: 1; background: linear-gradient(165deg, rgba(49,46,129,.78), rgba(15,118,110,.62) 48%, rgba(217,119,6,.55)); }
+        .hero::after { content: ''; position: absolute; inset: 0; z-index: 1; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.18; pointer-events: none; }
         .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); padding: 7px 16px; border-radius: 50px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; position: relative; z-index: 2; }
         .hero h1 { font-size: 2.1rem; font-weight: 900; margin-bottom: 12px; letter-spacing: -0.5px; position: relative; z-index: 2; }
         .hero p { opacity: 0.92; max-width: 560px; margin: 0 auto; position: relative; z-index: 2; font-size: 0.97rem; }
@@ -304,7 +306,47 @@
         @media (prefers-reduced-motion: reduce) {
             * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
         }
+
+        /* ---- Topic artwork ---------------------------------------- */
+        .topic-hero { position: relative; height: 210px; border-radius: 26px; overflow: hidden; margin-bottom: 20px; box-shadow: var(--shadow); }
+        .topic-hero img { width: 100%; height: 100%; object-fit: cover; animation: pd-kenburns 20s ease-in-out infinite alternate; }
+        .topic-hero .veil { position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,14,26,.85), rgba(10,14,26,.15) 65%); }
+        .topic-hero .cap { position: absolute; left: 22px; right: 22px; bottom: 18px; color: #fff; z-index: 2; }
+        .topic-hero .cap h2 { font-size: 1.6rem; font-weight: 900; text-shadow: 0 3px 18px rgba(0,0,0,.5); }
+        .topic-hero .cap small { font-size: .72rem; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; opacity: .9; }
+        .topic-hero.no-img { background: var(--pd-grad-dawn, linear-gradient(135deg,#f59e0b,#7c3aed)); }
+        .topic-hero.no-img .glyph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 4.4rem; color: rgba(255,255,255,.35); }
+
+        /* ---- Chips with artwork thumbnails ------------------------- */
+        .chip { overflow: hidden; }
+        .chip-thumb { width: 22px; height: 22px; border-radius: 7px; object-fit: cover; flex: 0 0 auto; }
+
+        /* ---- Language row on verses -------------------------------- */
+        .verse-langs { display: flex; gap: 6px; margin-top: 9px; flex-wrap: wrap; }
+        .lang-mini {
+            padding: 5px 12px; border-radius: 50px; cursor: pointer; font-family: 'Inter', sans-serif;
+            font-size: .66rem; font-weight: 800; letter-spacing: .4px;
+            border: 1.5px solid var(--border-color); background: transparent; color: var(--text-sub); transition: .3s;
+        }
+        .lang-mini:hover { transform: translateY(-2px); border-color: var(--accent-gold); color: var(--accent-gold-dark); }
+        .lang-mini.on { background: var(--pd-grad-ocean, linear-gradient(135deg,#0d9488,#4f46e5)); color: #fff; border-color: transparent; }
+        .translated {
+            margin-top: 11px; padding: 14px 16px; border-radius: 15px;
+            background: rgba(13,148,136,.07); border: 1px solid rgba(13,148,136,.22);
+            font-family: 'Merriweather', Georgia, serif; font-size: .93rem; line-height: 1.8;
+        }
+        .translated .head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+        .translated .pill { font-family: 'Inter', sans-serif; font-size: .58rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 50px; background: rgba(13,148,136,.14); color: #0f766e; }
+        body.dark-mode .translated .pill { background: rgba(45,212,191,.14); color: #5eead4; }
+        .translated .draft { font-family: 'Inter', sans-serif; font-size: .58rem; font-weight: 900; padding: 3px 10px; border-radius: 50px; background: rgba(245,158,11,.15); color: #b45309; border: 1px solid rgba(245,158,11,.32); }
+        body.dark-mode .translated .draft { color: #fcd34d; }
+        .translated .note { display: block; margin-top: 9px; font-family: 'Inter', sans-serif; font-size: .68rem; color: var(--text-sub); font-style: normal; }
+
+        @keyframes pd-kenburns { 0% { transform: scale(1) translate3d(0,0,0); } 100% { transform: scale(1.12) translate3d(-2%,-2%,0); } }
+
     </style>
+    <link rel="stylesheet" href="/assets/pd-brand.css">
+    <script src="/assets/pd-motion.js" defer></script>
 </head>
 <body>
 
@@ -319,6 +361,8 @@
 </header>
 
 <section class="hero">
+    <img class="hero-img" src="/assets/ai/hero-assistant.jpg" alt="" aria-hidden="true" fetchpriority="high">
+    <div class="hero-veil"></div>
     <div class="hero-badge"><i class="fas fa-wand-magic-sparkles"></i> Prayer Assistant</div>
     <h1>What are you facing today?</h1>
     <p>Tell the assistant what is on your heart and receive matching scriptures, guided prayer points and a prayer you can pray right now.</p>
@@ -357,18 +401,20 @@
 
 <div class="bottom-ui-system">
     <nav class="nav-bar">
-        <a href="/index.html" class="nav-link"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="/index.html" class="nav-link"><i class="fas fa-house"></i><span>Home</span></a>
         <a href="/bible.html" class="nav-link"><i class="fas fa-book-open"></i><span>Bible</span></a>
+        <a href="/sermons.html" class="nav-link"><i class="fas fa-microphone-lines"></i><span>Sermons</span></a>
         <a href="/prayer.html" class="nav-link"><i class="fas fa-hands-praying"></i><span>Pray</span></a>
         <a href="/ai-prayer.html" class="nav-link active"><i class="fas fa-wand-magic-sparkles"></i><span>Assistant</span></a>
-        <a href="/chat.html" class="nav-link"><i class="fas fa-comments"></i><span>Chat</span></a>
-        <a href="/account.html" class="nav-link"><i class="fas fa-user-circle"></i><span>Account</span></a>
+        <a href="/account.html" class="nav-link"><i class="fas fa-user"></i><span>Account</span></a>
     </nav>
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
 
 <script src="/ai-prayer-data.js"></script>
+<script src="/translation-data.js"></script>
+<script src="/assets/pd-motion.js" defer></script>
 <script>
 /* ---------- Theme (shared key with the rest of the site) ---------- */
 (function () {
@@ -386,6 +432,95 @@ function esc(str) {
     return d.innerHTML;
 }
 
+/* ---------- Topic artwork ----------
+   Only some topics have a commissioned illustration. Anything not listed here
+   falls back to a gradient tile with the topic's icon, so adding a topic never
+   leaves a broken image. */
+const PD_TOPIC_ART = {
+    fear:       '/assets/ai/topic-fear.jpg',
+    grief:      '/assets/ai/topic-grief.jpg',
+    healing:    '/assets/ai/topic-healing.jpg',
+    provision:  '/assets/ai/topic-provision.jpg',
+    strength:   '/assets/ai/topic-strength.jpg',
+    family:     '/assets/ai/topic-family.jpg',
+    marriage:   '/assets/ai/topic-family.jpg',
+    depression: '/assets/ai/topic-grief.jpg',
+    protection: '/assets/ai/topic-strength.jpg',
+    work:       '/assets/ai/topic-provision.jpg'
+};
+function topicArt(id) { return PD_TOPIC_ART[id] || null; }
+
+
+/* =====================================================================
+ * Multilingual verses
+ * ---------------------------------------------------------------------
+ * The assistant's own library is KJV-only. translation-data.js carries a
+ * curated pack in Chitumbuka and siSwati. Where a verse the assistant just
+ * showed also exists in that pack, we offer to show it in those languages.
+ *
+ * We match on the reference string. If a verse is not in the pack we simply
+ * do not offer the buttons — better silence than a wrong translation.
+ * ===================================================================== */
+function packEntryFor(verseRef) {
+    if (typeof PD_VERSES === 'undefined') return null;
+    const want = String(verseRef || '').trim().toLowerCase();
+    return PD_VERSES.find(function (v) {
+        const en = ((v.ref && v.ref.en) || '').toLowerCase();
+        // "Isaiah 41:10" should match, and so should a superset like
+        // "Philippians 4:6-7" vs "Philippians 4:6".
+        return en === want || en.indexOf(want) === 0 || want.indexOf(en) === 0;
+    }) || null;
+}
+
+function langRow(verse, i) {
+    const entry = packEntryFor(verse.ref);
+    if (!entry) return '';
+    const langs = (typeof PD_LANGUAGES !== 'undefined' ? PD_LANGUAGES : [])
+        .filter(function (l) { return l.code !== 'en'; });
+    if (!langs.length) return '';
+
+    return '<div class="verse-langs">' +
+        langs.map(function (l) {
+            return '<button class="lang-mini" id="lm-' + i + '-' + l.code + '" ' +
+                   'onclick="showTranslation(' + i + ',\'' + entry.id + '\',\'' + l.code + '\')">' +
+                   l.flag + ' ' + esc(l.endonym) + '</button>';
+        }).join('') +
+    '</div>';
+}
+
+function showTranslation(i, verseId, code) {
+    const host = document.getElementById('tr-' + i);
+    if (!host) return;
+
+    const btn = document.getElementById('lm-' + i + '-' + code);
+    // Tapping the language that is already showing collapses it again.
+    if (btn && btn.classList.contains('on')) {
+        host.innerHTML = '';
+        btn.classList.remove('on');
+        return;
+    }
+    host.parentElement.querySelectorAll('.lang-mini').forEach(function (b) { b.classList.remove('on'); });
+    if (btn) btn.classList.add('on');
+
+    const r = pdRenderVerse(verseId, code);
+    if (!r) { host.innerHTML = ''; return; }
+
+    const l = pdLanguage(r.lang);
+    host.innerHTML =
+        '<div class="translated">' +
+          '<div class="head">' +
+            '<span class="pill">' + esc(l.endonym) + '</span>' +
+            '<strong style="font-family:Inter,sans-serif;font-size:.74rem">' + esc(r.ref) + '</strong>' +
+            (r.reviewed ? '' : '<span class="draft">Draft</span>') +
+          '</div>' +
+          esc(r.text) +
+          (r.reviewed ? '' :
+            '<span class="note"><i class="fas fa-circle-info"></i> Community draft — ' +
+            'not yet checked by a fluent speaker, and not the published ' + esc(l.endonym) + ' Bible. ' +
+            '<a href="/translate.html" style="color:var(--accent-green);font-weight:700">More about our translations</a></span>') +
+        '</div>';
+}
+
 function showToast(msg) {
     const c = document.getElementById('toastContainer');
     const t = document.createElement('div');
@@ -401,8 +536,12 @@ function renderChips() {
     wrap.innerHTML = PD_TOPICS
         .filter(function (t) { return t.id !== 'general'; })
         .map(function (t) {
+            const art = topicArt(t.id);
+            const lead = art
+                ? '<img class="chip-thumb" src="' + art + '" alt="" loading="lazy">'
+                : '<i class="fas ' + t.icon + '" style="color:' + t.colour + '"></i>';
             return '<button class="chip" onclick="showTopic(\'' + t.id + '\')">' +
-                   '<i class="fas ' + t.icon + '" style="color:' + t.colour + '"></i>' + esc(t.title) + '</button>';
+                   lead + esc(t.title) + '</button>';
         }).join('');
 }
 
@@ -462,12 +601,24 @@ function render(topic, opts) {
             '</div>';
     }
 
-    html +=
-        '<div class="topic-head">' +
-          '<div class="topic-icon" style="background:' + topic.colour + '"><i class="fas ' + topic.icon + '"></i></div>' +
-          '<div><h2>' + esc(topic.title) + '</h2><small>Scriptures &amp; prayer points</small></div>' +
-        '</div>' +
-        '<p class="opening">' + esc(topic.opening) + '</p>';
+    /* Artwork for the topic — a real illustration where we have one, a
+       gradient tile with the topic glyph where we do not. */
+    const art = topicArt(topic.id);
+    html += art
+        ? '<figure class="topic-hero">' +
+            '<img src="' + art + '" alt="Illustration for ' + esc(topic.title) + '" loading="lazy" decoding="async">' +
+            '<div class="veil"></div>' +
+            '<figcaption class="cap"><small>Scriptures &amp; prayer points</small>' +
+              '<h2>' + esc(topic.title) + '</h2></figcaption>' +
+          '</figure>'
+        : '<figure class="topic-hero no-img">' +
+            '<div class="glyph"><i class="fas ' + topic.icon + '"></i></div>' +
+            '<div class="veil"></div>' +
+            '<figcaption class="cap"><small>Scriptures &amp; prayer points</small>' +
+              '<h2>' + esc(topic.title) + '</h2></figcaption>' +
+          '</figure>';
+
+    html += '<p class="opening">' + esc(topic.opening) + '</p>';
 
     /* Scriptures */
     html += '<div class="section"><div class="section-title"><i class="fas fa-book-bible"></i> What God says</div>';
@@ -480,6 +631,8 @@ function render(topic, opts) {
                 '<button class="mini-btn" onclick="copyVerse(' + i + ')"><i class="fas fa-copy"></i> Copy</button>' +
                 '<button class="mini-btn" onclick="shareVerse(' + i + ')"><i class="fas fa-share-nodes"></i> Share</button>' +
               '</div>' +
+              langRow(v, i) +
+              '<div id="tr-' + i + '"></div>' +
             '</div>';
     });
     html += '</div>';
