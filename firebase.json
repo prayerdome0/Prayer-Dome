@@ -9,71 +9,83 @@
     "public": ".",
     "ignore": [
       "firebase.json",
+      "vercel.json",
+      "seo/**",
       "**/.*",
       "**/node_modules/**"
     ],
     "cleanUrls": true,
     "trailingSlash": false,
     "rewrites": [
+      { "source": "/bible", "destination": "/bible.html" },
+      { "source": "/prayer", "destination": "/prayer.html" },
+      { "source": "/prayer-wall", "destination": "/prayer.html" },
+      { "source": "/ai-prayer", "destination": "/ai-prayer.html" },
+      { "source": "/assistant", "destination": "/ai-prayer.html" },
+      { "source": "/live", "destination": "/live.html" },
+      { "source": "/video", "destination": "/video.html" },
+      { "source": "/chat", "destination": "/chat.html" },
+      { "source": "/give", "destination": "/give.html" },
+      { "source": "/giving", "destination": "/give.html" },
+      { "source": "/events", "destination": "/events.html" },
+      { "source": "/event", "destination": "/event.html" },
+      { "source": "/testimony", "destination": "/testimony.html" },
+      { "source": "/quiz", "destination": "/quiz.html" },
+      { "source": "/gallery", "destination": "/gallery.html" },
+      { "source": "/membership", "destination": "/membership.html" },
+      { "source": "/about", "destination": "/about.html" },
+      { "source": "/team", "destination": "/team.html" },
+      { "source": "/contact", "destination": "/contact.html" },
+      { "source": "/support", "destination": "/support.html" },
+      { "source": "/account", "destination": "/account.html" },
+      { "source": "/admin", "destination": "/admin.html" },
+      { "source": "/finance", "destination": "/finance.html" }
+    ],
+    "redirects": [
+      { "source": "/index.html", "destination": "/", "type": 301 },
+      { "source": "/Chat.html", "destination": "/chat", "type": 301 },
+      { "source": "/livestream", "destination": "/live", "type": 301 },
+      { "source": "/live-stream", "destination": "/live", "type": 301 },
+      { "source": "/donate", "destination": "/give", "type": 301 },
+      { "source": "/pray", "destination": "/prayer", "type": 301 }
+    ],
+    "headers": [
       {
-        "source": "/bible",
-        "destination": "/bible.html"
+        "source": "**",
+        "headers": [
+          { "key": "X-Content-Type-Options", "value": "nosniff" },
+          { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+          { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+        ]
       },
       {
-        "source": "/admin",
-        "destination": "/admin.html"
+        "source": "/sw.js",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
+          { "key": "Service-Worker-Allowed", "value": "/" }
+        ]
       },
       {
-        "source": "/gallery",
-        "destination": "/gallery.html"
+        "source": "/firebase-messaging-sw.js",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+        ]
       },
       {
-        "source": "/prayer",
-        "destination": "/prayer.html"
+        "source": "**/*.html",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+        ]
       },
       {
-        "source": "/give",
-        "destination": "/give.html"
+        "source": "/sitemap.xml",
+        "headers": [{ "key": "Content-Type", "value": "application/xml" }]
       },
       {
-        "source": "/events",
-        "destination": "/event.html"
-      },
-      {
-        "source": "/quiz",
-        "destination": "/quiz.html"
-      },
-      {
-        "source": "/membership",
-        "destination": "/membership.html"
-      },
-      {
-        "source": "/support",
-        "destination": "/support.html"
-      },
-      {
-        "source": "/team",
-        "destination": "/team.html"
-      },
-      {
-        "source": "/testimony",
-        "destination": "/testimony.html"
-      },
-      {
-        "source": "/video",
-        "destination": "/video.html"
-      },
-      {
-        "source": "/finance",
-        "destination": "/finance-report.html"
-      },
-      {
-        "source": "/account",
-        "destination": "/account.html"
-      },
-      {
-        "source": "/**",
-        "destination": "/index.html"
+        "source": "**/*.@(js|css|png|jpg|jpeg|svg|webp|woff2)",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=604800, stale-while-revalidate=86400" }
+        ]
       }
     ]
   }

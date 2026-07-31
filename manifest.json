@@ -1,21 +1,63 @@
 {
-    "name": "Prayer Dome",
-    "short_name": "Prayer Dome",
-    "description": "A House of Prayer for All Nations",
-    "start_url": "/index.html",
-    "display": "standalone",
-    "background_color": "#15803d",
-    "theme_color": "#15803d",
-    "icons": [
-        {
-            "src": "https://i.ibb.co/TB5Fx4tb/logo-0.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "https://i.ibb.co/TB5Fx4tb/logo-0.png",
-            "sizes": "512x512",
-            "type": "image/png"
-        }
-    ]
+  "name": "Prayer Dome — Daily Prayer, Bible & Christian Community",
+  "short_name": "Prayer Dome",
+  "description": "Pray, study the Bible, join daily devotionals, watch live services and grow with the Prayer Dome community.",
+  "id": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#15803d",
+  "theme_color": "#15803d",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["lifestyle", "education", "social"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "https://i.ibb.co/TB5Fx4tb/logo-0.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.ibb.co/TB5Fx4tb/logo-0.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.ibb.co/TB5Fx4tb/logo-0.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Read the Bible",
+      "short_name": "Bible",
+      "description": "Open the Bible reader",
+      "url": "/bible.html?source=shortcut"
+    },
+    {
+      "name": "Prayer Wall",
+      "short_name": "Pray",
+      "description": "Share or answer a prayer request",
+      "url": "/prayer.html?source=shortcut"
+    },
+    {
+      "name": "Prayer Assistant",
+      "short_name": "Assistant",
+      "description": "Get scriptures and prayer points",
+      "url": "/ai-prayer.html?source=shortcut"
+    },
+    {
+      "name": "Live Service",
+      "short_name": "Live",
+      "description": "Watch the live broadcast",
+      "url": "/live.html?source=shortcut"
+    }
+  ]
 }
