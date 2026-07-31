@@ -200,6 +200,24 @@
       "description": "Prayer Dome chat (legacy page).",
       "schema": "webpage",
       "noindex": true
+    },
+    "sermons.html": {
+      "path": "/sermons",
+      "title": "Sermons & Bible Stories Read Aloud | Listen Online | Prayer Dome",
+      "description": "Listen to Prayer Dome sermons and narrated Bible stories. Each message is read aloud paragraph by paragraph, with scripture, a prayer and reflection questions.",
+      "keywords": "sermons online, bible stories read aloud, listen to sermons, audio bible stories, christian podcast, narrated bible, sermon archive",
+      "schema": "webpage",
+      "priority": "0.9",
+      "changefreq": "weekly"
+    },
+    "translate.html": {
+      "path": "/translate",
+      "title": "Bible in Tumbuka, siSwati & English | Prayer Dome Translator",
+      "description": "Read and hear scripture in English, Chitumbuka and siSwati side by side. Search any verse, switch language in one tap and listen to it read aloud.",
+      "keywords": "tumbuka bible, chitumbuka scripture, siswati bible, bible in siswati, multilingual bible, african language bible, bible translation",
+      "schema": "webapp",
+      "priority": "0.8",
+      "changefreq": "weekly"
     }
   }
 }

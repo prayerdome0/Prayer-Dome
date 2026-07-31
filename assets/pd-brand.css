@@ -1,0 +1,427 @@
+/* ==========================================================================
+   Prayer Dome — "Dawn" Brand System
+   --------------------------------------------------------------------------
+   A shared design layer: sunrise amber + teal + indigo, glassmorphism,
+   aurora backdrops and motion primitives.
+
+   Load AFTER a page's own <style> block so the tokens win, e.g.:
+     <link rel="stylesheet" href="/assets/pd-brand.css">
+
+   Every animation here is disabled automatically for visitors who have asked
+   their operating system to reduce motion (see the media query at the end).
+   ========================================================================== */
+
+:root {
+  /* --- Dawn palette --------------------------------------------------- */
+  --pd-amber:        #f59e0b;
+  --pd-amber-soft:   #fbbf24;
+  --pd-amber-deep:   #d97706;
+  --pd-coral:        #fb7185;
+  --pd-rose:         #f43f5e;
+  --pd-teal:         #0d9488;
+  --pd-teal-light:   #2dd4bf;
+  --pd-teal-deep:    #0f766e;
+  --pd-indigo:       #4f46e5;
+  --pd-indigo-deep:  #312e81;
+  --pd-violet:       #7c3aed;
+  --pd-sky:          #38bdf8;
+
+  /* --- Signature gradients -------------------------------------------- */
+  --pd-grad-dawn:    linear-gradient(135deg, #f59e0b 0%, #fb7185 45%, #7c3aed 100%);
+  --pd-grad-sunrise: linear-gradient(120deg, #fbbf24 0%, #f97316 40%, #f43f5e 100%);
+  --pd-grad-ocean:   linear-gradient(135deg, #0d9488 0%, #0ea5e9 50%, #4f46e5 100%);
+  --pd-grad-horizon: linear-gradient(160deg, #312e81 0%, #0f766e 55%, #f59e0b 100%);
+  --pd-grad-gold:    linear-gradient(135deg, #fde68a 0%, #f59e0b 50%, #b45309 100%);
+  --pd-grad-glass:   linear-gradient(135deg, rgba(255,255,255,.55), rgba(255,255,255,.12));
+
+  /* --- Elevation ------------------------------------------------------- */
+  --pd-shadow-sm:   0 2px 10px rgba(15, 23, 42, .06);
+  --pd-shadow:      0 14px 40px rgba(15, 23, 42, .10);
+  --pd-shadow-lg:   0 28px 70px rgba(15, 23, 42, .16);
+  --pd-glow-amber:  0 10px 40px rgba(245, 158, 11, .35);
+  --pd-glow-teal:   0 10px 40px rgba(13, 148, 136, .30);
+  --pd-glow-indigo: 0 10px 40px rgba(79, 70, 229, .30);
+
+  /* --- Motion ---------------------------------------------------------- */
+  --pd-ease:        cubic-bezier(.16, 1, .3, 1);
+  --pd-ease-back:   cubic-bezier(.34, 1.56, .64, 1);
+  --pd-radius:      22px;
+  --pd-radius-lg:   32px;
+
+  /* --- Compatibility aliases (older pages still ask for these) --------- */
+  --accent-green:       #0d9488;
+  --accent-green-light: #2dd4bf;
+  --accent-gold:        #f59e0b;
+  --accent-gold-dark:   #b45309;
+  --accent-blue:        #0ea5e9;
+  --accent-purple:      #7c3aed;
+  --shadow-glow:        0 10px 30px rgba(13, 148, 136, .18);
+}
+
+body.dark-mode {
+  --pd-shadow-sm:  0 2px 10px rgba(0, 0, 0, .4);
+  --pd-shadow:     0 14px 40px rgba(0, 0, 0, .45);
+  --pd-shadow-lg:  0 28px 70px rgba(0, 0, 0, .55);
+  --pd-grad-glass: linear-gradient(135deg, rgba(148,163,184,.16), rgba(148,163,184,.04));
+  --shadow-glow:   0 10px 30px rgba(45, 212, 191, .16);
+}
+
+/* ==========================================================================
+   1. Aurora backdrop
+   Drop <div class="pd-aurora" aria-hidden="true"></div> as the first child of
+   <body>. It sits behind everything and never intercepts clicks.
+   ========================================================================== */
+/* Existing pages paint an opaque colour on <body>, which would sit on top of a
+   z-index:-2 backdrop and hide it completely. So we move that colour up to
+   <html> and let <body> go transparent — the page looks identical, but the
+   aurora now has somewhere to show through. Scoped to .pd-has-aurora, which
+   pd-motion.js sets only once the backdrop is actually mounted. */
+html.pd-has-aurora { background: #f8fafc; }
+/* Pages declare their dark palette on `body.dark-mode`, so those custom
+   properties are not visible from <html>. pd-motion.js mirrors the class up,
+   and we restate the two dark backgrounds used across the site here. */
+html.pd-has-aurora.dark-mode { background: #060a13; }
+html.pd-has-aurora > body { background: transparent !important; }
+
+.pd-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+}
+.pd-aurora::before,
+.pd-aurora::after {
+  content: '';
+  position: absolute;
+  width: 60vmax;
+  height: 60vmax;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: .30;
+  will-change: transform;
+}
+.pd-aurora::before {
+  top: -22vmax;
+  left: -14vmax;
+  background: radial-gradient(circle at 30% 30%, var(--pd-amber), transparent 62%);
+  animation: pd-drift-a 26s var(--pd-ease) infinite alternate;
+}
+.pd-aurora::after {
+  bottom: -26vmax;
+  right: -16vmax;
+  background: radial-gradient(circle at 70% 70%, var(--pd-teal-light), transparent 62%);
+  animation: pd-drift-b 32s var(--pd-ease) infinite alternate;
+}
+.pd-aurora span {
+  position: absolute;
+  top: 30%;
+  left: 45%;
+  width: 42vmax;
+  height: 42vmax;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: .22;
+  background: radial-gradient(circle, var(--pd-violet), transparent 65%);
+  animation: pd-drift-c 38s var(--pd-ease) infinite alternate;
+}
+body.dark-mode .pd-aurora::before { opacity: .22; }
+body.dark-mode .pd-aurora::after  { opacity: .20; }
+body.dark-mode .pd-aurora span    { opacity: .18; }
+
+@keyframes pd-drift-a {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(14vw, 10vh, 0) scale(1.18); }
+}
+@keyframes pd-drift-b {
+  0%   { transform: translate3d(0, 0, 0) scale(1.1); }
+  100% { transform: translate3d(-16vw, -12vh, 0) scale(.92); }
+}
+@keyframes pd-drift-c {
+  0%   { transform: translate3d(-8vw, 6vh, 0) scale(.9) rotate(0deg); }
+  100% { transform: translate3d(10vw, -8vh, 0) scale(1.2) rotate(45deg); }
+}
+
+/* ==========================================================================
+   2. Glass surfaces
+   ========================================================================== */
+.pd-glass {
+  background: var(--pd-grad-glass);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, .35);
+  border-radius: var(--pd-radius);
+  box-shadow: var(--pd-shadow);
+}
+body.dark-mode .pd-glass { border-color: rgba(148, 163, 184, .18); }
+
+/* Card that lifts and catches light on hover */
+.pd-lift {
+  transition: transform .5s var(--pd-ease), box-shadow .5s var(--pd-ease);
+  will-change: transform;
+}
+.pd-lift:hover {
+  transform: translateY(-8px) scale(1.012);
+  box-shadow: var(--pd-shadow-lg);
+}
+
+/* A gradient hairline that animates around a card edge */
+.pd-edge { position: relative; }
+.pd-edge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: var(--pd-grad-dawn);
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity .45s var(--pd-ease);
+  animation: pd-pan 8s linear infinite;
+  pointer-events: none;
+}
+.pd-edge:hover::before { opacity: 1; }
+
+@keyframes pd-pan {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ==========================================================================
+   3. Text treatments
+   ========================================================================== */
+.pd-gradient-text {
+  background: var(--pd-grad-dawn);
+  background-size: 220% 220%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  animation: pd-pan 9s ease infinite;
+}
+.pd-shimmer {
+  background: linear-gradient(100deg,
+              currentColor 20%, rgba(255,255,255,.9) 40%, currentColor 60%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  animation: pd-shimmer 4.5s linear infinite;
+}
+@keyframes pd-shimmer {
+  0%   { background-position: 180% 0; }
+  100% { background-position: -80% 0; }
+}
+
+/* ==========================================================================
+   4. Buttons
+   ========================================================================== */
+.pd-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 26px;
+  border: none;
+  border-radius: 50px;
+  font-family: inherit;
+  font-size: .92rem;
+  font-weight: 800;
+  letter-spacing: .2px;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform .35s var(--pd-ease-back), box-shadow .35s var(--pd-ease);
+}
+.pd-btn:hover  { transform: translateY(-3px); }
+.pd-btn:active { transform: translateY(0) scale(.97); }
+.pd-btn:focus-visible { outline: 3px solid var(--pd-amber); outline-offset: 3px; }
+
+.pd-btn-dawn {
+  color: #fff;
+  background: var(--pd-grad-dawn);
+  background-size: 220% 220%;
+  box-shadow: var(--pd-glow-amber);
+  animation: pd-pan 7s ease infinite;
+}
+.pd-btn-ocean {
+  color: #fff;
+  background: var(--pd-grad-ocean);
+  background-size: 220% 220%;
+  box-shadow: var(--pd-glow-teal);
+  animation: pd-pan 7s ease infinite;
+}
+.pd-btn-ghost {
+  color: var(--text-main, #0f172a);
+  background: transparent;
+  border: 1.5px solid var(--border-color, #e2e8f0);
+}
+.pd-btn-ghost:hover { border-color: var(--pd-amber); color: var(--pd-amber-deep); }
+
+/* Light sweep across a button on hover */
+.pd-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.45), transparent 70%);
+  transform: translateX(-120%);
+  transition: transform .7s var(--pd-ease);
+}
+.pd-btn:hover::after { transform: translateX(120%); }
+
+/* ==========================================================================
+   5. Scroll-reveal
+   Add class="pd-reveal" (optionally with data-pd-delay="120") to any element.
+   pd-motion.js adds .is-visible when it scrolls into view.
+   ========================================================================== */
+.pd-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .8s var(--pd-ease), transform .8s var(--pd-ease);
+}
+.pd-reveal.is-visible { opacity: 1; transform: none; }
+
+.pd-reveal-left  { transform: translateX(-34px); }
+.pd-reveal-right { transform: translateX(34px); }
+.pd-reveal-zoom  { transform: scale(.9); }
+.pd-reveal-left.is-visible,
+.pd-reveal-right.is-visible,
+.pd-reveal-zoom.is-visible { transform: none; }
+
+/* ==========================================================================
+   6. Ambient motion primitives
+   ========================================================================== */
+.pd-float      { animation: pd-float 6s ease-in-out infinite; }
+.pd-float-slow { animation: pd-float 10s ease-in-out infinite; }
+@keyframes pd-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+.pd-breathe { animation: pd-breathe 5s ease-in-out infinite; }
+@keyframes pd-breathe {
+  0%, 100% { transform: scale(1);    opacity: 1; }
+  50%      { transform: scale(1.05); opacity: .88; }
+}
+
+.pd-pulse-ring { position: relative; }
+.pd-pulse-ring::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 2px solid var(--pd-amber);
+  opacity: 0;
+  animation: pd-pulse-ring 2.4s var(--pd-ease) infinite;
+  pointer-events: none;
+}
+@keyframes pd-pulse-ring {
+  0%   { transform: scale(.92); opacity: .7; }
+  100% { transform: scale(1.28); opacity: 0; }
+}
+
+.pd-spin-slow { animation: pd-spin 18s linear infinite; }
+@keyframes pd-spin { to { transform: rotate(360deg); } }
+
+/* Ken-Burns drift for hero photography */
+.pd-kenburns { animation: pd-kenburns 22s ease-in-out infinite alternate; }
+@keyframes pd-kenburns {
+  0%   { transform: scale(1)    translate3d(0, 0, 0); }
+  100% { transform: scale(1.12) translate3d(-2%, -2%, 0); }
+}
+
+/* Skeleton shimmer for loading states */
+.pd-skeleton {
+  background: linear-gradient(90deg,
+              rgba(148,163,184,.12) 25%,
+              rgba(148,163,184,.28) 37%,
+              rgba(148,163,184,.12) 63%);
+  background-size: 400% 100%;
+  animation: pd-skeleton 1.4s ease infinite;
+  border-radius: 12px;
+}
+@keyframes pd-skeleton {
+  0%   { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* ==========================================================================
+   7. Scroll progress bar (pd-motion.js injects the element)
+   ========================================================================== */
+.pd-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: var(--pd-grad-dawn);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   8. Media
+   ========================================================================== */
+.pd-media {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--pd-radius);
+  background: var(--pd-grad-horizon);
+}
+.pd-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .9s var(--pd-ease);
+}
+.pd-media:hover img { transform: scale(1.07); }
+.pd-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(15,23,42,.72), transparent 62%);
+  pointer-events: none;
+}
+.pd-media.pd-media-plain::after { display: none; }
+
+/* Fallback tiles when there is no photograph */
+.pd-tile-dawn    { background: var(--pd-grad-dawn); }
+.pd-tile-ocean   { background: var(--pd-grad-ocean); }
+.pd-tile-horizon { background: var(--pd-grad-horizon); }
+.pd-tile-gold    { background: var(--pd-grad-gold); }
+
+/* ==========================================================================
+   9. Accessibility
+   ========================================================================== */
+.pd-sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pd-aurora::before,
+  .pd-aurora::after,
+  .pd-aurora span,
+  .pd-float, .pd-float-slow, .pd-breathe, .pd-spin-slow,
+  .pd-kenburns, .pd-skeleton, .pd-shimmer, .pd-gradient-text,
+  .pd-btn-dawn, .pd-btn-ocean, .pd-pulse-ring::after,
+  .pd-edge::before {
+    animation: none !important;
+  }
+  .pd-reveal { opacity: 1 !important; transform: none !important; }
+  .pd-lift:hover { transform: none; }
+  * { scroll-behavior: auto !important; }
+}
