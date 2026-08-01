@@ -12,7 +12,7 @@
     <meta name="googlebot" content="noindex, nofollow">
     <link rel="canonical" href="https://prayerdome.net/account">
     <meta name="author" content="Prayer Dome">
-    <meta name="theme-color" content="#15803d">
+    <meta name="theme-color" content="#0b3d91">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Prayer Dome">
@@ -132,10 +132,10 @@
 
     <style>
         :root {
-            --accent-green: #15803d;
-            --accent-green-light: #22c55e;
+            --accent-green: #0b3d91;
+            --accent-green-light: #2563eb;
             --accent-gold: #d4af37;
-            --accent-gold-dark: #b45309;
+            --accent-gold-dark: #a67c00;
             --accent-red: #ef4444;
             --accent-blue: #3b82f6;
             --bg-primary: #f8fafc;
@@ -201,7 +201,7 @@
             display: flex; 
             align-items: center; 
             justify-content: center;
-            box-shadow: 0 4px 15px rgba(21,128,61,0.3);
+            box-shadow: 0 4px 15px rgba(11,61,145,0.3);
         }
         .logo-ring img {
             width: 100%;
@@ -234,7 +234,7 @@
         }
         .theme-btn:hover {
             transform: scale(1.05);
-            background: rgba(34,197,94,0.1);
+            background: rgba(37,99,235,0.1);
         }
 
         .container { max-width: 800px; margin: 40px auto; padding: 0 20px; animation: fadeInUp 0.5s ease; }
@@ -295,7 +295,7 @@
             font-size: 0.95rem;
             transition: all 0.3s;
         }
-        input:focus { border-color: var(--accent-green); box-shadow: 0 0 0 3px rgba(34,197,94,0.1); }
+        input:focus { border-color: var(--accent-green); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
         .full-width { grid-column: span 2; }
 
         .password-wrapper { position: relative; }
@@ -331,7 +331,7 @@
             font-size: 1rem;
         }
         .btn-primary { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); color: white; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(34,197,94,0.4); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37,99,235,0.4); }
         .btn-danger { background: linear-gradient(135deg, var(--accent-red), #dc2626); color: white; }
         .btn-google { background: white; border: 2px solid var(--border); color: var(--text-main); }
         .btn-google:hover { background: var(--bg-primary); transform: translateY(-2px); }
@@ -349,7 +349,7 @@
             cursor: pointer;
             transition: 0.2s;
         }
-        .verification-badge.verified { background: rgba(34,197,94,0.2); color: var(--accent-green); }
+        .verification-badge.verified { background: rgba(37,99,235,0.16); color: var(--accent-green); }
         .verification-badge.unverified { background: rgba(239,68,68,0.1); color: #ef4444; }
         .verification-badge.unverified:hover { background: rgba(239,68,68,0.2); transform: scale(1.02); }
 
@@ -472,7 +472,7 @@
         .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent-green), var(--accent-gold)); border-radius: 10px; transition: width 0.5s ease; }
         .ministry-tag { 
             display: inline-block; 
-            background: rgba(34,197,94,0.1); 
+            background: rgba(37,99,235,0.1);
             color: var(--accent-green); 
             padding: 6px 12px; 
             border-radius: 20px; 
@@ -804,11 +804,46 @@
         let currentUserData = null;
         let currentPhotoUrl = "";
 
-        // Email validation - only real email providers
+        // Firebase accepts any syntactically valid email address. Do not keep a
+        // provider allow-list here: it prevented members using church, work and
+        // country-specific email domains from registering or signing in.
         function isValidEmail(email) {
-            const validDomains = ['gmail.com', 'outlook.com', 'hotmail.com', 'yahoo.com', 'icloud.com', 'aol.com', 'protonmail.com', 'mail.com', 'yandex.com', 'gmx.com'];
-            const domain = email.split('@')[1];
-            return validDomains.includes(domain);
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).trim());
+        }
+
+        function authMessage(error, fallback) {
+            const messages = {
+                'auth/email-already-in-use': 'This email already has an account. Please sign in instead.',
+                'auth/invalid-email': 'Enter a valid email address.',
+                'auth/weak-password': 'Choose a password with at least 6 characters.',
+                'auth/invalid-credential': 'The email or password is incorrect.',
+                'auth/user-not-found': 'No account was found with this email.',
+                'auth/wrong-password': 'The email or password is incorrect.',
+                'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
+                'auth/popup-closed-by-user': 'Google sign-in was cancelled.',
+                'auth/popup-blocked': 'Your browser blocked the Google sign-in window. Please allow pop-ups and try again.',
+                'auth/operation-not-allowed': 'This sign-in method is not enabled in Firebase Authentication.'
+            };
+            return messages[error?.code] || fallback || error?.message || 'Something went wrong. Please try again.';
+        }
+
+        const defaultProfile = (user) => ({
+            fullName: user.displayName || user.email?.split('@')[0] || 'Prayer Dome Member',
+            email: user.email || '',
+            photoURL: user.photoURL || 'https://via.placeholder.com/150',
+            emailVerified: Boolean(user.emailVerified),
+            prayerCount: 0,
+            walletBalance: 0,
+            quizLevel: 1,
+            createdAt: serverTimestamp()
+        });
+
+        async function ensureUserProfile(user) {
+            const userRef = doc(db, 'users', user.uid);
+            const snapshot = await getDoc(userRef);
+            if (!snapshot.exists()) {
+                await setDoc(userRef, defaultProfile(user));
+            }
         }
 
         // Helper Functions
@@ -1002,42 +1037,37 @@
         };
 
         window.handleGoogle = async () => {
+            showLoading();
             try {
                 const res = await signInWithPopup(auth, googleProvider);
-                const userDoc = await getDoc(doc(db, "users", res.user.uid));
-                if (!userDoc.exists()) {
-                    await setDoc(doc(db, "users", res.user.uid), {
-                        fullName: res.user.displayName,
-                        email: res.user.email,
-                        photoURL: res.user.photoURL || "https://via.placeholder.com/150",
-                        emailVerified: res.user.emailVerified,
-                        createdAt: serverTimestamp()
-                    });
-                }
-                showToast("Signed in with Google!", "success");
+                await ensureUserProfile(res.user);
+                showToast('Signed in with Google!', 'success');
                 confetti({ particleCount: 100, spread: 70 });
-            } catch (e) { 
-                showToast(e.message, "error"); 
+            } catch (error) {
+                console.error('Google sign-in error:', error);
+                showToast(authMessage(error, 'Google sign-in could not be completed.'), 'error');
+            } finally {
+                hideLoading();
             }
         };
         
         window.handleRegister = async (e) => {
             e.preventDefault();
-            const name = document.getElementById('rName').value;
-            const email = document.getElementById('rEmail').value;
+            const name = document.getElementById('rName').value.trim();
+            const email = document.getElementById('rEmail').value.trim().toLowerCase();
             const pass = document.getElementById('rPass').value;
             const confirm = document.getElementById('rConfirm').value;
             const countryCode = document.getElementById('rCountryCode').value;
-            const phoneNum = document.getElementById('rPhone').value;
+            const phoneNum = document.getElementById('rPhone').value.trim();
             const fullPhone = `${countryCode}${phoneNum}`;
             const photoUrl = document.getElementById('uploadedPhoto').value || "https://via.placeholder.com/150";
             
-            // Validate email domain
-            if (!isValidEmail(email)) {
-                showToast("Please use a valid email address (gmail.com, outlook.com, etc.)", "error");
+            if (!name || !isValidEmail(email)) {
+                showToast('Enter your full name and a valid email address.', 'error');
                 return;
             }
             
+            if (!phoneNum) return showToast('Please enter your phone number.', 'error');
             if(pass !== confirm) return showToast("Passwords don't match", "error");
             if(pass.length < 6) return showToast("Password must be at least 6 characters", "error");
             
@@ -1054,21 +1084,21 @@
                     branch: document.getElementById('rBranch').value,
                     ministry: document.getElementById('rMinistry').value,
                     referral: document.getElementById('rReferral').value,
+                    dateOfBirth: document.getElementById('rDob').value,
                     emailVerified: false,
                     prayerCount: 0,
                     walletBalance: 0,
                     quizLevel: 1,
                     createdAt: serverTimestamp()
                 });
-                await sendEmailVerification(cred.user);
-                showToast("Registration successful! Please verify your email. Check spam folder!", "success");
+                // Email verification is helpful but must not turn a successful
+                // registration into a failed one when the mail service is delayed.
+                sendEmailVerification(cred.user).catch((error) => console.warn('Verification email error:', error));
+                showToast('Registration successful! Please verify your email from your inbox.', 'success');
                 confetti({ particleCount: 150, spread: 70 });
-            } catch (e) { 
-                if (e.code === 'auth/email-already-in-use') {
-                    showToast("Email already registered. Please sign in instead.", "error");
-                } else {
-                    showToast(e.message, "error");
-                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                showToast(authMessage(error, 'We could not create your account. Please try again.'), 'error');
             } finally {
                 hideLoading();
             }
@@ -1076,11 +1106,11 @@
         
         window.handleLogin = async (e) => {
             e.preventDefault();
-            const email = document.getElementById('lEmail').value;
+            const email = document.getElementById('lEmail').value.trim().toLowerCase();
             const password = document.getElementById('lPass').value;
             
             if (!isValidEmail(email)) {
-                showToast("Please use a valid email address", "error");
+                showToast('Enter a valid email address.', 'error');
                 return;
             }
             
@@ -1089,14 +1119,9 @@
                 await signInWithEmailAndPassword(auth, email, password);
                 showToast("Welcome back!", "success");
                 confetti({ particleCount: 80, spread: 60 });
-            } catch (e) { 
-                if (e.code === 'auth/user-not-found') {
-                    showToast("No account found with this email", "error");
-                } else if (e.code === 'auth/wrong-password') {
-                    showToast("Incorrect password", "error");
-                } else {
-                    showToast("Invalid Credentials", "error");
-                }
+            } catch (error) {
+                console.error('Sign-in error:', error);
+                showToast(authMessage(error, 'Unable to sign in. Please try again.'), 'error');
             } finally {
                 hideLoading();
             }
@@ -1291,9 +1316,15 @@
                 document.getElementById('loginForm').style.display = 'none';
                 document.getElementById('registerForm').style.display = 'none';
                 document.getElementById('profileSection').style.display = 'block';
-                await loadProfileData(user);
-                await checkEmailVerification();
-                await handleEmailVerificationLink();
+                try {
+                    await ensureUserProfile(user);
+                    await loadProfileData(user);
+                    await checkEmailVerification();
+                    await handleEmailVerificationLink();
+                } catch (error) {
+                    console.error('Profile loading error:', error);
+                    showToast('You are signed in, but we could not load your profile yet. Please refresh.', 'error');
+                }
             } else {
                 document.getElementById('authTabs').style.display = 'flex';
                 document.getElementById('profileSection').style.display = 'none';

@@ -191,7 +191,7 @@ def build_block(site, filename, page, has_manifest):
         f'    <meta name="googlebot" content="{robots}">',
         f'    <link rel="canonical" href="{canonical}">',
         f'    <meta name="author" content="{site["siteName"]}">',
-        '    <meta name="theme-color" content="#15803d">',
+        '    <meta name="theme-color" content="#0b3d91">',
         '    <meta name="apple-mobile-web-app-capable" content="yes">',
         '    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">',
         f'    <meta name="apple-mobile-web-app-title" content="{site["siteName"]}">',
