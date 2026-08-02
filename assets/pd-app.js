@@ -802,11 +802,20 @@
       for (var i = 0; i < all.length; i++) if (all[i].id === n.id) idx = i;
       if (idx >= 0) all[idx] = n; else all.unshift(n);
       store.set('news', all);
-      if (fb && fb.db && fb.collection && fb.addDoc && fb.serverTimestamp) {
-        var payload = Object.assign({}, n);
-        delete payload.id;
-        payload.createdAt = fb.serverTimestamp();
-        fb.addDoc(fb.collection(fb.db, 'news'), payload).catch(function () {});
+      if (fb && fb.db && fb.collection && fb.serverTimestamp) {
+        var payload = Object.assign({}, n, {
+          id: n.id,
+          featuredImage: n.featuredImage || n.image || '',
+          socialImage: n.socialImage || n.featuredImage || n.image || '',
+          updatedAt: fb.serverTimestamp()
+        });
+        if (fb.setDoc && fb.doc) {
+          if (!payload.createdAt) payload.createdAt = fb.serverTimestamp();
+          fb.setDoc(fb.doc(fb.db, 'news', n.id), payload, { merge: true }).catch(function () {});
+        } else if (fb.addDoc) {
+          payload.createdAt = fb.serverTimestamp();
+          fb.addDoc(fb.collection(fb.db, 'news'), payload).catch(function () {});
+        }
       }
       broadcast('news', n);
       return n;

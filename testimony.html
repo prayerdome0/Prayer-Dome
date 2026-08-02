@@ -25,7 +25,7 @@
     <meta property="og:title" content="Testimonies | Healing, Breakthrough, Salvation &amp; Provision | Prayer Dome">
     <meta property="og:description" content="Read and share real testimonies of healing, breakthrough, salvation and provision. Give God the glory and encourage someone&#x27;s faith today.">
     <meta property="og:url" content="https://prayerdome.net/testimony">
-    <meta property="og:image" content="https://prayerdome.net/assets/og-image.png">
+    <meta property="og:image" content="https://prayerdome.net/assets/testimonies/hero-praise.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Testimonies | Healing, Breakthrough, Salvation &amp; Provision | Prayer Dome">
@@ -36,7 +36,7 @@
     <meta name="twitter:site" content="@prayerdome">
     <meta name="twitter:title" content="Testimonies | Healing, Breakthrough, Salvation &amp; Provision | Prayer Dome">
     <meta name="twitter:description" content="Read and share real testimonies of healing, breakthrough, salvation and provision. Give God the glory and encourage someone&#x27;s faith today.">
-    <meta name="twitter:image" content="https://prayerdome.net/assets/og-image.png">
+    <meta name="twitter:image" content="https://prayerdome.net/assets/testimonies/hero-praise.jpg">
 
     <!-- Performance hints -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -455,6 +455,10 @@
       transform: translateY(-8px);
       box-shadow: var(--shadow-lg);
       border-color: var(--accent-gold);
+    }
+    .testimony-card.linked-testimony {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 0 4px rgba(212,175,55,.18), var(--shadow-lg);
     }
     .testimony-card::before {
       content: '';
@@ -920,6 +924,8 @@
     let allTestimonies = [];
     let currentFilter = "all";
     let uploadedPhotoUrl = null;
+    const SITE_ORIGIN = 'https://prayerdome.net';
+    const TESTIMONY_FALLBACK_IMAGE = '/assets/testimonies/hero-praise.jpg';
 
     // Emojis for reactions
     const emojis = [
@@ -929,6 +935,62 @@
         { code: '✝️', name: 'cross', icon: '✝️' },
         { code: '🕊️', name: 'peace', icon: '🕊️' }
     ];
+
+    function testimonyShareUrl(id) {
+        return `${SITE_ORIGIN}/testimony/${encodeURIComponent(id)}`;
+    }
+
+    function getOwnTestimonyImage(testimony) {
+        return testimony && (testimony.socialImage || testimony.featuredImage || testimony.imageUrl || testimony.image || testimony.photoUrl);
+    }
+
+    function getTestimonyImage(testimony) {
+        return getOwnTestimonyImage(testimony) || TESTIMONY_FALLBACK_IMAGE;
+    }
+
+    function setMeta(selector, value, attr = 'content') {
+        const el = document.head.querySelector(selector);
+        if (el && value) el.setAttribute(attr, value);
+    }
+
+    function updateTestimonyMeta(testimony) {
+        if (!testimony) return;
+        const title = `${testimony.category || 'Testimony'} by ${testimony.author || 'Anonymous'} | Prayer Dome`;
+        const desc = (testimony.content || 'Read this Prayer Dome testimony.').substring(0, 180);
+        const image = new URL(getTestimonyImage(testimony), SITE_ORIGIN).href;
+        const url = testimonyShareUrl(testimony.id);
+        document.title = title;
+        setMeta('meta[property="og:type"]', 'article');
+        setMeta('meta[property="og:title"]', title);
+        setMeta('meta[property="og:description"]', desc);
+        setMeta('meta[property="og:url"]', url);
+        setMeta('meta[property="og:image"]', image);
+        setMeta('meta[property="og:image:alt"]', title);
+        setMeta('meta[name="twitter:title"]', title);
+        setMeta('meta[name="twitter:description"]', desc);
+        setMeta('meta[name="twitter:image"]', image);
+    }
+
+    function getInitialTestimonyId() {
+        const url = new URL(window.location.href);
+        const fromQuery = url.searchParams.get('story') || url.searchParams.get('testimony') || url.searchParams.get('id');
+        if (fromQuery) return fromQuery;
+        const match = url.pathname.match(/^\/testimony\/([^/?#]+)/);
+        return match ? decodeURIComponent(match[1]) : '';
+    }
+
+    function focusLinkedTestimony() {
+        const id = getInitialTestimonyId();
+        if (!id) return;
+        const testimony = allTestimonies.find(t => t.id === id);
+        if (!testimony) return;
+        updateTestimonyMeta(testimony);
+        const card = document.getElementById(`testimony-${id}`);
+        if (card) {
+            card.classList.add('linked-testimony');
+            setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150);
+        }
+    }
 
     // Load testimonies
     async function loadTestimonies() {
@@ -941,6 +1003,7 @@
             });
             updateStats();
             renderTestimonies();
+            focusLinkedTestimony();
         } catch (error) {
             console.error("Error loading testimonies:", error);
         }
@@ -975,6 +1038,8 @@
                 content: content,
                 date: customDate || null,
                 imageUrl: photoUrl || null,
+                featuredImage: photoUrl || null,
+                socialImage: photoUrl || null,
                 timestamp: Timestamp.now(),
                 likes: 0,
                 likedBy: [],
@@ -1193,7 +1258,7 @@
             const comments = testimony.comments || [];
             
             return `
-                <div class="testimony-card" style="animation-delay: ${idx * 0.05}s">
+                <div class="testimony-card" id="testimony-${escapeHtml(testimony.id)}" data-testimony-id="${escapeHtml(testimony.id)}" style="animation-delay: ${idx * 0.05}s">
                     <div class="testimony-header-card">
                         <div class="testimony-author">
                             <div class="author-avatar">${(testimony.author || 'A').charAt(0).toUpperCase()}</div>
@@ -1211,7 +1276,7 @@
                         ${escapeHtml(testimony.content)}
                     </div>
                     
-                    ${testimony.imageUrl ? `<img src="${testimony.imageUrl}" class="testimony-image" loading="lazy">` : ''}
+                    ${getOwnTestimonyImage(testimony) ? `<img src="${escapeHtml(getOwnTestimonyImage(testimony))}" class="testimony-image" loading="lazy" onerror="this.style.display='none'">` : ''}
                     
                     <!-- Emoji Reactions -->
                     <div class="reactions">

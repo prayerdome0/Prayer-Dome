@@ -4,6 +4,18 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/news/:id",
+      "destination": "/api/share?type=news&id=:id"
+    },
+    {
+      "source": "/testimony/:id",
+      "destination": "/api/share?type=testimony&id=:id"
+    },
+    {
+      "source": "/share/:type/:id",
+      "destination": "/api/share?type=:type&id=:id"
+    },
+    {
       "source": "/bible",
       "destination": "/bible.html"
     },
