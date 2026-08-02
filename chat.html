@@ -595,31 +595,42 @@
         .suggestion-chip:hover { transform: translateY(-2px) scale(1.04); background: var(--accent-gold); color: #fff; box-shadow: 0 6px 14px -3px rgba(212,175,55,.5); }
 
         .chat-input-area {
-            padding: 11px 16px;
+            padding: 14px 14px calc(14px + env(safe-area-inset-bottom, 0px));
             background: var(--bg-card);
-            background: color-mix(in srgb, var(--bg-card) 94%, transparent);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: color-mix(in srgb, var(--bg-card) 96%, transparent);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border-top: 1px solid var(--border-color);
             display: flex;
-            gap: 8px;
+            gap: 10px;
             align-items: center;
-            flex-wrap: wrap;
             flex-shrink: 0;
-            transition: box-shadow 0.25s;
+            transition: box-shadow 0.25s, background 0.25s;
+            position: relative;
         }
-        .chat-input-area:focus-within { box-shadow: 0 -6px 20px -8px rgba(10,77,155, 0.18); }
+        .chat-input-area::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-gold), var(--accent-green-light), var(--accent-green));
+            background-size: 300% 100%;
+            animation: gradientFlow 8s linear infinite;
+            opacity: .85;
+        }
+        .chat-input-area:focus-within { box-shadow: 0 -8px 28px -10px rgba(10,77,155, 0.28); }
         .media-buttons { display: flex; gap: 6px; }
         .media-btn {
             background: var(--bg-primary);
             border: 1px solid var(--border-color);
             border-radius: 50%;
-            width: 33px;
-            height: 33px;
-            font-size: 0.75rem;
+            width: 44px;
+            height: 44px;
+            font-size: 0.95rem;
             cursor: pointer;
             color: var(--accent-gold);
             transition: transform 0.3s var(--ease-spring), background 0.2s, color 0.2s, box-shadow 0.2s;
+            flex-shrink: 0;
         }
         .media-btn:hover {
             transform: translateY(-2px) rotate(-10deg) scale(1.1);
@@ -629,34 +640,49 @@
         .media-btn:active { transform: scale(0.9); }
         .chat-input {
             flex: 1;
-            padding: 10px 16px;
-            border: 2px solid var(--border-color);
+            min-width: 0;
+            padding: 13px 20px;
+            border: none;
             border-radius: 26px;
             background: var(--bg-primary);
             color: var(--text-main);
             font-family: inherit;
-            font-size: 0.82rem;
-            transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            transition: box-shadow 0.25s, background 0.2s;
+            box-shadow: inset 0 0 0 1px var(--border-color);
         }
         .chat-input:focus {
             outline: none;
-            border-color: var(--accent-green-light);
-            box-shadow: 0 0 0 3px rgba(59,130,246, 0.14);
+            background: var(--bg-card);
+            box-shadow: inset 0 0 0 1.5px var(--accent-green-light);
         }
+        .chat-input::placeholder { color: var(--text-sub); opacity: .75; }
+        /* WhatsApp-style send tab: pill-shaped, prominent, with a soft inner sheen. */
         .chat-send {
-            background: var(--grad-main);
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-green-light) 100%);
             color: white;
             border: none;
-            width: 38px;
-            height: 38px;
-            font-size: 0.82rem;
-            border-radius: 50%;
+            width: auto;
+            min-width: 56px;
+            height: 48px;
+            padding: 0 18px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            border-radius: 999px;
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 5px 14px -3px rgba(10,77,155, 0.45);
-            transition: transform 0.3s var(--ease-spring), box-shadow 0.25s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 8px 20px -4px rgba(10,77,155, 0.5);
+            transition: transform 0.25s var(--ease-spring), box-shadow 0.25s, padding 0.2s;
+            flex-shrink: 0;
         }
+        .chat-send .send-label { display: inline; }
         .chat-send::after {
             content: '';
             position: absolute;
@@ -665,9 +691,15 @@
             background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             transform: skewX(-20deg);
         }
-        .chat-send:hover { transform: scale(1.12) rotate(8deg); box-shadow: 0 8px 20px -4px rgba(10,77,155, 0.55); }
+        .chat-send:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 12px 28px -6px rgba(10,77,155, 0.6); }
         .chat-send:hover::after { animation: sheen 0.7s ease; }
-        .chat-send:active { transform: scale(0.9); }
+        .chat-send:active { transform: scale(0.96); }
+        .chat-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 0 2px 6px -2px rgba(10,77,155, 0.3); }
+        .chat-send i { font-size: 0.9rem; }
+        @media (max-width: 480px) {
+            .chat-send { min-width: 48px; height: 44px; padding: 0 14px; }
+            .chat-send .send-label { display: none; }
+        }
 
         /* Typing Indicator */
         .typing-indicator {
@@ -1128,13 +1160,16 @@
                 </div>
                 <div class="chat-input-area">
                     <div class="media-buttons">
-                        <button class="media-btn" onclick="uploadPhoto()" title="Send Photo"><i class="fas fa-image"></i></button>
-                        <button class="media-btn" onclick="uploadVideo()" title="Send Video"><i class="fas fa-video"></i></button>
-                        <button class="media-btn" onclick="uploadDocument()" title="Send Document"><i class="fas fa-file-alt"></i></button>
-                        <button class="media-btn" onclick="startVoiceRecording()" title="Voice Message"><i class="fas fa-microphone"></i></button>
+                        <button class="media-btn" onclick="uploadPhoto()" title="Send Photo" aria-label="Send photo"><i class="fas fa-image"></i></button>
+                        <button class="media-btn" onclick="uploadVideo()" title="Send Video" aria-label="Send video"><i class="fas fa-video"></i></button>
+                        <button class="media-btn" onclick="uploadDocument()" title="Send Document" aria-label="Send document"><i class="fas fa-file-alt"></i></button>
+                        <button class="media-btn" onclick="startVoiceRecording()" title="Voice Message" aria-label="Voice message"><i class="fas fa-microphone"></i></button>
                     </div>
-                    <input type="text" id="messageInput" class="chat-input" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMessage()">
-                    <button class="chat-send" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                    <input type="text" id="messageInput" class="chat-input" placeholder="Type a message" autocomplete="off" maxlength="2000" onkeypress="if(event.key==='Enter') sendMessage()">
+                    <button class="chat-send" id="chatSendBtn" onclick="sendMessage()" aria-label="Send message">
+                        <i class="fas fa-paper-plane"></i>
+                        <span class="send-label">Send</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1713,17 +1748,22 @@
 
         window.sendSuggestion = async (text) => {
             const input = document.getElementById('messageInput');
-            if (input) input.value = text;
+            if (input) {
+                input.value = text;
+                input.focus();
+            }
             await sendMessage();
         };
 
         window.sendMessage = async () => {
             const input = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('chatSendBtn');
             const text = input?.value.trim() || '';
             if (!text && !pendingMedia) return;
-            
+            if (sendBtn) sendBtn.disabled = true;
+
             const collectionPath = currentChatType === 'group' ? `groupMessages_${currentRoom}` : `privateMessages_${currentRoom}`;
-            
+
             const messageData = {
                 userId: currentUser.uid,
                 userName: currentUser.displayName || currentUser.email?.split('@')[0] || 'Anonymous',
@@ -1732,18 +1772,28 @@
                 delivered: false,
                 read: false
             };
-            
+
             if (pendingMedia) {
                 messageData.mediaUrl = pendingMedia.url;
                 messageData.mediaType = pendingMedia.type;
                 messageData.mediaName = pendingMedia.name;
                 pendingMedia = null;
             }
-            
+
             try {
                 await addDoc(collection(db, collectionPath, currentRoom, "messages"), messageData);
-                if (input) input.value = '';
-            } catch(e) { console.error(e); showToast("Error sending message", "error"); }
+                if (input) {
+                    input.value = '';
+                    input.style.height = '';
+                }
+            } catch(e) {
+                console.error(e);
+                showToast("Error sending message", "error");
+                if (input) input.value = text;
+            } finally {
+                if (sendBtn) sendBtn.disabled = false;
+                if (input) input.focus();
+            }
         };
         
         window.deleteMessage = async (messageId) => {

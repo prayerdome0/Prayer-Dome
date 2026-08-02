@@ -133,6 +133,14 @@
       ui.drawer();
       ui.splash();
       ui.syncTheme();
+      // Auto-show the friendly "Allow notifications?" pop-up once per
+      // device, ~6s after the app loads, so members get the OS push
+      // experience they expect without hunting for a bell.
+      setTimeout(function () {
+        if (notifications.canPrompt && notifications.canPrompt() && !localStorage.getItem('pd_notif_pop_dismissed')) {
+          notifications.showEnablePop();
+        }
+      }, 6000);
     },
     drawer: function () {
       var btn = $('#pdMenuBtn');
@@ -396,12 +404,18 @@
       notifications.panelEl = $('#pdNotifPanel');
       if (notifications.listEl) notifications.render();
       notifications.syncBadge();
-      // Bell opens the in-app notification center.
+      // Bell opens the in-app notification center — and if the browser
+      // permission is still "default", it pops the friendly enable dialog
+      // (instead of leaving the user wondering why nothing pings).
       var bell = $('#pdNotifBell') || $('#notificationBell');
       if (bell) {
         bell.addEventListener('click', function (e) {
           e.stopPropagation();
-          ui.toggleNotifPanel();
+          if (notifications.canPrompt() && !localStorage.getItem('pd_notif_pop_dismissed')) {
+            notifications.showEnablePop();
+          } else {
+            ui.toggleNotifPanel();
+          }
         });
       }
       document.addEventListener('click', function (e) {
@@ -438,6 +452,56 @@
             notifications.syncBadge();
           }
         }).catch(function () {});
+      }
+    },
+    canPrompt: function () {
+      return typeof Notification !== 'undefined' && Notification.permission === 'default';
+    },
+    /* Friendly in-app "Allow notifications?" modal. We show it once per device
+       (and on every bell click until the user grants or dismisses) so members
+       actually get the OS push experience they expect. */
+    showEnablePop: function () {
+      if (document.getElementById('pdNotifPop')) return;
+      var overlay = document.createElement('div');
+      overlay.id = 'pdNotifPop';
+      overlay.className = 'pd-notif-pop-overlay';
+      overlay.innerHTML =
+        '<div class="pd-notif-pop" role="dialog" aria-modal="true" aria-label="Enable notifications">' +
+          '<div class="pd-notif-pop-icon"><i class="fas fa-bell"></i></div>' +
+          '<h3>Stay connected to Prayer Dome</h3>' +
+          '<p>Get instant alerts when a service goes live, a prayer request needs you, or new gospel content is published. You can turn this off anytime.</p>' +
+          '<div class="pd-notif-pop-actions">' +
+            '<button class="pd-notif-pop-btn pd-notif-pop-btn--ghost" data-action="dismiss">Maybe later</button>' +
+            '<button class="pd-notif-pop-btn pd-notif-pop-btn--primary" data-action="enable"><i class="fas fa-bell"></i> Allow notifications</button>' +
+          '</div>' +
+          '<small class="pd-notif-pop-hint">Works on iOS, Android and desktop. We never spam.</small>' +
+        '</div>';
+      document.body.appendChild(overlay);
+      // Animate in
+      requestAnimationFrame(function () { overlay.classList.add('pd-notif-pop-open'); });
+      overlay.addEventListener('click', function (e) {
+        var act = e.target && e.target.getAttribute && e.target.getAttribute('data-action');
+        if (!act && e.target !== overlay) return;
+        if (act === 'enable') {
+          notifications.requestPermission().then(function (perm) {
+            if (perm === 'granted') toast('Notifications enabled — you will hear from us', 'success');
+            else if (perm === 'denied') toast('Notifications blocked — enable them in your browser settings', 'error');
+            closePop();
+          });
+        } else {
+          // dismiss = "Maybe later" or backdrop tap
+          closePop();
+          localStorage.setItem('pd_notif_pop_dismissed', new Date().toISOString());
+        }
+        function closePop() { overlay.classList.remove('pd-notif-pop-open'); setTimeout(function () { overlay.remove(); }, 250); }
+      });
+    },
+    requestPermission: function () {
+      if (typeof Notification === 'undefined') return Promise.resolve('unsupported');
+      try { return Notification.requestPermission(); }
+      catch (e) {
+        // Some browsers throw if not from a user gesture — fall back to in-app only.
+        return Promise.resolve(Notification.permission || 'default');
       }
     },
     push: function (item, opts) {

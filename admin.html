@@ -1033,7 +1033,20 @@
         window.escapeHTML = (str) => { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; };
         window.showLoading = () => document.getElementById('globalLoader').style.display = 'flex';
         window.hideLoading = () => document.getElementById('globalLoader').style.display = 'none';
-        window.loadMembers = function() { filterMembers(); };
+        window.loadMembers = async function() {
+            const tbody = document.getElementById('listMembers');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;"><div class="spinner" style="width:30px;height:30px;"></div></td></tr>';
+            try {
+                const snap = await getDocs(query(collection(db, "memberships"), orderBy("createdAt", "desc")));
+                allMembersCache = [];
+                snap.forEach(d => allMembersCache.push(Object.assign({ id: d.id }, d.data())));
+                filterMembers();
+            } catch (e) {
+                console.error('loadMembers error:', e);
+                toast('Could not load members: ' + e.message, 'error');
+                if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--accent-red);">Could not load members — check your connection.</td></tr>';
+            }
+        };
 
         async function logAdminActivity(action, details) {
             if (!adminUser) return;
@@ -1119,9 +1132,19 @@
             finally { hideLoading(); } 
         };
 
-        window.viewFullMemberDetails = async function(uid) { 
-            const member=allMembersCache.find(x=>x.id===uid); 
-            if(!member) return toast("Not found","error"); 
+        window.viewFullMemberDetails = async function(uid) {
+            let member = allMembersCache.find(x => x.id === uid);
+            if (!member) {
+                // The Members panel may not be loaded yet — fetch this single member directly so the
+                // "View/Edit" button never silently fails.
+                try {
+                    const snap = await getDoc(doc(db, 'memberships', uid));
+                    if (!snap.exists()) return toast('Member not found', 'error');
+                    member = Object.assign({ id: snap.id }, snap.data());
+                } catch (e) {
+                    return toast('Could not load member: ' + e.message, 'error');
+                }
+            }
             showLoading(); 
             try { 
                 const walletDoc=await getDoc(doc(db,"wallets",uid)); 

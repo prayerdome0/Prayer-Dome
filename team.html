@@ -172,6 +172,84 @@
         /* Luxury Font */
         .luxury-font, h1, h2, h3, .founder-name, .team-name, .stat-number { font-family: 'Playfair Display', serif; }
 
+        /* ===== Special banner that sits above the founder card ===== */
+        .pd-special-banner {
+            position: relative;
+            overflow: hidden;
+            border-radius: 32px;
+            margin-bottom: 28px;
+            padding: 30px 28px 32px;
+            color: #fff;
+            text-align: center;
+            background:
+              radial-gradient(ellipse 60% 55% at 50% 35%, rgba(212,175,55,.42) 0%, transparent 60%),
+              linear-gradient(135deg, #0A4D9B 0%, #0a3d7a 55%, #07244d 100%);
+            box-shadow: 0 22px 50px -16px rgba(10,77,155,.55), inset 0 0 0 1px rgba(212,175,55,.35);
+            animation: pdSpecialRise .8s var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+        }
+        .pd-special-shine {
+            position: absolute; inset: 0;
+            background:
+              radial-gradient(1.5px 1.5px at 12% 18%, rgba(255,255,255,.6), transparent 60%),
+              radial-gradient(1px 1px at 28% 70%, rgba(246,223,138,.8), transparent 60%),
+              radial-gradient(1.2px 1.2px at 70% 28%, rgba(255,255,255,.5), transparent 60%),
+              radial-gradient(1px 1px at 88% 78%, rgba(246,223,138,.6), transparent 60%),
+              radial-gradient(1px 1px at 48% 88%, rgba(255,255,255,.45), transparent 60%);
+            pointer-events: none;
+            opacity: .9;
+        }
+        .pd-special-banner::after {
+            content: '';
+            position: absolute; top: 0; left: -120%;
+            width: 60%; height: 100%;
+            background: linear-gradient(105deg, transparent, rgba(255,255,255,.18), transparent);
+            transform: skewX(-20deg);
+            animation: pdSheen 6s linear infinite;
+            pointer-events: none;
+        }
+        .pd-special-inner { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; }
+        .pd-special-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(212,175,55,.18);
+            border: 1px solid rgba(212,175,55,.55);
+            color: #f6df8a;
+            padding: 6px 16px; border-radius: 999px;
+            font-size: .72rem; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase;
+            animation: pdBadgeGlow 2.6s ease-in-out infinite;
+        }
+        .pd-special-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.45rem, 3.4vw, 2.05rem);
+            font-weight: 700;
+            line-height: 1.2; margin: 14px 0 8px;
+            text-shadow: 0 2px 18px rgba(212,175,55,.35);
+        }
+        .pd-special-text { font-size: .95rem; opacity: .92; max-width: 620px; margin: 0 auto; line-height: 1.55; }
+        .pd-special-text strong { color: #f6df8a; }
+        .pd-special-crown {
+            display: inline-flex; align-items: center; gap: 10px;
+            margin-top: 16px;
+            background: rgba(0,0,0,.28);
+            border: 1px solid rgba(212,175,55,.4);
+            color: #f6df8a;
+            padding: 8px 18px; border-radius: 999px;
+            font-size: .78rem; font-weight: 800; letter-spacing: 1.2px;
+        }
+        .pd-special-crown i { color: #d4af37; }
+        @keyframes pdSpecialRise {
+            from { opacity: 0; transform: translateY(-14px) scale(.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes pdSheen { to { left: 130%; } }
+        @keyframes pdBadgeGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(212,175,55,.0); }
+            50%      { box-shadow: 0 0 0 6px rgba(212,175,55,.12); }
+        }
+        @media (max-width: 600px) {
+            .pd-special-banner { padding: 22px 18px 24px; border-radius: 26px; }
+            .pd-special-title { font-size: 1.25rem; }
+        }
+
         /* Header with Logo - Increased Size */
         .team-header {
             background: var(--bg-card);
@@ -262,7 +340,7 @@
             background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark));
             border-radius: 40px;
             padding: 50px;
-            margin-bottom: 50px;
+            margin-bottom: 30px;
             text-align: center;
             color: white;
             position: relative;
@@ -606,6 +684,17 @@
     </header>
 
     <div class="main-container">
+        <!-- Special: Spirit-Led Welcome Banner (above the founder card) -->
+        <div class="pd-special-banner" role="region" aria-label="Prayer Dome welcome">
+            <div class="pd-special-shine"></div>
+            <div class="pd-special-inner">
+                <span class="pd-special-badge"><i class="fas fa-fire"></i> A House of Prayer for All Nations</span>
+                <h2 class="pd-special-title">The Dome Is Alive &mdash; Meet the Family</h2>
+                <p class="pd-special-text">Pastors, worship leaders and ministry servants across <strong>Zambia, Eswatini &amp; Ireland</strong> &mdash; united by prayer, bound by love, sent to the nations.</p>
+                <div class="pd-special-crown"><i class="fas fa-crown"></i><span>Matthew 21:13</span></div>
+            </div>
+        </div>
+
         <!-- Founder Featured Card -->
         <div class="founder-featured">
             <div class="founder-image">
@@ -616,30 +705,19 @@
             <p>"A House of Prayer for All Nations – Matthew 21:13. Our calling is to see lives transformed through the power of prayer and the Word of God."</p>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number" id="teamCount">16</div>
-                <div class="stat-label"><i class="fas fa-users"></i> Team Members</div>
-            </div>
-            <div class="stat-card" style="background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark)); color: white;">
-                <div class="stat-number">3</div>
-                <div class="stat-label"><i class="fas fa-globe"></i> Countries</div>
-            </div>
-            <div class="stat-card" style="background: linear-gradient(135deg, #3b82f6, #1e40af); color: white;">
-                <div class="stat-number">7+</div>
-                <div class="stat-label"><i class="fas fa-calendar-alt"></i> Years of Ministry</div>
-            </div>
-            <div class="stat-card" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white;">
-                <div class="stat-number">5</div>
-                <div class="stat-label"><i class="fas fa-church"></i> Ministries</div>
-            </div>
+        <!-- Stats Cards — live from PDApp.stats (same numbers as the home page) -->
+        <div class="stats-grid pd-stats-strip" aria-label="Prayer Dome community at a glance">
+            <div class="stat-card"><div class="stat-number" data-pd-stat="members">0</div><div class="stat-label"><i class="fas fa-users"></i> Members</div></div>
+            <div class="stat-card"><div class="stat-number" data-pd-stat="prayerRequests">0</div><div class="stat-label"><i class="fas fa-hands-praying"></i> Prayer Requests</div></div>
+            <div class="stat-card"><div class="stat-number" data-pd-stat="testimonies">0</div><div class="stat-label"><i class="fas fa-star"></i> Testimonies</div></div>
+            <div class="stat-card" style="background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark)); color: white;"><div class="stat-number" data-pd-stat="countriesReached">0</div><div class="stat-label" style="color: rgba(255,255,255,.9);"><i class="fas fa-globe"></i> Countries Reached</div></div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #3b82f6, #1e40af); color: white;"><div class="stat-number" data-pd-stat="liveViewers">0</div><div class="stat-label" style="color: rgba(255,255,255,.9);"><i class="fas fa-tower-broadcast"></i> Live Viewers</div></div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white;"><div class="stat-number" data-pd-stat="prayerGroups">0</div><div class="stat-label" style="color: rgba(255,255,255,.9);"><i class="fas fa-people-group"></i> Prayer Groups</div></div>
         </div>
 
         <!-- Category Tabs -->
         <div class="category-tabs">
             <button class="category-btn active" onclick="filterTeam('all')"><i class="fas fa-users"></i> All Team (16)</button>
-            <button class="category-btn" onclick="filterTeam('founder')"><i class="fas fa-crown"></i> Founder</button>
             <button class="category-btn" onclick="filterTeam('eswatini')"><i class="fas fa-flag"></i> Eswatini (6)</button>
             <button class="category-btn" onclick="filterTeam('zambia')"><i class="fas fa-flag"></i> Zambia (2)</button>
             <button class="category-btn" onclick="filterTeam('worship')"><i class="fas fa-music"></i> Worship (5)</button>
@@ -753,10 +831,10 @@
 
         window.filterTeam = function(category) {
             currentFilter = category;
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            // Match the button by its onclick handler (the on-screen label can change).
             document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.textContent.toLowerCase().includes(category) || 
-                    (category === 'all' && btn.textContent.includes('All'))) {
+                if (btn.getAttribute('onclick') === "filterTeam('" + category + "')") {
                     btn.classList.add('active');
                 }
             });
