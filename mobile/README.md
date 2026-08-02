@@ -55,8 +55,11 @@ android/app/build/outputs/bundle/release/app-release.aab
 
 ## GitHub Actions artifact
 
-The repository includes `.github/workflows/android.yml`. After it runs, list
-builds and download the artifact with GitHub CLI:
+A ready-to-run GitHub Actions workflow is provided at
+`mobile/android-build.yml`. A repository maintainer can copy it to
+`.github/workflows/android.yml` (GitHub requires workflow write permission for
+that path). After it runs, list builds and download the artifact with GitHub
+CLI:
 
 ```bash
 gh run list --repo prayerdome0/Prayer-Dome --workflow android.yml
