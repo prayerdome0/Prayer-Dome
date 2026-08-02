@@ -10,6 +10,12 @@
     "ignore": [
       "firebase.json",
       "vercel.json",
+      "capacitor.config.json",
+      "package.json",
+      "package-lock.json",
+      "android/**",
+      "mobile/**",
+      "scripts/**",
       "seo/**",
       "api/**",
       "functions/**",
@@ -94,6 +100,10 @@
       {
         "source": "/membership",
         "destination": "/membership.html"
+      },
+      {
+        "source": "/privacy",
+        "destination": "/privacy.html"
       },
       {
         "source": "/about",

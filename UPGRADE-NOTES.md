@@ -205,8 +205,9 @@ From your roadmap, in the order I'd tackle them:
    Chart.js and aggregate queries
 4. **Devotional scheduler** — `devotional-data.js` is static; moving it to Firestore
    with a publish date gives you the admin publishing dashboard
-5. **Mobile app** — the PWA work here is the foundation; Capacitor would wrap it
-   with the least effort since it reuses these exact pages
+5. **Mobile app** — the PWA is now packaged by the Capacitor Android wrapper
+   in `android/`; run `npm run mobile:sync` before opening Android Studio and
+   configure a release keystore for the Play Store AAB
 6. **Recurring donations / mobile money** — needs a payment provider decision first
    (Flutterwave and Paystack both handle Zambian mobile money)
 
