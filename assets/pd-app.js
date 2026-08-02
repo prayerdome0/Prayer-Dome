@@ -20,7 +20,8 @@
 (function () {
   'use strict';
 
-  var VERSION = '1.0.0';
+  var VERSION = '1.0.1';
+  var BRAND_LOGO = 'https://i.ibb.co/TB5Fx4tb/logo-0.png'; // official Prayer Dome mark
   var channel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('pd-app') : null;
   var fb = null;            // Firestore bindings, set via setFirestore()
   var listeners = [];
@@ -588,6 +589,7 @@
         media +
         '<div class="pd-hero-shade"></div>' +
         '<div class="pd-hero-content">' +
+          '<img class="pd-hero-logo" src="' + BRAND_LOGO + '" alt="Prayer Dome logo" loading="lazy" onerror="this.remove()">' +
           (banner.badge ? '<span class="pd-hero-badge">' + esc(banner.badge) + '</span>' : '') +
           '<p class="pd-hero-eyebrow pd-brand-mark">Prayer Dome</p>' +
           '<h1 class="pd-hero-headline">' + esc(banner.headline || 'Welcome to Prayer Dome') + '</h1>' +
