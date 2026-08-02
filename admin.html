@@ -711,7 +711,7 @@
                 <div class="page-title"><i class="fas fa-hand-holding-heart"></i> Community Support Claims</div>
                 <div class="panel-card">
                     <div class="panel-header"><h3><i class="fas fa-file-invoice"></i> Pending Claims & Active Plans</h3><button class="btn btn-outline btn-sm" onclick="loadSupport()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
-                    <div class="table-responsive"> <tr><thead> <tr><th>Date Applied</th><th>Member</th><th>Plan Type</th><th>Amount</th><th>Documents</th><th>Status</th><th>Actions</th> </tr></thead><tbody id="listSupportClaims"> <tr><td colspan="7"><div class="spinner" style="width:30px;height:30px;"></div></td></tr> </tbody> </table> </div>
+                    <div class="table-responsive"><table><thead><tr><th>Date Applied</th><th>Member</th><th>Plan Type</th><th>Amount</th><th>Documents</th><th>Status</th><th>Actions</th></tr></thead><tbody id="listSupportClaims"> <tr><td colspan="7"><div class="spinner" style="width:30px;height:30px;"></div></td></tr> </tbody> </table> </div>
                 </div>
             </div>
 
@@ -973,17 +973,29 @@
 
     <input type="hidden" id="editMemberId">
 
+    <!-- Keep a failed CDN/Firebase module from leaving the administrator behind
+         an infinite spinner, especially inside the Capacitor WebView. -->
+    <script>
+        window.setTimeout(() => {
+            const loader = document.getElementById('globalLoader');
+            if (!loader || loader.style.display === 'none') return;
+            loader.style.display = 'none';
+            const login = document.getElementById('loginModal');
+            if (login) login.style.display = 'flex';
+            const message = loader.querySelector('h3');
+            if (message) message.textContent = 'Admin sign-in could not be loaded. Check your connection and refresh.';
+        }, 8000);
+    </script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, getDoc, doc, updateDoc, setDoc, deleteDoc, query, where, orderBy, serverTimestamp, increment, addDoc, limit, onSnapshot, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo", authDomain: "prayer-dome.firebaseapp.com", projectId: "prayer-dome", storageBucket: "prayer-dome.firebasestorage.app", messagingSenderId: "198295153196", appId: "1:198295153196:web:1222b31948d7974ba3bf89" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        const messaging = getMessaging(app);
 
         // Hand Firestore to the shared premium layer (pd-app.js) so banners,
         // news, notifications, live status and stats sync to every page.
@@ -1296,7 +1308,7 @@
         /* ===== Portal Notices (Announcements) Management ===== */
         window.loadAnnouncements = async function(){ const tbody=document.getElementById('listAnnouncements'); if(tbody) tbody.innerHTML='<td colspan="5"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try{ const snap=await getDocs(query(collection(db,"announcements"),orderBy("createdAt","desc"),limit(100))); const items=[]; snap.forEach(d=>items.push({id:d.id,...d.data()})); items.sort((a,b)=>(b.pinned===true)-(a.pinned===true)); let html=''; items.forEach(a=>{ const cat=a.category==='urgent'?'<span class="badge badge-danger">⚠️ Urgent</span>':a.category==='event'?'<span class="badge badge-warning">📅 Event</span>':'<span class="badge badge-info">📢 General</span>'; const pin=a.pinned?'<span class="badge badge-warning"><i class="fas fa-thumbtack"></i> Pinned</span>':'<span style="color:var(--text-sub);font-size:0.7rem;">—</span>'; html+=`<tr><td style="white-space:nowrap;">${a.createdAt?moment(a.createdAt.toDate()).format('MMM D, YYYY HH:mm'):'N/A'}</td><td style="white-space:normal;"><strong>${escapeHTML(a.title||'')}</strong><p style="font-size:0.7rem;color:var(--text-sub);white-space:normal;margin-top:2px;">${escapeHTML((a.body||'').substring(0,80))}${(a.body||'').length>80?'...':''}</p></td><td>${cat}</td><td>${pin}</td><td style="white-space:nowrap;"><button class="btn btn-sm btn-outline" onclick="toggleAnnouncementPin('${a.id}', ${a.pinned===true})"><i class="fas fa-thumbtack"></i> ${a.pinned?'Unpin':'Pin'}</button><button class="btn btn-sm btn-danger" onclick="deleteRecord('announcements','${a.id}')"><i class="fas fa-trash"></i></button></td></tr>`; }); if(tbody) tbody.innerHTML=html||'<td colspan="5">No notices published yet<\/td>'; } catch(e){ console.error(e); toast("Error loading notices","error"); } };
 
-        window.saveAnnouncement = async function(){ const title=document.getElementById('annTitle').value.trim(), body=document.getElementById('annBody').value.trim(); if(!title||!body) return toast("Title and message are required","error"); showLoading(); try{ await addDoc(collection(db,"announcements"),{ title:title, body:body, category:document.getElementById('annCategory').value, pinned:document.getElementById('annPinned').checked, createdAt:serverTimestamp(), createdBy:adminUser?.email }); await logAdminActivity('announcement_published',{ title:title }); // Instant in-app notification + moving announcement bar on every open page. if(window.PDApp){ PDApp.notifications.push({ type:'general', title:'📢 '+title, message:body.substring(0,110), link:null }); const marquee = PDApp.store.get('announcements','DEFAULT_ANNOUNCEMENTS') || []; marquee.unshift({ id:'ann-'+Date.now().toString(36), text:title+(body?' — '+body.substring(0,80):''), icon:'fa-bullhorn', active:true }); PDApp.store.set('announcements', marquee.slice(0,20)); } document.getElementById('annTitle').value=''; document.getElementById('annBody').value=''; document.getElementById('annPinned').checked=false; closeModal('modalAnnouncement'); toast("Notice published — users notified instantly 📢"); await loadAnnouncements(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
+        window.saveAnnouncement = async function(){ const title=document.getElementById('annTitle').value.trim(), body=document.getElementById('annBody').value.trim(); if(!title||!body) return toast("Title and message are required","error"); showLoading(); try{ await addDoc(collection(db,"announcements"),{ title:title, body:body, category:document.getElementById('annCategory').value, pinned:document.getElementById('annPinned').checked, createdAt:serverTimestamp(), createdBy:adminUser?.email }); await logAdminActivity('announcement_published',{ title:title }); /* Instant in-app notification + moving announcement bar on every open page. */ if(window.PDApp){ PDApp.notifications.push({ type:'general', title:'📢 '+title, message:body.substring(0,110), link:null }); const marquee = PDApp.store.get('announcements','DEFAULT_ANNOUNCEMENTS') || []; marquee.unshift({ id:'ann-'+Date.now().toString(36), text:title+(body?' — '+body.substring(0,80):''), icon:'fa-bullhorn', active:true }); PDApp.store.set('announcements', marquee.slice(0,20)); } document.getElementById('annTitle').value=''; document.getElementById('annBody').value=''; document.getElementById('annPinned').checked=false; closeModal('modalAnnouncement'); toast("Notice published — users notified instantly 📢"); await loadAnnouncements(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
 
         window.toggleAnnouncementPin = async function(id, currentlyPinned){ showLoading(); try{ await updateDoc(doc(db,"announcements",id),{ pinned:!currentlyPinned }); toast(!currentlyPinned?"📌 Notice pinned":"Notice unpinned"); await loadAnnouncements(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
 

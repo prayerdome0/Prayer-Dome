@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Prayer Dome</string>
+    <string name="title_activity_main">Prayer Dome</string>
+    <string name="package_name">net.prayerdome.app</string>
+    <string name="custom_url_scheme">net.prayerdome.app</string>
+</resources>

@@ -1,0 +1,8 @@
+{
+  "appId": "net.prayerdome.app",
+  "appName": "Prayer Dome",
+  "webDir": "mobile/www",
+  "server": {
+    "androidScheme": "https"
+  }
+}
