@@ -1,8 +1,8 @@
 /* ==========================================================================
-   Prayer Dome — Blue, Gold & White Brand System
+   Prayer Dome — Deep Green, Gold & White Brand System
    --------------------------------------------------------------------------
-   A shared design layer: royal blue + gold + white, glassmorphism,
-   and motion primitives.
+   Matched to the official brand mark: deep forest green, radiant gold,
+   clean white. Glassmorphism + motion primitives shared across the app.
 
    Load AFTER a page's own <style> block so the tokens win, e.g.:
      <link rel="stylesheet" href="/assets/pd-brand.css">
@@ -12,34 +12,49 @@
    ========================================================================== */
 
 :root {
-  /* --- Prayer Dome palette: blue, gold and white ---------------------- */
+  /* --- Prayer Dome palette: deep green, gold and white ----------------- */
+  --pd-green:        #0a5c36;
+  --pd-green-mid:    #15803d;
+  --pd-green-light:  #22c55e;
+  --pd-green-deep:   #064e3b;
+  --pd-green-dark:   #022c22;
+  --pd-forest:       #0b3d2e;
+
   --pd-amber:        #d4af37;
   --pd-amber-soft:   #f6df8a;
   --pd-amber-deep:   #a67c00;
+  --pd-gold:         #d4af37;
+  --pd-gold-bright:  #f0d060;
+
+  /* Aliases kept so older class names still resolve correctly */
   --pd-coral:        #d4af37;
   --pd-rose:         #a67c00;
-  --pd-teal:         #0b3d91;
-  --pd-teal-light:   #2563eb;
-  --pd-teal-deep:    #082b66;
-  --pd-indigo:       #174ea6;
-  --pd-indigo-deep:  #061f4a;
-  --pd-violet:       #174ea6;
-  --pd-sky:          #3b82f6;
+  --pd-teal:         #0a5c36;
+  --pd-teal-light:   #22c55e;
+  --pd-teal-deep:    #064e3b;
+  --pd-indigo:       #0b3d2e;
+  --pd-indigo-deep:  #022c22;
+  --pd-violet:       #15803d;
+  --pd-sky:          #4ade80;
 
-  /* --- Signature gradients: blue, gold and white only ---------------- */
-  --pd-grad-dawn:    linear-gradient(135deg, #0b3d91 0%, #2563eb 55%, #d4af37 100%);
+  /* --- Signature gradients --------------------------------------------- */
+  --pd-grad-dawn:    linear-gradient(135deg, #0a5c36 0%, #15803d 48%, #d4af37 100%);
   --pd-grad-sunrise: linear-gradient(120deg, #ffffff 0%, #f6df8a 45%, #d4af37 100%);
-  --pd-grad-ocean:   linear-gradient(135deg, #082b66 0%, #0b3d91 52%, #2563eb 100%);
-  --pd-grad-horizon: linear-gradient(160deg, #061f4a 0%, #0b3d91 58%, #d4af37 100%);
+  --pd-grad-ocean:   linear-gradient(135deg, #022c22 0%, #0a5c36 52%, #15803d 100%);
+  --pd-grad-horizon: linear-gradient(160deg, #022c22 0%, #0a5c36 45%, #15803d 72%, #d4af37 100%);
   --pd-grad-gold:    linear-gradient(135deg, #ffffff 0%, #f6df8a 45%, #d4af37 100%);
-  --pd-grad-glass:   linear-gradient(135deg, rgba(255,255,255,.72), rgba(255,255,255,.22));
+  --pd-grad-forest:  linear-gradient(145deg, #064e3b 0%, #0a5c36 55%, #15803d 100%);
+  --pd-grad-glass:   linear-gradient(135deg, rgba(255,255,255,.78), rgba(255,255,255,.28));
+  --pd-grad-hero:    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(212,175,55,.35) 0%, transparent 55%),
+                     linear-gradient(160deg, #064e3b 0%, #0a5c36 40%, #022c22 100%);
 
-  --pd-shadow-sm:   0 2px 10px rgba(6, 31, 74, .08);
-  --pd-shadow:      0 14px 40px rgba(6, 31, 74, .13);
-  --pd-shadow-lg:   0 28px 70px rgba(6, 31, 74, .20);
-  --pd-glow-amber:  0 10px 40px rgba(212, 175, 55, .35);
-  --pd-glow-teal:   0 10px 40px rgba(11, 61, 145, .30);
-  --pd-glow-indigo: 0 10px 40px rgba(37, 99, 235, .30);
+  --pd-shadow-sm:   0 2px 10px rgba(2, 44, 34, .08);
+  --pd-shadow:      0 14px 40px rgba(2, 44, 34, .13);
+  --pd-shadow-lg:   0 28px 70px rgba(2, 44, 34, .20);
+  --pd-glow-amber:  0 10px 40px rgba(212, 175, 55, .40);
+  --pd-glow-teal:   0 10px 40px rgba(10, 92, 54, .32);
+  --pd-glow-indigo: 0 10px 40px rgba(21, 128, 61, .30);
+  --pd-glow-gold:   0 0 60px rgba(212, 175, 55, .45);
 
   --pd-ease:        cubic-bezier(.16, 1, .3, 1);
   --pd-ease-back:   cubic-bezier(.34, 1.56, .64, 1);
@@ -47,13 +62,13 @@
   --pd-radius-lg:   32px;
 
   /* Compatibility aliases used by existing pages. */
-  --accent-green:       #0b3d91;
-  --accent-green-light: #2563eb;
+  --accent-green:       #15803d;
+  --accent-green-light: #22c55e;
   --accent-gold:        #d4af37;
   --accent-gold-dark:   #a67c00;
   --accent-blue:        #2563eb;
-  --accent-purple:      #174ea6;
-  --shadow-glow:        0 10px 30px rgba(11, 61, 145, .18);
+  --accent-purple:      #0a5c36;
+  --shadow-glow:        0 10px 30px rgba(21, 128, 61, .18);
 }
 
 body.dark-mode {
@@ -61,7 +76,7 @@ body.dark-mode {
   --pd-shadow:     0 14px 40px rgba(0, 0, 0, .45);
   --pd-shadow-lg:  0 28px 70px rgba(0, 0, 0, .55);
   --pd-grad-glass: linear-gradient(135deg, rgba(148,163,184,.16), rgba(148,163,184,.04));
-  --shadow-glow:   0 10px 30px rgba(37, 99, 235, .16);
+  --shadow-glow:   0 10px 30px rgba(34, 197, 94, .16);
 }
 
 /* ==========================================================================
@@ -69,16 +84,8 @@ body.dark-mode {
    Drop <div class="pd-aurora" aria-hidden="true"></div> as the first child of
    <body>. It sits behind everything and never intercepts clicks.
    ========================================================================== */
-/* Existing pages paint an opaque colour on <body>, which would sit on top of a
-   z-index:-2 backdrop and hide it completely. So we move that colour up to
-   <html> and let <body> go transparent — the page looks identical, but the
-   aurora now has somewhere to show through. Scoped to .pd-has-aurora, which
-   pd-motion.js sets only once the backdrop is actually mounted. */
-html.pd-has-aurora { background: #f8fafc; }
-/* Pages declare their dark palette on `body.dark-mode`, so those custom
-   properties are not visible from <html>. pd-motion.js mirrors the class up,
-   and we restate the two dark backgrounds used across the site here. */
-html.pd-has-aurora.dark-mode { background: #060a13; }
+html.pd-has-aurora { background: #f4f7f5; }
+html.pd-has-aurora.dark-mode { background: #020c08; }
 html.pd-has-aurora > body { background: transparent !important; }
 
 .pd-aurora {
@@ -96,7 +103,7 @@ html.pd-has-aurora > body { background: transparent !important; }
   height: 60vmax;
   border-radius: 50%;
   filter: blur(90px);
-  opacity: .30;
+  opacity: .28;
   will-change: transform;
 }
 .pd-aurora::before {
@@ -108,7 +115,7 @@ html.pd-has-aurora > body { background: transparent !important; }
 .pd-aurora::after {
   bottom: -26vmax;
   right: -16vmax;
-  background: radial-gradient(circle at 70% 70%, var(--pd-teal-light), transparent 62%);
+  background: radial-gradient(circle at 70% 70%, var(--pd-green-light), transparent 62%);
   animation: pd-drift-b 32s var(--pd-ease) infinite alternate;
 }
 .pd-aurora span {
@@ -119,13 +126,13 @@ html.pd-has-aurora > body { background: transparent !important; }
   height: 42vmax;
   border-radius: 50%;
   filter: blur(100px);
-  opacity: .22;
-  background: radial-gradient(circle, var(--pd-violet), transparent 65%);
+  opacity: .20;
+  background: radial-gradient(circle, var(--pd-green), transparent 65%);
   animation: pd-drift-c 38s var(--pd-ease) infinite alternate;
 }
 body.dark-mode .pd-aurora::before { opacity: .22; }
-body.dark-mode .pd-aurora::after  { opacity: .20; }
-body.dark-mode .pd-aurora span    { opacity: .18; }
+body.dark-mode .pd-aurora::after  { opacity: .18; }
+body.dark-mode .pd-aurora span    { opacity: .16; }
 
 @keyframes pd-drift-a {
   0%   { transform: translate3d(0, 0, 0) scale(1); }
@@ -153,7 +160,6 @@ body.dark-mode .pd-aurora span    { opacity: .18; }
 }
 body.dark-mode .pd-glass { border-color: rgba(148, 163, 184, .18); }
 
-/* Card that lifts and catches light on hover */
 .pd-lift {
   transition: transform .5s var(--pd-ease), box-shadow .5s var(--pd-ease);
   will-change: transform;
@@ -163,7 +169,6 @@ body.dark-mode .pd-glass { border-color: rgba(148, 163, 184, .18); }
   box-shadow: var(--pd-shadow-lg);
 }
 
-/* A gradient hairline that animates around a card edge */
 .pd-edge { position: relative; }
 .pd-edge::before {
   content: '';
@@ -214,6 +219,29 @@ body.dark-mode .pd-glass { border-color: rgba(148, 163, 184, .18); }
   100% { background-position: -80% 0; }
 }
 
+/* Brand wordmark style — matches the OG card typography feel */
+.pd-brand-mark {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 2px 24px rgba(212, 175, 55, .35);
+}
+.pd-brand-tagline {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: .04em;
+  color: rgba(255, 255, 255, .88);
+}
+.pd-gold-rule {
+  width: 72px;
+  height: 2px;
+  margin: 14px auto;
+  background: linear-gradient(90deg, transparent, var(--pd-amber), transparent);
+  border: 0;
+}
+
 /* ==========================================================================
    4. Buttons
    ========================================================================== */
@@ -253,6 +281,17 @@ body.dark-mode .pd-glass { border-color: rgba(148, 163, 184, .18); }
   box-shadow: var(--pd-glow-teal);
   animation: pd-pan 7s ease infinite;
 }
+.pd-btn-gold {
+  color: #1a1400;
+  background: var(--pd-grad-gold);
+  box-shadow: var(--pd-glow-amber);
+  font-weight: 800;
+}
+.pd-btn-live {
+  color: #fff;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 10px 30px rgba(220, 38, 38, .35);
+}
 .pd-btn-ghost {
   color: var(--text-main, #0f172a);
   background: transparent;
@@ -260,7 +299,6 @@ body.dark-mode .pd-glass { border-color: rgba(148, 163, 184, .18); }
 }
 .pd-btn-ghost:hover { border-color: var(--pd-amber); color: var(--pd-amber-deep); }
 
-/* Light sweep across a button on hover */
 .pd-btn::after {
   content: '';
   position: absolute;
@@ -274,8 +312,6 @@ body.dark-mode .pd-glass { border-color: rgba(148, 163, 184, .18); }
 
 /* ==========================================================================
    5. Scroll-reveal
-   Add class="pd-reveal" (optionally with data-pd-delay="120") to any element.
-   pd-motion.js adds .is-visible when it scrolls into view.
    ========================================================================== */
 .pd-reveal {
   opacity: 0;
@@ -326,14 +362,12 @@ body.dark-mode .pd-glass { border-color: rgba(148, 163, 184, .18); }
 .pd-spin-slow { animation: pd-spin 18s linear infinite; }
 @keyframes pd-spin { to { transform: rotate(360deg); } }
 
-/* Ken-Burns drift for hero photography */
 .pd-kenburns { animation: pd-kenburns 22s ease-in-out infinite alternate; }
 @keyframes pd-kenburns {
   0%   { transform: scale(1)    translate3d(0, 0, 0); }
   100% { transform: scale(1.12) translate3d(-2%, -2%, 0); }
 }
 
-/* Skeleton shimmer for loading states */
 .pd-skeleton {
   background: linear-gradient(90deg,
               rgba(148,163,184,.12) 25%,
@@ -349,7 +383,7 @@ body.dark-mode .pd-glass { border-color: rgba(148, 163, 184, .18); }
 }
 
 /* ==========================================================================
-   7. Scroll progress bar (pd-motion.js injects the element)
+   7. Scroll progress bar
    ========================================================================== */
 .pd-progress {
   position: fixed;
@@ -385,16 +419,56 @@ body.dark-mode .pd-glass { border-color: rgba(148, 163, 184, .18); }
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(15,23,42,.72), transparent 62%);
+  background: linear-gradient(to top, rgba(2,44,34,.72), transparent 62%);
   pointer-events: none;
 }
 .pd-media.pd-media-plain::after { display: none; }
 
-/* Fallback tiles when there is no photograph */
 .pd-tile-dawn    { background: var(--pd-grad-dawn); }
 .pd-tile-ocean   { background: var(--pd-grad-ocean); }
 .pd-tile-horizon { background: var(--pd-grad-horizon); }
 .pd-tile-gold    { background: var(--pd-grad-gold); }
+.pd-tile-forest  { background: var(--pd-grad-forest); }
+
+/* Professional surface utilities */
+.pd-card {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--pd-radius);
+  box-shadow: var(--pd-shadow-sm);
+}
+.pd-section-label {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 800;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.pd-section-label i { color: var(--pd-amber); }
+
+/* Live badge */
+.pd-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #dc2626;
+  color: #fff;
+  font-size: .68rem;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  text-transform: uppercase;
+}
+.pd-live-badge::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff;
+  animation: pd-pulse-ring 1.4s ease infinite;
+}
 
 /* ==========================================================================
    9. Accessibility
@@ -416,7 +490,8 @@ body.dark-mode .pd-glass { border-color: rgba(148, 163, 184, .18); }
   .pd-float, .pd-float-slow, .pd-breathe, .pd-spin-slow,
   .pd-kenburns, .pd-skeleton, .pd-shimmer, .pd-gradient-text,
   .pd-btn-dawn, .pd-btn-ocean, .pd-pulse-ring::after,
-  .pd-edge::before {
+  .pd-edge::before,
+  .pd-live-badge::before {
     animation: none !important;
   }
   .pd-reveal { opacity: 1 !important; transform: none !important; }
