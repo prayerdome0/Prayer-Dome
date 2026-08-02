@@ -11,12 +11,26 @@
       "firebase.json",
       "vercel.json",
       "seo/**",
+      "api/**",
+      "functions/**",
       "**/.*",
       "**/node_modules/**"
     ],
     "cleanUrls": true,
     "trailingSlash": false,
     "rewrites": [
+      {
+        "source": "/news/**",
+        "function": "share"
+      },
+      {
+        "source": "/testimony/**",
+        "function": "share"
+      },
+      {
+        "source": "/share/**",
+        "function": "share"
+      },
       {
         "source": "/bible",
         "destination": "/bible.html"

@@ -900,7 +900,7 @@
                 <div class="form-group"><label>Category</label><select id="newsCategory" class="form-control"><option>Church Updates</option><option>Ministry News</option><option>Event Announcements</option><option>Revival Reports</option><option>Testimonies</option><option>Global Christian News</option></select></div>
                 <div class="form-group"><label>Summary (shown on cards)</label><textarea id="newsSummary" class="form-control" rows="2" placeholder="One or two sentences…" maxlength="240"></textarea></div>
                 <div class="form-group"><label>Full Story</label><textarea id="newsBody" class="form-control" rows="6" placeholder="Write the full story here…"></textarea></div>
-                <div class="form-group"><label>Image URL</label><input type="text" id="newsImage" class="form-control" placeholder="https://… or upload with the button below"></div>
+                <div class="form-group"><label>Featured / social sharing image URL</label><input type="text" id="newsImage" class="form-control" placeholder="Use the exact image for this story preview, or upload below"><small style="color:var(--text-sub);">This same image appears on the story card and as the Facebook/WhatsApp preview.</small></div>
                 <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
                     <button class="btn btn-outline btn-sm" type="button" onclick="uploadNewsImage()"><i class="fas fa-cloud-upload-alt"></i> Upload Image</button>
                     <label style="display:flex; align-items:center; gap:8px; font-size:.85rem;"><input type="checkbox" id="newsFeatured" style="width:18px;height:18px;"> Feature on News Center hero</label>
@@ -1388,12 +1388,12 @@
             const category = document.getElementById('newsCategory').value;
             const summary = document.getElementById('newsSummary').value.trim();
             const body = document.getElementById('newsBody').value.trim();
-            const image = document.getElementById('newsImage').value.trim() || '/assets/og-image.png';
+            const image = document.getElementById('newsImage').value.trim() || '/assets/hero-worship.jpg';
             const featured = document.getElementById('newsFeatured').checked;
             if(!title || !body){ toast('Title and story are required', 'error'); return; }
             if(!window.PDApp){ toast('Premium layer not loaded', 'error'); return; }
-            const item = PDApp.news.publish({ title, category, summary, body, image, featured, author: adminUser?.email || 'Prayer Dome Media Team' });
-            PDApp.notifications.push({ type: 'news', title: '📰 ' + title, message: (summary || body).substring(0, 90), link: '/news.html' });
+            const item = PDApp.news.publish({ title, category, summary, body, image, featuredImage: image, socialImage: image, featured, author: adminUser?.email || 'Prayer Dome Media Team' });
+            PDApp.notifications.push({ type: 'news', title: '📰 ' + title, message: (summary || body).substring(0, 90), link: `/news/${encodeURIComponent(item.id)}` });
             toast('Story published — users notified 📰');
             closeModal('modalNews');
             document.getElementById('newsTitle').value = ''; document.getElementById('newsSummary').value = ''; document.getElementById('newsBody').value = ''; document.getElementById('newsImage').value = ''; document.getElementById('newsFeatured').checked = false;

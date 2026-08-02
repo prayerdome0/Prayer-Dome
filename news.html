@@ -25,7 +25,7 @@
     <meta property="og:title" content="Christian News Center | Ministry Updates &amp; Revival Reports | Prayer Dome">
     <meta property="og:description" content="Church updates, ministry news, event announcements, revival reports, testimonies and global Christian news from Prayer Dome across the nations.">
     <meta property="og:url" content="https://prayerdome.net/news">
-    <meta property="og:image" content="https://prayerdome.net/assets/og-image.png">
+    <meta property="og:image" content="https://prayerdome.net/assets/hero-worship.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Christian News Center | Ministry Updates &amp; Revival Reports | Prayer Dome">
@@ -36,7 +36,7 @@
     <meta name="twitter:site" content="@prayerdome">
     <meta name="twitter:title" content="Christian News Center | Ministry Updates &amp; Revival Reports | Prayer Dome">
     <meta name="twitter:description" content="Church updates, ministry news, event announcements, revival reports, testimonies and global Christian news from Prayer Dome across the nations.">
-    <meta name="twitter:image" content="https://prayerdome.net/assets/og-image.png">
+    <meta name="twitter:image" content="https://prayerdome.net/assets/hero-worship.jpg">
 
     <!-- Performance hints -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -345,6 +345,10 @@
     // ==================== NEWS CENTER ====================
     let currentCategory = 'All';
     let currentQuery = '';
+    let initialStoryOpened = false;
+
+    const NEWS_FALLBACK_IMAGE = '/assets/hero-worship.jpg';
+    const SITE_ORIGIN = 'https://prayerdome.net';
 
     const CATEGORIES = ['All', 'Church Updates', 'Ministry News', 'Event Announcements', 'Revival Reports', 'Testimonies', 'Global Christian News'];
 
@@ -353,6 +357,53 @@
         const div = document.createElement('div');
         div.textContent = String(str);
         return div.innerHTML;
+    }
+
+    function getNewsImage(item) {
+        return (item && (item.socialImage || item.featuredImage || item.image || item.imageUrl || item.photoUrl)) || NEWS_FALLBACK_IMAGE;
+    }
+
+    function storyShareUrl(id) {
+        return `${SITE_ORIGIN}/news/${encodeURIComponent(id)}`;
+    }
+
+    function setMeta(selector, value, attr = 'content') {
+        const el = document.head.querySelector(selector);
+        if (el && value) el.setAttribute(attr, value);
+    }
+
+    function updateArticleMeta(item) {
+        if (!item) return;
+        const title = `${item.title || 'News'} | Prayer Dome`;
+        const desc = (item.summary || item.body || 'Read this Prayer Dome news story.').substring(0, 180);
+        const image = new URL(getNewsImage(item), SITE_ORIGIN).href;
+        const url = storyShareUrl(item.id);
+        document.title = title;
+        setMeta('meta[property="og:type"]', 'article');
+        setMeta('meta[property="og:title"]', title);
+        setMeta('meta[property="og:description"]', desc);
+        setMeta('meta[property="og:url"]', url);
+        setMeta('meta[property="og:image"]', image);
+        setMeta('meta[property="og:image:alt"]', item.title || 'Prayer Dome news');
+        setMeta('meta[name="twitter:title"]', title);
+        setMeta('meta[name="twitter:description"]', desc);
+        setMeta('meta[name="twitter:image"]', image);
+    }
+
+    function getInitialStoryId() {
+        const url = new URL(window.location.href);
+        const fromQuery = url.searchParams.get('story') || url.searchParams.get('id') || url.searchParams.get('news');
+        if (fromQuery) return fromQuery;
+        const match = url.pathname.match(/^\/news\/([^/?#]+)/);
+        return match ? decodeURIComponent(match[1]) : '';
+    }
+
+    function openInitialNewsArticle() {
+        if (initialStoryOpened) return;
+        const id = getInitialStoryId();
+        if (!id || !window.PDApp || !PDApp.news.get(id)) return;
+        initialStoryOpened = true;
+        openArticle(id, { pushState: false });
     }
 
     function getItems() {
@@ -398,7 +449,7 @@
             if (featured && currentCategory === 'All' && !currentQuery) {
                 hero.style.display = 'block';
                 hero.innerHTML = `<a class="pd-news-hero" href="#" data-open="${esc(featured.id)}" style="display:flex; text-decoration:none;">
-                    <img src="${esc(featured.image || '/assets/hero-worship.jpg')}" alt="" onerror="this.style.display='none'">
+                    <img src="${esc(getNewsImage(featured))}" alt="" onerror="this.src='${NEWS_FALLBACK_IMAGE}'">
                     <div class="pd-news-hero-body">
                         <span class="pd-news-cat">${esc(featured.category || 'Ministry News')}</span>
                         <h2>${esc(featured.title)}</h2>
@@ -418,8 +469,7 @@
         grid.innerHTML = items.map(n => `
             <article class="pd-news-card">
                 <div class="pd-news-media">
-                    <img src="${esc(n.image || '/assets/og-image.png')}" alt="" class="pd-news-cover" loading="lazy" onerror="this.src='/assets/og-image.png'">
-                    <img src="/assets/news/accent-cross.png" alt="" class="pd-news-badge" aria-hidden="true" onerror="this.style.display='none'">
+                    <img src="${esc(getNewsImage(n))}" alt="" class="pd-news-cover" loading="lazy" onerror="this.src='${NEWS_FALLBACK_IMAGE}'">
                 </div>
                 <div class="pd-news-card-body">
                     <span class="pd-news-cat">${esc(n.category || 'Ministry News')}</span>
@@ -442,29 +492,36 @@
         return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
-    function openArticle(id) {
+    function openArticle(id, options = {}) {
         if (!window.PDApp) return;
         const n = PDApp.news.get(id);
         if (!n) return;
-        document.getElementById('newsModalImg').src = n.image || '/assets/og-image.png';
+        document.getElementById('newsModalImg').src = getNewsImage(n);
+        document.getElementById('newsModalImg').onerror = function(){ this.src = NEWS_FALLBACK_IMAGE; };
         document.getElementById('newsModalCat').textContent = n.category || 'Ministry News';
         document.getElementById('newsModalTitle').textContent = n.title;
         document.getElementById('newsModalMeta').innerHTML = `<span><i class="far fa-clock"></i> ${formatDate(n.date)}</span><span><i class="fas fa-user"></i> ${esc(n.author || 'Prayer Dome')}</span>`;
         document.getElementById('newsModalBody').textContent = n.body || n.summary || '';
-        const shareUrl = encodeURIComponent('https://prayerdome.net/news.html');
+        const rawShareUrl = storyShareUrl(n.id);
+        const shareUrl = encodeURIComponent(rawShareUrl);
         const shareText = encodeURIComponent(n.title);
         document.getElementById('newsShareRow').innerHTML = `
             <button class="btn-share-wa" onclick="window.open('https://wa.me/?text=${shareText}%20${shareUrl}','_blank')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
             <button class="btn-share-fb" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=${shareUrl}','_blank')"><i class="fab fa-facebook-f"></i> Facebook</button>
             <button class="btn-share-x" onclick="window.open('https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}','_blank')"><i class="fab fa-x-twitter"></i> X</button>
-            <button class="btn-share-copy" onclick="navigator.clipboard.writeText(decodeURIComponent('${shareUrl}')); PDApp.toast('Link copied to clipboard');"><i class="fas fa-link"></i> Copy</button>`;
+            <button class="btn-share-copy" onclick="navigator.clipboard.writeText('${rawShareUrl}'); PDApp.toast('Story link copied — it will share with this story image');"><i class="fas fa-link"></i> Copy Story Link</button>`;
+        updateArticleMeta(n);
+        if (options.pushState !== false && history.pushState) history.pushState({ newsId: n.id }, '', `/news/${encodeURIComponent(n.id)}`);
         document.getElementById('newsModalOverlay').classList.add('open');
         document.body.style.overflow = 'hidden';
     }
 
-    window.closeArticle = () => {
+    window.closeArticle = (options = {}) => {
         document.getElementById('newsModalOverlay').classList.remove('open');
         document.body.style.overflow = '';
+        if (options.updateUrl !== false && history.pushState && (/^\/news\//.test(location.pathname) || new URL(location.href).searchParams.get('story'))) {
+            history.pushState({}, '', '/news.html');
+        }
     };
 
     document.getElementById('newsModalOverlay').addEventListener('click', e => {
@@ -482,14 +539,83 @@
         if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
     };
 
-    // Live news updates from the admin dashboard / other tabs.
-    if (window.PDApp) {
-        PDApp.on('news', () => { renderCats(); renderNews(); });
-        PDApp.on('news:remove', () => { renderCats(); renderNews(); });
+    function bootstrapNews() {
+        renderCats();
+        renderNews();
+        openInitialNewsArticle();
+        if (window.PDApp && !bootstrapNews.bound) {
+            bootstrapNews.bound = true;
+            PDApp.on('news', () => { renderCats(); renderNews(); openInitialNewsArticle(); });
+            PDApp.on('news:remove', () => { renderCats(); renderNews(); });
+        }
     }
 
-    renderCats();
-    renderNews();
+    window.renderCats = renderCats;
+    window.renderNews = renderNews;
+    window.openInitialNewsArticle = openInitialNewsArticle;
+    window.addEventListener('popstate', () => {
+        const id = getInitialStoryId();
+        if (id) openArticle(id, { pushState: false }); else closeArticle({ updateUrl: false });
+    });
+
+    if (document.readyState === 'complete') bootstrapNews();
+    else window.addEventListener('load', bootstrapNews);
+</script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, query, orderBy, limit, onSnapshot, getDocs, doc, getDoc, setDoc, addDoc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo",
+        authDomain: "prayer-dome.firebaseapp.com",
+        projectId: "prayer-dome",
+        storageBucket: "prayer-dome.firebasestorage.app",
+        messagingSenderId: "198295153196",
+        appId: "1:198295153196:web:1222b31948d7974ba3bf89"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    if (window.PDApp) PDApp.setFirestore({ db, doc, getDoc, setDoc, addDoc, collection, query, orderBy, limit, getDocs, serverTimestamp, Timestamp, onSnapshot });
+
+    const toIso = (value) => {
+        if (!value) return null;
+        if (typeof value === 'string') return value;
+        if (value.toDate) return value.toDate().toISOString();
+        if (value.seconds) return new Date(value.seconds * 1000).toISOString();
+        return null;
+    };
+
+    const applyNewsSnapshot = (snapshot) => {
+        if (!window.PDApp) return;
+        const remote = snapshot.docs.map((d) => {
+            const data = d.data() || {};
+            const image = data.socialImage || data.featuredImage || data.image || data.imageUrl || data.photoUrl || '';
+            return {
+                ...data,
+                id: data.id || d.id,
+                image,
+                featuredImage: data.featuredImage || image,
+                socialImage: data.socialImage || image,
+                date: toIso(data.date) || toIso(data.createdAt) || toIso(data.updatedAt),
+                published: data.published !== false
+            };
+        }).filter((n) => n.published !== false);
+        const seeds = (window.PD_CONTENT && window.PD_CONTENT.DEFAULT_NEWS) ? window.PD_CONTENT.DEFAULT_NEWS : [];
+        const byId = new Map();
+        [...remote, ...seeds].forEach((item) => { if (item && item.id && !byId.has(item.id)) byId.set(item.id, item); });
+        PDApp.store.set('news', Array.from(byId.values()));
+        window.renderCats?.();
+        window.renderNews?.();
+        window.openInitialNewsArticle?.();
+    };
+
+    try {
+        const newsQuery = query(collection(db, "news"), orderBy("createdAt", "desc"), limit(100));
+        onSnapshot(newsQuery, applyNewsSnapshot, (error) => console.warn('News sync unavailable:', error));
+    } catch (error) {
+        console.warn('News sync unavailable:', error);
+    }
 </script>
 </body>
 </html>

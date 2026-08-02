@@ -1392,8 +1392,8 @@
         }
         container.innerHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px;">
             ${items.map(n => `
-                <a class="pd-news-card" href="/news.html" style="text-decoration:none; cursor:pointer;">
-                    <img src="${escapeHtml(n.image || '/assets/og-image.png')}" alt="" loading="lazy" onerror="this.src='/assets/og-image.png'">
+                <a class="pd-news-card" href="/news.html?story=${encodeURIComponent(n.id)}" style="text-decoration:none; cursor:pointer;">
+                    <img src="${escapeHtml(n.socialImage || n.featuredImage || n.image || '/assets/hero-worship.jpg')}" alt="" loading="lazy" onerror="this.src='/assets/hero-worship.jpg'">
                     <div class="pd-news-card-body">
                         <span class="pd-news-cat">${escapeHtml(n.category || 'Ministry News')}</span>
                         <h3>${escapeHtml(n.title)}</h3>
