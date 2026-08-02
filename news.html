@@ -61,8 +61,8 @@
   "sameAs": [],
   "address": {
     "@type": "PostalAddress",
-    "addressLocality": "Lusaka",
-    "addressCountry": "ZM"
+    "addressLocality": "Manzini",
+    "addressCountry": "SZ"
   },
   "potentialAction": {
     "@type": "SearchAction",
@@ -417,7 +417,10 @@
         }
         grid.innerHTML = items.map(n => `
             <article class="pd-news-card">
-                <img src="${esc(n.image || '/assets/og-image.png')}" alt="" loading="lazy" onerror="this.src='/assets/og-image.png'">
+                <div class="pd-news-media">
+                    <img src="${esc(n.image || '/assets/og-image.png')}" alt="" class="pd-news-cover" loading="lazy" onerror="this.src='/assets/og-image.png'">
+                    <img src="/assets/news/accent-cross.png" alt="" class="pd-news-badge" aria-hidden="true" onerror="this.style.display='none'">
+                </div>
                 <div class="pd-news-card-body">
                     <span class="pd-news-cat">${esc(n.category || 'Ministry News')}</span>
                     <h3>${esc(n.title)}</h3>

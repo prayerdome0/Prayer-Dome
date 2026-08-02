@@ -947,7 +947,18 @@ body.dark-mode .pd-notif-head-actions button { background: rgba(255,255,255,.08)
   transition: .35s var(--pd-ease); display: flex; flex-direction: column;
 }
 .pd-news-card:hover { transform: translateY(-6px); box-shadow: var(--pd-shadow); border-color: var(--pd-amber); }
-.pd-news-card img { width: 100%; height: 170px; object-fit: cover; }
+.pd-news-media { position: relative; overflow: hidden; }
+.pd-news-cover { width: 100%; height: 170px; object-fit: cover; transition: .5s var(--pd-ease); }
+.pd-news-card:hover .pd-news-cover { transform: scale(1.06); }
+.pd-news-media::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(7,36,77,.35), transparent 55%);
+}
+.pd-news-badge {
+  position: absolute; top: 12px; right: 12px; width: 52px; height: 52px;
+  object-fit: cover; border-radius: 50%; border: 2px solid rgba(255,255,255,.85);
+  box-shadow: 0 6px 18px rgba(7,36,77,.4); z-index: 2;
+}
 .pd-news-card-body { padding: 16px 18px 20px; flex: 1; display: flex; flex-direction: column; }
 .pd-news-cat {
   font-size: .58rem; font-weight: 900; letter-spacing: 1.3px; text-transform: uppercase;

@@ -61,8 +61,8 @@
   "sameAs": [],
   "address": {
     "@type": "PostalAddress",
-    "addressLocality": "Lusaka",
-    "addressCountry": "ZM"
+    "addressLocality": "Manzini",
+    "addressCountry": "SZ"
   },
   "potentialAction": {
     "@type": "SearchAction",
@@ -524,6 +524,38 @@
             color: white;
         }
 
+        /* Admin Access Card */
+        .admin-access-card {
+            background: linear-gradient(135deg, rgba(239,68,68,0.10), rgba(212,175,55,0.12));
+            border: 1px solid rgba(239,68,68,0.35);
+            border-radius: 20px;
+            padding: 18px 20px;
+            margin: 18px 0 6px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            animation: cardFadeIn 0.45s ease backwards;
+        }
+        .admin-access-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 900;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.05rem;
+            color: var(--accent-red);
+        }
+        .admin-access-head i { font-size: 1.3rem; }
+        .admin-access-sub {
+            font-size: 0.78rem;
+            color: var(--text-sub);
+            margin: 8px 0 14px;
+            line-height: 1.5;
+        }
+        .admin-access-btn { flex: 1; min-width: 140px; justify-content: center; text-align: center; }
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         @media (max-width: 600px) {
             .form-grid { grid-template-columns: 1fr; }
             .full-width { grid-column: span 1; }
@@ -668,6 +700,18 @@
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                     <button onclick="toggleEdit(true)" class="btn btn-primary" style="flex: 2;">Edit Profile</button>
                     <button onclick="handleLogout()" class="btn btn-outline" style="flex: 1; color: #ef4444;">Logout</button>
+                </div>
+                <!-- Admin Dashboard Access -->
+                <div id="adminDashboardCard" class="admin-access-card" style="display: none;">
+                    <div class="admin-access-head">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Leadership Access</span>
+                    </div>
+                    <p class="admin-access-sub">You are signed in with an administrator role. Manage the Prayer Dome platform below.</p>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <a href="admin.html" class="btn btn-primary admin-access-btn"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</a>
+                        <a href="finance.html" class="btn btn-outline admin-access-btn"><i class="fas fa-chart-line"></i> Finance Portal</a>
+                    </div>
                 </div>
                 <button onclick="showDeleteAccountModal()" class="btn btn-outline delete-account-btn" style="width: 100%; margin-top: 15px;">
                     <i class="fas fa-trash-alt"></i> Delete Account
@@ -1179,6 +1223,12 @@
                 const data = currentUserData;
                 const photoUrl = data.photoURL || user.photoURL || "https://via.placeholder.com/150";
                 currentPhotoUrl = photoUrl;
+
+                // Show Admin / Finance dashboard access for leadership roles.
+                const memberSnap2 = await getDoc(doc(db, "memberships", user.uid));
+                const role = memberSnap2.exists() ? memberSnap2.data().role : null;
+                const adminCard = document.getElementById('adminDashboardCard');
+                if (adminCard) adminCard.style.display = (role === 'admin' || role === 'finance') ? 'block' : 'none';
                 
                 document.getElementById('pNameDisplay').innerText = data.fullName;
                 document.getElementById('pRoleDisplay').innerText = data.ministry?.toUpperCase() || "MEMBER";

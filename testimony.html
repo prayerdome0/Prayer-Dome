@@ -61,8 +61,8 @@
   "sameAs": [],
   "address": {
     "@type": "PostalAddress",
-    "addressLocality": "Lusaka",
-    "addressCountry": "ZM"
+    "addressLocality": "Manzini",
+    "addressCountry": "SZ"
   },
   "potentialAction": {
     "@type": "SearchAction",
@@ -170,6 +170,38 @@
     /* Luxury Font */
     .luxury-font, h1, h2, h3, .form-title, .stat-number, .testimony-category { font-family: 'Playfair Display', serif; }
 
+    /* Testimony Hero */
+    .t-hero {
+      position: relative; overflow: hidden; border-radius: 32px;
+      min-height: 340px; display: flex; align-items: center;
+      margin-bottom: 30px; box-shadow: 0 24px 60px -12px rgba(7,36,77,.5);
+    }
+    .t-hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .t-hero-tint {
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, rgba(7,36,77,.92) 0%, rgba(10,77,155,.55) 55%, rgba(10,77,155,.15) 100%);
+    }
+    .t-hero-content { position: relative; z-index: 2; padding: 44px; max-width: 640px; color: #fff; }
+    .t-hero-eyebrow {
+      display: inline-flex; align-items: center;
+      background: rgba(212,175,55,.9); color: #fff; font-size: .62rem; font-weight: 900;
+      letter-spacing: 2px; text-transform: uppercase; padding: 6px 14px; border-radius: 30px; margin-bottom: 16px;
+    }
+    .t-hero-title {
+      font-size: clamp(1.9rem, 5vw, 3rem); line-height: 1.15; font-weight: 900;
+      text-shadow: 0 4px 24px rgba(0,0,0,.35); margin-bottom: 14px;
+    }
+    .t-hero-sub { font-size: 1rem; line-height: 1.7; color: rgba(255,255,255,.9); margin-bottom: 24px; }
+    .t-hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .t-hero-btn {
+      border: none; cursor: pointer; padding: 14px 26px; border-radius: 40px;
+      font-weight: 700; font-size: .9rem; transition: .3s; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .t-hero-btn-primary { background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark)); color: #fff; box-shadow: 0 10px 25px rgba(212,175,55,.4); }
+    .t-hero-btn-primary:hover { transform: translateY(-3px); }
+    .t-hero-btn-ghost { background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.4); backdrop-filter: blur(6px); }
+    .t-hero-btn-ghost:hover { background: rgba(255,255,255,.22); }
+
     /* Header with Logo */
     .testimony-header {
       background: var(--bg-card);
@@ -264,7 +296,9 @@
 
     /* Stats Banner */
     .stats-banner {
-      background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+      background:
+        linear-gradient(135deg, rgba(212,175,55,.12), rgba(10,77,155,.10)),
+        var(--bg-card);
       border-radius: 28px;
       padding: 25px 30px;
       margin-bottom: 30px;
@@ -273,7 +307,7 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 20px;
-      border: 1px solid var(--border-color);
+      border: 1px solid rgba(212,175,55,.3);
       box-shadow: var(--shadow);
       animation: fadeInUp 0.5s ease;
     }
@@ -421,6 +455,26 @@
       transform: translateY(-8px);
       box-shadow: var(--shadow-lg);
       border-color: var(--accent-gold);
+    }
+    .testimony-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 28px; right: 28px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent-green), var(--accent-gold), var(--accent-pink));
+      border-radius: 0 0 10px 10px;
+      opacity: .85;
+    }
+    .testimony-card::after {
+      content: '\f10d';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      top: 18px; right: 22px;
+      font-size: 2.2rem;
+      color: var(--accent-gold);
+      opacity: .16;
+      pointer-events: none;
     }
 
     .testimony-header-card {
@@ -736,6 +790,21 @@
   </header>
 
   <div class="main-container">
+    <!-- Testimony Hero Banner -->
+    <section class="t-hero">
+      <img src="/assets/testimonies/hero-praise.jpg" alt="Praise and worship" class="t-hero-bg">
+      <div class="t-hero-tint"></div>
+      <div class="t-hero-content">
+        <span class="t-hero-eyebrow"><i class="fas fa-fire"></i> &nbsp;REVIVAL STORIES</span>
+        <h1 class="t-hero-title">Testimonies of His Faithfulness</h1>
+        <p class="t-hero-sub">Every story is a seed of faith. Read how God is moving in the lives of His people — and share what He has done for you.</p>
+        <div class="t-hero-actions">
+          <button class="t-hero-btn t-hero-btn-primary" onclick="scrollToForm()"><i class="fas fa-pen-fancy"></i> Share Your Story</button>
+          <button class="t-hero-btn t-hero-btn-ghost" onclick="scrollToGrid()"><i class="fas fa-arrow-down"></i> Read Stories</button>
+        </div>
+      </div>
+    </section>
+
     <!-- Stats Banner -->
     <div class="stats-banner">
       <div class="stat-item">
@@ -1241,6 +1310,11 @@
     function scrollToForm() {
         document.getElementById('testimonyForm').scrollIntoView({ behavior: 'smooth' });
         document.getElementById('testimonyContent').focus();
+    }
+
+    function scrollToGrid() {
+        const grid = document.getElementById('testimoniesGrid');
+        if (grid) grid.scrollIntoView({ behavior: 'smooth' });
     }
 
     function showToast(message, type = 'success') {
