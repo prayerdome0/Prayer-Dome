@@ -53,7 +53,7 @@ forms, the manifest theme colour, SEO theme-colour and the OG share card
 <!-- everything else is data-driven; pd-app.js scans for its targets -->
 <div class="pd-location-card" id="pdLocationCard">…</div>   <!-- live location -->
 <div class="pd-marquee" id="pdAnnouncementBar">…</div>      <!-- moving announcements -->
-<div class="hero" data-pd-hero>…</div>                       <!-- admin-scheduled banner -->
+<div class="hero" data-pd-hero>…</div>                       <!-- brand logo + admin-scheduled banner -->
 <div data-pd-scripture></div>                                <!-- Mark 7:37 card -->
 <div class="pd-stats-strip">…<div data-pd-stat="members">…   <!-- community stats -->
 ```

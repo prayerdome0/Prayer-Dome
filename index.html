@@ -238,17 +238,18 @@
             z-index: 2;
             margin-bottom: 18px;
         }
-        .hero-brand .hero-icon {
-            width: 56px; height: 56px;
+        .hero-brand .hero-logo {
+            width: 78px; height: 78px;
             margin: 0 auto 14px;
-            border: 1.5px solid rgba(212,175,55,.75);
+            border: 1.5px solid rgba(212,175,55,.8);
             border-radius: 50% 50% 42% 42%;
             display: flex; align-items: center; justify-content: center;
-            color: #f6df8a;
-            font-size: 1.35rem;
-            box-shadow: 0 0 40px rgba(212,175,55,.35);
-            background: rgba(7,36,77,.25);
+            background: #fff;
+            padding: 9px;
+            box-shadow: 0 0 42px rgba(212,175,55,.45), 0 12px 30px rgba(0,0,0,.3);
+            overflow: hidden;
         }
+        .hero-brand .hero-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
         .hero-brand .hero-wordmark {
             font-family: 'Playfair Display', serif;
             font-size: clamp(1.6rem, 5vw, 2.4rem);
@@ -468,6 +469,20 @@
         .btn-submit-review { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); color: white; border: none; padding: 12px 25px; border-radius: 40px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; margin-top: 15px; }
         .btn-submit-review:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
 
+        /* Form blocks (reviews & shared form components) */
+        .form-group { margin-bottom: 18px; text-align: left; }
+        .form-group label { display: block; font-weight: 800; font-size: .8rem; margin-bottom: 8px; color: var(--text-main); text-transform: uppercase; letter-spacing: .5px; }
+        .form-group label i { color: var(--accent-gold); margin-right: 4px; }
+        .form-control { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-main); font-family: 'Inter', sans-serif; font-size: .92rem; transition: border-color .2s ease, box-shadow .2s ease; }
+        .form-control:focus { outline: none; border-color: var(--accent-green); box-shadow: 0 0 0 3px rgba(10,77,155,.12); }
+        .form-control::placeholder { color: var(--text-sub); opacity: .7; }
+
+        /* Founder card info column */
+        .founder-info { display: flex; flex-direction: column; align-items: center; }
+
+        /* Footer legal line */
+        .copyright { color: var(--text-sub); font-size: .78rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin: 4px auto 0; max-width: 90%; }
+
         @media (max-width: 600px) {
             .portal-grid { grid-template-columns: repeat(3, 1fr); gap: 12px;}
             .portal-icon { width: 55px; height: 55px; font-size: 1.3rem; }
@@ -595,7 +610,7 @@
 <!-- Hero — brand mark + typing welcome (managed by admin banners) -->
 <div class="hero" data-pd-hero>
     <div class="hero-brand">
-        <div class="hero-icon" aria-hidden="true"><i class="fas fa-hands-praying"></i></div>
+        <div class="hero-logo"><img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" alt="Prayer Dome logo" onerror="this.parentNode.style.display='none'"></div>
         <p class="hero-wordmark">Prayer Dome</p>
         <hr class="hero-rule">
     </div>
@@ -1014,19 +1029,11 @@
         return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
     }
 
-    async function getAddressFromCoords(lat, lng) {
-        try {
-            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
-            const data = await response.json();
-            let district = data.address.county || data.address.state_district || data.address.town || data.address.city || '';
-            let country = data.address.country || '';
-            if (district && country) return `${district}, ${country}`;
-            if (country) return country;
-            return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-        } catch { return `${lat.toFixed(4)}, ${lng.toFixed(4)}`; }
-    }
-
-    function updateLocationUI(lat, lng, locationName) {
+    // The premium layer (assets/pd-app.js) owns geolocation, reverse-geocoding
+    // and the "You are worshipping from" card. Here we only compute the
+    // distances to the three branches from that shared location result —
+    // one geolocation request, one reverse lookup, everything in sync.
+    function updateBranchDistances(lat, lng) {
         let minDistance = Infinity;
         let closestBranch = "chama";
         for (const [key, branch] of Object.entries(branches)) {
@@ -1041,28 +1048,24 @@
         document.querySelectorAll('.branch-card').forEach(c => c.classList.remove('closest'));
         const closestCard = document.getElementById(branches[closestBranch].card);
         if (closestCard) closestCard.classList.add('closest');
-        
-        const locSpan = document.getElementById('locationText');
-        if (locSpan) locSpan.innerHTML = `<i class="fas fa-map-pin"></i> ${locationName}`;
     }
 
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            const locName = await getAddressFromCoords(pos.coords.latitude, pos.coords.longitude);
-            updateLocationUI(pos.coords.latitude, pos.coords.longitude, locName);
-        }, () => {
-            fetch('https://ipapi.co/json/').then(res => res.json()).then(data => {
-                if (data.latitude && data.longitude) {
-                    updateLocationUI(data.latitude, data.longitude, `${data.city || ''}, ${data.country_name || ''}`);
-                }
-            }).catch(() => {
-                const locSpan = document.getElementById('locationText');
-                if (locSpan) locSpan.innerHTML = `<i class="fas fa-globe-africa"></i> Global Network`;
-            });
-        });
-    } else {
-        document.getElementById('locationText').innerHTML = `<i class="fas fa-globe-africa"></i> Global Network`;
+    function initHomeLocation() {
+        if (!window.PDApp || !PDApp.location) return;
+        const apply = (r) => { if (r && r.lat != null && r.lng != null) updateBranchDistances(r.lat, r.lng); };
+        // Live updates — fires when the location resolves or the retry button refetches it
+        PDApp.on('location', (e) => apply((e && e.detail && e.detail.lat != null) ? e.detail : PDApp.location.state));
+        // Immediate value if already resolved
+        if (PDApp.location.state) apply(PDApp.location.state);
+        // Poll briefly as a safety net (covers cached state and offline Firestore where no event fires)
+        let tries = 0;
+        const timer = setInterval(() => {
+            const s = PDApp.location.state;
+            if (s && s.lat != null) { apply(s); clearInterval(timer); }
+            else if (++tries > 24) clearInterval(timer); // give up after ~60s
+        }, 2500);
     }
+    initHomeLocation();
     
     // ==================== LOAD EVENTS & TESTIMONIES ====================
     
@@ -1306,8 +1309,10 @@
     };
 
     window.toggleNotificationPanel = () => {
-        const panel = document.getElementById('notificationPanel');
-        panel.classList.toggle('open');
+        // The premium layer owns the shared notification panel (#pdNotifPanel).
+        if (window.PDApp && PDApp.ui && PDApp.ui.toggleNotifPanel) { PDApp.ui.toggleNotifPanel(); return; }
+        const panel = document.getElementById('notificationPanel') || document.getElementById('pdNotifPanel');
+        if (panel) panel.classList.toggle('open');
     };
 
     // ==================== AUTH AND ROLE CHECKS ====================
