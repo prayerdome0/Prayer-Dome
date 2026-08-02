@@ -12,7 +12,7 @@
     <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="https://prayerdome.net/support">
     <meta name="author" content="Prayer Dome">
-    <meta name="theme-color" content="#0a5c36">
+    <meta name="theme-color" content="#0A4D9B">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Prayer Dome">
@@ -134,7 +134,7 @@
 
     <style>
         :root {
-            --pd-green: #15803d;
+            --pd-green: #0A4D9B;
             --pd-gold: #d4af37;
             --pd-navy: #0f172a;
             --pd-red: #ef4444;
@@ -155,7 +155,7 @@
 
         /* --- HIGH-END HEADER --- */
         .app-header {
-            background: linear-gradient(135deg, var(--pd-green), #064e3b);
+            background: linear-gradient(135deg, var(--pd-green), #0a3d7a);
             padding: 15px 25px; color: white; position: sticky; top: 0; z-index: 1000;
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 10px 20px rgba(0,0,0,0.15);
@@ -169,7 +169,7 @@
         /* --- NAVIGATION TABS --- */
         .tab-wrapper { display: flex; background: var(--glass); margin: 20px auto; max-width: 800px; padding: 8px; border-radius: 50px; border: 1px solid var(--border); backdrop-filter: blur(10px); overflow-x: auto; box-shadow: var(--shadow-sm);}
         .tab-item { flex: 1; padding: 12px 20px; text-align: center; border-radius: 50px; font-weight: 800; font-size: 0.75rem; cursor: pointer; transition: 0.3s; color: #94a3b8; white-space: nowrap; min-width: 130px;}
-        .tab-item.active { background: var(--pd-green); color: white; box-shadow: 0 4px 15px rgba(21, 128, 61, 0.4); }
+        .tab-item.active { background: var(--pd-green); color: white; box-shadow: 0 4px 15px rgba(10,77,155, 0.4); }
 
         .page-container { padding: 0 20px; max-width: 900px; margin: 0 auto; }
         .view-section { display: none; animation: fadeIn 0.4s ease; }
@@ -235,7 +235,7 @@
 
         .tx-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; border-bottom: 1px solid var(--border); background: var(--bg-card); margin-bottom: 10px; border-radius: 16px;}
         .tx-icon { width: 45px; height: 45px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
-        .tx-icon.dep { background: rgba(34,197,94,0.1); color: var(--pd-green); }
+        .tx-icon.dep { background: rgba(59,130,246,0.1); color: var(--pd-green); }
         .tx-icon.wth { background: rgba(239,68,68,0.1); color: var(--pd-red); }
 
         /* --- BUTTONS --- */
@@ -253,7 +253,7 @@
         .form-group { margin-bottom: 20px; text-align: left; }
         .form-group label { display: block; font-weight: 800; font-size: 0.85rem; margin-bottom: 8px; color: var(--pd-navy); text-transform: uppercase; letter-spacing: 0.5px;}
         input, select, textarea { width: 100%; padding: 16px; border-radius: 16px; border: 2px solid var(--border); background: var(--bg-base); color: var(--text-main); font-size: 1rem; font-weight: 500; outline: none; transition: 0.3s; font-family: inherit;}
-        input:focus, select:focus, textarea:focus { border-color: var(--pd-green); background: var(--bg-card); box-shadow: 0 0 0 4px rgba(34,197,94,0.1);}
+        input:focus, select:focus, textarea:focus { border-color: var(--pd-green); background: var(--bg-card); box-shadow: 0 0 0 4px rgba(59,130,246,0.1);}
 
         /* Document Upload Zone */
         .doc-upload-zone { border: 2px dashed var(--border); border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; background: var(--bg-base); margin-bottom: 15px; display: flex; align-items: center; gap: 15px; justify-content: center;}
@@ -273,6 +273,8 @@
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
+    <script src="/assets/pd-content-data.js" defer></script>
+    <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
 
@@ -723,7 +725,7 @@
         function successAnimate(msg) {
             document.getElementById('js-secure-title').innerText = msg;
             document.getElementById('js-secure-icon').innerHTML = '<i class="fas fa-shield-check" style="color:var(--pd-green)"></i>';
-            document.getElementById('js-secure-icon').style.boxShadow = '0 0 30px rgba(34,197,94,0.4)';
+            document.getElementById('js-secure-icon').style.boxShadow = '0 0 30px rgba(59,130,246,0.4)';
             
             setTimeout(() => {
                 document.getElementById('secureOverlay').style.display = 'none';
@@ -861,7 +863,7 @@ window.loadMyPlans = async () => {
                             <span style="font-size: 10px; font-weight: 900; color: ${themeColor}; text-transform: uppercase; letter-spacing: 1px;">${data.planTier || 'Standard'} TIER</span>
                             <h3 style="font-weight:900; color:var(--pd-navy); font-size: 1.4rem;">${data.planType}</h3>
                         </div>
-                        <span style="background:rgba(34,197,94,0.1); color:var(--pd-green); padding:6px 14px; border-radius:20px; font-size:0.75rem; font-weight:800;">ACTIVE</span>
+                        <span style="background:rgba(59,130,246,0.1); color:var(--pd-green); padding:6px 14px; border-radius:20px; font-size:0.75rem; font-weight:800;">ACTIVE</span>
                     </div>
                     
                     <div style="background:var(--bg-base); padding:15px 20px; border-radius:18px; margin-bottom:20px; display:flex; justify-content:space-between; border: 1px solid var(--border);">
@@ -1118,7 +1120,7 @@ window.loadWalletData = async () => {
                 iconClass = 'dep';
             }
             
-            const statColor = t.stat === 'approved' ? '#22c55e' : (t.stat === 'rejected' ? '#ef4444' : '#f59e0b');
+            const statColor = t.stat === 'approved' ? '#3b82f6' : (t.stat === 'rejected' ? '#ef4444' : '#f59e0b');
             const statText = t.stat === 'approved' ? '✓ Approved' : (t.stat === 'rejected' ? '✗ Rejected' : '⏳ Pending');
 
             return `

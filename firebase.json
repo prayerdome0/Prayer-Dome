@@ -124,6 +124,14 @@
       {
         "source": "/bible-translation",
         "destination": "/translate.html"
+      },
+      {
+        "source": "/news",
+        "destination": "/news.html"
+      },
+      {
+        "source": "/radio",
+        "destination": "/radio.html"
       }
     ],
     "redirects": [

@@ -11,7 +11,7 @@
     <meta name="googlebot" content="noindex, nofollow">
     <link rel="canonical" href="https://prayerdome.net/finance">
     <meta name="author" content="Prayer Dome">
-    <meta name="theme-color" content="#0a5c36">
+    <meta name="theme-color" content="#0A4D9B">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Prayer Dome">
@@ -137,8 +137,8 @@
         }
 
         :root {
-            --accent-green: #15803d;
-            --accent-green-light: #22c55e;
+            --accent-green: #0A4D9B;
+            --accent-green-light: #3b82f6;
             --accent-gold: #d4af37;
             --accent-gold-dark: #b45309;
             --accent-blue: #3b82f6;
@@ -204,7 +204,7 @@
             display: flex; 
             align-items: center; 
             justify-content: center;
-            box-shadow: 0 4px 15px rgba(21,128,61,0.3);
+            box-shadow: 0 4px 15px rgba(10,77,155,0.3);
         }
         .logo-ring img {
             width: 100%;
@@ -247,7 +247,7 @@
         }
         .theme-btn:hover, .back-btn:hover {
             transform: translateY(-2px);
-            background: rgba(34,197,94,0.1);
+            background: rgba(59,130,246,0.1);
         }
 
         /* Main Container */
@@ -312,7 +312,7 @@
             background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light));
             border-color: var(--accent-green);
             color: white;
-            box-shadow: 0 4px 12px rgba(34,197,94,0.3);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
         }
         .branch-btn:hover:not(.active) {
             transform: translateY(-2px);
@@ -361,7 +361,7 @@
         input:focus {
             outline: none;
             border-color: var(--accent-green);
-            box-shadow: 0 0 0 2px rgba(34,197,94,0.1);
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.1);
         }
 
         /* Totals Section */
@@ -513,7 +513,7 @@
 
         .history-branch {
             padding: 4px 12px;
-            background: rgba(34,197,94,0.1);
+            background: rgba(59,130,246,0.1);
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 700;
@@ -675,6 +675,8 @@
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
+    <script src="/assets/pd-content-data.js" defer></script>
+    <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
     <header class="report-header">
@@ -1067,7 +1069,7 @@
                     <tr><td>Water:</td><td style="text-align:right;">E${(r.expenditure?.water || 0).toFixed(2)}</td></tr>
                     <tr><td>Maintenance:</td><td style="text-align:right;">E${(r.expenditure?.maintenance || 0).toFixed(2)}</td></tr>
                     <tr style="border-top:2px solid var(--border-color); font-weight:bold;"><td>Total Expense:</td><td style="text-align:right;">E${(r.totalExpense || 0).toFixed(2)}</td></tr></table>
-                    <div style="background: rgba(34,197,94,0.1); padding: 15px; border-radius: 15px; margin: 15px 0;">
+                    <div style="background: rgba(59,130,246,0.1); padding: 15px; border-radius: 15px; margin: 15px 0;">
                         <strong>Balance Brought Forward:</strong> E${(r.balanceForward || 0).toFixed(2)}<br>
                         <strong>SURPLUS / (DEFICIT):</strong> <span style="color: ${(r.surplus || 0) >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}; font-size: 1.2rem;">E${(r.surplus || 0).toFixed(2)}</span>
                     </div>

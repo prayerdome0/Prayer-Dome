@@ -209,3 +209,114 @@ From your roadmap, in the order I'd tackle them:
    with the least effort since it reuses these exact pages
 6. **Recurring donations / mobile money** — needs a payment provider decision first
    (Flutterwave and Paystack both handle Zambian mobile money)
+
+---
+
+## 9. Premium Platform Pass — Blue · Gold · White
+
+The big one: the roadmap's premium upgrade. Everything below is **live in the
+app**, not a mockup.
+
+### 9.1 Brand identity
+
+- **Primary Blue `#0A4D9B` · Premium Gold `#D4AF37` · White `#FFFFFF`** applied
+  across the whole platform. `assets/pd-brand.css` now leads with the royal
+  palette; all legacy `--accent-green` / `--pd-green-*` tokens are **aliased to
+  blue** so every page re-skinned without being rewritten.
+- Repo-wide hex conversion (27 files) — old greens → blue scale, including
+  `rgba()` forms, `manifest.json`, SEO theme-colour and a **new OG share card**
+  (`assets/og-image.png`).
+- New premium components in `pd-brand.css`: topbar, slide-in drawer, splash
+  screen, live location card, moving announcement bar, managed video/image
+  hero, featured-scripture card, community-stats strip, notification center,
+  news cards, live-reaction kit, toasts.
+
+### 9.2 Shared premium app layer — `assets/pd-app.js`
+
+Loaded on **every page** (defensive: no-ops where its targets are absent).
+Modules: `ui` (drawer/splash/theme), `i18n` (5-language selector), `location`
+(geolocation → reverse geocode → IP fallback → "Global Network"), `announcements`
+(marquee), `notifications` (instant in-app center + badge + FCM bridge),
+`banners` (scheduled video/image hero), `stats` (community statistics),
+`live` (status hub, viewer presence, chat/reactions/prayers, replays,
+schedules), `news`, `scripture` (Mark 7:37), `radio` (streaming player).
+
+- Works **fully offline** via `localStorage` + `BroadcastChannel`; pages that
+  call `PDApp.setFirestore({…})` also mirror to Firestore (`liveStatus/current`,
+  `notifications`, `communityStats/current`, `banners`, `news`) so the whole
+  platform syncs in real time.
+- Seed content lives in `assets/pd-content-data.js` and is **admin-overridden**
+  the moment anything is published from the dashboard.
+
+### 9.3 Home page
+
+New premium shell: ☰ drawer · centred logo · 🔔 notification center ·
+🌍 language selector (English, Tumbuka, siSwati, Bemba, Nyanja) · live location
+card below the nav · auto-scrolling announcement bar · admin-scheduled video
+hero · permanent **Mark 7:37 featured scripture** · live community statistics ·
+News Center preview. A splash screen (Mark 7:37, once per session) opens the
+app.
+
+### 9.4 Admin Dashboard — the control center
+
+- **Mark 7:37 welcome area** + live community-stat KPIs on the dashboard.
+- **News Center view** — publish stories (category, summary, body, image,
+  featured) → instant in-app notification to every user + home-page preview.
+- **Hero Banners view** — image **or video** banners, headline/subtext/CTA,
+  schedule start/end, active toggle; the first active banner within schedule
+  renders on the home hero (video autoplays muted).
+- **Languages view** — toggle which of the five languages appear in the app.
+- **Notifications composer** — all content types (live, sermon, prayer, event,
+  news, scripture, urgent) + optional deep link; broadcasts via FCM **and**
+  instant in-app push.
+- **Prayers & Testimonies moderation** — approve/hide, ⭐ highlight prayers,
+  ✨ feature testimonies.
+- **Live view — "Broadcast From This Device"**: tap GO LIVE → camera opens
+  immediately → on-air timer, live viewer count, flip camera, stop & save
+  replay. No external app required. (The RTMP/OBS path remains for large
+  audiences.)
+- **Gospel Media view** — publish podcast episodes + edit radio stream URLs.
+
+### 9.5 Live page
+
+Reaction bar (❤️ 🙏 👏 🔥 🕊️), Follow button (live alerts), live Prayer
+Requests list, device-broadcast "on air" state, upcoming scheduled streams,
+and device-broadcast replays merged into the sermon archive.
+
+### 9.6 Prayer Wall
+
+Admin approval flow (`pending` → `approved` / `hidden`), ⭐ highlighted
+prayers, **Follow this prayer** (instant alert when it's answered), quick
+encouragement chips, and one-tap **share as testimony** when marking answered.
+
+### 9.7 New pages
+
+- **`/news` — Christian News Center**: featured hero, 6 ministry categories,
+  search, article reader, WhatsApp/Facebook/X share. Admin-published.
+- **`/radio` — Gospel Radio & Podcasts**: in-app streaming player, narrated
+  Bible stories + daily encouragement podcasts. Admin-managed.
+
+### 9.8 Translation
+
+Bemba (`bem`) and Nyanja (`nya`) added as community drafts (same
+`reviewed: false` discipline as Tumbuka/siSwati); **Mark 7:37** is now the
+featured verse with all five languages.
+
+### 9.9 Tests
+
+`tests/premium.test.js` (new, jsdom) — 18 assertions on the app layer against
+the real home page DOM. `tests/content.test.js` extended to 150 assertions
+(brand tokens, page wiring, admin views, SEO/PWA). Full suite:
+**225 passing**.
+
+### 9.10 Honest limitations
+
+- A truly public device→viewer video stream needs a WebRTC signaling server
+  or RTMP relay; the in-app device broadcast therefore shows a live state
+  (chat/reactions/prayers/viewers all real-time via Firestore) and the video
+  becomes a replay the moment the broadcast ends. For large audiences use the
+  RTMP path (OBS/Larix) which streams via Cloudinary HLS.
+- The default radio/podcast audio URLs are **demo audio** — replace them with
+  your licensed streams in Admin → Media before promoting the feature.
+- Tumbuka/siSwati/Bemba/Nyanja strings remain community drafts until reviewed
+  by fluent speakers (the draft badge shows automatically).

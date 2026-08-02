@@ -11,7 +11,7 @@
     <meta name="googlebot" content="noindex, nofollow">
     <link rel="canonical" href="https://prayerdome.net/admin">
     <meta name="author" content="Prayer Dome">
-    <meta name="theme-color" content="#0a5c36">
+    <meta name="theme-color" content="#0A4D9B">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Prayer Dome">
@@ -136,17 +136,17 @@
 
     <style>
         :root {
-            --accent-green: #15803d;
-            --accent-green-dark: #0a5c36;
+            --accent-green: #0A4D9B;
+            --accent-green-dark: #0A4D9B;
             --accent-gold: #d4af37;
             --accent-gold-dark: #a67c00;
             --accent-red: #ef4444;
             --accent-blue: #3b82f6;
-            --accent-purple: #0a5c36;
+            --accent-purple: #0A4D9B;
             --bg-main: #f4f7f5;
             --bg-panel: #ffffff;
-            --sidebar-bg: #022c22;
-            --sidebar-hover: #064e3b;
+            --sidebar-bg: #07244d;
+            --sidebar-hover: #0a3d7a;
             --text-main: #0f172a;
             --text-sub: #64748b;
             --text-light: #f8fafc;
@@ -184,7 +184,7 @@
             align-items: center; 
             justify-content: center; 
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(21,128,61,0.3);
+            box-shadow: 0 4px 15px rgba(10,77,155,0.3);
         }
         .sidebar-logo img {
             width: 100%;
@@ -201,11 +201,11 @@
         .nav-item { display: flex; align-items: center; gap: 15px; padding: 12px 18px; color: #cbd5e1; text-decoration: none; border-radius: 12px; margin-bottom: 5px; transition: 0.2s; cursor: pointer; font-weight: 500; }
         .nav-item i { font-size: 1.2rem; width: 24px; text-align: center; }
         .nav-item:hover { background: var(--sidebar-hover); color: white; }
-        .nav-item.active { background: linear-gradient(135deg, #0a5c36, #15803d); color: white; box-shadow: 0 4px 12px rgba(10,92,54,0.35); }
+        .nav-item.active { background: linear-gradient(135deg, #0A4D9B, #0A4D9B); color: white; box-shadow: 0 4px 12px rgba(10,77,155,0.35); }
         .nav-item .live-nav-dot { width: 8px; height: 8px; border-radius: 50%; background: #64748b; display: inline-block; margin-left: auto; }
         .nav-item .live-nav-dot.on { background: #ef4444; box-shadow: 0 0 0 0 rgba(239,68,68,.7); animation: livePulse 1.5s infinite; }
         @keyframes livePulse { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,.55); } 70% { box-shadow: 0 0 0 10px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
-        .live-status-card { background: linear-gradient(145deg, #022c22 0%, #0a5c36 55%, #15803d 100%); color: #fff; border-radius: 24px; padding: 28px; margin-bottom: 24px; position: relative; overflow: hidden; border: 1px solid rgba(212,175,55,.35); }
+        .live-status-card { background: linear-gradient(145deg, #07244d 0%, #0A4D9B 55%, #0A4D9B 100%); color: #fff; border-radius: 24px; padding: 28px; margin-bottom: 24px; position: relative; overflow: hidden; border: 1px solid rgba(212,175,55,.35); }
         .live-status-card::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 60% 50% at 70% 30%, rgba(212,175,55,.28), transparent 60%); pointer-events:none; }
         .live-status-card > * { position: relative; z-index: 1; }
         .live-status-row { display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between; margin-bottom: 18px; }
@@ -250,7 +250,7 @@
         .kpi-card { background: var(--bg-panel); padding: 25px; border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 20px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; }
         .kpi-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--accent-gold); }
         .kpi-icon { width: 60px; height: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        .kpi-icon.green { background: rgba(34,197,94,0.1); color: var(--accent-green); }
+        .kpi-icon.green { background: rgba(59,130,246,0.1); color: var(--accent-green); }
         .kpi-icon.gold { background: rgba(212,175,55,0.1); color: var(--accent-gold); }
         .kpi-icon.blue { background: rgba(59,130,246,0.1); color: var(--accent-blue); }
         .kpi-icon.red { background: rgba(239,68,68,0.1); color: var(--accent-red); }
@@ -267,7 +267,7 @@
         table { width: 100%; border-collapse: collapse; min-width: 800px; }
         th { padding: 15px 25px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-sub); border-bottom: 1px solid var(--border); background: var(--bg-panel); font-weight: 800; }
         td { padding: 16px 25px; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 0.9rem; vertical-align: middle; }
-        tr:hover td { background: rgba(34,197,94,0.05); }
+        tr:hover td { background: rgba(59,130,246,0.05); }
         tr:last-child td { border-bottom: none; }
 
         .user-cell { display: flex; align-items: center; gap: 12px; }
@@ -276,7 +276,7 @@
         .user-info p { font-size: 0.7rem; color: var(--text-sub); }
 
         .badge { padding: 5px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; }
-        .badge-success { background: rgba(34,197,94,0.15); color: var(--accent-green); }
+        .badge-success { background: rgba(59,130,246,0.15); color: var(--accent-green); }
         .badge-warning { background: rgba(245,158,11,0.15); color: #f59e0b; }
         .badge-danger { background: rgba(239,68,68,0.15); color: var(--accent-red); }
         .badge-info { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
@@ -286,7 +286,7 @@
         .btn { padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; }
         .btn-sm { padding: 6px 12px; font-size: 0.75rem; border-radius: 8px; }
         .btn-primary { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); color: white; }
-        .btn-primary:hover { box-shadow: 0 4px 12px rgba(34,197,94,0.3); transform: translateY(-1px); }
+        .btn-primary:hover { box-shadow: 0 4px 12px rgba(59,130,246,0.3); transform: translateY(-1px); }
         .btn-danger { background: rgba(239,68,68,0.1); color: var(--accent-red); }
         .btn-danger:hover { background: var(--accent-red); color: white; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
@@ -297,7 +297,7 @@
         .form-group label { display: block; margin-bottom: 8px; font-weight: 700; color: var(--text-main); font-size: 0.85rem;}
         .form-group label i { margin-right: 6px; color: var(--accent-gold); }
         .form-control { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-main); color: var(--text-main); font-family: inherit; font-size: 0.9rem; outline: none; transition: 0.2s;}
-        .form-control:focus { border-color: var(--accent-green); box-shadow: 0 0 0 3px rgba(34,197,94,0.1); }
+        .form-control:focus { border-color: var(--accent-green); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
         textarea.form-control { resize: vertical; min-height: 100px; }
         select.form-control { cursor: pointer; }
 
@@ -367,12 +367,14 @@
         }
         
         .status-pending { background: rgba(245,158,11,0.15); color: #f59e0b; }
-        .status-approved { background: rgba(34,197,94,0.15); color: var(--accent-green); }
+        .status-approved { background: rgba(59,130,246,0.15); color: var(--accent-green); }
         .status-suspended { background: rgba(239,68,68,0.15); color: var(--accent-red); }
         .status-rejected { background: rgba(100,116,139,0.15); color: #64748b; }
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
+    <script src="/assets/pd-content-data.js" defer></script>
+    <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
 
@@ -410,6 +412,9 @@
             <div class="nav-item" onclick="switchView('events', this)"><i class="fas fa-calendar-alt"></i> Events & Cal</div>
             <div class="nav-item" onclick="switchView('media', this)"><i class="fas fa-camera"></i> Media Upload</div>
             <div class="nav-item" onclick="switchView('content', this)"><i class="fas fa-comment-dots"></i> Prayers & Testimonies</div>
+            <div class="nav-item" onclick="switchView('news', this)"><i class="fas fa-newspaper"></i> News Center</div>
+            <div class="nav-item" onclick="switchView('banners', this)"><i class="fas fa-photo-film"></i> Hero Banners</div>
+            <div class="nav-item" onclick="switchView('languages', this)"><i class="fas fa-language"></i> Languages</div>
             <div class="nav-item" onclick="switchView('notifications', this)"><i class="fas fa-bell"></i> Notifications</div>
             <div class="nav-item" onclick="switchView('contacts', this)"><i class="fas fa-envelope"></i> Contact Messages</div>
         </div>
@@ -443,6 +448,31 @@
 
             <!-- DASHBOARD VIEW -->
             <div id="view-dashboard" class="section-view active">
+                <!-- Welcome area — theme scripture -->
+                <div style="position: relative; overflow: hidden; border-radius: 24px; padding: 26px 28px; margin-bottom: 20px; background: linear-gradient(135deg, #0A4D9B 0%, #0a3d7a 60%, #07244d 100%); color: #fff; box-shadow: 0 18px 44px rgba(10,77,155,.3);">
+                    <div style="position:absolute; top:-30px; right:10px; font-family:'Playfair Display', serif; font-size:150px; opacity:.12; color:#d4af37;">“</div>
+                    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                        <div style="width:54px; height:54px; border-radius:16px; background: rgba(212,175,55,.18); border:1px solid rgba(212,175,55,.5); display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:#f6df8a;"><i class="fas fa-book-bible"></i></div>
+                        <div style="flex:1; min-width:220px;">
+                            <div style="font-size:.62rem; font-weight:900; letter-spacing:2.4px; text-transform:uppercase; color:#f6df8a;">Theme Scripture</div>
+                            <div style="font-family:'Playfair Display', serif; font-size:clamp(1.1rem, 3vw, 1.5rem); font-weight:700; margin-top:4px;">“He does everything blamelessly.”</div>
+                            <div style="margin-top:6px; font-size:.8rem; color:rgba(255,255,255,.85);">Mark 7:37 — the primary scripture across the Prayer Dome platform</div>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button class="btn btn-primary btn-sm" style="background:#d4af37; border-color:#d4af37; color:#fff;" onclick="switchView('live', document.querySelectorAll('.nav-item')[1])"><i class="fas fa-tower-broadcast"></i> Go Live</button>
+                            <button class="btn btn-primary btn-sm" style="background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.3);" onclick="switchView('news', document.querySelectorAll('.nav-item')[12])"><i class="fas fa-newspaper"></i> Publish News</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Community statistics (live across the platform) -->
+                <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 8px;">
+                    <div class="kpi-card"><div class="kpi-icon blue"><i class="fas fa-users"></i></div><div class="kpi-details"><h3 data-pd-stat="members">0</h3><p>Members</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon gold"><i class="fas fa-hands-praying"></i></div><div class="kpi-details"><h3 data-pd-stat="prayerRequests">0</h3><p>Prayer Requests</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon green"><i class="fas fa-star-of-life"></i></div><div class="kpi-details"><h3 data-pd-stat="testimonies">0</h3><p>Testimonies</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon red"><i class="fas fa-globe-africa"></i></div><div class="kpi-details"><h3 data-pd-stat="countriesReached">0</h3><p>Countries Reached</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon red"><i class="fas fa-tower-broadcast"></i></div><div class="kpi-details"><h3 data-pd-stat="liveViewers">0</h3><p>Live Viewers</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon blue"><i class="fas fa-people-group"></i></div><div class="kpi-details"><h3 data-pd-stat="prayerGroups">0</h3><p>Prayer Groups</p></div></div>
+                </div>
                 <div class="page-title">
                     <span><i class="fas fa-chart-line"></i> System Overview</span>
                     <button class="btn btn-primary btn-sm" onclick="loadDashboardStats()"><i class="fas fa-sync-alt"></i> Refresh</button>
@@ -531,6 +561,25 @@
                             Open <strong>OBS Studio</strong>, <strong>Larix Broadcaster</strong> or <strong>PRISM Live</strong> → paste the RTMP URL and Stream Key → start streaming.
                             Members watching <a href="/live.html" target="_blank" style="color:#f6df8a;">/live</a> will see the broadcast automatically. Cloudinary cloud: <strong>prayerdome</strong>.
                         </p>
+                    </div>
+
+                    <!-- DEVICE BROADCAST — go live straight from this device -->
+                    <div style="margin-top:18px; padding-top:18px; border-top:1px dashed rgba(255,255,255,.2);">
+                        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;">
+                            <span style="font-size:1.05rem; font-weight:800; color:#f6df8a;"><i class="fas fa-mobile-screen-button"></i> Broadcast From This Device</span>
+                            <span style="font-size:.72rem; opacity:.8;">No external app needed — your camera opens immediately</span>
+                        </div>
+                        <div id="deviceCamWrap" style="position:relative; border-radius:18px; overflow:hidden; background:#000; display:none;">
+                            <video id="deviceCamPreview" autoplay muted playsinline style="width:100%; max-height:340px; object-fit:cover; display:block;"></video>
+                            <div style="position:absolute; top:12px; left:12px; background:rgba(220,38,38,.92); color:#fff; font-size:.68rem; font-weight:900; letter-spacing:1.4px; padding:6px 12px; border-radius:10px; display:flex; align-items:center; gap:7px;"><span class="pd-live-dot"></span> ON AIR <span id="deviceLiveTimer" style="font-family:monospace;">00:00</span></div>
+                            <div style="position:absolute; top:12px; right:12px; background:rgba(0,0,0,.55); color:#fff; font-size:.72rem; font-weight:800; padding:6px 12px; border-radius:10px;"><i class="fas fa-users"></i> <span id="deviceViewerCount">0</span> watching</div>
+                        </div>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+                            <button class="btn-go-live" id="btnDeviceGoLive" onclick="adminDeviceGoLive()"><i class="fas fa-video"></i> OPEN CAMERA & GO LIVE</button>
+                            <button class="btn-end-live" id="btnDeviceEndLive" onclick="adminDeviceEndLive()" style="display:none;"><i class="fas fa-stop-circle"></i> STOP & SAVE REPLAY</button>
+                            <button class="btn-end-live" id="btnDeviceToggleCam" onclick="adminDeviceToggleCam()" style="display:none;"><i class="fas fa-camera-rotate"></i> Flip Camera</button>
+                        </div>
+                        <p style="font-size:.72rem; opacity:.75; margin-top:10px;"><i class="fas fa-circle-info"></i> Broadcasts from this device are saved as replays and shared through the app instantly (Firestore + same-network tabs). For large audiences, use the RTMP path above with OBS/Larix.</p>
                     </div>
                 </div>
 
@@ -701,6 +750,19 @@
             <div id="view-media" class="section-view">
                 <div class="page-title"><span><i class="fas fa-camera"></i> Media Upload</span><button class="btn btn-primary" onclick="uploadMedia()"><i class="fas fa-cloud-upload-alt"></i> Upload Image</button></div>
                 <div class="panel-card" style="padding: 30px; text-align: center;"><i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: var(--accent-gold); margin-bottom: 15px;"></i><p>Upload images to be displayed in the gallery. All uploads require admin approval before appearing publicly.</p></div>
+
+                <div class="page-title" style="margin-top: 26px;"><span><i class="fas fa-tower-cell"></i> Gospel Radio & Podcasts</span><button class="btn btn-primary" onclick="openModal('modalPodcast')"><i class="fas fa-plus"></i> New Podcast</button></div>
+                <div class="panel-card">
+                    <div class="panel-header"><h3><i class="fas fa-podcast"></i> Podcast Episodes <span style="font-weight:400; font-size:.7rem; color:var(--text-sub);">— stream on /radio.html inside the app</span></h3><button class="btn btn-outline btn-sm" onclick="loadAdminPodcasts()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
+                    <div class="table-responsive">
+                        <table><thead><tr><th>Title</th><th>Series</th><th>Audio URL</th><th>Actions</th></tr></thead>
+                        <tbody id="listAdminPodcasts"><tr><td colspan="4"><div class="spinner" style="width:30px;height:30px;"></div></td></tr></tbody></table>
+                    </div>
+                </div>
+                <div class="panel-card" style="margin-top: 18px;">
+                    <div class="panel-header"><h3><i class="fas fa-tower-broadcast"></i> Radio Stations <span style="font-weight:400; font-size:.7rem; color:var(--text-sub);">— edit the stream URL to your licensed broadcast</span></h3></div>
+                    <div id="adminRadioList" style="padding: 16px;"></div>
+                </div>
             </div>
 
             <!-- CONTENT VIEW -->
@@ -720,11 +782,12 @@
                     <div style="padding: 25px;">
                         <div class="form-group"><label><i class="fas fa-heading"></i> Title</label><input type="text" id="notifTitle" class="form-control" placeholder="e.g. Urgent Prayer Meeting Tonight"></div>
                         <div class="form-group"><label><i class="fas fa-comment"></i> Message</label><textarea id="notifMessage" class="form-control" rows="4" placeholder="Enter the full message..."></textarea></div>
-                        <div class="form-group"><label><i class="fas fa-tag"></i> Type / Category</label><select id="notifType" class="form-control"><option value="general">📢 General Info</option><option value="urgent">⚠️ Urgent Alert</option><option value="event">📅 Event Reminder</option></select></div>
+                        <div class="form-group"><label><i class="fas fa-tag"></i> Type / Category</label><select id="notifType" class="form-control"><option value="general">📢 General Info</option><option value="live">🔴 Live Stream</option><option value="sermon">🎙️ New Sermon</option><option value="prayer">🙏 Prayer Alert</option><option value="event">📅 Event Reminder</option><option value="news">📰 News Update</option><option value="scripture">📖 Daily Scripture</option><option value="urgent">⚠️ Urgent Alert</option></select></div>
+                        <div class="form-group"><label><i class="fas fa-link"></i> Link (optional)</label><input type="text" id="notifLink" class="form-control" placeholder="/live.html or /news.html"></div>
                         <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="sendNotification()"><i class="fas fa-paper-plane"></i> Broadcast to All Users</button>
                         <button class="btn btn-outline" style="width: 100%;" onclick="testNotification()"><i class="fas fa-flask"></i> Test Notification (Send to Me)</button>
                         <p style="font-size: 0.7rem; margin-top: 15px; color: var(--text-sub); text-align: center;">
-                            <i class="fas fa-info-circle"></i> Make sure you have notifications enabled in your browser.
+                            <i class="fas fa-info-circle"></i> Every broadcast also triggers an instant in-app notification for everyone currently using the app — no login required.
                         </p>
                     </div>
                 </div>
@@ -736,6 +799,42 @@
                 <div class="panel-card">
                     <div class="panel-header"><h3><i class="fas fa-inbox"></i> User Messages</h3><button class="btn btn-outline btn-sm" onclick="loadContactMessages()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
                     <div class="table-responsive"> <table><thead> <tr><th>Date</th><th>Name</th><th>Email</th><th>Subject</th><th>Message</th><th>Actions</th> </tr></thead><tbody id="contactMessagesList"> <tr><td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div> </td> </tr> </tbody> </table> </div>
+                </div>
+            </div>
+
+            <!-- NEWS CENTER VIEW -->
+            <div id="view-news" class="section-view">
+                <div class="page-title"><span><i class="fas fa-newspaper"></i> Christian News Center</span><button class="btn btn-primary" onclick="openModal('modalNews')"><i class="fas fa-plus"></i> Publish News</button></div>
+                <div class="panel-card">
+                    <div class="panel-header"><h3><i class="fas fa-list"></i> Published Stories <span style="font-weight:400; font-size:.7rem; color:var(--text-sub);">— appear instantly in the News Center and on the home page</span></h3></div>
+                    <div class="table-responsive">
+                        <table><thead><tr><th>Date</th><th>Title</th><th>Category</th><th>Featured</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="listAdminNews"><tr><td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div></td></tr></tbody></table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HERO BANNERS VIEW -->
+            <div id="view-banners" class="section-view">
+                <div class="page-title"><span><i class="fas fa-photo-film"></i> Home Page Banners</span><button class="btn btn-primary" onclick="openModal('modalBanner')"><i class="fas fa-plus"></i> New Banner</button></div>
+                <div class="panel-card">
+                    <div class="panel-header"><h3><i class="fas fa-tv"></i> Scheduled Hero Banners <span style="font-weight:400; font-size:.7rem; color:var(--text-sub);">— video or image, shown on the home page hero; the first active banner within its schedule wins</span></h3></div>
+                    <div class="table-responsive">
+                        <table><thead><tr><th>Type</th><th>Headline</th><th>Media</th><th>Schedule</th><th>Active</th><th>Actions</th></tr></thead>
+                        <tbody id="listAdminBanners"><tr><td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div></td></tr></tbody></table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LANGUAGES VIEW -->
+            <div id="view-languages" class="section-view">
+                <div class="page-title"><span><i class="fas fa-language"></i> Language Manager</span></div>
+                <div class="panel-card" style="max-width: 720px;">
+                    <div class="panel-header"><h3><i class="fas fa-globe"></i> Platform Languages <span style="font-weight:400; font-size:.7rem; color:var(--text-sub);">— the language selector at the top of every page</span></h3></div>
+                    <div style="padding: 20px;">
+                        <div id="languageToggles"></div>
+                        <p style="font-size:.72rem; color:var(--text-sub); margin-top:16px;"><i class="fas fa-info-circle"></i> Tumbuka, siSwati, Bemba and Nyanja content is a community draft awaiting review by fluent speakers (see translation-data.js). Toggling a language off hides it from the app's language selector.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -793,6 +892,72 @@
 
     <div id="modalEvent" class="modal-overlay"><div class="modal-card"><div class="modal-header"><h2>Create Event</h2><button class="modal-close" onclick="closeModal('modalEvent')"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="form-group"><label>Title</label><input type="text" id="evTitle" class="form-control"></div><div class="form-group"><label>Date & Time</label><input type="datetime-local" id="evDate" class="form-control"></div><div class="form-group"><label>Location</label><input type="text" id="evLocation" class="form-control"></div><div class="form-group"><label>Category</label><select id="evCategory" class="form-control"><option>Service</option><option>Prayer</option><option>Conference</option></select></div><div class="form-group"><label>Description</label><textarea id="evDesc" class="form-control" rows="3"></textarea></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalEvent')">Cancel</button><button class="btn btn-primary" onclick="saveEvent()">Publish</button></div></div></div>
 
+    <div id="modalNews" class="modal-overlay">
+        <div class="modal-card" style="max-width: 640px;">
+            <div class="modal-header"><h2><i class="fas fa-newspaper"></i> Publish News Story</h2><button class="modal-close" onclick="closeModal('modalNews')"><i class="fas fa-times"></i></button></div>
+            <div class="modal-body">
+                <div class="form-group"><label>Title</label><input type="text" id="newsTitle" class="form-control" placeholder="e.g. Revival Weekend — Lusaka" maxlength="140"></div>
+                <div class="form-group"><label>Category</label><select id="newsCategory" class="form-control"><option>Church Updates</option><option>Ministry News</option><option>Event Announcements</option><option>Revival Reports</option><option>Testimonies</option><option>Global Christian News</option></select></div>
+                <div class="form-group"><label>Summary (shown on cards)</label><textarea id="newsSummary" class="form-control" rows="2" placeholder="One or two sentences…" maxlength="240"></textarea></div>
+                <div class="form-group"><label>Full Story</label><textarea id="newsBody" class="form-control" rows="6" placeholder="Write the full story here…"></textarea></div>
+                <div class="form-group"><label>Image URL</label><input type="text" id="newsImage" class="form-control" placeholder="https://… or upload with the button below"></div>
+                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                    <button class="btn btn-outline btn-sm" type="button" onclick="uploadNewsImage()"><i class="fas fa-cloud-upload-alt"></i> Upload Image</button>
+                    <label style="display:flex; align-items:center; gap:8px; font-size:.85rem;"><input type="checkbox" id="newsFeatured" style="width:18px;height:18px;"> Feature on News Center hero</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('modalNews')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveNews()"><i class="fas fa-paper-plane"></i> Publish & Notify</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalPodcast" class="modal-overlay">
+        <div class="modal-card" style="max-width: 560px;">
+            <div class="modal-header"><h2><i class="fas fa-podcast"></i> Publish Podcast Episode</h2><button class="modal-close" onclick="closeModal('modalPodcast')"><i class="fas fa-times"></i></button></div>
+            <div class="modal-body">
+                <div class="form-group"><label>Title</label><input type="text" id="podTitle" class="form-control" placeholder="e.g. Daily Encouragement — Faith for Today"></div>
+                <div class="form-group"><label>Series</label><input type="text" id="podSeries" class="form-control" placeholder="e.g. Daily Encouragement"></div>
+                <div class="form-group"><label>Description</label><textarea id="podDesc" class="form-control" rows="3" placeholder="What is this episode about?"></textarea></div>
+                <div class="form-group"><label>Audio URL (MP3/AAC)</label><input type="text" id="podAudioUrl" class="form-control" placeholder="https://…/episode.mp3"></div>
+                <div class="form-group"><label>Duration Label</label><input type="text" id="podDuration" class="form-control" placeholder="~12 min"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('modalPodcast')">Cancel</button>
+                <button class="btn btn-primary" onclick="savePodcast()"><i class="fas fa-paper-plane"></i> Publish</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalBanner" class="modal-overlay">
+        <div class="modal-card" style="max-width: 620px;">
+            <div class="modal-header"><h2><i class="fas fa-photo-film"></i> Hero Banner</h2><button class="modal-close" onclick="closeModal('modalBanner')"><i class="fas fa-times"></i></button></div>
+            <div class="modal-body">
+                <div class="form-group"><label>Banner Type</label><select id="bannerType" class="form-control" onchange="document.getElementById('bannerMediaHelp').textContent = this.value === 'video' ? 'MP4 URL — autoplays silently, loops' : 'Image URL (JPG/PNG/WebP)'"><option value="image">🖼️ Image</option><option value="video">🎬 Video (autoplay, muted)</option></select></div>
+                <div class="form-group"><label>Media URL</label><input type="text" id="bannerMediaUrl" class="form-control" placeholder="/assets/hero-worship.jpg"><small id="bannerMediaHelp" style="color:var(--text-sub);">Image URL (JPG/PNG/WebP)</small></div>
+                <div class="form-group"><label>Poster URL (for videos)</label><input type="text" id="bannerPoster" class="form-control" placeholder="/assets/hero-worship.jpg"></div>
+                <div class="form-group"><label>Headline</label><input type="text" id="bannerHeadline" class="form-control" placeholder="Welcome to Prayer Dome" maxlength="90"></div>
+                <div class="form-group"><label>Subtext</label><input type="text" id="bannerSubtext" class="form-control" placeholder="He does everything blamelessly. — Mark 7:37" maxlength="160"></div>
+                <div class="form-group"><label>Badge (small pill, optional)</label><input type="text" id="bannerBadge" class="form-control" placeholder="e.g. REVIVAL WEEKEND" maxlength="40"></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                    <div class="form-group"><label>Button Label</label><input type="text" id="bannerCtaLabel" class="form-control" placeholder="Watch Live"></div>
+                    <div class="form-group"><label>Button Link</label><input type="text" id="bannerCtaUrl" class="form-control" placeholder="/live.html"></div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                    <div class="form-group"><label>Schedule Start (optional)</label><input type="datetime-local" id="bannerStart" class="form-control"></div>
+                    <div class="form-group"><label>Schedule End (optional)</label><input type="datetime-local" id="bannerEnd" class="form-control"></div>
+                </div>
+                <label style="display:flex; align-items:center; gap:8px; font-size:.9rem;"><input type="checkbox" id="bannerActive" checked style="width:18px;height:18px;"> Active</label>
+                <input type="hidden" id="bannerEditId" value="">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('modalBanner')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveBanner()"><i class="fas fa-save"></i> Save Banner</button>
+            </div>
+        </div>
+    </div>
+
     <div id="modalAnnouncement" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header"><h2><i class="fas fa-bullhorn"></i> Publish Portal Notice</h2><button class="modal-close" onclick="closeModal('modalAnnouncement')"><i class="fas fa-times"></i></button></div>
@@ -810,7 +975,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, getDoc, doc, updateDoc, setDoc, deleteDoc, query, where, orderBy, serverTimestamp, increment, addDoc, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, getDoc, doc, updateDoc, setDoc, deleteDoc, query, where, orderBy, serverTimestamp, increment, addDoc, limit, onSnapshot, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
 
@@ -819,6 +984,12 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         const messaging = getMessaging(app);
+
+        // Hand Firestore to the shared premium layer (pd-app.js) so banners,
+        // news, notifications, live status and stats sync to every page.
+        if (window.PDApp) {
+            PDApp.setFirestore({ db, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, orderBy, limit, getDocs, serverTimestamp, Timestamp, onSnapshot });
+        }
 
         let adminUser = null;
         let allMembersCache = [];
@@ -1125,7 +1296,7 @@
         /* ===== Portal Notices (Announcements) Management ===== */
         window.loadAnnouncements = async function(){ const tbody=document.getElementById('listAnnouncements'); if(tbody) tbody.innerHTML='<td colspan="5"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try{ const snap=await getDocs(query(collection(db,"announcements"),orderBy("createdAt","desc"),limit(100))); const items=[]; snap.forEach(d=>items.push({id:d.id,...d.data()})); items.sort((a,b)=>(b.pinned===true)-(a.pinned===true)); let html=''; items.forEach(a=>{ const cat=a.category==='urgent'?'<span class="badge badge-danger">⚠️ Urgent</span>':a.category==='event'?'<span class="badge badge-warning">📅 Event</span>':'<span class="badge badge-info">📢 General</span>'; const pin=a.pinned?'<span class="badge badge-warning"><i class="fas fa-thumbtack"></i> Pinned</span>':'<span style="color:var(--text-sub);font-size:0.7rem;">—</span>'; html+=`<tr><td style="white-space:nowrap;">${a.createdAt?moment(a.createdAt.toDate()).format('MMM D, YYYY HH:mm'):'N/A'}</td><td style="white-space:normal;"><strong>${escapeHTML(a.title||'')}</strong><p style="font-size:0.7rem;color:var(--text-sub);white-space:normal;margin-top:2px;">${escapeHTML((a.body||'').substring(0,80))}${(a.body||'').length>80?'...':''}</p></td><td>${cat}</td><td>${pin}</td><td style="white-space:nowrap;"><button class="btn btn-sm btn-outline" onclick="toggleAnnouncementPin('${a.id}', ${a.pinned===true})"><i class="fas fa-thumbtack"></i> ${a.pinned?'Unpin':'Pin'}</button><button class="btn btn-sm btn-danger" onclick="deleteRecord('announcements','${a.id}')"><i class="fas fa-trash"></i></button></td></tr>`; }); if(tbody) tbody.innerHTML=html||'<td colspan="5">No notices published yet<\/td>'; } catch(e){ console.error(e); toast("Error loading notices","error"); } };
 
-        window.saveAnnouncement = async function(){ const title=document.getElementById('annTitle').value.trim(), body=document.getElementById('annBody').value.trim(); if(!title||!body) return toast("Title and message are required","error"); showLoading(); try{ await addDoc(collection(db,"announcements"),{ title:title, body:body, category:document.getElementById('annCategory').value, pinned:document.getElementById('annPinned').checked, createdAt:serverTimestamp(), createdBy:adminUser?.email }); await logAdminActivity('announcement_published',{ title:title }); document.getElementById('annTitle').value=''; document.getElementById('annBody').value=''; document.getElementById('annPinned').checked=false; closeModal('modalAnnouncement'); toast("Notice published to the member portal!"); await loadAnnouncements(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
+        window.saveAnnouncement = async function(){ const title=document.getElementById('annTitle').value.trim(), body=document.getElementById('annBody').value.trim(); if(!title||!body) return toast("Title and message are required","error"); showLoading(); try{ await addDoc(collection(db,"announcements"),{ title:title, body:body, category:document.getElementById('annCategory').value, pinned:document.getElementById('annPinned').checked, createdAt:serverTimestamp(), createdBy:adminUser?.email }); await logAdminActivity('announcement_published',{ title:title }); // Instant in-app notification + moving announcement bar on every open page. if(window.PDApp){ PDApp.notifications.push({ type:'general', title:'📢 '+title, message:body.substring(0,110), link:null }); const marquee = PDApp.store.get('announcements','DEFAULT_ANNOUNCEMENTS') || []; marquee.unshift({ id:'ann-'+Date.now().toString(36), text:title+(body?' — '+body.substring(0,80):''), icon:'fa-bullhorn', active:true }); PDApp.store.set('announcements', marquee.slice(0,20)); } document.getElementById('annTitle').value=''; document.getElementById('annBody').value=''; document.getElementById('annPinned').checked=false; closeModal('modalAnnouncement'); toast("Notice published — users notified instantly 📢"); await loadAnnouncements(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
 
         window.toggleAnnouncementPin = async function(id, currentlyPinned){ showLoading(); try{ await updateDoc(doc(db,"announcements",id),{ pinned:!currentlyPinned }); toast(!currentlyPinned?"📌 Notice pinned":"Notice unpinned"); await loadAnnouncements(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
 
@@ -1137,7 +1308,325 @@
 
         window.noteCareRequest = async function(id){ const r=careRequestsCache[id]; const note=prompt("Response note to the member (visible in their portal):", r?.adminNotes||''); if(note===null) return; showLoading(); try{ await updateDoc(doc(db,"memberCareRequests",id),{ adminNotes:note.trim(), updatedAt:serverTimestamp() }); await logAdminActivity('care_request_note',{ requestId:id }); toast("Response saved — member can see it in their portal"); await loadCareRequests(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
         
-        window.loadContent = async function(){ const col=document.getElementById('contentFilter').value, tbody=document.getElementById('listContent'); if(tbody) tbody.innerHTML='<td colspan="4"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try{ const snap=await getDocs(query(collection(db,col),orderBy("timestamp","desc"),limit(30))); if(snap.empty){ if(tbody) tbody.innerHTML=`<td colspan="4">No ${col}<\/td>`; return; } let html=''; snap.forEach(d=>{ const data=d.data(); const text=data.text||data.content||''; html+=`<tr><td>${data.timestamp?moment(data.timestamp.toDate()).format('MMM D, YYYY'):'N/A'}</td><td><strong>${escapeHTML(data.name||data.author||'Anonymous')}</strong></td><td title="${escapeHTML(text)}">${escapeHTML(text).substring(0,50)}...</td><td><button class="btn btn-sm btn-danger" onclick="deleteRecord('${col}','${d.id}')">Delete</button></td></tr>`; }); if(tbody) tbody.innerHTML=html; } catch(e){ console.error(e); } };
+        window.loadContent = async function(){
+            const col=document.getElementById('contentFilter').value, tbody=document.getElementById('listContent');
+            if(tbody) tbody.innerHTML='<td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div></td>';
+            try{
+                const snap=await getDocs(query(collection(db,col),orderBy("timestamp","desc"),limit(40)));
+                if(snap.empty){ if(tbody) tbody.innerHTML=`<td colspan="6">No ${col}<\/td>`; return; }
+                let html='';
+                snap.forEach(d=>{
+                    const data=d.data();
+                    const text=data.text||data.content||'';
+                    const status = data.status || (col==='testimonies' ? 'published' : 'pending');
+                    const statusBadge = status==='approved'||status==='published' ? '<span class="badge badge-success">Live</span>' : (status==='rejected' ? '<span class="badge badge-danger">Hidden</span>' : '<span class="badge badge-warning">Pending</span>');
+                    const flags = [];
+                    if(data.highlighted) flags.push('<span class="badge badge-warning">⭐ Highlighted</span>');
+                    if(data.featured) flags.push('<span class="badge badge-info">✨ Featured</span>');
+                    html+=`<tr>
+                        <td>${data.timestamp?moment(data.timestamp.toDate()).format('MMM D, YYYY'):'N/A'}</td>
+                        <td><strong>${escapeHTML(data.name||data.author||'Anonymous')}</strong></td>
+                        <td title="${escapeHTML(text)}">${escapeHTML(text).substring(0,60)}${text.length>60?'…':''} ${flags.join(' ')}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="moderateContent('${col}','${d.id}','${data.status==='approved'||data.status==='published'?'pending':'approved'}')">${data.status==='approved'||data.status==='published'?'<i class="fas fa-eye-slash"></i> Hide':'<i class="fas fa-check"></i> Approve'}</button>
+                            ${col==='prayers'?`<button class="btn btn-sm" style="background:rgba(212,175,55,.15);color:#a67c00;border:1px solid rgba(212,175,55,.4);" onclick="moderateContent('${col}','${d.id}','highlight')"><i class="fas fa-star"></i> ${data.highlighted?'Unhighlight':'Highlight'}</button>`:''}
+                            ${col==='testimonies'?`<button class="btn btn-sm" style="background:rgba(10,77,155,.1);color:#0A4D9B;border:1px solid rgba(10,77,155,.3);" onclick="moderateContent('${col}','${d.id}','feature')"><i class="fas fa-crown"></i> ${data.featured?'Unfeature':'Feature'}</button>`:''}
+                            <button class="btn btn-sm btn-danger" onclick="deleteRecord('${col}','${d.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+                });
+                if(tbody) tbody.innerHTML=html;
+            } catch(e){ console.error(e); }
+        };
+
+        // Approve / hide / highlight / feature wall content.
+        window.moderateContent = async function(col, id, action) {
+            if(!adminUser) return toast('Not authenticated', 'error');
+            showLoading();
+            try {
+                const ref = doc(db, col, id);
+                if(action === 'highlight') {
+                    const snap = await getDoc(ref);
+                    await updateDoc(ref, { highlighted: !(snap.data()?.highlighted) });
+                    toast('Prayer ' + (snap.data()?.highlighted ? 'unhighlighted' : 'highlighted ⭐'));
+                } else if(action === 'feature') {
+                    const snap = await getDoc(ref);
+                    await updateDoc(ref, { featured: !(snap.data()?.featured) });
+                    toast('Testimony ' + (snap.data()?.featured ? 'unfeatured' : 'featured ✨'));
+                } else {
+                    await updateDoc(ref, { status: action });
+                    toast(action === 'approved' ? 'Content approved — now live on the wall' : 'Content hidden', action === 'approved' ? 'success' : 'info');
+                }
+                await logAdminActivity('content_moderated', { col, id, action });
+                await loadContent();
+            } catch(e) { toast('Error: ' + e.message, 'error'); } finally { hideLoading(); }
+        };
+
+        // ==================== NEWS CENTER (admin) ====================
+        window.loadAdminNews = function() {
+            const tbody = document.getElementById('listAdminNews');
+            if(!tbody) return;
+            const items = window.PDApp ? PDApp.news.list() : [];
+            const all = window.PDApp ? (PDApp.store.get('news', 'DEFAULT_NEWS') || []) : [];
+            if(!all.length){ tbody.innerHTML = '<td colspan="6">No stories yet — publish your first story</td>'; return; }
+            tbody.innerHTML = all.map(n => `
+                <tr>
+                    <td>${n.date ? moment(n.date).format('MMM D, YYYY') : '—'}</td>
+                    <td><strong>${escapeHTML(n.title)}</strong><br><small style="color:var(--text-sub);">${escapeHTML((n.summary||'').substring(0,60))}…</small></td>
+                    <td><span class="badge badge-info">${escapeHTML(n.category||'Ministry News')}</span></td>
+                    <td>${n.featured ? '<span class="badge badge-warning">⭐ Featured</span>' : '<span class="badge badge-outline">—</span>'}</td>
+                    <td>${n.published !== false ? '<span class="badge badge-success">Published</span>' : '<span class="badge badge-warning">Draft</span>'}</td>
+                    <td>
+                        <button class="btn btn-sm" style="background:rgba(212,175,55,.15);color:#a67c00;border:1px solid rgba(212,175,55,.4);" onclick="toggleNewsFeatured('${n.id}')"><i class="fas fa-star"></i></button>
+                        <button class="btn btn-sm btn-outline" onclick="deleteAdminNews('${n.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`).join('');
+        };
+        window.saveNews = async function() {
+            const title = document.getElementById('newsTitle').value.trim();
+            const category = document.getElementById('newsCategory').value;
+            const summary = document.getElementById('newsSummary').value.trim();
+            const body = document.getElementById('newsBody').value.trim();
+            const image = document.getElementById('newsImage').value.trim() || '/assets/og-image.png';
+            const featured = document.getElementById('newsFeatured').checked;
+            if(!title || !body){ toast('Title and story are required', 'error'); return; }
+            if(!window.PDApp){ toast('Premium layer not loaded', 'error'); return; }
+            const item = PDApp.news.publish({ title, category, summary, body, image, featured, author: adminUser?.email || 'Prayer Dome Media Team' });
+            PDApp.notifications.push({ type: 'news', title: '📰 ' + title, message: (summary || body).substring(0, 90), link: '/news.html' });
+            toast('Story published — users notified 📰');
+            closeModal('modalNews');
+            document.getElementById('newsTitle').value = ''; document.getElementById('newsSummary').value = ''; document.getElementById('newsBody').value = ''; document.getElementById('newsImage').value = ''; document.getElementById('newsFeatured').checked = false;
+            await logAdminActivity('news_published', { title });
+            await loadAdminNews();
+        };
+        window.toggleNewsFeatured = function(id) {
+            const all = PDApp.store.get('news', 'DEFAULT_NEWS') || [];
+            const next = all.map(n => n.id === id ? Object.assign({}, n, { featured: !n.featured }) : n);
+            PDApp.store.set('news', next);
+            toast('Featured flag updated');
+            loadAdminNews();
+        };
+        window.deleteAdminNews = function(id) {
+            if(!confirm('Delete this story permanently?')) return;
+            PDApp.news.remove(id);
+            toast('Story deleted');
+            loadAdminNews();
+        };
+        window.uploadNewsImage = function() {
+            if(typeof cloudinary === 'undefined') return toast('Cloudinary not loaded', 'error');
+            cloudinary.createUploadWidget({ cloudName:'prayerdome', uploadPreset:'news_images', folder:'news', maxFileSize:8*1024*1024 }, (error, result) => {
+                if(!error && result && result.event === 'success'){
+                    document.getElementById('newsImage').value = result.info.secure_url;
+                    toast('Image uploaded ✅');
+                }
+            }).open();
+        };
+
+        // ==================== HERO BANNERS (admin) ====================
+        window.loadAdminBanners = function() {
+            const tbody = document.getElementById('listAdminBanners');
+            if(!tbody || !window.PDApp) return;
+            const all = PDApp.store.get('banners', 'DEFAULT_BANNERS') || [];
+            if(!all.length){ tbody.innerHTML = '<td colspan="6">No banners yet</td>'; return; }
+            tbody.innerHTML = all.map(b => `
+                <tr>
+                    <td>${b.type === 'video' ? '<span class="badge badge-info">🎬 Video</span>' : '<span class="badge badge-outline">🖼️ Image</span>'}</td>
+                    <td><strong>${escapeHTML(b.headline||'—')}</strong><br><small style="color:var(--text-sub);">${escapeHTML((b.subtext||'').substring(0,50))}</small></td>
+                    <td style="max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHTML(b.mediaUrl)}">${escapeHTML(b.mediaUrl||'')}</td>
+                    <td>${b.scheduleStart||b.scheduleEnd ? `${b.scheduleStart ? moment(b.scheduleStart).format('MMM D, h:mm A') : 'any'} → ${b.scheduleEnd ? moment(b.scheduleEnd).format('MMM D, h:mm A') : 'any'}` : '<small>Always</small>'}</td>
+                    <td>${b.active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-warning">Off</span>'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="editBanner('${b.id}')"><i class="fas fa-pen"></i></button>
+                        <button class="btn btn-sm" style="background:rgba(10,77,155,.1);color:#0A4D9B;border:1px solid rgba(10,77,155,.3);" onclick="toggleBanner('${b.id}')">${b.active ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>'}</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteBanner('${b.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`).join('');
+        };
+        window.saveBanner = function() {
+            if(!window.PDApp){ toast('Premium layer not loaded', 'error'); return; }
+            const editId = document.getElementById('bannerEditId').value;
+            const banner = {
+                id: editId || 'banner-' + Date.now().toString(36),
+                type: document.getElementById('bannerType').value,
+                mediaUrl: document.getElementById('bannerMediaUrl').value.trim(),
+                poster: document.getElementById('bannerPoster').value.trim() || null,
+                headline: document.getElementById('bannerHeadline').value.trim(),
+                subtext: document.getElementById('bannerSubtext').value.trim(),
+                badge: document.getElementById('bannerBadge').value.trim() || null,
+                ctaLabel: document.getElementById('bannerCtaLabel').value.trim(),
+                ctaUrl: document.getElementById('bannerCtaUrl').value.trim(),
+                scheduleStart: document.getElementById('bannerStart').value ? new Date(document.getElementById('bannerStart').value).toISOString() : null,
+                scheduleEnd: document.getElementById('bannerEnd').value ? new Date(document.getElementById('bannerEnd').value).toISOString() : null,
+                active: document.getElementById('bannerActive').checked
+            };
+            if(!banner.mediaUrl){ toast('Media URL is required', 'error'); return; }
+            const all = PDApp.store.get('banners', 'DEFAULT_BANNERS') || [];
+            const idx = all.findIndex(b => b.id === banner.id);
+            if(idx >= 0) all[idx] = banner; else all.unshift(banner);
+            PDApp.store.set('banners', all);
+            toast('Banner saved — home page hero updated 🎬');
+            closeModal('modalBanner');
+            document.getElementById('bannerEditId').value = '';
+            document.getElementById('bannerMediaUrl').value = ''; document.getElementById('bannerPoster').value = '';
+            document.getElementById('bannerHeadline').value = ''; document.getElementById('bannerSubtext').value = '';
+            document.getElementById('bannerBadge').value = ''; document.getElementById('bannerCtaLabel').value = ''; document.getElementById('bannerCtaUrl').value = '';
+            document.getElementById('bannerStart').value = ''; document.getElementById('bannerEnd').value = '';
+            loadAdminBanners();
+        };
+        window.editBanner = function(id) {
+            const all = PDApp.store.get('banners', 'DEFAULT_BANNERS') || [];
+            const b = all.find(x => x.id === id);
+            if(!b) return;
+            document.getElementById('bannerEditId').value = b.id;
+            document.getElementById('bannerType').value = b.type || 'image';
+            document.getElementById('bannerMediaUrl').value = b.mediaUrl || '';
+            document.getElementById('bannerPoster').value = b.poster || '';
+            document.getElementById('bannerHeadline').value = b.headline || '';
+            document.getElementById('bannerSubtext').value = b.subtext || '';
+            document.getElementById('bannerBadge').value = b.badge || '';
+            document.getElementById('bannerCtaLabel').value = b.ctaLabel || '';
+            document.getElementById('bannerCtaUrl').value = b.ctaUrl || '';
+            document.getElementById('bannerStart').value = b.scheduleStart ? b.scheduleStart.slice(0,16) : '';
+            document.getElementById('bannerEnd').value = b.scheduleEnd ? b.scheduleEnd.slice(0,16) : '';
+            document.getElementById('bannerActive').checked = b.active !== false;
+            openModal('modalBanner');
+        };
+        window.toggleBanner = function(id) {
+            const all = PDApp.store.get('banners', 'DEFAULT_BANNERS') || [];
+            const next = all.map(b => b.id === id ? Object.assign({}, b, { active: !b.active }) : b);
+            PDApp.store.set('banners', next);
+            toast('Banner toggled');
+            loadAdminBanners();
+        };
+        window.deleteBanner = function(id) {
+            if(!confirm('Delete this banner?')) return;
+            const all = PDApp.store.get('banners', 'DEFAULT_BANNERS') || [];
+            PDApp.store.set('banners', all.filter(b => b.id !== id));
+            toast('Banner deleted');
+            loadAdminBanners();
+        };
+
+        // ==================== LANGUAGES (admin) ====================
+        window.loadAdminLanguages = function() {
+            const wrap = document.getElementById('languageToggles');
+            if(!wrap || !window.PDApp) return;
+            const langs = [
+                { code:'en', name:'English', flag:'🇬🇧', note:'Official — full content' },
+                { code:'tum', name:'Tumbuka (Chitumbuka)', flag:'🇲🇼', note:'Community draft — Malawi / Zambia' },
+                { code:'ssw', name:'siSwati', flag:'🇸🇿', note:'Community draft — Eswatini' },
+                { code:'bem', name:'Bemba (Ichibemba)', flag:'🇿🇲', note:'Community draft — Zambia' },
+                { code:'nya', name:'Nyanja (Chichewa)', flag:'🇲🇼', note:'Community draft — Malawi / Zambia' }
+            ];
+            const enabled = PDApp.store.get('languages', 'DEFAULT_LANGUAGES') || ['en'];
+            wrap.innerHTML = langs.map(l => `
+                <div style="display:flex; align-items:center; gap:14px; padding:14px; border:1px solid var(--border-color); border-radius:16px; margin-bottom:10px; background:var(--bg-card);">
+                    <div style="font-size:1.6rem;">${l.flag}</div>
+                    <div style="flex:1;"><strong>${l.name}</strong><br><small style="color:var(--text-sub);">${l.note}</small></div>
+                    <label class="switch" style="display:inline-flex; align-items:center;">
+                        <input type="checkbox" ${enabled.includes(l.code) ? 'checked' : ''} ${l.code==='en' ? 'disabled' : ''} onchange="toggleAdminLanguage('${l.code}', this.checked)">
+                        <span class="slider round"></span>
+                    </label>
+                </div>`).join('');
+        };
+        window.toggleAdminLanguage = function(code, on) {
+            if(!window.PDApp) return;
+            const enabled = PDApp.store.get('languages', 'DEFAULT_LANGUAGES') || ['en'];
+            const next = on ? (enabled.includes(code) ? enabled : enabled.concat(code)) : enabled.filter(c => c !== code);
+            PDApp.store.set('languages', next);
+            toast(code.toUpperCase() + (on ? ' enabled — appears in the app language selector' : ' disabled'));
+        };
+
+        // ==================== PODCASTS & RADIO (admin) ====================
+        window.loadAdminPodcasts = function() {
+            const tbody = document.getElementById('listAdminPodcasts');
+            if(!tbody || !window.PDApp) return;
+            const all = PDApp.store.get('podcasts', 'DEFAULT_PODCASTS') || [];
+            if(!all.length){ tbody.innerHTML = '<td colspan="4">No episodes yet — publish your first podcast</td>'; return; }
+            tbody.innerHTML = all.map(p => `
+                <tr>
+                    <td><strong>${escapeHTML(p.title)}</strong><br><small style="color:var(--text-sub);">${escapeHTML(p.series||'')}</small></td>
+                    <td>${escapeHTML(p.series || '—')}</td>
+                    <td style="max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHTML(p.audioUrl)}">${escapeHTML(p.audioUrl||'')}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="editPodcast('${p.id}')"><i class="fas fa-pen"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="deletePodcast('${p.id}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`).join('');
+        };
+        window.savePodcast = function() {
+            if(!window.PDApp){ toast('Premium layer not loaded', 'error'); return; }
+            const editId = document.getElementById('podEditId')?.value || '';
+            const pod = {
+                id: editId || 'pod-' + Date.now().toString(36),
+                title: document.getElementById('podTitle').value.trim(),
+                series: document.getElementById('podSeries').value.trim(),
+                description: document.getElementById('podDesc').value.trim(),
+                audioUrl: document.getElementById('podAudioUrl').value.trim(),
+                duration: document.getElementById('podDuration').value.trim(),
+                date: new Date().toISOString()
+            };
+            if(!pod.title || !pod.audioUrl){ toast('Title and audio URL are required', 'error'); return; }
+            const all = PDApp.store.get('podcasts', 'DEFAULT_PODCASTS') || [];
+            const idx = all.findIndex(p => p.id === pod.id);
+            if(idx >= 0) all[idx] = pod; else all.unshift(pod);
+            PDApp.store.set('podcasts', all);
+            PDApp.notifications.push({ type: 'sermon', title: '🎙️ New Podcast: ' + pod.title, message: 'Listen on the Radio & Podcasts page', link: '/radio.html' });
+            toast('Podcast published — users notified 🎙️');
+            closeModal('modalPodcast');
+            document.getElementById('podTitle').value = ''; document.getElementById('podSeries').value = '';
+            document.getElementById('podDesc').value = ''; document.getElementById('podAudioUrl').value = ''; document.getElementById('podDuration').value = '';
+            loadAdminPodcasts();
+        };
+        window.editPodcast = function(id) {
+            const all = PDApp.store.get('podcasts', 'DEFAULT_PODCASTS') || [];
+            const p = all.find(x => x.id === id);
+            if(!p) return;
+            if(!document.getElementById('podEditId')) {
+                const h = document.createElement('input');
+                h.type = 'hidden'; h.id = 'podEditId'; h.value = '';
+                document.querySelector('#modalPodcast .modal-body').appendChild(h);
+            }
+            document.getElementById('podEditId').value = p.id;
+            document.getElementById('podTitle').value = p.title || '';
+            document.getElementById('podSeries').value = p.series || '';
+            document.getElementById('podDesc').value = p.description || '';
+            document.getElementById('podAudioUrl').value = p.audioUrl || '';
+            document.getElementById('podDuration').value = p.duration || '';
+            openModal('modalPodcast');
+        };
+        window.deletePodcast = function(id) {
+            if(!confirm('Delete this episode?')) return;
+            const all = PDApp.store.get('podcasts', 'DEFAULT_PODCASTS') || [];
+            PDApp.store.set('podcasts', all.filter(p => p.id !== id));
+            toast('Episode deleted');
+            loadAdminPodcasts();
+        };
+        window.loadAdminRadio = function() {
+            const wrap = document.getElementById('adminRadioList');
+            if(!wrap || !window.PDApp) return;
+            const all = PDApp.store.get('radio', 'DEFAULT_RADIO') || [];
+            wrap.innerHTML = all.map(s => `
+                <div style="display:flex; align-items:center; gap:12px; padding:12px; border:1px solid var(--border-color); border-radius:14px; margin-bottom:8px; background:var(--bg-card);">
+                    <i class="fas ${escapeHTML(s.icon || 'fa-tower-broadcast')}" style="font-size:1.2rem; color:var(--accent-green);"></i>
+                    <div style="flex:1; min-width:0;">
+                        <strong>${escapeHTML(s.name)}</strong>
+                        <div style="font-size:.72rem; color:var(--text-sub); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHTML(s.streamUrl)}</div>
+                    </div>
+                    <button class="btn btn-sm btn-outline" onclick="editRadio('${s.id}')"><i class="fas fa-pen"></i></button>
+                </div>`).join('');
+        };
+        window.editRadio = function(id) {
+            const all = PDApp.store.get('radio', 'DEFAULT_RADIO') || [];
+            const s = all.find(x => x.id === id);
+            if(!s) return;
+            const url = prompt('Stream URL for ' + s.name + ':', s.streamUrl);
+            if(url === null) return;
+            s.streamUrl = url.trim();
+            PDApp.store.set('radio', all);
+            toast('Radio station updated — check /radio.html');
+            loadAdminRadio();
+        };
         
         window.sendPushNotificationToAll = async function(title, message, type = 'general') {
             if (!adminUser) { toast("Admin not logged in", "error"); return; }
@@ -1173,11 +1662,19 @@
             const title = document.getElementById('notifTitle').value;
             const msg = document.getElementById('notifMessage').value;
             const type = document.getElementById('notifType').value;
+            const link = document.getElementById('notifLink')?.value || null;
             if (!title || !msg) { toast("Title and message required", "error"); return; }
             if (!confirm(`Send notification to ALL users?\n\nTitle: ${title}\nMessage: ${msg}`)) return;
+            // 1) Instant in-app push — every open tab sees it immediately.
+            if (window.PDApp) {
+                PDApp.notifications.push({ type, title, message: msg, link });
+                PDApp.broadcast('announcement', { text: title + (msg ? ' — ' + msg : '') });
+            }
+            // 2) Firestore + FCM push for logged-in / registered devices.
             await sendPushNotificationToAll(title, msg, type);
             document.getElementById('notifTitle').value = '';
             document.getElementById('notifMessage').value = '';
+            document.getElementById('notifLink').value = '';
         };
 
         window.uploadFinancialReport = function() {
@@ -1258,10 +1755,10 @@
             }
             if (btnStart) btnStart.style.display = live ? 'none' : 'inline-flex';
             if (btnEnd) btnEnd.style.display = live ? 'inline-flex' : 'none';
-            if (btnCopy) btnCopy.style.display = live ? 'inline-flex' : 'none';
+            if (btnCopy) btnCopy.style.display = (live && currentLiveData.source !== 'device') ? 'inline-flex' : 'none';
             if (setupForm) setupForm.style.display = live ? 'none' : 'grid';
 
-            if (live && currentLiveData.streamId) {
+            if (live && currentLiveData.streamId && currentLiveData.source !== 'device') {
                 const rtmp = `rtmp://api.cloudinary.com/v2/${CLOUD_NAME}/live/${currentLiveData.streamId}`;
                 const hls = currentLiveData.hlsUrl || `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/hls/${currentLiveData.streamId}.m3u8`;
                 if (document.getElementById('adminRtmpUrl')) document.getElementById('adminRtmpUrl').textContent = rtmp;
@@ -1388,6 +1885,170 @@
             }
         };
 
+        /* ==================== DEVICE BROADCAST (in-app Go Live) ==================== */
+        let deviceStream = {
+            active: false, stream: null, recorder: null, chunks: [], timer: null, seconds: 0,
+            facing: 'user', videoEl: null, status: null, recordId: null
+        };
+
+        window.adminDeviceGoLive = async function () {
+            if (!adminUser) return toast('Not authenticated', 'error');
+            const title = (document.getElementById('liveTitleInput')?.value || '').trim() || 'Live Service — Prayer Dome';
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                return toast('Camera not available on this device/browser', 'error');
+            }
+            showLoading();
+            try {
+                // 1. Camera opens immediately.
+                deviceStream.stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: deviceStream.facing, width: { ideal: 1280 }, height: { ideal: 720 } },
+                    audio: true
+                });
+                const wrap = document.getElementById('deviceCamWrap');
+                const preview = document.getElementById('deviceCamPreview');
+                if (wrap) wrap.style.display = 'block';
+                if (preview) { preview.srcObject = deviceStream.stream; deviceStream.videoEl = preview; }
+
+                // 2. Record with MediaRecorder so a replay can be saved.
+                const mime = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'].find(m => MediaRecorder.isTypeSupported(m)) || '';
+                deviceStream.recorder = new MediaRecorder(deviceStream.stream, mime ? { mimeType: mime } : undefined);
+                deviceStream.chunks = [];
+                deviceStream.recorder.ondataavailable = e => { if (e.data && e.data.size) deviceStream.chunks.push(e.data); };
+                deviceStream.recorder.start(2000);
+
+                // 3. Publish live status (localStorage + Firestore + BroadcastChannel).
+                const streamId = `device_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+                deviceStream.status = {
+                    isLive: true, title, source: 'device', deviceStream: true,
+                    description: (document.getElementById('liveDescInput')?.value || 'Live from the Prayer Dome app').trim(),
+                    streamId, startedBy: adminUser.email || adminUser.uid,
+                    startTime: new Date().toISOString(), viewers: 0
+                };
+                if (window.PDApp) {
+                    PDApp.live.setStatus(deviceStream.status);
+                    PDApp.notifications.push({ type: 'live', title: '🔴 LIVE NOW: ' + title, message: 'Tap to watch the broadcast', link: '/live.html' });
+                } else {
+                    // Fallback: mirror to Firestore exactly like adminStartLive.
+                    await setDoc(doc(db, 'liveStatus', 'current'), {
+                        isLive: true, title, description: deviceStream.status.description,
+                        streamId, startedBy: adminUser.email, startTime: serverTimestamp(), viewers: 0, source: 'device'
+                    });
+                }
+                await addDoc(collection(db, 'liveChat'), {
+                    userId: 'system', name: 'System',
+                    message: `🔴 Live now from the app: "${title}"`, timestamp: serverTimestamp(), isSystem: true
+                }).catch(() => {});
+                await logAdminActivity('live_started_device', { title, streamId });
+
+                deviceStream.active = true;
+                document.getElementById('btnDeviceGoLive').style.display = 'none';
+                document.getElementById('btnDeviceEndLive').style.display = 'inline-flex';
+                document.getElementById('btnDeviceToggleCam').style.display = 'inline-flex';
+                document.getElementById('btnStartLive').style.display = 'none';
+                document.getElementById('btnEndLive').style.display = 'none';
+                applyAdminLiveUI(Object.assign({}, deviceStream.status, { viewers: 0 }));
+
+                // 4. Viewer count + timer loop.
+                deviceStream.seconds = 0;
+                const timerEl = document.getElementById('deviceLiveTimer');
+                const viewerEl = document.getElementById('deviceViewerCount');
+                deviceStream.timer = setInterval(() => {
+                    deviceStream.seconds++;
+                    if (timerEl) timerEl.textContent = String(Math.floor(deviceStream.seconds / 60)).padStart(2, '0') + ':' + String(deviceStream.seconds % 60).padStart(2, '0');
+                    if (window.PDApp) {
+                        const n = PDApp.live.syncViewerCount();
+                        if (viewerEl) viewerEl.textContent = n;
+                        document.getElementById('adminViewerCount').textContent = n;
+                    }
+                }, 1000);
+                toast('🔴 You are LIVE on Prayer Dome — camera broadcasting');
+                confetti({ particleCount: 140, spread: 90, origin: { y: 0.6 } });
+            } catch (e) {
+                console.error(e);
+                toast('Could not start camera: ' + (e.name === 'NotAllowedError' ? 'camera permission denied' : e.message), 'error');
+            } finally {
+                hideLoading();
+            }
+        };
+
+        window.adminDeviceToggleCam = async function () {
+            if (!deviceStream.active) return;
+            deviceStream.facing = deviceStream.facing === 'user' ? 'environment' : 'user';
+            const tracks = deviceStream.stream.getVideoTracks();
+            tracks.forEach(t => t.stop());
+            try {
+                const newStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: deviceStream.facing, width: { ideal: 1280 }, height: { ideal: 720 } },
+                    audio: { deviceId: deviceStream.stream.getAudioTracks()[0]?.getSettings().deviceId }
+                });
+                // Carry the old audio track if available.
+                const audioTracks = newStream.getAudioTracks();
+                if (!audioTracks.length && deviceStream.stream.getAudioTracks().length) {
+                    newStream.addTrack(deviceStream.stream.getAudioTracks()[0]);
+                }
+                deviceStream.stream = newStream;
+                if (deviceStream.videoEl) deviceStream.videoEl.srcObject = newStream;
+                // Rebuild recorder with the new stream.
+                deviceStream.recorder.stop();
+                const mime = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'].find(m => MediaRecorder.isTypeSupported(m)) || '';
+                deviceStream.recorder = new MediaRecorder(newStream, mime ? { mimeType: mime } : undefined);
+                deviceStream.chunks = [];
+                deviceStream.recorder.ondataavailable = e => { if (e.data && e.data.size) deviceStream.chunks.push(e.data); };
+                deviceStream.recorder.start(2000);
+                toast('Camera flipped');
+            } catch (e) { toast('Could not flip camera: ' + e.message, 'error'); }
+        };
+
+        window.adminDeviceEndLive = async function () {
+            if (!deviceStream.active) return;
+            if (!confirm('Stop the broadcast and save this replay?')) return;
+            try {
+                deviceStream.active = false;
+                clearInterval(deviceStream.timer);
+                if (deviceStream.recorder && deviceStream.recorder.state !== 'inactive') deviceStream.recorder.stop();
+                deviceStream.stream?.getTracks().forEach(t => t.stop());
+                if (deviceStream.videoEl) deviceStream.videoEl.srcObject = null;
+                document.getElementById('deviceCamWrap').style.display = 'none';
+                document.getElementById('btnDeviceGoLive').style.display = 'inline-flex';
+                document.getElementById('btnDeviceEndLive').style.display = 'none';
+                document.getElementById('btnDeviceToggleCam').style.display = 'none';
+                document.getElementById('btnStartLive').style.display = 'inline-flex';
+
+                // Save replay (blob URL is session-scoped; Firestore copy stores metadata).
+                const blob = new Blob(deviceStream.chunks, { type: 'video/webm' });
+                const replayUrl = URL.createObjectURL(blob);
+                if (window.PDApp) {
+                    PDApp.live.addReplay({
+                        title: deviceStream.status?.title || 'Live Service',
+                        description: deviceStream.status?.description || '',
+                        url: replayUrl, durationSeconds: deviceStream.seconds,
+                        date: new Date().toISOString(), source: 'device'
+                    });
+                }
+                // End status (keep last title for the replay row).
+                const prev = deviceStream.status || {};
+                deviceStream.status = { isLive: false, endedAt: new Date().toISOString(), title: prev.title, streamId: prev.streamId, viewers: 0 };
+                if (window.PDApp) PDApp.live.setStatus(deviceStream.status);
+                await addDoc(collection(db, 'liveRecordings'), {
+                    title: prev.title || 'Live Service', description: prev.description || '',
+                    streamId: prev.streamId || null, playbackUrl: replayUrl || null, source: 'device',
+                    startedBy: adminUser.email, createdAt: serverTimestamp()
+                }).catch(() => {});
+                await addDoc(collection(db, 'liveChat'), {
+                    userId: 'system', name: 'System',
+                    message: '🔴 The live stream has ended. The replay is available in Live → Previous Streams.',
+                    timestamp: serverTimestamp(), isSystem: true
+                }).catch(() => {});
+                await logAdminActivity('live_ended_device', { title: prev.title });
+                applyAdminLiveUI({ isLive: false, viewers: 0 });
+                toast('Broadcast ended — replay saved ✅');
+                loadLiveRecordings();
+            } catch (e) {
+                console.error(e);
+                toast('Error ending broadcast: ' + e.message, 'error');
+            }
+        };
+
         window.loadLiveRecordings = async function () {
             const tbody = document.getElementById('listLiveRecordings');
             if (!tbody) return;
@@ -1461,6 +2122,10 @@
                 else if(viewId === 'content') await loadContent();
                 else if(viewId === 'financial_reports') await loadFinancialReports();
                 else if(viewId === 'contacts') await loadContactMessages();
+                else if(viewId === 'news') await loadAdminNews();
+                else if(viewId === 'banners') await loadAdminBanners();
+                else if(viewId === 'languages') await loadAdminLanguages();
+                else if(viewId === 'media') { await loadAdminPodcasts(); loadAdminRadio(); }
             } catch(e) { console.error(`Error loading ${viewId}:`, e); toast(`Error loading ${viewId} data`, 'error'); }
         };
 

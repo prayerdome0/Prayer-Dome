@@ -316,6 +316,28 @@ export function getDailyDevotional() {
         };
     }
     
+    // Theme scripture feature — Mark 7:37 on the 1st and 15th of every month,
+    // keeping "He does everything blamelessly" anchored in the devotional area.
+    const dayOfMonth = now.getDate();
+    if (dayOfMonth === 1 || dayOfMonth === 15) {
+        const hour2 = now.getHours();
+        let periodName2 = 'Morning Devotional 🌅';
+        if (hour2 >= 12 && hour2 < 17) periodName2 = 'Afternoon Devotional ☀️';
+        else if (hour2 >= 17 || hour2 < 5) periodName2 = 'Evening Devotional 🌙';
+        return {
+            period: 'featured',
+            periodIcon: 'fa-star-of-life',
+            periodName: `Theme Scripture — Mark 7:37 ✨`,
+            verse: 'Mark 7:37',
+            text: 'He hath done all things well: he maketh both the deaf to hear, and the dumb to speak.',
+            theme: 'He does everything blamelessly.',
+            message: 'The crowd stood astonished at Jesus. Everything He touched was made whole — the deaf heard, the mute spoke. His works were not almost right; they were blameless. Whatever you are carrying today, the same hands that did all things well are at work in your life. He does everything blamelessly — trust the process, the timing, and the outcome to Him.',
+            prayer: 'Lord Jesus, You do all things well. I place my life, my needs, and my future into Your blameless hands. Perfect what concerns me today, and let my testimony bring You glory. Amen.',
+            isSpecial: true,
+            featured: true
+        };
+    }
+    
     // Determine time of day
     let period = 'morning';
     let periodIcon = 'fa-sun';

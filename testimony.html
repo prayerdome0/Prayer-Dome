@@ -12,7 +12,7 @@
     <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="https://prayerdome.net/testimony">
     <meta name="author" content="Prayer Dome">
-    <meta name="theme-color" content="#0a5c36">
+    <meta name="theme-color" content="#0A4D9B">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Prayer Dome">
@@ -133,8 +133,8 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --accent-green: #15803d;
-      --accent-green-light: #22c55e;
+      --accent-green: #0A4D9B;
+      --accent-green-light: #3b82f6;
       --accent-gold: #d4af37;
       --accent-gold-dark: #b45309;
       --accent-red: #ef4444;
@@ -148,7 +148,7 @@
       --border-color: #e2e8f0;
       --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
       --shadow-lg: 0 20px 35px -10px rgba(0, 0, 0, 0.1);
-      --shadow-glow: 0 10px 30px rgba(21, 128, 61, 0.15);
+      --shadow-glow: 0 10px 30px rgba(10,77,155, 0.15);
     }
 
     body {
@@ -202,7 +202,7 @@
       display: flex; 
       align-items: center; 
       justify-content: center;
-      box-shadow: 0 4px 15px rgba(21,128,61,0.3);
+      box-shadow: 0 4px 15px rgba(10,77,155,0.3);
     }
     .logo-ring img {
       width: 100%;
@@ -237,7 +237,7 @@
       transition: 0.2s;
       color: var(--text-primary);
     }
-    .theme-btn:hover { transform: scale(1.05); background: rgba(34,197,94,0.1); }
+    .theme-btn:hover { transform: scale(1.05); background: rgba(59,130,246,0.1); }
     .back-btn {
       background: var(--bg-primary);
       border: 1px solid var(--border-color);
@@ -253,7 +253,7 @@
       font-size: 0.85rem;
       font-weight: 600;
     }
-    .back-btn:hover { transform: scale(1.05); background: rgba(34,197,94,0.1); }
+    .back-btn:hover { transform: scale(1.05); background: rgba(59,130,246,0.1); }
 
     /* Main Container */
     .main-container {
@@ -356,7 +356,7 @@
     .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
       outline: none;
       border-color: var(--accent-green);
-      box-shadow: 0 0 0 3px rgba(34,197,94,0.1);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
     }
     .form-group textarea {
       resize: vertical;
@@ -466,7 +466,7 @@
     }
 
     .testimony-category {
-      background: rgba(34,197,94,0.1);
+      background: rgba(59,130,246,0.1);
       padding: 5px 12px;
       border-radius: 30px;
       font-size: 0.7rem;
@@ -525,8 +525,8 @@
       gap: 5px;
       font-size: 0.9rem;
     }
-    .reaction-btn:hover { transform: scale(1.05); background: rgba(34,197,94,0.1); }
-    .reaction-btn.active { background: rgba(34,197,94,0.2); border-color: var(--accent-green); }
+    .reaction-btn:hover { transform: scale(1.05); background: rgba(59,130,246,0.1); }
+    .reaction-btn.active { background: rgba(59,130,246,0.2); border-color: var(--accent-green); }
     .reaction-count { font-size: 0.7rem; font-weight: 600; color: var(--text-sub); }
 
     /* Comments Section */
@@ -603,7 +603,7 @@
       gap: 8px;
       color: var(--text-secondary);
     }
-    .action-btn:hover { background: rgba(34,197,94,0.1); color: var(--accent-green); }
+    .action-btn:hover { background: rgba(59,130,246,0.1); color: var(--accent-green); }
     .action-btn.prayed { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); color: white; border: none; }
 
     /* Filter Bar */
@@ -714,6 +714,8 @@
   </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
+    <script src="/assets/pd-content-data.js" defer></script>
+    <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
 

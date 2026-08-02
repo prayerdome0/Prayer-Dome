@@ -66,6 +66,32 @@ const PD_LANGUAGES = [
     speech: ['zu', 'ss', 'en'],
     accent: '#7c3aed',
     note: 'An official language of Eswatini and South Africa, closely related to isiZulu.'
+  },
+  {
+    code: 'bem',
+    name: 'Bemba',
+    endonym: 'Ichibemba',
+    flag: '🇿🇲',
+    source: 'Prayer Dome community draft — awaiting review',
+    official: false,
+    // No browser voice ships with Bemba; Swahili phonetics are the closest
+    // available approximation, then English.
+    speech: ['sw', 'en'],
+    accent: '#0A4D9B',
+    note: 'The largest indigenous language of Zambia, spoken by millions in the Copperbelt and Northern provinces.'
+  },
+  {
+    code: 'nya',
+    name: 'Nyanja (Chichewa)',
+    endonym: 'Chinyanja',
+    flag: '🇲🇼',
+    source: 'Prayer Dome community draft — awaiting review',
+    official: false,
+    // Nyanja has no dedicated browser voice; Swahili phonetics are the
+    // closest available approximation, then English.
+    speech: ['sw', 'en'],
+    accent: '#d4af37',
+    note: 'A national language of Malawi and widely spoken in eastern Zambia, especially Lusaka.'
   }
 ];
 
@@ -117,11 +143,53 @@ const PD_UI_STRINGS = {
     'label.draft': 'Umculu wekucala — usalindzele kubukwa ngulokhulumako lulwimi',
     'greeting.welcome': 'Wemukelekile ku-Prayer Dome',
     'greeting.amen': 'Amen'
+  },
+  bem: {
+    'nav.home': 'Paŵulu', 'nav.bible': 'Baibolo', 'nav.pray': 'Lomba',
+    'nav.sermons': 'Icilengo', 'nav.assistant': 'Umwafwilisha', 'nav.chat': 'Ukulanshana',
+    'nav.account': 'Akaunti',
+    'app.tagline': 'Ing’anda ya Kupempela ya Mitundu Yonse',
+    'verse.of.day': 'Lembelo lya lelo',
+    'action.listen': 'Ufwikisha', 'action.stop': 'Leka', 'action.copy': 'Kopa',
+    'action.share': 'Abelana', 'action.save': 'Sunga', 'action.search': 'Fwaya',
+    'action.pray': 'Lombela ili',
+    'label.language': 'Ululimi', 'label.scripture': 'Ilembelo',
+    'label.reference': 'Ishimikila', 'label.topic': 'Mutu',
+    'label.draft': 'Amalembo yasambililo — yalindilila ukubwekwa ku bantu bashimikila ululimi',
+    'greeting.welcome': 'Mwaiseni ku Prayer Dome',
+    'greeting.amen': 'Ameni'
+  },
+  nya: {
+    'nav.home': 'Kunyumba', 'nav.bible': 'Baibulo', 'nav.pray': 'Pempherani',
+    'nav.sermons': 'Ulaliki', 'nav.assistant': 'Wothandiza', 'nav.chat': 'Kukambirana',
+    'nav.account': 'Akaunti',
+    'app.tagline': 'Nyumba ya Pemphero ya Mitundu Yonse',
+    'verse.of.day': 'Vesi la lero',
+    'action.listen': 'Mverani', 'action.stop': 'Lekani', 'action.copy': 'Koperani',
+    'action.share': 'Gawanani', 'action.save': 'Sungani', 'action.search': 'Fufuzani',
+    'action.pray': 'Pempherani ili',
+    'label.language': 'Chilankhulo', 'label.scripture': 'Lemba',
+    'label.reference': 'Mavesi', 'label.topic': 'Mutu',
+    'label.draft': 'Zolembedwa zoyamba — zikudikirira kuwunikidwa ndi olankhula chinenerocho',
+    'greeting.welcome': 'Takulandirani ku Prayer Dome',
+    'greeting.amen': 'Ameni'
   }
 };
 
 /* --- Scripture pack ----------------------------------------------------- */
 const PD_VERSES = [
+  {
+    id: 'mark-7-37', ref: { en: 'Mark 7:37', tum: 'Maliko 7:37', ssw: 'Makho 7:37', bem: 'Marko 7:37', nya: 'Maliko 7:37' },
+    topics: ['wonder', 'praise', 'healing', 'featured'],
+    featured: true,
+    en: 'And were beyond measure astonished, saying, He hath done all things well: he maketh both the deaf to hear, and the dumb to speak.',
+    theme: 'He does everything blamelessly.',
+    tum: 'Iwo ŵakazizwa kujumpha muyeso, ŵakati, Wacita vinthu vyose makora: wakupangiska na ŵakufufuma kuti apulike, na ŵakutetemera kuti ayowoyere.',
+    ssw: 'Basebatiwa ngendlela leyendlula kukala, batsi, Wente konkhe kuhle: wenza labo labangalali batwe, nelabangakhulumi bakhulume.',
+    bem: 'Ukuti balengele nganshi, balanda abati, Eico atenda ifintu fyonse bwino: aletila abakutwi ukumfwa, kabili abaluluma ukulanda.',
+    nya: 'Ndipo anadabwa kwambiri, nati, Iye wachita zonse bwino: amachititsa ogontha kumva, ndi osalankhula kuyankhula.',
+    reviewed: { en: true, tum: false, ssw: false, bem: false, nya: false }
+  },
   {
     id: 'john-3-16', ref: { en: 'John 3:16', tum: 'Yohane 3:16', ssw: 'Johane 3:16' },
     topics: ['salvation', 'love', 'faith'],

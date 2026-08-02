@@ -12,7 +12,7 @@
     <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="https://prayerdome.net/ai-prayer">
     <meta name="author" content="Prayer Dome">
-    <meta name="theme-color" content="#0a5c36">
+    <meta name="theme-color" content="#0A4D9B">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Prayer Dome">
@@ -142,8 +142,8 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         :root {
-            --accent-green: #15803d;
-            --accent-green-light: #22c55e;
+            --accent-green: #0A4D9B;
+            --accent-green-light: #3b82f6;
             --accent-gold: #d4af37;
             --accent-gold-dark: #b45309;
             --accent-blue: #3b82f6;
@@ -155,7 +155,7 @@
             --text-sub: #64748b;
             --border-color: #e2e8f0;
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            --shadow-glow: 0 10px 30px rgba(21, 128, 61, 0.15);
+            --shadow-glow: 0 10px 30px rgba(10,77,155, 0.15);
             --nav-bg: rgba(255, 255, 255, 0.85);
         }
 
@@ -197,12 +197,12 @@
         .ask-label { font-weight: 800; font-size: 1.05rem; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; color: var(--accent-green); }
         .ask-hint { font-size: 0.83rem; color: var(--text-sub); margin-bottom: 16px; }
         textarea#askInput { width: 100%; min-height: 110px; padding: 16px; border-radius: 18px; border: 2px solid var(--border-color); background: var(--bg-primary); color: var(--text-main); font-family: 'Inter', sans-serif; font-size: 0.97rem; resize: vertical; transition: 0.2s; line-height: 1.6; }
-        textarea#askInput:focus { outline: none; border-color: var(--accent-green-light); box-shadow: 0 0 0 4px rgba(34,197,94,0.12); }
+        textarea#askInput:focus { outline: none; border-color: var(--accent-green-light); box-shadow: 0 0 0 4px rgba(59,130,246,0.12); }
 
         .ask-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
         .btn { border: none; border-radius: 50px; padding: 14px 26px; font-weight: 800; font-size: 0.9rem; cursor: pointer; transition: 0.25s; display: inline-flex; align-items: center; gap: 9px; font-family: 'Inter', sans-serif; }
         .btn-primary { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); color: white; box-shadow: var(--shadow-glow); flex: 1; justify-content: center; min-width: 190px; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(21,128,61,0.28); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(10,77,155,0.28); }
         .btn-primary:active { transform: translateY(0); }
         .btn-ghost { background: var(--bg-primary); color: var(--text-main); border: 1px solid var(--border-color); }
         .btn-ghost:hover { border-color: var(--accent-green-light); color: var(--accent-green); }
@@ -242,9 +242,9 @@
         ol.points { list-style: none; counter-reset: pt; }
         ol.points li { counter-increment: pt; position: relative; padding: 12px 0 12px 44px; border-bottom: 1px dashed var(--border-color); font-size: 0.94rem; }
         ol.points li:last-child { border-bottom: none; padding-bottom: 0; }
-        ol.points li::before { content: counter(pt); position: absolute; left: 0; top: 11px; width: 28px; height: 28px; border-radius: 50%; background: rgba(21,128,61,0.1); color: var(--accent-green); font-size: 0.76rem; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+        ol.points li::before { content: counter(pt); position: absolute; left: 0; top: 11px; width: 28px; height: 28px; border-radius: 50%; background: rgba(10,77,155,0.1); color: var(--accent-green); font-size: 0.76rem; font-weight: 900; display: flex; align-items: center; justify-content: center; }
 
-        .prayer-box { background: linear-gradient(135deg, var(--accent-green), #064e3b); color: white; border-radius: 26px; padding: 26px; margin-bottom: 18px; position: relative; overflow: hidden; box-shadow: var(--shadow-glow); }
+        .prayer-box { background: linear-gradient(135deg, var(--accent-green), #0a3d7a); color: white; border-radius: 26px; padding: 26px; margin-bottom: 18px; position: relative; overflow: hidden; box-shadow: var(--shadow-glow); }
         .prayer-box::after { content: ''; position: absolute; inset: 0; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.18; pointer-events: none; }
         .prayer-box .section-title { color: rgba(255,255,255,0.85); }
         .prayer-body { font-family: 'Merriweather', Georgia, serif; font-size: 1rem; line-height: 1.95; position: relative; z-index: 2; }
@@ -347,6 +347,8 @@
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
+    <script src="/assets/pd-content-data.js" defer></script>
+    <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
 

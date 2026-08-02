@@ -12,7 +12,7 @@
     <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="https://prayerdome.net/event">
     <meta name="author" content="Prayer Dome">
-    <meta name="theme-color" content="#0a5c36">
+    <meta name="theme-color" content="#0A4D9B">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Prayer Dome">
@@ -136,7 +136,7 @@
         }
 
         :root {
-            --accent-green: #22c55e;
+            --accent-green: #3b82f6;
             --accent-gold: #d4af37;
             --accent-blue: #3b82f6;
             --accent-red: #ef4444;
@@ -244,7 +244,7 @@
 
         .add-event-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(34,197,94,0.4);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.4);
         }
 
         /* Main Container */
@@ -373,7 +373,7 @@
         }
 
         .calendar-day:hover {
-            background: rgba(34, 197, 94, 0.1);
+            background: rgba(59,130,246, 0.1);
             transform: scale(1.02);
         }
 
@@ -610,6 +610,8 @@
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
+    <script src="/assets/pd-content-data.js" defer></script>
+    <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
     <div class="events-header">
@@ -960,14 +962,14 @@
 
         function getCategoryColor(category) {
             const colors = {
-                'Service': '#22c55e',
+                'Service': '#3b82f6',
                 'Prayer': '#3b82f6',
                 'Bible Study': '#8b5cf6',
                 'Worship': '#d4af37',
                 'Outreach': '#ef4444',
                 'Conference': '#f97316'
             };
-            return colors[category] || '#22c55e';
+            return colors[category] || '#3b82f6';
         }
 
         async function showEventDetails(eventId) {

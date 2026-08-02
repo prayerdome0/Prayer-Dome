@@ -12,7 +12,7 @@
     <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="https://prayerdome.net/give">
     <meta name="author" content="Prayer Dome">
-    <meta name="theme-color" content="#0a5c36">
+    <meta name="theme-color" content="#0A4D9B">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Prayer Dome">
@@ -140,8 +140,8 @@
 
     <style>
         :root {
-            --accent-green: #15803d;
-            --accent-green-light: #22c55e;
+            --accent-green: #0A4D9B;
+            --accent-green-light: #3b82f6;
             --accent-gold: #d4af37;
             --accent-gold-dark: #b45309;
             --accent-blue: #3b82f6;
@@ -153,7 +153,7 @@
             --border: #e2e8f0;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 20px 35px -10px rgba(0, 0, 0, 0.1);
-            --shadow-glow: 0 10px 30px rgba(21, 128, 61, 0.15);
+            --shadow-glow: 0 10px 30px rgba(10,77,155, 0.15);
         }
 
         body.dark-mode {
@@ -208,7 +208,7 @@
             display: flex; 
             align-items: center; 
             justify-content: center;
-            box-shadow: 0 4px 15px rgba(21,128,61,0.3);
+            box-shadow: 0 4px 15px rgba(10,77,155,0.3);
         }
         .logo-ring img {
             width: 100%;
@@ -251,14 +251,14 @@
         }
         .theme-btn:hover, .back-btn:hover {
             transform: translateY(-2px);
-            background: rgba(34,197,94,0.1);
+            background: rgba(59,130,246,0.1);
         }
 
         .main-container { max-width: 1200px; margin: 0 auto; padding: 30px; }
 
         /* Hero Section */
         .give-hero {
-            background: linear-gradient(135deg, var(--accent-green), #064e3b);
+            background: linear-gradient(135deg, var(--accent-green), #0a3d7a);
             border-radius: 32px;
             padding: 40px;
             margin-bottom: 30px;
@@ -415,7 +415,7 @@
         }
         .custom-input:focus {
             border-color: var(--accent-green);
-            box-shadow: 0 0 0 3px rgba(34,197,94,0.1);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
         }
 
         .btn-donate {
@@ -479,7 +479,7 @@
 
         /* Currency Converter - Enhanced */
         .converter-card {
-            background: linear-gradient(135deg, rgba(34,197,94,0.05), rgba(212,175,55,0.05));
+            background: linear-gradient(135deg, rgba(59,130,246,0.05), rgba(212,175,55,0.05));
             border-radius: 32px;
             padding: 30px;
             border: 1px solid var(--border);
@@ -510,7 +510,7 @@
         }
         .conv-group:focus-within {
             border-color: var(--accent-green);
-            box-shadow: 0 0 0 3px rgba(34,197,94,0.1);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
         }
         .conv-group label { 
             display: block; 
@@ -592,6 +592,8 @@
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
+    <script src="/assets/pd-content-data.js" defer></script>
+    <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
 
@@ -980,7 +982,7 @@
                     uploadedReceiptUrl = result.info.secure_url;
                     document.getElementById('receiptUrl').value = uploadedReceiptUrl;
                     document.getElementById('upLabel').innerHTML = "✅ RECEIPT ATTACHED";
-                    document.getElementById('upLabel').style.color = "#22c55e";
+                    document.getElementById('upLabel').style.color = "#3b82f6";
                     toast("Receipt uploaded successfully!", "success");
                 }
             }).open();

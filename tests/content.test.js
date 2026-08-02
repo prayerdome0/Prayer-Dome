@@ -17,14 +17,22 @@ function t(name, ok, extra) {
 
 /* ===================== Translation pack ===================== */
 
-t('three languages are defined', T.PD_LANGUAGES.length === 3);
-t('language codes are en / tum / ssw',
-  T.PD_LANGUAGES.map(l => l.code).join(',') === 'en,tum,ssw');
+t('five languages are defined', T.PD_LANGUAGES.length === 5);
+t('language codes are en / tum / ssw / bem / nya',
+  T.PD_LANGUAGES.map(l => l.code).join(',') === 'en,tum,ssw,bem,nya');
 
 t('English is flagged official, drafts are not',
   T.pdLanguage('en').official === true &&
   T.pdLanguage('tum').official === false &&
-  T.pdLanguage('ssw').official === false);
+  T.pdLanguage('ssw').official === false &&
+  T.pdLanguage('bem').official === false &&
+  T.pdLanguage('nya').official === false);
+
+// The Mark 7:37 theme verse must be the featured scripture.
+const featured = T.pdVerse('mark-7-37');
+t('Mark 7:37 is the featured theme verse', featured && featured.featured === true);
+t('Mark 7:37 carries all five languages',
+  featured && ['en', 'tum', 'ssw', 'bem', 'nya'].every(c => featured[c] && featured.ref[c]));
 
 t('verse pack is non-empty', T.PD_VERSES.length >= 25, '(' + T.PD_VERSES.length + ' verses)');
 
@@ -186,6 +194,93 @@ t('brand css honours prefers-reduced-motion',
 const motionJs = fs.readFileSync(path.join(ROOT, 'assets/pd-motion.js'), 'utf8');
 t('motion runtime honours prefers-reduced-motion',
   motionJs.includes('prefers-reduced-motion'));
+
+/* ===================== Premium layer (Blue · Gold · White) ===================== */
+
+const appJs = fs.readFileSync(path.join(ROOT, 'assets/pd-app.js'), 'utf8');
+const contentData = fs.readFileSync(path.join(ROOT, 'assets/pd-content-data.js'), 'utf8');
+const indexHtml = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+const adminHtml = fs.readFileSync(path.join(ROOT, 'admin.html'), 'utf8');
+const liveHtml = fs.readFileSync(path.join(ROOT, 'live.html'), 'utf8');
+const prayerHtml = fs.readFileSync(path.join(ROOT, 'prayer.html'), 'utf8');
+const newsHtml = fs.readFileSync(path.join(ROOT, 'news.html'), 'utf8');
+const radioHtml = fs.readFileSync(path.join(ROOT, 'radio.html'), 'utf8');
+const sw = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
+const vercel = fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8');
+const firebase = fs.readFileSync(path.join(ROOT, 'firebase.json'), 'utf8');
+
+// Brand identity — Royal Blue / Gold / White tokens.
+t('brand css leads with the royal blue palette',
+  brandCss.includes('#0A4D9B') && brandCss.includes('--pd-blue'));
+t('legacy green aliases now resolve to the blue brand',
+  brandCss.includes('--pd-green:        #0A4D9B'));
+t('gold remains the premium accent',
+  brandCss.includes('--pd-gold:         #d4af37'));
+
+// Shared app layer ships on every page.
+const pages = fs.readdirSync(ROOT).filter(f => f.endsWith('.html'));
+const missingAppLayer = pages.filter(p =>
+  !fs.readFileSync(path.join(ROOT, p), 'utf8').includes('pd-app.js'));
+t('every html page loads the shared app layer', missingAppLayer.length === 0,
+  missingAppLayer.join(', '));
+
+// Home page premium shell.
+['pd-topbar', 'pdMenuBtn', 'pdDrawer', 'pdSplash', 'pdLocationCard',
+ 'pdAnnouncementBar', 'pdNotifBell', 'data-pd-hero', 'data-pd-stat',
+ 'pd-lang-select', 'Mark 7:37'].forEach(id =>
+  t('index.html contains ' + id, indexHtml.includes(id)));
+t('index.html loads pd-app.js before its own module',
+  indexHtml.indexOf('pd-app.js') < indexHtml.indexOf('firebase-app.js'));
+t('home page shows the featured scripture card',
+  indexHtml.includes('data-pd-scripture'));
+t('home page links to the News Center',
+  indexHtml.includes('/news.html'));
+
+// Admin Dashboard = control center for the whole platform.
+['view-news', 'view-banners', 'view-languages', 'modalNews', 'modalBanner',
+ 'modalPodcast', 'loadAdminNews', 'loadAdminBanners', 'loadAdminLanguages',
+ 'loadAdminPodcasts', 'adminDeviceGoLive', 'adminDeviceEndLive',
+ 'moderateContent', 'He does everything blamelessly'].forEach(id =>
+  t('admin.html contains ' + id, adminHtml.includes(id)));
+t('admin notification composer supports all content types',
+  ['live', 'sermon', 'prayer', 'news', 'scripture'].every(tp =>
+    adminHtml.includes('value="' + tp + '"')));
+t('admin live view offers in-app device broadcast',
+  adminHtml.includes('OPEN CAMERA & GO LIVE'));
+
+// Live page: reactions, follow, device streams, upcoming streams.
+['sendReaction', 'followStream', 'deviceLiveState', 'upcomingGrid',
+ 'livePrayerList', 'pd-reaction-bar'].forEach(id =>
+  t('live.html contains ' + id, liveHtml.includes(id)));
+
+// Prayer wall: moderation, highlights, follows, encouragement.
+['highlighted-prayer', 'followPrayer', 'notifyFollowedUpdates',
+ 'Leave an encouragement', 'Awaiting approval'].forEach(id =>
+  t('prayer.html contains ' + id, prayerHtml.includes(id)));
+
+// News Center page.
+['newsGrid', 'newsHero', 'newsSearchInput', 'newsModalOverlay', 'pd-app.js',
+ 'PD-SEO:START', 'canonical'].forEach(id =>
+  t('news.html contains ' + id, newsHtml.includes(id)));
+t('news.html categories cover the ministry news brief',
+  ['Church Updates', 'Ministry News', 'Event Announcements', 'Revival Reports',
+   'Testimonies', 'Global Christian News'].every(c => newsHtml.includes(c)));
+
+// Radio & Podcasts page.
+['radioGrid', 'podGrid', 'data-pd-radio', 'pd-app.js', 'PD-SEO:START',
+ 'canonical'].forEach(id =>
+  t('radio.html contains ' + id, radioHtml.includes(id)));
+
+// SEO, PWA and hosting wiring.
+t('sw.js precaches the premium layer and new pages',
+  ['pd-app.js', 'pd-content-data.js', 'news.html', 'radio.html']
+    .every(f => sw.includes(f)));
+t('vercel.json rewrites /news and /radio', vercel.includes('"/news"') && vercel.includes('"/radio"'));
+t('firebase.json rewrites /news and /radio', firebase.includes('"/news"') && firebase.includes('"/radio"'));
+const sitemap = fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8');
+t('sitemap lists /news', sitemap.includes('/news'));
+t('sitemap lists /radio', sitemap.includes('/radio'));
+t('seo theme color is the royal blue', brandCss.includes('--pd-blue')); // token presence guard
 
 /* ===================== Result ===================== */
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
