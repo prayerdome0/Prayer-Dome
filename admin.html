@@ -11,7 +11,7 @@
     <meta name="googlebot" content="noindex, nofollow">
     <link rel="canonical" href="https://prayerdome.net/admin">
     <meta name="author" content="Prayer Dome">
-    <meta name="theme-color" content="#0b3d91">
+    <meta name="theme-color" content="#0a5c36">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Prayer Dome">
@@ -137,16 +137,16 @@
     <style>
         :root {
             --accent-green: #15803d;
-            --accent-green-dark: #16a34a;
+            --accent-green-dark: #0a5c36;
             --accent-gold: #d4af37;
-            --accent-gold-dark: #b45309;
+            --accent-gold-dark: #a67c00;
             --accent-red: #ef4444;
             --accent-blue: #3b82f6;
-            --accent-purple: #8b5cf6;
-            --bg-main: #f1f5f9;
+            --accent-purple: #0a5c36;
+            --bg-main: #f4f7f5;
             --bg-panel: #ffffff;
-            --sidebar-bg: #0f172a;
-            --sidebar-hover: #1e293b;
+            --sidebar-bg: #022c22;
+            --sidebar-hover: #064e3b;
             --text-main: #0f172a;
             --text-sub: #64748b;
             --text-light: #f8fafc;
@@ -201,7 +201,28 @@
         .nav-item { display: flex; align-items: center; gap: 15px; padding: 12px 18px; color: #cbd5e1; text-decoration: none; border-radius: 12px; margin-bottom: 5px; transition: 0.2s; cursor: pointer; font-weight: 500; }
         .nav-item i { font-size: 1.2rem; width: 24px; text-align: center; }
         .nav-item:hover { background: var(--sidebar-hover); color: white; }
-        .nav-item.active { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dark)); color: white; box-shadow: 0 4px 12px rgba(34,197,94,0.3); }
+        .nav-item.active { background: linear-gradient(135deg, #0a5c36, #15803d); color: white; box-shadow: 0 4px 12px rgba(10,92,54,0.35); }
+        .nav-item .live-nav-dot { width: 8px; height: 8px; border-radius: 50%; background: #64748b; display: inline-block; margin-left: auto; }
+        .nav-item .live-nav-dot.on { background: #ef4444; box-shadow: 0 0 0 0 rgba(239,68,68,.7); animation: livePulse 1.5s infinite; }
+        @keyframes livePulse { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,.55); } 70% { box-shadow: 0 0 0 10px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
+        .live-status-card { background: linear-gradient(145deg, #022c22 0%, #0a5c36 55%, #15803d 100%); color: #fff; border-radius: 24px; padding: 28px; margin-bottom: 24px; position: relative; overflow: hidden; border: 1px solid rgba(212,175,55,.35); }
+        .live-status-card::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 60% 50% at 70% 30%, rgba(212,175,55,.28), transparent 60%); pointer-events:none; }
+        .live-status-card > * { position: relative; z-index: 1; }
+        .live-status-row { display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between; margin-bottom: 18px; }
+        .live-badge-lg { display:inline-flex; align-items:center; gap:8px; background:rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.15); padding:8px 16px; border-radius:50px; font-weight:800; font-size:.85rem; letter-spacing:.5px; }
+        .live-badge-lg .dot { width:10px; height:10px; border-radius:50%; background:#94a3b8; }
+        .live-badge-lg .dot.on { background:#ef4444; animation: livePulse 1.4s infinite; }
+        .live-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top: 8px; }
+        .btn-go-live { background: linear-gradient(135deg, #dc2626, #b91c1c); color:#fff; border:none; padding:14px 22px; border-radius:14px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:8px; font-size:.95rem; box-shadow: 0 8px 24px rgba(220,38,38,.35); }
+        .btn-go-live:hover { transform: translateY(-1px); }
+        .btn-end-live { background: rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.3); padding:14px 22px; border-radius:14px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:8px; font-size:.95rem; }
+        .btn-end-live:hover { background: rgba(239,68,68,.25); border-color:#ef4444; }
+        .live-form-grid { display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+        @media (max-width:700px){ .live-form-grid { grid-template-columns: 1fr; } }
+        .rtmp-box { background: rgba(0,0,0,.3); border:1px solid rgba(212,175,55,.3); border-radius:14px; padding:14px 16px; margin-top:14px; font-family: ui-monospace, monospace; font-size:.75rem; word-break:break-all; }
+        .rtmp-box strong { color: #f6df8a; display:block; margin-bottom:4px; font-family: Inter, sans-serif; font-size:.72rem; letter-spacing:.5px; text-transform:uppercase; }
+        .rtmp-box p { margin: 0 0 10px; color: rgba(255,255,255,.9); }
+        .live-help { font-size:.8rem; color: rgba(255,255,255,.75); margin-top:12px; line-height:1.55; }
 
         .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
         
@@ -378,6 +399,7 @@
         </div>
         <div class="nav-menu">
             <div class="nav-item active" onclick="switchView('dashboard', this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
+            <div class="nav-item" onclick="switchView('live', this)"><i class="fas fa-tower-broadcast"></i> Live Broadcast <span class="live-nav-dot" id="navLiveDot"></span></div>
             <div class="nav-item" onclick="switchView('members', this)"><i class="fas fa-users"></i> Members CRM</div>
             <div class="nav-item" onclick="switchView('announcements', this)"><i class="fas fa-bullhorn"></i> Notices</div>
             <div class="nav-item" onclick="switchView('care', this)"><i class="fas fa-hand-holding-heart"></i> Member Care</div>
@@ -426,23 +448,27 @@
                     <button class="btn btn-primary btn-sm" onclick="loadDashboardStats()"><i class="fas fa-sync-alt"></i> Refresh</button>
                 </div>
                 <div class="kpi-grid">
-                    <div class="kpi-card" onclick="switchView('members', document.querySelectorAll('.nav-item')[1])">
+                    <div class="kpi-card" onclick="switchView('live', document.querySelectorAll('.nav-item')[1])" style="border-color: rgba(212,175,55,.35);">
+                        <div class="kpi-icon red"><i class="fas fa-tower-broadcast"></i></div>
+                        <div class="kpi-details"><h3 id="statLiveStatus" style="font-size:1.35rem;">Offline</h3><p>Live Broadcast</p></div>
+                    </div>
+                    <div class="kpi-card" onclick="switchView('members', document.querySelectorAll('.nav-item')[2])">
                         <div class="kpi-icon blue"><i class="fas fa-users"></i></div>
                         <div class="kpi-details"><h3 id="statTotalMembers">0</h3><p>Total Members</p></div>
                     </div>
-                    <div class="kpi-card" onclick="switchView('members', document.querySelectorAll('.nav-item')[1])">
+                    <div class="kpi-card" onclick="switchView('members', document.querySelectorAll('.nav-item')[2])">
                         <div class="kpi-icon gold"><i class="fas fa-clock"></i></div>
                         <div class="kpi-details"><h3 id="statPendingMembers">0</h3><p>Pending Members</p></div>
                     </div>
-                    <div class="kpi-card" onclick="switchView('gallery', this)">
+                    <div class="kpi-card" onclick="switchView('gallery', document.querySelectorAll('.nav-item')[5])">
                         <div class="kpi-icon green"><i class="fas fa-images"></i></div>
                         <div class="kpi-details"><h3 id="statGalleryItems">0</h3><p>Gallery Items</p></div>
                     </div>
-                    <div class="kpi-card" onclick="switchView('support', document.querySelectorAll('.nav-item')[4])">
+                    <div class="kpi-card" onclick="switchView('support', document.querySelectorAll('.nav-item')[7])">
                         <div class="kpi-icon red"><i class="fas fa-file-invoice"></i></div>
                         <div class="kpi-details"><h3 id="statPendingClaims">0</h3><p>Support Claims</p></div>
                     </div>
-                    <div class="kpi-card" onclick="switchView('content', document.querySelectorAll('.nav-item')[8])">
+                    <div class="kpi-card" onclick="switchView('content', document.querySelectorAll('.nav-item')[11])">
                         <div class="kpi-icon green"><i class="fas fa-pray"></i></div>
                         <div class="kpi-details"><h3 id="statActivePrayers">0</h3><p>Active Prayers</p></div>
                     </div>
@@ -450,6 +476,88 @@
                 <div class="panel-card">
                     <div class="panel-header"><h3><i class="fas fa-user-clock"></i> Recent Membership Applications</h3><button class="btn btn-outline btn-sm" onclick="switchView('members', document.querySelectorAll('.nav-item')[1])">View All</button></div>
                     <div class="table-responsive"><table><thead> <tr><th>Applicant</th><th>Branch</th><th>Date</th><th>Status</th><th>Action</th> </tr></thead><tbody id="dashPendingMembers"> <tr><td colspan="5" style="text-align: center;"><div class="spinner" style="width:30px;height:30px;"></div></td></tr> </tbody> </table> </div>
+                </div>
+            </div>
+
+            <!-- LIVE BROADCAST VIEW -->
+            <div id="view-live" class="section-view">
+                <div class="page-title">
+                    <span><i class="fas fa-tower-broadcast"></i> Live Broadcast Control</span>
+                    <a href="/live.html" target="_blank" class="btn btn-outline btn-sm"><i class="fas fa-external-link-alt"></i> Open Viewer Page</a>
+                </div>
+
+                <div class="live-status-card" id="liveControlCard">
+                    <div class="live-status-row">
+                        <div>
+                            <div class="live-badge-lg"><span class="dot" id="adminLiveDot"></span> <span id="adminLiveLabel">OFFLINE</span></div>
+                            <h2 style="margin:14px 0 6px; font-family:'Playfair Display',serif; font-size:1.6rem;" id="adminLiveTitle">No broadcast running</h2>
+                            <p style="opacity:.85; font-size:.9rem; max-width:520px;" id="adminLiveDesc">Start a live service so members can watch on the Live page and in the app.</p>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:2rem; font-weight:900; line-height:1;" id="adminViewerCount">0</div>
+                            <div style="font-size:.75rem; opacity:.75; text-transform:uppercase; letter-spacing:1px; font-weight:700;">Viewers</div>
+                        </div>
+                    </div>
+
+                    <div class="live-form-grid" id="liveSetupForm">
+                        <div class="form-group" style="margin:0;">
+                            <label style="color:#f6df8a;"><i class="fas fa-heading"></i> Stream Title</label>
+                            <input type="text" id="liveTitleInput" class="form-control" placeholder="e.g. Sunday Service — Prayer Dome" maxlength="120" style="background:rgba(0,0,0,.25); border-color:rgba(255,255,255,.15); color:#fff;">
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <label style="color:#f6df8a;"><i class="fas fa-align-left"></i> Description</label>
+                            <input type="text" id="liveDescInput" class="form-control" placeholder="Short description members will see" maxlength="200" style="background:rgba(0,0,0,.25); border-color:rgba(255,255,255,.15); color:#fff;">
+                        </div>
+                    </div>
+
+                    <div class="live-actions">
+                        <button class="btn-go-live" id="btnStartLive" onclick="adminStartLive()"><i class="fas fa-broadcast-tower"></i> GO LIVE</button>
+                        <button class="btn-end-live" id="btnEndLive" onclick="adminEndLive()" style="display:none;"><i class="fas fa-stop-circle"></i> END BROADCAST</button>
+                        <button class="btn-end-live" type="button" onclick="copyLiveRTMP()" id="btnCopyRtmp" style="display:none;"><i class="fas fa-copy"></i> Copy Stream Info</button>
+                        <a class="btn-end-live" href="/video.html" target="_blank" style="text-decoration:none;"><i class="fas fa-mobile-alt"></i> Phone Camera Stream</a>
+                    </div>
+
+                    <div id="liveRtmpPanel" style="display:none;">
+                        <div class="rtmp-box">
+                            <strong>RTMP Server URL</strong>
+                            <p id="adminRtmpUrl">—</p>
+                            <strong>Stream Key</strong>
+                            <p id="adminStreamKey">—</p>
+                            <strong>HLS Playback (auto)</strong>
+                            <p id="adminHlsUrl">—</p>
+                        </div>
+                        <p class="live-help">
+                            <i class="fas fa-info-circle" style="color:#f6df8a;"></i>
+                            Open <strong>OBS Studio</strong>, <strong>Larix Broadcaster</strong> or <strong>PRISM Live</strong> → paste the RTMP URL and Stream Key → start streaming.
+                            Members watching <a href="/live.html" target="_blank" style="color:#f6df8a;">/live</a> will see the broadcast automatically. Cloudinary cloud: <strong>prayerdome</strong>.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-history"></i> Recent Recordings</h3>
+                        <button class="btn btn-outline btn-sm" onclick="loadLiveRecordings()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Date</th><th>Title</th><th>Stream ID</th><th>Started By</th><th>Actions</th></tr></thead>
+                            <tbody id="listLiveRecordings"><tr><td colspan="5" style="text-align:center;"><div class="spinner" style="width:30px;height:30px;"></div></td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-comments"></i> Live Chat (latest)</h3>
+                        <button class="btn btn-outline btn-sm" onclick="loadLiveChatPreview()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Time</th><th>Name</th><th>Message</th></tr></thead>
+                            <tbody id="listLiveChatPreview"><tr><td colspan="3" style="text-align:center; color:var(--text-sub);">Open this tab while live to monitor chat</td></tr></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -1099,7 +1207,7 @@
         window.viewDoc = function(url,type){ const img=document.getElementById('docImagePreview'), pdf=document.getElementById('docPdfBtn'); if(url.toLowerCase().includes('.pdf')){ if(img) img.style.display='none'; if(pdf){ pdf.style.display='inline-flex'; pdf.href=url; } } else { if(img){ img.style.display='block'; img.src=url; } if(pdf) pdf.style.display='none'; } openModal('modalViewDoc'); };
         window.exportFinancialReports = function() { toast("Export feature - CSV export ready", "info"); };
         window.uploadMedia = function(){ window.uploadGalleryImage(); };
-        window.deleteRecord = async function(col,id){ if(!confirm("Delete permanently?")) return; showLoading(); try{ await deleteDoc(doc(db,col,id)); toast("Deleted"); if(col==='events') await loadEvents(); if(col==='gallery') await loadGallery(); if(col==='prayers'||col==='testimonies') await loadContent(); if(col==='contactMessages') await loadContactMessages(); if(col==='announcements') await loadAnnouncements(); if(col==='memberCareRequests') await loadCareRequests(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
+        window.deleteRecord = async function(col,id){ if(!confirm("Delete permanently?")) return; showLoading(); try{ await deleteDoc(doc(db,col,id)); toast("Deleted"); if(col==='events') await loadEvents(); if(col==='gallery') await loadGallery(); if(col==='prayers'||col==='testimonies') await loadContent(); if(col==='contactMessages') await loadContactMessages(); if(col==='announcements') await loadAnnouncements(); if(col==='memberCareRequests') await loadCareRequests(); if(col==='liveRecordings') await loadLiveRecordings(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
         
         function setupAdminRealtimeListeners() {
             const membershipsQuery = query(collection(db, "memberships"), where("status", "==", "pending"));
@@ -1112,6 +1220,227 @@
             onSnapshot(galleryQuery, (snapshot) => { snapshot.docChanges().forEach((change) => { if(change.type === "added"){ const data=change.doc.data(); showAdminToast("🖼️ New Gallery Upload", `${data.title} uploaded by ${data.userName || 'Anonymous'} awaiting approval`, "info"); } }); });
         }
         
+        /* ===== LIVE BROADCAST CONTROL ===== */
+        const CLOUD_NAME = 'prayerdome';
+        let currentLiveData = { isLive: false };
+        let liveStatusUnsub = null;
+
+        function applyAdminLiveUI(data) {
+            currentLiveData = data || { isLive: false };
+            const live = !!currentLiveData.isLive;
+            const dot = document.getElementById('adminLiveDot');
+            const navDot = document.getElementById('navLiveDot');
+            const label = document.getElementById('adminLiveLabel');
+            const title = document.getElementById('adminLiveTitle');
+            const desc = document.getElementById('adminLiveDesc');
+            const viewers = document.getElementById('adminViewerCount');
+            const btnStart = document.getElementById('btnStartLive');
+            const btnEnd = document.getElementById('btnEndLive');
+            const btnCopy = document.getElementById('btnCopyRtmp');
+            const rtmpPanel = document.getElementById('liveRtmpPanel');
+            const setupForm = document.getElementById('liveSetupForm');
+
+            if (dot) dot.classList.toggle('on', live);
+            if (navDot) navDot.classList.toggle('on', live);
+            if (label) label.textContent = live ? '● LIVE NOW' : 'OFFLINE';
+            const dashLive = document.getElementById('statLiveStatus');
+            if (dashLive) {
+                dashLive.textContent = live ? '● LIVE' : 'Offline';
+                dashLive.style.color = live ? 'var(--accent-red)' : '';
+            }
+            if (title) title.textContent = live ? (currentLiveData.title || 'Prayer Dome Live') : 'No broadcast running';
+            if (desc) desc.textContent = live
+                ? (currentLiveData.description || 'Members can watch on /live right now.')
+                : 'Start a live service so members can watch on the Live page and in the app.';
+            if (viewers) {
+                const v = currentLiveData.viewers;
+                viewers.textContent = (typeof v === 'number') ? v : (v && typeof v === 'object' ? Object.keys(v).length : 0);
+            }
+            if (btnStart) btnStart.style.display = live ? 'none' : 'inline-flex';
+            if (btnEnd) btnEnd.style.display = live ? 'inline-flex' : 'none';
+            if (btnCopy) btnCopy.style.display = live ? 'inline-flex' : 'none';
+            if (setupForm) setupForm.style.display = live ? 'none' : 'grid';
+
+            if (live && currentLiveData.streamId) {
+                const rtmp = `rtmp://api.cloudinary.com/v2/${CLOUD_NAME}/live/${currentLiveData.streamId}`;
+                const hls = currentLiveData.hlsUrl || `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/hls/${currentLiveData.streamId}.m3u8`;
+                if (document.getElementById('adminRtmpUrl')) document.getElementById('adminRtmpUrl').textContent = rtmp;
+                if (document.getElementById('adminStreamKey')) document.getElementById('adminStreamKey').textContent = currentLiveData.streamKey || currentLiveData.streamId;
+                if (document.getElementById('adminHlsUrl')) document.getElementById('adminHlsUrl').textContent = hls;
+                if (rtmpPanel) rtmpPanel.style.display = 'block';
+            } else if (rtmpPanel && !live) {
+                rtmpPanel.style.display = 'none';
+            }
+        }
+
+        function watchLiveStatus() {
+            if (liveStatusUnsub) return;
+            liveStatusUnsub = onSnapshot(doc(db, 'liveStatus', 'current'),
+                snap => applyAdminLiveUI(snap.exists() ? snap.data() : { isLive: false }),
+                () => applyAdminLiveUI({ isLive: false })
+            );
+        }
+
+        window.adminStartLive = async function () {
+            if (!adminUser) return toast('Not authenticated', 'error');
+            const title = (document.getElementById('liveTitleInput')?.value || '').trim();
+            const description = (document.getElementById('liveDescInput')?.value || '').trim();
+            if (!title) return toast('Enter a stream title first', 'error');
+            if (!confirm(`Go LIVE with "${title}"?\n\nMembers on /live will see this broadcast.`)) return;
+
+            showLoading();
+            try {
+                const streamId = `live_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+                const rtmpUrl = `rtmp://api.cloudinary.com/v2/${CLOUD_NAME}/live/${streamId}`;
+                const hlsUrl = `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/hls/${streamId}.m3u8`;
+
+                await setDoc(doc(db, 'liveStatus', 'current'), {
+                    isLive: true,
+                    title,
+                    description: description || 'Join us live at Prayer Dome',
+                    streamId,
+                    streamKey: streamId,
+                    rtmpUrl,
+                    hlsUrl,
+                    startedBy: adminUser.email || adminUser.uid,
+                    startTime: serverTimestamp(),
+                    viewers: 0,
+                    source: 'admin-dashboard'
+                });
+
+                await addDoc(collection(db, 'liveChat'), {
+                    userId: 'system',
+                    name: 'System',
+                    message: `🔴 Live now: "${title}" — welcome to Prayer Dome Live`,
+                    timestamp: serverTimestamp(),
+                    isSystem: true
+                }).catch(() => {});
+
+                await logAdminActivity('live_started', { title, streamId });
+                applyAdminLiveUI({
+                    isLive: true, title, description, streamId, streamKey: streamId,
+                    rtmpUrl, hlsUrl, viewers: 0
+                });
+                toast('🔴 You are LIVE — paste RTMP info into OBS / Larix');
+                confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 } });
+            } catch (e) {
+                console.error(e);
+                toast('Could not start live: ' + e.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        };
+
+        window.adminEndLive = async function () {
+            if (!adminUser) return toast('Not authenticated', 'error');
+            if (!confirm('End the live broadcast for everyone?')) return;
+            showLoading();
+            try {
+                const prev = currentLiveData || {};
+                await setDoc(doc(db, 'liveStatus', 'current'), {
+                    isLive: false,
+                    endedAt: serverTimestamp(),
+                    endedBy: adminUser.email || adminUser.uid,
+                    title: prev.title || null,
+                    streamId: prev.streamId || null,
+                    hlsUrl: prev.hlsUrl || null,
+                    viewers: 0
+                }, { merge: true });
+
+                if (prev.streamId) {
+                    await addDoc(collection(db, 'liveRecordings'), {
+                        title: prev.title || 'Live Service',
+                        description: prev.description || '',
+                        streamId: prev.streamId,
+                        hlsUrl: prev.hlsUrl || `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/hls/${prev.streamId}.m3u8`,
+                        playbackUrl: prev.hlsUrl || `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/hls/${prev.streamId}.m3u8`,
+                        startedBy: prev.startedBy || adminUser.email,
+                        createdAt: serverTimestamp()
+                    }).catch(() => {});
+                }
+
+                await addDoc(collection(db, 'liveChat'), {
+                    userId: 'system',
+                    name: 'System',
+                    message: '🔴 The live stream has ended. Thank you for joining us.',
+                    timestamp: serverTimestamp(),
+                    isSystem: true
+                }).catch(() => {});
+
+                await logAdminActivity('live_ended', { streamId: prev.streamId || null });
+                toast('Broadcast ended');
+                loadLiveRecordings();
+            } catch (e) {
+                toast('Could not end live: ' + e.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        };
+
+        window.copyLiveRTMP = function () {
+            const rtmp = document.getElementById('adminRtmpUrl')?.textContent || '';
+            const key = document.getElementById('adminStreamKey')?.textContent || '';
+            const text = `RTMP URL: ${rtmp}\nStream Key: ${key}`;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => toast('Stream info copied')).catch(() => toast(text, 'info'));
+            } else {
+                prompt('Copy stream info:', text);
+            }
+        };
+
+        window.loadLiveRecordings = async function () {
+            const tbody = document.getElementById('listLiveRecordings');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;"><div class="spinner" style="width:30px;height:30px;"></div></td></tr>';
+            try {
+                const snap = await getDocs(query(collection(db, 'liveRecordings'), orderBy('createdAt', 'desc'), limit(20)));
+                if (snap.empty) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-sub);">No recordings yet — ended streams appear here</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = snap.docs.map(d => {
+                    const r = d.data();
+                    const when = r.createdAt ? moment(r.createdAt.toDate()).format('MMM D, YYYY h:mm A') : '—';
+                    const play = r.playbackUrl || r.hlsUrl || (r.streamId ? `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/hls/${r.streamId}.m3u8` : '');
+                    return `<tr>
+                        <td style="white-space:nowrap;">${when}</td>
+                        <td><strong>${escapeHTML(r.title || 'Live Service')}</strong></td>
+                        <td style="font-family:monospace;font-size:.75rem;color:var(--accent-gold);">${escapeHTML(r.streamId || '—')}</td>
+                        <td>${escapeHTML(r.startedBy || '—')}</td>
+                        <td>${play ? `<a class="btn btn-sm btn-outline" href="${play}" target="_blank"><i class="fas fa-play"></i> HLS</a>` : '—'}
+                            <button class="btn btn-sm btn-danger" onclick="deleteRecord('liveRecordings','${d.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--accent-red);">Could not load recordings</td></tr>';
+            }
+        };
+
+        window.loadLiveChatPreview = async function () {
+            const tbody = document.getElementById('listLiveChatPreview');
+            if (!tbody) return;
+            try {
+                const snap = await getDocs(query(collection(db, 'liveChat'), orderBy('timestamp', 'desc'), limit(25)));
+                if (snap.empty) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text-sub);">No chat messages yet</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = snap.docs.map(d => {
+                    const m = d.data();
+                    const when = m.timestamp ? moment(m.timestamp.toDate()).format('h:mm A') : '—';
+                    return `<tr>
+                        <td style="white-space:nowrap;">${when}</td>
+                        <td><strong>${escapeHTML(m.name || 'Member')}</strong>${m.isPrayer ? ' <span class="badge badge-gold">Prayer</span>' : ''}${m.isSystem ? ' <span class="badge badge-info">System</span>' : ''}</td>
+                        <td style="white-space:normal;max-width:420px;">${escapeHTML(m.message || '')}</td>
+                    </tr>`;
+                }).join('');
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="3">Chat unavailable</td></tr>';
+            }
+        };
+
         window.switchView = async (viewId, navElement) => {
             document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -1121,6 +1450,7 @@
             if(window.innerWidth <= 992) document.getElementById('sidebar').style.left = '-280px';
             try {
                 if(viewId === 'dashboard') await loadDashboardStats();
+                else if(viewId === 'live') { watchLiveStatus(); await loadLiveRecordings(); await loadLiveChatPreview(); }
                 else if(viewId === 'members') { await loadDashboardStats(); filterMembers(); }
                 else if(viewId === 'announcements') await loadAnnouncements();
                 else if(viewId === 'care') await loadCareRequests();
@@ -1146,6 +1476,7 @@
                         document.getElementById('loginModal').style.display = 'none';
                         await loadDashboardStats();
                         setupAdminRealtimeListeners();
+                        watchLiveStatus();
                     } else { 
                         await signOut(auth); 
                         document.getElementById('loginModal').style.display = 'flex'; 

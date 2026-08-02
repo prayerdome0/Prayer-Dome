@@ -12,7 +12,7 @@
     <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="https://prayerdome.net/">
     <meta name="author" content="Prayer Dome">
-    <meta name="theme-color" content="#0b3d91">
+    <meta name="theme-color" content="#0a5c36">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Prayer Dome">
@@ -196,10 +196,12 @@
         .delete-notif-btn:hover { color: var(--accent-red); transform: scale(1.1); }
         .empty-notifications { text-align: center; padding: 60px 20px; color: var(--text-sub); }
 
-        /* Hero Section with Typing Animation */
+        /* Hero Section — brand green + gold glow (matches OG mark) */
         .hero {
-            background: linear-gradient(135deg, var(--accent-green), #064e3b);
-            padding: 60px 20px 80px;
+            background:
+              radial-gradient(ellipse 70% 55% at 50% 42%, rgba(212,175,55,.38) 0%, transparent 58%),
+              linear-gradient(165deg, #0a5c36 0%, #064e3b 42%, #022c22 100%);
+            padding: 56px 20px 88px;
             color: white;
             text-align: center;
             position: relative;
@@ -207,9 +209,123 @@
             margin-top: 0;
             border-radius: 0 0 50px 50px;
         }
-        .hero::after { content:''; position:absolute; top:0; left:0; width:100%; height:100%; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.2; pointer-events: none;}
-        .hero h1 { min-height: 100px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 900; margin-bottom: 15px; letter-spacing: -1px; position: relative; z-index: 2; font-family: 'Playfair Display', serif; }
-        .hero p { opacity: 0.9; font-size: 1rem; max-width: 500px; margin: 0 auto; position: relative; z-index: 2; }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+              radial-gradient(1.5px 1.5px at 12% 18%, rgba(255,255,255,.55), transparent),
+              radial-gradient(1px 1px at 28% 62%, rgba(246,223,138,.7), transparent),
+              radial-gradient(1.5px 1.5px at 72% 24%, rgba(255,255,255,.45), transparent),
+              radial-gradient(1px 1px at 88% 70%, rgba(246,223,138,.55), transparent),
+              radial-gradient(1px 1px at 48% 80%, rgba(255,255,255,.35), transparent),
+              radial-gradient(1.2px 1.2px at 62% 12%, rgba(255,255,255,.5), transparent);
+            opacity: .85;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            opacity: 0.18;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .hero-brand {
+            position: relative;
+            z-index: 2;
+            margin-bottom: 18px;
+        }
+        .hero-brand .hero-icon {
+            width: 56px; height: 56px;
+            margin: 0 auto 14px;
+            border: 1.5px solid rgba(212,175,55,.75);
+            border-radius: 50% 50% 42% 42%;
+            display: flex; align-items: center; justify-content: center;
+            color: #f6df8a;
+            font-size: 1.35rem;
+            box-shadow: 0 0 40px rgba(212,175,55,.35);
+            background: rgba(2,44,34,.25);
+        }
+        .hero-brand .hero-wordmark {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.6rem, 5vw, 2.4rem);
+            font-weight: 700;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: #fffef8;
+            text-shadow: 0 2px 28px rgba(212,175,55,.4);
+            margin: 0;
+            min-height: auto;
+            display: block;
+        }
+        .hero-brand .hero-rule {
+            width: 88px; height: 1.5px;
+            margin: 14px auto 12px;
+            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+            border: 0;
+        }
+        .hero h1 {
+            min-height: 72px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: clamp(1.25rem, 3.6vw, 1.85rem);
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.3px;
+            position: relative;
+            z-index: 2;
+            font-family: 'Playfair Display', serif;
+            color: rgba(255,255,255,.96);
+        }
+        .hero p {
+            opacity: 0.92;
+            font-size: .98rem;
+            max-width: 520px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+            font-weight: 400;
+            letter-spacing: .02em;
+        }
+        .hero-cta {
+            position: relative;
+            z-index: 2;
+            margin-top: 22px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .hero-cta a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 22px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: .85rem;
+            text-decoration: none;
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+        .hero-cta a:hover { transform: translateY(-2px); }
+        .hero-cta .cta-live {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(220,38,38,.35);
+        }
+        .hero-cta .cta-pray {
+            background: linear-gradient(135deg, #d4af37, #a67c00);
+            color: #1a1400;
+            box-shadow: 0 8px 24px rgba(212,175,55,.35);
+        }
+        .hero-cta .cta-ghost {
+            background: rgba(255,255,255,.12);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,.28);
+            backdrop-filter: blur(8px);
+        }
 
         .typing-cursor {
             display: inline-block;
@@ -239,7 +355,7 @@
         .devotional-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 12px; }
         .devotional-header h2 { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 12px; color: var(--accent-green); font-family: 'Playfair Display', serif; }
         .devotional-header h2 i { font-size: 1.8rem; color: var(--accent-gold); }
-        .time-indicator { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); padding: 8px 20px; border-radius: 40px; color: white; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; animation: pulseGlow 2s infinite; box-shadow: 0 4px 15px rgba(34,197,94,0.3); }
+        .time-indicator { background: linear-gradient(135deg, #0a5c36, #15803d); padding: 8px 20px; border-radius: 40px; color: white; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; animation: pulseGlow 2s infinite; box-shadow: 0 4px 15px rgba(10,92,54,0.35); }
         .timezone-info { font-size: 0.7rem; color: var(--accent-gold); margin-top: 5px; }
         @keyframes pulseGlow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.02); } }
         
@@ -355,7 +471,9 @@
         @media (max-width: 600px) {
             .portal-grid { grid-template-columns: repeat(3, 1fr); gap: 12px;}
             .portal-icon { width: 55px; height: 55px; font-size: 1.3rem; }
-            .hero h1 { min-height: 80px; font-size: 1.5rem; }
+            .hero h1 { min-height: 56px; font-size: 1.15rem; }
+            .hero-brand .hero-wordmark { letter-spacing: .1em; }
+            .hero-cta a { padding: 10px 16px; font-size: .78rem; }
             .verse-text { font-size: 1rem; }
             .verse-card { padding: 20px; }
             .devotional-header h2 { font-size: 1.2rem; }
@@ -404,10 +522,20 @@
     </div>
 </div>
 
-<!-- Hero with Typing Animation -->
+<!-- Hero — brand mark + typing welcome -->
 <div class="hero">
+    <div class="hero-brand">
+        <div class="hero-icon" aria-hidden="true"><i class="fas fa-hands-praying"></i></div>
+        <p class="hero-wordmark">Prayer Dome</p>
+        <hr class="hero-rule">
+    </div>
     <h1 id="typingHeading"></h1>
     <p id="js-welcome-message">A House of Prayer for All Nations. Experience the supernatural atmosphere today.</p>
+    <div class="hero-cta">
+        <a href="/live.html" class="cta-live"><i class="fas fa-tower-broadcast"></i> Watch Live</a>
+        <a href="/prayer.html" class="cta-pray"><i class="fas fa-hands-praying"></i> Prayer Wall</a>
+        <a href="/bible.html" class="cta-ghost"><i class="fas fa-book-open"></i> Read Bible</a>
+    </div>
 </div>
 
 <main>
@@ -612,7 +740,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp, Timestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp, Timestamp, deleteDoc, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     
     // Import devotional system

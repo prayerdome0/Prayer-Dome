@@ -1,6 +1,6 @@
 // Prayer Dome Service Worker
 // Bump CACHE_NAME whenever the precache list changes.
-const CACHE_NAME = 'prayer-dome-v4';
+const CACHE_NAME = 'prayer-dome-v5';
 
 // Shell assets worth having available offline.
 const PRECACHE = [
