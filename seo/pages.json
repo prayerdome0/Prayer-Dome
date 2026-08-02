@@ -4,8 +4,10 @@
     "baseUrl": "https://prayerdome.net",
     "siteName": "Prayer Dome",
     "twitter": "@prayerdome",
-    "defaultImage": "https://prayerdome.net/assets/og-image.png",
-    "logo": "https://i.ibb.co/TB5Fx4tb/logo-0.png"
+  "defaultImage": "https://prayerdome.net/assets/og-image.png",
+  "logo": "https://i.ibb.co/TB5Fx4tb/logo-0.png",
+  "addressLocality": "Manzini",
+  "addressCountry": "SZ"
   },
   "pages": {
     "index.html": {

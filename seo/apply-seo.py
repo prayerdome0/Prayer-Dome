@@ -65,8 +65,8 @@ def org_schema(site):
         "sameAs": site.get("sameAs", []),
         "address": {
             "@type": "PostalAddress",
-            "addressLocality": site.get("addressLocality", "Lusaka"),
-            "addressCountry": site.get("addressCountry", "ZM"),
+            "addressLocality": site.get("addressLocality", "Manzini"),
+            "addressCountry": site.get("addressCountry", "SZ"),
         },
         "potentialAction": {
             "@type": "SearchAction",

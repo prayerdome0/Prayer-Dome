@@ -61,8 +61,8 @@
   "sameAs": [],
   "address": {
     "@type": "PostalAddress",
-    "addressLocality": "Lusaka",
-    "addressCountry": "ZM"
+    "addressLocality": "Manzini",
+    "addressCountry": "SZ"
   },
   "potentialAction": {
     "@type": "SearchAction",
@@ -478,6 +478,10 @@
             flex: 1;
             overflow-y: auto;
             padding: 18px;
+            background:
+                radial-gradient(circle at 15% 15%, rgba(59,130,246,0.06), transparent 40%),
+                radial-gradient(circle at 85% 90%, rgba(212,175,55,0.07), transparent 45%),
+                var(--bg-primary);
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -493,6 +497,26 @@
             gap: 8px;
             max-width: 75%;
             animation: fadeInUp 0.28s var(--ease-smooth) both;
+        }
+        /* Date divider */
+        .message-date-divider {
+            display: flex; align-items: center; gap: 12px;
+            margin: 6px 0; align-self: center; max-width: 90%;
+        }
+        .message-date-divider::before, .message-date-divider::after {
+            content: ''; flex: 1; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+            opacity: .5;
+        }
+        .message-date-chip {
+            font-size: .6rem; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase;
+            padding: 5px 14px; border-radius: 30px;
+            background: color-mix(in srgb, var(--accent-gold) 14%, transparent);
+            color: var(--accent-gold-deep, var(--accent-gold)); border: 1px solid rgba(212,175,55,.3);
+        }
+        .message.received .message-bubble {
+            background: linear-gradient(135deg, var(--bg-card), color-mix(in srgb, var(--bg-card) 92%, var(--accent-green-light)));
+            border-top-left-radius: 5px;
         }
         .message.sent { margin-left: auto; flex-direction: row-reverse; }
         .message-avatar {
@@ -549,6 +573,26 @@
         .message.sent .delivered { color: rgba(255, 255, 255, 0.85); }
         .read { color: var(--accent-blue); }
         .message.sent .read { color: #bfdbfe; }
+
+        /* Quick-reply suggestion chips */
+        .chat-suggestions {
+            display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+            padding: 8px 16px 2px;
+            background: var(--bg-card);
+            background: color-mix(in srgb, var(--bg-card) 94%, transparent);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        .suggestion-hint { font-size: .7rem; color: var(--accent-gold); opacity: .85; }
+        .suggestion-chip {
+            border: 1px solid rgba(212,175,55,.35); background: color-mix(in srgb, var(--accent-gold) 10%, transparent);
+            color: var(--accent-gold-deep, var(--accent-gold));
+            border-radius: 30px; padding: 6px 13px; font-size: .7rem; font-weight: 700; cursor: pointer;
+            transition: .2s var(--ease-spring);
+        }
+        .suggestion-chip:hover { transform: translateY(-2px) scale(1.04); background: var(--accent-gold); color: #fff; box-shadow: 0 6px 14px -3px rgba(212,175,55,.5); }
 
         .chat-input-area {
             padding: 11px 16px;
@@ -1075,6 +1119,13 @@
                     <span class="typing-dots"><span></span><span></span><span></span></span> Someone is typing...
                 </div>
                 
+                <div class="chat-suggestions" id="chatSuggestions">
+                    <span class="suggestion-hint"><i class="fas fa-bolt"></i></span>
+                    <button class="suggestion-chip" onclick="sendSuggestion('Amen, God is good! 🙌')">Amen 🙌</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion('God bless you and your family 🌿')">God bless you 🌿</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion('I am praying for you today 🙏')">Praying for you 🙏</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion('Welcome to the Prayer Dome family! 🕊️')">Welcome 🕊️</button>
+                </div>
                 <div class="chat-input-area">
                     <div class="media-buttons">
                         <button class="media-btn" onclick="uploadPhoto()" title="Send Photo"><i class="fas fa-image"></i></button>
@@ -1603,15 +1654,30 @@
                 return;
             }
             
-            container.innerHTML = messages.map(msg => {
+            container.innerHTML = messages.map((msg, i) => {
                 const isOwn = currentUser && msg.userId === currentUser.uid;
                 let statusIcon = '';
+                // Insert a date divider when the day changes.
+                let dateDivider = '';
+                if (msg.timestamp && msg.timestamp.toDate) {
+                    const prevMsg = i > 0 ? messages[i - 1] : null;
+                    const prevDay = prevMsg && prevMsg.timestamp && prevMsg.timestamp.toDate ? moment(prevMsg.timestamp.toDate()).format('YYYY-MM-DD') : null;
+                    const thisDay = moment(msg.timestamp.toDate()).format('YYYY-MM-DD');
+                    if (prevDay !== thisDay) {
+                        const label = moment(msg.timestamp.toDate()).calendar(null, {
+                            sameDay: '[Today]', lastDay: '[Yesterday]', lastWeek: 'dddd',
+                            sameElse: 'MMMM D, YYYY'
+                        });
+                        dateDivider = `<div class="message-date-divider"><span class="message-date-chip">${label}</span></div>`;
+                    }
+                }
                 if (isOwn) {
                     if (msg.read) statusIcon = '<span class="delivery-status read"><i class="fas fa-check-double"></i><i class="fas fa-check-double"></i></span>';
                     else if (msg.delivered) statusIcon = '<span class="delivery-status delivered"><i class="fas fa-check-double"></i></span>';
                     else statusIcon = '<span class="delivery-status"><i class="fas fa-check"></i></span>';
                 }
                 return `
+                    ${dateDivider}
                     <div class="message ${isOwn ? 'sent' : 'received'}">
                         <div class="message-avatar">${(msg.userName || 'A').charAt(0).toUpperCase()}</div>
                         <div class="message-bubble">
@@ -1644,6 +1710,12 @@
                 }
             });
         }
+
+        window.sendSuggestion = async (text) => {
+            const input = document.getElementById('messageInput');
+            if (input) input.value = text;
+            await sendMessage();
+        };
 
         window.sendMessage = async () => {
             const input = document.getElementById('messageInput');
