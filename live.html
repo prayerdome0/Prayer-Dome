@@ -384,7 +384,7 @@
                 <div class="offline-state" id="deviceLiveState" style="display:none; background: linear-gradient(160deg, #0A4D9B, #07244d); color:#fff;">
                     <i class="fas fa-tower-broadcast" style="color:#f6df8a;"></i>
                     <h3 style="color:#fff;">Live from the ministry's device</h3>
-                    <p style="color:rgba(255,255,255,.85);">The broadcast is happening right now. Chat, react and send prayer requests below — the video replay will be available here the moment the broadcast ends.</p>
+                    <p style="color:rgba(255,255,255,.85);">The broadcast is happening right now. Tap <strong>Watch Live</strong> below to connect to the stream &mdash; HLS is generated automatically on Cloudinary so you can watch on any device, anywhere. Chat, react and send prayer requests below while you watch &mdash; the full replay will be available the moment the broadcast ends.</p>
                 </div>
 
                 <div class="play-overlay" id="playOverlay" style="display:none;" onclick="startWatching()">
@@ -557,7 +557,12 @@
     function applyStatus(data) {
         currentStatus = data || { isLive: false };
         const live = !!currentStatus.isLive;
-        const deviceLive = live && !currentStatus.hlsUrl && currentStatus.source === 'device';
+        // Cloudinary HLS — always derive a real URL when we have a streamId so
+        // device / OBS / Larix broadcasts all play for viewers without extra setup.
+        if (live && !currentStatus.hlsUrl && currentStatus.streamId) {
+            currentStatus.hlsUrl = 'https://res.cloudinary.com/prayerdome/video/upload/hls/' + currentStatus.streamId + '.m3u8';
+        }
+        const deviceLive = live && currentStatus.source === 'device';
 
         $('liveDot').classList.toggle('on', live);
         $('liveTag').classList.toggle('show', live);
@@ -570,10 +575,12 @@
             $('npDesc').textContent = currentStatus.description || 'Join the service in real time.';
             $('offlineState').style.display = 'none';
             if (deviceLive) {
-                // Device broadcast — no HLS yet: show the live card instead of the player.
-                $('playOverlay').style.display = 'none';
-                $('livePlayer').style.display = 'none';
+                // Device broadcast — the HLS URL is created automatically by
+                // the admin's device, but it may not be ready yet. Show the
+                // live card with a note, and also try the player (HLS.js will
+                // retry until the stream is available).
                 $('deviceLiveState').style.display = 'flex';
+                if (!watching) $('playOverlay').style.display = 'flex';
             } else {
                 $('deviceLiveState').style.display = 'none';
                 if (!watching) $('playOverlay').style.display = 'flex';
@@ -610,6 +617,7 @@
         const v = $('livePlayer');
         $('playOverlay').style.display = 'none';
         $('offlineState').style.display = 'none';
+        $('deviceLiveState').style.display = 'none';
         v.style.display = 'block';
         watching = true;
 
@@ -619,14 +627,20 @@
             v.play().catch(() => {});
         } else if (window.Hls && Hls.isSupported()) {
             if (hls) hls.destroy();
-            hls = new Hls({ lowLatencyMode: true });
+            hls = new Hls({ lowLatencyMode: true, maxBufferLength: 6, liveSyncDurationCount: 3 });
             hls.loadSource(url);
             hls.attachMedia(v);
             hls.on(Hls.Events.MANIFEST_PARSED, () => v.play().catch(() => {}));
             hls.on(Hls.Events.ERROR, (_e, data) => {
                 if (data.fatal) {
-                    toast('Stream interrupted — reconnecting', 'error');
-                    setTimeout(() => { if (currentStatus.isLive) startWatching(); }, 3000);
+                    // For device-broadcast HLS that may not be transcoded yet,
+                    // back off instead of infinite-spinning the player.
+                    if (data.type === Hls.ErrorTypes.NETWORK_ERROR && currentStatus.source === 'device') {
+                        setTimeout(() => { if (currentStatus.isLive) startWatching(); }, 4000);
+                    } else {
+                        toast('Stream interrupted — reconnecting', 'error');
+                        setTimeout(() => { if (currentStatus.isLive) startWatching(); }, 3000);
+                    }
                 }
             });
         } else {
