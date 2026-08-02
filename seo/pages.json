@@ -38,7 +38,7 @@
     "ai-prayer.html": {
       "path": "/ai-prayer",
       "title": "AI Prayer Assistant | Scriptures & Prayer Points For What You Face",
-      "description": "Tell the Prayer Dome assistant what you are facing — fear, grief, provision, healing, anxiety — and receive matching scriptures, guided prayer points and encouragement instantly.",
+      "description": "Tell the Prayer Dome assistant what you are facing \u2014 fear, grief, provision, healing, anxiety \u2014 and receive matching scriptures, guided prayer points and encouragement instantly.",
       "keywords": "ai prayer assistant, prayer points, scriptures for fear, bible verses for anxiety, what does the bible say, christian ai, guided prayer",
       "schema": "webapp",
       "priority": "0.9",
@@ -83,7 +83,7 @@
     "events.html": {
       "path": "/events",
       "title": "Church Events Calendar | Services & Gatherings | Prayer Dome",
-      "description": "See what is coming up at Prayer Dome — Sunday services, prayer nights, Bible studies, conferences and special gatherings. Register and add events to your calendar.",
+      "description": "See what is coming up at Prayer Dome \u2014 Sunday services, prayer nights, Bible studies, conferences and special gatherings. Register and add events to your calendar.",
       "keywords": "church events, church calendar, prayer meeting, sunday service times, christian conference, church gathering",
       "schema": "webpage",
       "priority": "0.8",
@@ -217,6 +217,24 @@
       "keywords": "tumbuka bible, chitumbuka scripture, siswati bible, bible in siswati, multilingual bible, african language bible, bible translation",
       "schema": "webapp",
       "priority": "0.8",
+      "changefreq": "weekly"
+    },
+    "news.html": {
+      "path": "/news",
+      "title": "Christian News Center | Ministry Updates & Revival Reports | Prayer Dome",
+      "description": "Church updates, ministry news, event announcements, revival reports, testimonies and global Christian news from Prayer Dome across the nations.",
+      "keywords": "christian news, ministry news, church updates, revival reports, prayer dome news, event announcements",
+      "schema": "webpage",
+      "priority": "0.8",
+      "changefreq": "daily"
+    },
+    "radio.html": {
+      "path": "/radio",
+      "title": "Gospel Radio & Podcasts | Worship, Bible Stories & Encouragement | Prayer Dome",
+      "description": "Listen to gospel radio, narrated Bible stories, sermons and daily encouragement streams inside the Prayer Dome app \u2014 no external player needed.",
+      "keywords": "gospel radio, christian podcasts, worship radio, bible stories audio, prayer dome radio",
+      "schema": "webpage",
+      "priority": "0.7",
       "changefreq": "weekly"
     }
   }

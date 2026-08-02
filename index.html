@@ -12,7 +12,7 @@
     <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="https://prayerdome.net/">
     <meta name="author" content="Prayer Dome">
-    <meta name="theme-color" content="#0a5c36">
+    <meta name="theme-color" content="#0A4D9B">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Prayer Dome">
@@ -115,8 +115,8 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
-            --accent-green: #15803d;
-            --accent-green-light: #22c55e;
+            --accent-green: #0A4D9B;
+            --accent-green-light: #3b82f6;
             --accent-gold: #d4af37;
             --accent-gold-dark: #b45309;
             --accent-blue: #3b82f6;
@@ -128,7 +128,7 @@
             --text-sub: #64748b;
             --border-color: #e2e8f0;
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            --shadow-glow: 0 10px 30px rgba(21, 128, 61, 0.15);
+            --shadow-glow: 0 10px 30px rgba(10,77,155, 0.15);
             --nav-bg: rgba(255, 255, 255, 0.85);
             --glass-bg: rgba(255, 255, 255, 0.7);
         }
@@ -136,7 +136,7 @@
         body.dark-mode {
             --bg-primary: #020617; --bg-card: #0f172a; --text-main: #f8fafc; --text-sub: #94a3b8; 
             --nav-bg: rgba(15, 23, 42, 0.9); --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            --shadow-glow: 0 10px 30px rgba(21, 128, 61, 0.1);
+            --shadow-glow: 0 10px 30px rgba(10,77,155, 0.1);
             --glass-bg: rgba(15, 23, 42, 0.7);
             --border-color: #334155;
         }
@@ -160,8 +160,8 @@
         
         .theme-toggle-btn { background: var(--bg-primary); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 20px; cursor: pointer; transition: 0.2s; }
         .theme-toggle-btn:hover { transform: scale(1.05); }
-        .location-detective { background: rgba(21, 128, 61, 0.1); padding: 8px 16px; border-radius: 50px; font-size: 11px; font-weight: 800; color: var(--accent-green); display: flex; align-items: center; gap: 6px; border: 1px solid rgba(21, 128, 61, 0.2); cursor: pointer; transition: 0.2s; }
-        .location-detective:hover { background: rgba(21, 128, 61, 0.2); transform: scale(1.02); }
+        .location-detective { background: rgba(10,77,155, 0.1); padding: 8px 16px; border-radius: 50px; font-size: 11px; font-weight: 800; color: var(--accent-green); display: flex; align-items: center; gap: 6px; border: 1px solid rgba(10,77,155, 0.2); cursor: pointer; transition: 0.2s; }
+        .location-detective:hover { background: rgba(10,77,155, 0.2); transform: scale(1.02); }
         .location-detective span { max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Notification Panel */
@@ -186,7 +186,7 @@
         .delete-all-notif { background: rgba(239,68,68,0.1); border: 1px solid var(--accent-red); color: var(--accent-red); padding: 6px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .delete-all-notif:hover { background: var(--accent-red); color: white; }
         .notification-item { padding: 20px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: 0.3s; display: flex; justify-content: space-between; align-items: center; }
-        .notification-item:hover { background: rgba(34,197,94,0.05); transform: translateX(5px); }
+        .notification-item:hover { background: rgba(59,130,246,0.05); transform: translateX(5px); }
         .notification-item.unread { background: rgba(212,175,55,0.1); border-left: 4px solid var(--accent-gold); }
         .notification-content { flex: 1; }
         .notification-title { font-weight: 800; margin-bottom: 5px; color: var(--text-main); }
@@ -200,7 +200,7 @@
         .hero {
             background:
               radial-gradient(ellipse 70% 55% at 50% 42%, rgba(212,175,55,.38) 0%, transparent 58%),
-              linear-gradient(165deg, #0a5c36 0%, #064e3b 42%, #022c22 100%);
+              linear-gradient(165deg, #0A4D9B 0%, #0a3d7a 42%, #07244d 100%);
             padding: 56px 20px 88px;
             color: white;
             text-align: center;
@@ -247,7 +247,7 @@
             color: #f6df8a;
             font-size: 1.35rem;
             box-shadow: 0 0 40px rgba(212,175,55,.35);
-            background: rgba(2,44,34,.25);
+            background: rgba(7,36,77,.25);
         }
         .hero-brand .hero-wordmark {
             font-family: 'Playfair Display', serif;
@@ -355,11 +355,11 @@
         .devotional-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 12px; }
         .devotional-header h2 { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 12px; color: var(--accent-green); font-family: 'Playfair Display', serif; }
         .devotional-header h2 i { font-size: 1.8rem; color: var(--accent-gold); }
-        .time-indicator { background: linear-gradient(135deg, #0a5c36, #15803d); padding: 8px 20px; border-radius: 40px; color: white; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; animation: pulseGlow 2s infinite; box-shadow: 0 4px 15px rgba(10,92,54,0.35); }
+        .time-indicator { background: linear-gradient(135deg, #0A4D9B, #0A4D9B); padding: 8px 20px; border-radius: 40px; color: white; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; animation: pulseGlow 2s infinite; box-shadow: 0 4px 15px rgba(10,77,155,0.35); }
         .timezone-info { font-size: 0.7rem; color: var(--accent-gold); margin-top: 5px; }
         @keyframes pulseGlow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.02); } }
         
-        .verse-card { background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(212,175,55,0.05)); border-radius: 28px; padding: 35px; margin-bottom: 25px; border-left: 6px solid var(--accent-gold); transition: all 0.5s ease; animation: fadeSlideIn 0.6s ease; position: relative; overflow: hidden; }
+        .verse-card { background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(212,175,55,0.05)); border-radius: 28px; padding: 35px; margin-bottom: 25px; border-left: 6px solid var(--accent-gold); transition: all 0.5s ease; animation: fadeSlideIn 0.6s ease; position: relative; overflow: hidden; }
         .verse-card::before { content: '"'; position: absolute; bottom: -20px; right: 20px; font-size: 120px; opacity: 0.1; font-family: 'Playfair Display', serif; color: var(--accent-gold); }
         @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -367,14 +367,14 @@
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
         
         .verse-text { font-family: 'Merriweather', serif; font-size: 1.3rem; line-height: 1.8; color: var(--text-main); font-weight: 500; font-style: italic; margin-bottom: 20px; }
-        .verse-ref { color: var(--accent-green); font-weight: 800; font-size: 1rem; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 8px; background: rgba(34,197,94,0.1); padding: 5px 15px; border-radius: 30px; }
+        .verse-ref { color: var(--accent-green); font-weight: 800; font-size: 1rem; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 8px; background: rgba(59,130,246,0.1); padding: 5px 15px; border-radius: 30px; }
         
         .commentary-card { background: rgba(0,0,0,0.02); border-radius: 24px; padding: 25px; margin: 25px 0; border: 1px solid rgba(212,175,55,0.15); transition: all 0.3s; }
         .commentary-card:hover { transform: translateX(5px); border-left: 3px solid var(--accent-gold); }
         .commentary-title { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; font-weight: 800; color: var(--accent-gold); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
         .commentary-text { font-size: 1rem; color: var(--text-sub); line-height: 1.8; }
         
-        .prayer-card { background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(34,197,94,0.08)); border-radius: 24px; padding: 30px; border: 1px solid rgba(212,175,55,0.3); margin-top: 20px; transition: all 0.3s; }
+        .prayer-card { background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(59,130,246,0.08)); border-radius: 24px; padding: 30px; border: 1px solid rgba(212,175,55,0.3); margin-top: 20px; transition: all 0.3s; }
         .prayer-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(212,175,55,0.1); }
         .prayer-title { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; font-weight: 800; color: var(--accent-green); font-size: 1.1rem; }
         .prayer-title i { font-size: 1.8rem; color: var(--accent-gold); }
@@ -407,7 +407,7 @@
         /* Content Cards */
         .content-card { background: var(--bg-card); border-radius: 24px; padding: 20px; border: 1px solid var(--border-color); box-shadow: var(--shadow); margin: 0 20px 15px; display: flex; gap: 15px; align-items: center; cursor: pointer; transition: 0.3s;}
         .content-card:hover { transform: translateX(5px); border-left: 5px solid var(--accent-green); }
-        .content-icon { width: 50px; height: 50px; background: rgba(34,197,94,0.1); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--accent-green); flex-shrink: 0;}
+        .content-icon { width: 50px; height: 50px; background: rgba(59,130,246,0.1); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--accent-green); flex-shrink: 0;}
 
         /* Reviews Section */
         .reviews-section { padding: 0 20px; margin: 40px 0; }
@@ -422,7 +422,7 @@
         .review-text { font-size: 0.9rem; line-height: 1.6; color: var(--text-main); font-style: italic; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); }
         .review-text i { color: var(--accent-gold); margin-right: 5px; opacity: 0.5; }
         
-        .add-review-card { background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(34,197,94,0.05)); border-radius: 28px; padding: 25px; margin-top: 30px; border: 1px solid var(--border-color); }
+        .add-review-card { background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(59,130,246,0.05)); border-radius: 28px; padding: 25px; margin-top: 30px; border: 1px solid var(--border-color); }
         .add-review-title { font-weight: 800; font-size: 1.2rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: var(--accent-green); }
         .rating-input { display: flex; gap: 8px; margin: 15px 0; }
         .rating-star { font-size: 1.8rem; cursor: pointer; color: #cbd5e1; transition: 0.2s; }
@@ -441,7 +441,7 @@
         .admin-btn-special { background: linear-gradient(135deg, var(--text-main), #334155); color: var(--bg-primary); }
         .admin-btn-special:hover { transform: translateY(-3px); box-shadow: var(--shadow); color: white; }
         .contact-info { margin: 20px 0; padding: 20px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
-        .ministry-verse { margin-top: 20px; padding: 15px; background: rgba(34,197,94,0.05); border-radius: 24px; display: inline-block; max-width: 90%; }
+        .ministry-verse { margin-top: 20px; padding: 15px; background: rgba(59,130,246,0.05); border-radius: 24px; display: inline-block; max-width: 90%; }
         .ministry-verse i { font-size: 1.5rem; color: var(--accent-gold); margin-bottom: 8px; display: block; }
 
         /* Bottom Navigation */
@@ -484,34 +484,104 @@
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
+    <script src="/assets/pd-content-data.js" defer></script>
+    <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
 
-<header>
-    <a href="index.html" class="brand">
-        <div class="logo-ring"><img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" alt="PD Logo"></div>
-        <div><h2 style="font-size: 1.1rem; font-weight: 900;">PRAYER DOME</h2></div>
+<!-- Splash Screen — theme scripture (Mark 7:37) -->
+<div class="pd-splash" id="pdSplash" aria-hidden="true">
+    <div class="pd-splash-logo"><img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" alt="Prayer Dome"></div>
+    <p class="pd-splash-word">Prayer <span>Dome</span></p>
+    <div class="pd-splash-verse pd-scripture-verse" data-pd-scripture data-pd-scripture-style="bare"></div>
+    <div class="pd-splash-loading"></div>
+</div>
+
+<!-- Slide-in Drawer Navigation -->
+<div class="pd-drawer-overlay" id="pdDrawerOverlay"></div>
+<aside class="pd-drawer" id="pdDrawer" aria-label="Main menu">
+    <div class="pd-drawer-head">
+        <img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" alt="PD">
+        <div>
+            <div class="pd-drawer-title">Prayer Dome</div>
+            <small>A House of Prayer for All Nations</small>
+        </div>
+        <button class="pd-drawer-close" aria-label="Close menu"><i class="fas fa-times"></i></button>
+    </div>
+    <nav class="pd-drawer-nav">
+        <a class="pd-drawer-link" href="/"><i class="fas fa-home"></i> Home</a>
+        <a class="pd-drawer-link pd-drawer-live" href="/live.html"><i class="fas fa-tower-broadcast"></i> Live Service</a>
+        <a class="pd-drawer-link" href="/prayer.html"><i class="fas fa-hands-praying"></i> Prayer Wall</a>
+        <a class="pd-drawer-link" href="/bible.html"><i class="fas fa-book-open"></i> Bible Center</a>
+        <a class="pd-drawer-link" href="/sermons.html"><i class="fas fa-microphone-lines"></i> Sermon Center</a>
+        <a class="pd-drawer-link" href="/video.html"><i class="fas fa-photo-film"></i> Gospel Media</a>
+        <a class="pd-drawer-link" href="/news.html"><i class="fas fa-newspaper"></i> Christian News</a>
+        <a class="pd-drawer-link" href="/testimony.html"><i class="fas fa-star-of-life"></i> Testimony Center</a>
+        <a class="pd-drawer-link" href="/events.html"><i class="fas fa-calendar-days"></i> Event Calendar</a>
+        <a class="pd-drawer-link" href="/chat.html"><i class="fas fa-comments"></i> Community Hub</a>
+        <a class="pd-drawer-link" href="/ai-prayer.html"><i class="fas fa-wand-magic-sparkles"></i> Prayer Assistant</a>
+        <a class="pd-drawer-link" href="/gallery.html"><i class="fas fa-images"></i> Gallery</a>
+        <a class="pd-drawer-link" href="/quiz.html"><i class="fas fa-star"></i> Bible Quiz</a>
+        <a class="pd-drawer-link" href="/give.html"><i class="fas fa-heart"></i> Give</a>
+        <a class="pd-drawer-link" href="/account.html"><i class="fas fa-user-circle"></i> My Account</a>
+    </nav>
+    <div class="pd-drawer-foot">
+        <i class="fas fa-bible"></i> “He does everything blamelessly.” — Mark 7:37<br>
+        <span style="opacity:.7;">© Prayer Dome Ministry · Zambia · Eswatini · Ireland</span>
+    </div>
+</aside>
+
+<header class="pd-topbar">
+    <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+    <a href="index.html" class="pd-topbar-center">
+        <div class="pd-topbar-logo"><img src="https://i.ibb.co/TB5Fx4tb/logo-0.png" alt="PD Logo"></div>
+        <div class="pd-topbar-word">PRAYER DOME</div>
     </a>
-    <div class="header-right">
-        <div class="notification-bell" id="notificationBell" onclick="toggleNotificationPanel()">
-            <i class="fas fa-bell"></i>
-            <span class="notification-badge" id="notifBadge" style="display: none;">0</span>
-        </div>
-        <div class="location-detective" id="js-user-loc">
-            <i class="fas fa-location-dot"></i>
-            <span id="locationText">Locating...</span>
-        </div>
+    <div class="pd-topbar-right">
+        <select class="pd-lang-select" aria-label="Language">
+            <option value="en">🇬🇧 English</option>
+            <option value="tum">🇲🇼 Tumbuka</option>
+            <option value="ssw">🇸🇿 siSwati</option>
+            <option value="bem">🇿🇲 Bemba</option>
+            <option value="nya">🇲🇼 Nyanja</option>
+        </select>
+        <button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="fas fa-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>
         <button class="theme-toggle-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
     </div>
 </header>
 
-<!-- Notification Panel -->
-<div class="notification-panel" id="notificationPanel">
-    <div class="notification-header">
-        <h3><i class="fas fa-bell"></i> Announcements</h3>
-        <div style="display: flex; gap: 10px;">
-            <button class="delete-all-notif" onclick="deleteAllNotifications()"><i class="fas fa-trash-alt"></i> Delete All</button>
-            <button class="close-notif" onclick="toggleNotificationPanel()"><i class="fas fa-times"></i></button>
+<!-- Live Location Card -->
+<div class="pd-location-card" id="pdLocationCard">
+    <div class="pd-location-pin"><i class="fas fa-location-crosshairs"></i></div>
+    <div class="pd-location-info">
+        <span class="pd-location-label" data-pd-t="location.title">You are worshipping from</span>
+        <div class="pd-location-name" id="pdLocationName">Detecting your location…</div>
+        <div class="pd-location-coords" id="pdLocationSub"></div>
+    </div>
+    <button class="pd-location-retry" id="pdLocationRetry" title="Refresh location"><i class="fas fa-rotate-right"></i></button>
+</div>
+
+<!-- Moving Announcement Bar -->
+<div class="pd-marquee" id="pdAnnouncementBar">
+    <span class="pd-marquee-label"><i class="fas fa-bullhorn"></i> News</span>
+    <div class="pd-marquee-viewport"><div class="pd-marquee-track"></div></div>
+</div>
+
+<!-- Notification Center (instant in-app push) -->
+<div class="pd-notif-panel" id="pdNotifPanel">
+    <div class="pd-notif-head">
+        <h3><i class="fas fa-bell"></i> <span data-pd-t="notifications.title">Notifications</span></h3>
+        <div class="pd-notif-head-actions">
+            <button title="Mark all read" onclick="PDApp.notifications.markAllRead()"><i class="fas fa-check-double"></i></button>
+            <button title="Clear" onclick="PDApp.notifications.clear()"><i class="fas fa-trash-can"></i></button>
+            <button title="Close" onclick="PDApp.ui.toggleNotifPanel(false)"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
+    <div id="pdNotifList"></div>
+    <div class="pd-notif-head" style="border-top: 1px solid var(--border-color); border-radius: 0;">
+        <h3><i class="fas fa-bullhorn"></i> Announcements</h3>
+        <div class="pd-notif-head-actions">
+            <button title="Delete all" onclick="deleteAllNotifications()"><i class="fas fa-trash-alt"></i></button>
         </div>
     </div>
     <div id="notificationList">
@@ -522,8 +592,8 @@
     </div>
 </div>
 
-<!-- Hero — brand mark + typing welcome -->
-<div class="hero">
+<!-- Hero — brand mark + typing welcome (managed by admin banners) -->
+<div class="hero" data-pd-hero>
     <div class="hero-brand">
         <div class="hero-icon" aria-hidden="true"><i class="fas fa-hands-praying"></i></div>
         <p class="hero-wordmark">Prayer Dome</p>
@@ -539,6 +609,19 @@
 </div>
 
 <main>
+    <!-- Featured Scripture — Mark 7:37 (permanent theme) -->
+    <section style="margin: 26px 16px 0;" data-pd-scripture aria-label="Featured scripture"></section>
+
+    <!-- Community Statistics -->
+    <section class="pd-stats-strip" style="margin-top: 16px;" aria-label="Community statistics">
+        <div class="pd-stat-item"><div class="pd-stat-value" data-pd-stat="members">0</div><div class="pd-stat-label" data-pd-t="stat.members">Members</div></div>
+        <div class="pd-stat-item"><div class="pd-stat-value" data-pd-stat="prayerRequests">0</div><div class="pd-stat-label" data-pd-t="stat.prayers">Prayer Requests</div></div>
+        <div class="pd-stat-item"><div class="pd-stat-value" data-pd-stat="testimonies">0</div><div class="pd-stat-label" data-pd-t="stat.testimonies">Testimonies</div></div>
+        <div class="pd-stat-item"><div class="pd-stat-value" data-pd-stat="countriesReached">0</div><div class="pd-stat-label" data-pd-t="stat.countries">Countries Reached</div></div>
+        <div class="pd-stat-item"><div class="pd-stat-value" data-pd-stat="liveViewers">0</div><div class="pd-stat-label" data-pd-t="stat.live">Live Viewers</div></div>
+        <div class="pd-stat-item"><div class="pd-stat-value" data-pd-stat="prayerGroups">0</div><div class="pd-stat-label" data-pd-t="stat.groups">Prayer Groups</div></div>
+    </section>
+
     <!-- Founder Card with Larger Photo -->
     <div class="founder-card glass-card pd-reveal">
         <div class="founder-img-wrapper">
@@ -609,6 +692,8 @@
         <a href="/support.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-hand-holding-heart"></i></div><span>Support</span></a>
         <a href="/testimony.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-star"></i></div><span>Testimony</span></a>
         <a href="/events.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-calendar-alt"></i></div><span>Events</span></a>
+        <a href="/news.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-newspaper"></i></div><span>News</span></a>
+        <a href="/video.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-photo-film"></i></div><span>Media</span></a>
         <a href="/about.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-church"></i></div><span>About</span></a>
         <a href="/contact.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-envelope"></i></div><span>Contact</span></a>
         <a href="/team.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-users"></i></div><span>Team</span></a>
@@ -626,6 +711,10 @@
     <div id="recentTestimonies" style="margin-bottom: 30px;">
         <div class="loading-spinner"></div>
     </div>
+
+    <!-- Christian News Center preview -->
+    <div class="section-label pd-reveal"><i class="fas fa-newspaper"></i> Christian News</div>
+    <div id="pdHomeNews" style="padding: 0 20px 30px;"></div>
 
     <!-- Branch Tracker -->
     <div class="section-label pd-reveal"><i class="fas fa-map-marked-alt"></i> Church Locations</div>
@@ -740,7 +829,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp, Timestamp, deleteDoc, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp, Timestamp, deleteDoc, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     
     // Import devotional system
@@ -758,6 +847,12 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+
+    // Hand the Firestore bindings to the shared premium layer (pd-app.js)
+    // so live status, notifications, banners, news and stats sync in real time.
+    if (window.PDApp) {
+        PDApp.setFirestore({ db, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, orderBy, limit, getDocs, serverTimestamp, Timestamp });
+    }
 
     let currentUser = null;
     let notifications = [];
@@ -960,7 +1055,10 @@
                 if (data.latitude && data.longitude) {
                     updateLocationUI(data.latitude, data.longitude, `${data.city || ''}, ${data.country_name || ''}`);
                 }
-            }).catch(() => { document.getElementById('locationText').innerHTML = `<i class="fas fa-globe-africa"></i> Global Network`; });
+            }).catch(() => {
+                const locSpan = document.getElementById('locationText');
+                if (locSpan) locSpan.innerHTML = `<i class="fas fa-globe-africa"></i> Global Network`;
+            });
         });
     } else {
         document.getElementById('locationText').innerHTML = `<i class="fas fa-globe-africa"></i> Global Network`;
@@ -1144,7 +1242,11 @@
     }
 
     function updateNotificationBadge() {
-        const badge = document.getElementById('notifBadge');
+        // The premium layer owns the shared bell badge; it combines this
+        // legacy unread count with its own instant-notification count.
+        if (window.PDApp) { PDApp.notifications.syncBadge(); return; }
+        const badge = document.getElementById('notifBadge') || document.querySelector('.pd-bell-badge');
+        if (!badge) return;
         if (unreadCount > 0) {
             badge.style.display = 'flex';
             badge.innerText = unreadCount > 9 ? '9+' : unreadCount;
@@ -1267,12 +1369,41 @@
     });
 
     document.addEventListener('click', function(event) {
-        const panel = document.getElementById('notificationPanel');
-        const bell = document.getElementById('notificationBell');
-        if (panel && panel.classList.contains('open') && !panel.contains(event.target) && !bell.contains(event.target)) {
+        const panel = document.getElementById('pdNotifPanel');
+        const bell = document.getElementById('pdNotifBell') || document.getElementById('notificationBell');
+        if (panel && panel.classList.contains('open') && !panel.contains(event.target) && bell && !bell.contains(event.target)) {
             panel.classList.remove('open');
         }
     });
+
+    // ==================== HOME NEWS PREVIEW ====================
+    function renderHomeNews() {
+        const container = document.getElementById('pdHomeNews');
+        if (!container || !window.PDApp) return;
+        const items = PDApp.news.list().slice(0, 3);
+        if (!items.length) {
+            container.innerHTML = '<div class="content-card" style="justify-content:center;"><i class="fas fa-newspaper"></i> News coming soon. Check the News Center!</div>';
+            return;
+        }
+        container.innerHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px;">
+            ${items.map(n => `
+                <a class="pd-news-card" href="/news.html" style="text-decoration:none; cursor:pointer;">
+                    <img src="${escapeHtml(n.image || '/assets/og-image.png')}" alt="" loading="lazy" onerror="this.src='/assets/og-image.png'">
+                    <div class="pd-news-card-body">
+                        <span class="pd-news-cat">${escapeHtml(n.category || 'Ministry News')}</span>
+                        <h3>${escapeHtml(n.title)}</h3>
+                        <p>${escapeHtml((n.summary || '').substring(0, 110))}${(n.summary || '').length > 110 ? '…' : ''}</p>
+                        <div class="pd-news-meta"><i class="far fa-clock"></i> ${n.date ? new Date(n.date).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Latest'} · <i class="fas fa-user"></i> ${escapeHtml(n.author || 'Prayer Dome')}</div>
+                    </div>
+                </a>`).join('')}
+        </div>`;
+    }
+
+    if (window.PDApp) {
+        renderHomeNews();
+        PDApp.on('news', renderHomeNews);
+        PDApp.on('news:remove', renderHomeNews);
+    }
 
     // Initialize everything
     startTypingAnimation();

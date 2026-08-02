@@ -12,7 +12,7 @@
     <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="https://prayerdome.net/prayer">
     <meta name="author" content="Prayer Dome">
-    <meta name="theme-color" content="#0a5c36">
+    <meta name="theme-color" content="#0A4D9B">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Prayer Dome">
@@ -135,8 +135,8 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         :root {
-            --accent-green: #15803d;
-            --accent-green-light: #22c55e;
+            --accent-green: #0A4D9B;
+            --accent-green-light: #3b82f6;
             --accent-gold: #d4af37;
             --accent-gold-dark: #b45309;
             --accent-blue: #3b82f6;
@@ -149,7 +149,7 @@
             --text-sub: #64748b;
             --border-color: #e2e8f0;
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            --shadow-glow: 0 10px 30px rgba(21, 128, 61, 0.15);
+            --shadow-glow: 0 10px 30px rgba(10,77,155, 0.15);
             --nav-bg: rgba(255, 255, 255, 0.85);
         }
 
@@ -268,6 +268,8 @@
         }
         .prayer-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-glow); border-color: var(--accent-gold);}
         .prayer-card.answered { border: 2px solid var(--accent-gold); background: linear-gradient(135deg, rgba(212,175,55,0.05), var(--bg-card)); }
+        .prayer-card.highlighted-prayer { border: 2px solid var(--accent-gold); box-shadow: 0 0 0 3px rgba(212,175,55,.25), var(--shadow-glow); background: linear-gradient(160deg, rgba(212,175,55,.07), var(--bg-card) 45%); }
+        .prayer-card.highlighted-prayer::before { content: '⭐'; position: absolute; top: -14px; right: 18px; font-size: 1.5rem; filter: drop-shadow(0 3px 6px rgba(0,0,0,.25)); }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
@@ -338,8 +340,8 @@
             gap: 6px;
             font-size: 1rem;
         }
-        .reaction-btn:hover { transform: scale(1.05); background: rgba(34,197,94,0.1); }
-        .reaction-btn.active { background: rgba(34,197,94,0.2); border-color: var(--accent-green); }
+        .reaction-btn:hover { transform: scale(1.05); background: rgba(59,130,246,0.1); }
+        .reaction-btn.active { background: rgba(59,130,246,0.2); border-color: var(--accent-green); }
         .reaction-count { font-size: 0.7rem; font-weight: 600; color: var(--text-sub); }
 
         /* Comments Section */
@@ -416,7 +418,7 @@
             gap: 8px;
             color: var(--text-sub);
         }
-        .action-btn:hover { background: rgba(34,197,94,0.1); color: var(--accent-green); }
+        .action-btn:hover { background: rgba(59,130,246,0.1); color: var(--accent-green); }
         .action-btn.prayed { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); color: white; border: none; }
 
         /* Modals */
@@ -522,6 +524,8 @@
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
+    <script src="/assets/pd-content-data.js" defer></script>
+    <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
 
@@ -661,6 +665,11 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
+    // Hand Firestore to the shared premium layer (pd-app.js) for stats & live data.
+    if (window.PDApp) {
+        PDApp.setFirestore({ db, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, orderBy, limit, getDocs, serverTimestamp, onSnapshot });
+    }
+
     let currentUser = null;
     let allPrayers = [];
     let currentFilter = 'all';
@@ -677,7 +686,7 @@
 
     const categoryStyles = {
         Sickness: { bg: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', icon: '🤒' },
-        Healing: { bg: 'rgba(34, 197, 94, 0.1)', color: '#22c55e', icon: '🩺' },
+        Healing: { bg: 'rgba(59,130,246, 0.1)', color: '#3b82f6', icon: '🩺' },
         Provision: { bg: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', icon: '💰' },
         Protection: { bg: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', icon: '🛡️' },
         Family: { bg: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6', icon: '👨‍👩‍👧' },
@@ -732,6 +741,7 @@
             });
             updateStats();
             renderPrayers();
+            notifyFollowedUpdates();
         });
     }
 
@@ -753,9 +763,28 @@
         renderPrayers();
     };
 
+    function getFollowedPrayers() {
+        try { return JSON.parse(localStorage.getItem('pd_followed_prayers') || '[]'); } catch (e) { return []; }
+    }
+    function saveFollowedPrayers(list) {
+        localStorage.setItem('pd_followed_prayers', JSON.stringify(list));
+    }
+
+    // Notify followers when something changes on a prayer they follow.
+    function notifyFollowedUpdates() {
+        const followed = getFollowedPrayers();
+        if (!followed.length) return;
+        allPrayers.forEach(p => {
+            if (followed.includes(p.id) && p.answered) {
+                saveFollowedPrayers(followed.filter(id => id !== p.id));
+                showToast('✨ Answered: "' + (p.text || '').substring(0, 60) + '"', 'success');
+            }
+        });
+    }
+
     function renderPrayers() {
         const grid = document.getElementById('prayerGrid');
-        let filtered = allPrayers.filter(p => p.isPublic !== false);
+        let filtered = allPrayers.filter(p => p.isPublic !== false && p.status !== 'rejected');
         if (currentFilter !== 'all') {
             filtered = filtered.filter(p => p.category === currentFilter);
         }
@@ -772,9 +801,13 @@
             const hasPrayed = currentUser && p.prayedBy && p.prayedBy.includes(currentUser.uid);
             const reactions = p.reactions || {};
             const comments = p.comments || [];
+            const followed = getFollowedPrayers().includes(p.id);
+            const highlighted = p.highlighted === true;
+            const pendingApproval = p.status === 'pending' || (!p.status && !p.answered);
             
             return `
-                <div class="prayer-card ${p.answered ? 'answered' : ''}" style="animation-delay: ${index * 0.05}s">
+                <div class="prayer-card ${p.answered ? 'answered' : ''} ${highlighted ? 'highlighted-prayer' : ''}" style="animation-delay: ${index * 0.05}s">
+                    ${highlighted ? `<div style="display:flex; align-items:center; gap:8px; background: linear-gradient(135deg, rgba(212,175,55,.18), rgba(212,175,55,.05)); border: 1px solid rgba(212,175,55,.45); color: #a67c00; font-size:.68rem; font-weight:900; letter-spacing:1.2px; text-transform:uppercase; padding:7px 14px; border-radius:30px; margin-bottom:14px; width:fit-content;"><i class="fas fa-star"></i> Highlighted by the ministry</div>` : ''}
                     <div class="prayer-header">
                         <div class="prayer-user">
                             <div class="prayer-avatar">${initial}</div>
@@ -786,6 +819,7 @@
                         <div>
                             <span class="category-badge" style="background: ${style.bg}; color: ${style.color};">${style.icon} ${p.category || 'General'}</span>
                             ${p.answered ? `<span class="category-badge" style="background: var(--accent-gold); color: white; margin-top: 5px; display: inline-block;"><i class="fas fa-check-circle"></i> Answered</span>` : ''}
+                            ${pendingApproval && isOwner ? `<span class="category-badge" style="background: rgba(212,175,55,.15); color: #a67c00; margin-top: 5px; display: inline-block; border:1px solid rgba(212,175,55,.4);"><i class="fas fa-hourglass-half"></i> Awaiting approval</span>` : ''}
                         </div>
                     </div>
                     
@@ -816,14 +850,20 @@
                         `).join('')}
                         ${comments.length > 3 ? `<div style="text-align: center; margin-top: 8px;"><button class="filter-btn" style="padding: 4px 12px; font-size: 0.7rem;" onclick="loadMoreComments('${p.id}')">View all ${comments.length} comments</button></div>` : ''}
                         <div class="add-comment">
-                            <input type="text" id="comment-${p.id}" placeholder="Write a prayer of support..." onkeypress="if(event.key==='Enter') addComment('${p.id}')">
+                            <input type="text" id="comment-${p.id}" placeholder="Leave an encouragement..." onkeypress="if(event.key==='Enter') addComment('${p.id}')">
                             <button onclick="addComment('${p.id}')"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
+                            ${['🙏 Praying for you', '💪 Standing with you', '✨ God is faithful', '🕊️ Peace be with you'].map(c => `<button class="filter-btn" style="padding:3px 10px; font-size:.62rem;" onclick="document.getElementById('comment-${p.id}').value='${c}'; document.getElementById('comment-${p.id}').focus();">${c}</button>`).join('')}
                         </div>
                     </div>
                     
                     <div class="prayer-actions">
                         <button class="action-btn ${hasPrayed ? 'prayed' : ''}" onclick="togglePray('${p.id}', this)" ${p.answered ? 'disabled' : ''}>
                             <i class="fas fa-pray"></i> <span>${p.prayedCount || 0}</span> Prayed
+                        </button>
+                        <button class="action-btn ${followed ? 'prayed' : ''}" style="${followed ? 'color: var(--accent-gold);' : ''}" onclick="followPrayer('${p.id}')" title="Get updates on this prayer">
+                            <i class="fas ${followed ? 'fa-bell' : 'fa-bell'}" style="color: var(--accent-gold);"></i> <span>${followed ? 'Following ✓' : 'Follow'}</span>
                         </button>
                         <button class="action-btn" onclick="sharePrayer('${escapeHtml(p.text).replace(/'/g, "\\'")}')">
                             <i class="fas fa-share-alt"></i> Share
@@ -989,8 +1029,10 @@
                 prayedBy: [],
                 reactions: {},
                 comments: [],
-                answered: false
+                answered: false,
+                status: 'pending'
             });
+            if (window.PDApp) PDApp.stats.bump('prayerRequests', 1);
             closeModal('submitModal');
             document.getElementById('pText').value = '';
             uploadedImageUrl = null;
@@ -1024,9 +1066,38 @@
         }
     };
 
+    window.followPrayer = (id) => {
+        let list = getFollowedPrayers();
+        if (list.includes(id)) {
+            saveFollowedPrayers(list.filter(x => x !== id));
+            showToast('Unfollowed — no more updates for this prayer');
+        } else {
+            list.push(id);
+            saveFollowedPrayers(list);
+            showToast('🔔 Following — you will be notified when this prayer is answered', 'success');
+        }
+        renderPrayers();
+    };
+
     window.markAnswered = async (id) => {
         if (confirm("Mark this prayer as answered?")) {
             await updateDoc(doc(db, "prayers", id), { answered: true, answeredAt: serverTimestamp() });
+            // Encourage the owner to share the answer as a testimony.
+            if (confirm("Share this answered prayer as a testimony to encourage others?")) {
+                const p = allPrayers.find(x => x.id === id);
+                try {
+                    await addDoc(collection(db, "testimonies"), {
+                        text: p?.text ? 'My prayer was answered! "' + p.text.substring(0, 160) + '"' : 'My prayer was answered — God is faithful!',
+                        author: p?.name || 'Anonymous',
+                        userId: p?.userId || null,
+                        timestamp: serverTimestamp(),
+                        status: 'published',
+                        source: 'prayer-wall'
+                    });
+                    if (window.PDApp) PDApp.stats.bump('testimonies', 1);
+                    showToast('✨ Testimony shared!', 'success');
+                } catch (e) { console.error(e); }
+            }
             showToast('✨ Marked as answered!', 'success');
             confetti({ particleCount: 150, spread: 100 });
         }

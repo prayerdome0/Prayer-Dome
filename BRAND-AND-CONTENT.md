@@ -1,60 +1,78 @@
-# Prayer Dome — Brand, Sermons & Translation
+# Prayer Dome — Brand, Sermons, Translation & Premium Platform
 
-What shipped in this pass, how to use it, and the one thing you must decide
-before promoting the translation feature.
+What shipped across the last passes, how to use it, and what to review before
+promoting the translation feature.
 
 ---
 
-## 1. The "Dawn" brand system
+## 1. The "Royal" brand system — Blue · Gold · White
 
-Two new shared files, loaded on all 23 pages:
+The platform now carries the official **Prayer Dome premium identity**:
+
+| Token | Value | Role |
+|---|---|---|
+| `--pd-blue` / `--pd-royal` | `#0A4D9B` | Primary Blue — actions, headers, heroes |
+| `--pd-gold` / `--pd-amber` | `#D4AF37` | Premium Gold — highlights, accents |
+| `--pd-blue-deep` / `--pd-navy` | `#0a3d7a` / `#07244d` | Deep shades for gradients & dark surfaces |
+| `--pd-blue-mid` | `#3b82f6` | Bright blue for hover/light states |
+
+Shared files, loaded on every page:
 
 | File | Purpose |
 |---|---|
-| `assets/pd-brand.css` | Palette, gradients, glass surfaces, motion primitives |
+| `assets/pd-brand.css` | Palette, gradients, glass surfaces, motion primitives, **premium components** (topbar, drawer, splash, marquee, location card, notification center, hero banner, stats, scripture card, radio) |
 | `assets/pd-motion.js` | Scroll reveal, progress bar, tilt, count-up, parallax, ripple |
+| `assets/pd-content-data.js` | Seed content: announcements, banners, news, radio, podcasts, stats, Mark 7:37 theme |
+| `assets/pd-app.js` | **Premium app layer** — `PDApp` with modules: `ui`, `i18n`, `location`, `announcements`, `notifications`, `banners`, `stats`, `live`, `news`, `scripture`, `radio` |
 
 ### Palette
 
-Sunrise amber → coral → violet on one axis, teal → sky → indigo on the other.
-
 ```
---pd-amber #f59e0b   --pd-coral #fb7185   --pd-violet #7c3aed
---pd-teal  #0d9488   --pd-sky   #38bdf8   --pd-indigo #4f46e5
+--pd-blue  #0A4D9B   --pd-gold #D4AF37   --pd-blue-mid  #3b82f6
+--pd-blue-deep #0a3d7a                  --pd-navy #07244d
 
---pd-grad-dawn     amber → coral → violet   (primary actions, headings)
---pd-grad-ocean    teal → sky → indigo      (secondary, translation)
---pd-grad-horizon  indigo → teal → amber    (hero backdrops)
---pd-grad-gold     pale gold → bronze       (highlights)
+--pd-grad-dawn     blue → deep blue → gold   (primary actions, headings)
+--pd-grad-ocean    navy → blue → bright blue (secondary)
+--pd-grad-horizon  navy → blue → gold        (hero backdrops)
+--pd-grad-gold     white → pale gold → gold  (highlights)
 ```
 
-The old `--accent-green` / `--accent-gold` variable names still work — they are
-aliased to the new palette, so existing pages picked up the refresh without
-being rewritten.
+The old `--accent-green` / `--pd-green-*` names still work — they are **aliased
+to the blue brand**, so every page picked up the rebrand without being
+rewritten. Old hex values (`#0a5c36`, `#15803d`, `#22c55e`, `#064e3b`,
+`#022c22` …) were converted repo-wide to the blue scale, including `rgba()`
+forms, the manifest theme colour, SEO theme-colour and the OG share card
+(`assets/og-image.png`).
 
-### Using it
+### Using the premium layer
 
 ```html
-<!-- reveal on scroll, with a stagger across a group -->
-<div class="cards" data-pd-stagger="80">
-  <div class="pd-reveal">…</div>
-  <div class="pd-reveal">…</div>
-</div>
+<!-- top bar: hamburger · centred logo · bell + language + theme -->
+<header class="pd-topbar">…</header>
 
-<h1 class="pd-gradient-text">Animated gradient heading</h1>
-<button class="pd-btn pd-btn-dawn">Primary</button>
-<div class="pd-glass pd-lift pd-edge" data-pd-tilt="8">Glass card that tilts</div>
-<span data-pd-count="1200" data-pd-suffix="+">0</span>
+<!-- everything else is data-driven; pd-app.js scans for its targets -->
+<div class="pd-location-card" id="pdLocationCard">…</div>   <!-- live location -->
+<div class="pd-marquee" id="pdAnnouncementBar">…</div>      <!-- moving announcements -->
+<div class="hero" data-pd-hero>…</div>                       <!-- admin-scheduled banner -->
+<div data-pd-scripture></div>                                <!-- Mark 7:37 card -->
+<div class="pd-stats-strip">…<div data-pd-stat="members">…   <!-- community stats -->
 ```
 
-After injecting markup dynamically, call `PDMotion.refresh(container)` so new
-`.pd-reveal` elements get observed.
+Pages with Firestore register it once so everything syncs live:
+
+```js
+PDApp.setFirestore({ db, doc, getDoc, setDoc, updateDoc, addDoc, collection,
+                    query, orderBy, limit, getDocs, onSnapshot, serverTimestamp, Timestamp });
+```
+
+Everything else works fully offline via localStorage + BroadcastChannel.
 
 ### Accessibility
 
 Every animation is switched off under `prefers-reduced-motion: reduce` — the
-aurora stops drifting, reveals appear instantly, the progress bar is not even
-created. This is tested (`tests/content.test.js`).
+aurora stops drifting, reveals appear instantly, the marquee freezes, the
+progress bar is not even created. This is tested (`tests/content.test.js`,
+`tests/premium.test.js`).
 
 ### One thing worth knowing
 
@@ -119,16 +137,23 @@ actual Firestore listener in `admin.html` is the remaining step.
 
 ## 3. Translation — `/translate`
 
-English (KJV), Chitumbuka and siSwati. 32 verses, side-by-side comparison,
-cross-language search, verse of the day, read-aloud.
+English (KJV), **Chitumbuka, siSwati, Bemba and Nyanja** (5 languages). 33+
+verses including the featured **Mark 7:37** theme, side-by-side comparison,
+cross-language search, verse of the day, read-aloud, plus a language selector
+in the app top bar (`pd-app.js` → `PDApp.i18n`).
 
 Cross-language search is genuinely useful: typing the siSwati word *umelusi* or
 the Tumbuka *muliska* both find Psalm 23. A member can search in whichever
 language they think in.
 
+**Bemba (`bem`) and Nyanja (`nya`)** were added as community drafts with the
+same `reviewed: false` discipline as Tumbuka and siSwati — the draft badge
+shows until a fluent speaker signs each string off. Voices fall back to the
+nearest available browser voice (Swahili phonetics), then English.
+
 ### ⚠️ Read this before you promote the feature
 
-**The Tumbuka and siSwati text is a draft, not a published translation.**
+**The Tumbuka, siSwati, Bemba and Nyanja text is a draft, not a published translation.**
 
 The English is KJV and exact. The other two are machine-assisted renderings
 prepared to give you a working starting point. Every entry carries

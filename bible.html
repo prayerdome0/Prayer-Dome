@@ -12,7 +12,7 @@
     <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="https://prayerdome.net/bible">
     <meta name="author" content="Prayer Dome">
-    <meta name="theme-color" content="#0a5c36">
+    <meta name="theme-color" content="#0A4D9B">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Prayer Dome">
@@ -142,8 +142,8 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
-            --accent-green: #15803d;
-            --accent-green-light: #22c55e;
+            --accent-green: #0A4D9B;
+            --accent-green-light: #3b82f6;
             --accent-gold: #d4af37;
             --accent-gold-dark: #b45309;
             --bg-primary: #f8fafc;
@@ -192,7 +192,7 @@
             display: flex; 
             align-items: center; 
             justify-content: center;
-            box-shadow: 0 4px 15px rgba(21,128,61,0.3);
+            box-shadow: 0 4px 15px rgba(10,77,155,0.3);
         }
         .logo-ring img {
             width: 100%;
@@ -223,7 +223,7 @@
             transition: 0.2s;
             color: var(--text-primary);
         }
-        .theme-btn:hover { transform: scale(1.05); background: rgba(34,197,94,0.1); }
+        .theme-btn:hover { transform: scale(1.05); background: rgba(59,130,246,0.1); }
 
         /* Progress Bar */
         .progress-container {
@@ -264,7 +264,7 @@
         .app-wrapper { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
         .app-tabs { display: flex; gap: 10px; background: var(--bg-card); padding: 8px; border-radius: 60px; margin-bottom: 20px; border: 1px solid var(--border-color); }
         .app-tab { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 700; cursor: pointer; border-radius: 50px; color: var(--text-secondary); transition: 0.2s; text-align: center; font-size: 0.9rem; }
-        .app-tab.active { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); color: white; box-shadow: 0 4px 12px rgba(34,197,94,0.3); }
+        .app-tab.active { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); color: white; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
 
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
@@ -285,9 +285,9 @@
         .chapter-title { text-align: center; font-size: 2rem; color: var(--accent-green); margin-bottom: 30px; border-bottom: 3px solid var(--accent-gold); display: inline-block; width: auto; padding-bottom: 10px; }
 
         .verse-item { display: inline; padding: 2px 4px; border-radius: 6px; cursor: pointer; transition: 0.2s; position: relative; }
-        .verse-item:hover { background: rgba(34,197,94,0.1); }
+        .verse-item:hover { background: rgba(59,130,246,0.1); }
         .verse-item.selected { background: rgba(212,175,55,0.2); border-radius: 8px; }
-        .verse-item.reading { background: rgba(34,197,94,0.2); color: var(--accent-green); font-weight: bold; }
+        .verse-item.reading { background: rgba(59,130,246,0.2); color: var(--accent-green); font-weight: bold; }
         .verse-num { font-size: 0.7rem; font-weight: 800; color: var(--accent-gold); vertical-align: super; margin-right: 6px; font-family: 'Inter', sans-serif; }
 
         /* Reading Plan - Books Grid */
@@ -351,6 +351,8 @@
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
+    <script src="/assets/pd-content-data.js" defer></script>
+    <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
 
