@@ -822,7 +822,7 @@
             <!-- EVENTS VIEW -->
             <div id="view-events" class="section-view">
                 <div class="page-title"><span><i class="fas fa-calendar-alt"></i> Events Management</span><button class="btn btn-primary" onclick="openModal('modalEvent')"><i class="fas fa-plus"></i> Create Event</button></div>
-                <div class="panel-card"><div class="table-responsive"> <table><thead> <tr><th>Date & Time</th><th>Event Title</th><th>Location</th><th>Category</th><th>Actions</th> </tr></thead><tbody id="listEvents"> <tr><td colspan="5"><div class="spinner" style="width:30px;height:30px;"></div> </td> </tr> </tbody> </table> </div></div>
+                <div class="panel-card"><div class="table-responsive"> <table><thead> <tr><th>Date & Time</th><th>Event Title</th><th>Location</th><th>Category</th><th>RSVPs</th><th>Actions</th> </tr></thead><tbody id="listEvents"> <tr><td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div> </td> </tr> </tbody> </table> </div></div>
             </div>
 
             <!-- MEDIA UPLOAD VIEW -->
@@ -1568,7 +1568,43 @@
         window.approveClaim = async function(id){ if(!confirm("Approve claim?")) return; await updateDoc(doc(db,"supportClaims",id),{status:'approved',approvedBy:adminUser?.uid,approvedAt:serverTimestamp()}); toast("Claim approved!"); await loadSupport(); await loadDashboardStats(); };
         window.rejectClaim = async function(id){ const reason=prompt("Reason:"); if(!reason) return; await updateDoc(doc(db,"supportClaims",id),{status:'rejected',rejectReason:reason,rejectedAt:serverTimestamp(),rejectedBy:adminUser?.uid}); toast("Claim rejected!"); await loadSupport(); await loadDashboardStats(); };
         
-        window.loadEvents = async function(){ const tbody=document.getElementById('listEvents'); if(tbody) tbody.innerHTML='<td colspan="5"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try{ const snap=await getDocs(query(collection(db,"events"),orderBy("date","desc"))); let html=''; snap.forEach(d=>{ const data=d.data(); html+=`<tr><td>${data.date?moment(data.date.toDate()).format('MMM D, YYYY HH:mm'):'N/A'}</td><td><strong>${escapeHTML(data.title)}</strong></td><td>${escapeHTML(data.location)}</td><td>${data.category}</td><td><button class="btn btn-sm btn-danger" onclick="deleteRecord('events','${d.id}')">Delete</button></td></tr>`; }); if(tbody) tbody.innerHTML=html||'<td colspan="5">No events<\/td>'; } catch(e){ console.error(e); } };
+        window.loadEvents = async function(){ const tbody=document.getElementById('listEvents'); if(tbody) tbody.innerHTML='<td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try{ const snap=await getDocs(query(collection(db,"events"),orderBy("date","desc"))); let html=''; snap.forEach(d=>{ const data=d.data(); const n=data.attendeeCount||0; const max=data.maxAttendees>0?' / '+data.maxAttendees:''; const safeTitle=String(data.title||'event').replace(/'/g,"\\'"); html+=`<tr><td>${data.date?moment(data.date.toDate()).format('MMM D, YYYY HH:mm'):'N/A'}</td><td><strong>${escapeHTML(data.title)}</strong></td><td>${escapeHTML(data.location)}</td><td>${data.category}</td><td><span class="badge badge-info">${n}${max}</span></td><td style="white-space:nowrap;"><button class="btn btn-sm btn-outline" onclick="exportEventRsvps('${d.id}','${safeTitle}')" title="Download attendee CSV"><i class="fas fa-file-csv"></i></button><button class="btn btn-sm btn-danger" onclick="deleteRecord('events','${d.id}')"><i class="fas fa-trash"></i></button></td></tr>`; }); if(tbody) tbody.innerHTML=html||'<td colspan="6">No events</td>'; } catch(e){ console.error(e); } };
+
+window.exportEventRsvps = async function(eventId, eventTitle){
+  try{
+    const [evSnap, rsvpSnap] = await Promise.all([
+      getDoc(doc(db,"events",eventId)),
+      getDocs(query(collection(db,"userEvents"), where("eventId","==",eventId)))
+    ]);
+    const ev = evSnap.exists()?evSnap.data():{};
+    const rows = [["Name","Email","RSVP Date","Attended"]];
+    for (const d of rsvpSnap.docs) {
+      const r = d.data();
+      let name = r.name || r.userName || r.userId || '', email = r.email || '';
+      if (r.userId) {
+        try { const ms = await getDoc(doc(db,"memberships",r.userId)); if (ms.exists()) { name = ms.data().fullName || name; email = ms.data().email || email; } } catch(e){}
+      }
+      rows.push([String(name||'').replace(/,/g,' '), email, r.rsvpedAt?moment(r.rsvpedAt.toDate()).format('YYYY-MM-DD HH:mm'):'', r.attended?'Yes':'No']);
+    }
+    if (rows.length === 1 && !Array.isArray(ev.attendees)) { toast('No RSVPs for this event yet','error'); return; }
+    // Fall back to the attendees array when userEvents is incomplete.
+    if (rows.length === 1 && Array.isArray(ev.attendees)) {
+      for (const uid of ev.attendees) {
+        let name = uid, email = '';
+        try { const ms = await getDoc(doc(db,"memberships",uid)); if (ms.exists()) { name = ms.data().fullName || name; email = ms.data().email || email; } } catch(e){}
+        rows.push([String(name).replace(/,/g,' '), email, (ev.rsvpTimestamps&&ev.rsvpTimestamps[uid])?moment(ev.rsvpTimestamps[uid].toDate()).format('YYYY-MM-DD HH:mm'):'', '']);
+      }
+    }
+    const csv = rows.map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'rsvps-' + (eventTitle||'event').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '.csv';
+    document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500);
+    toast(`Exported ${rows.length-1} RSVPs`, 'success');
+  } catch(e){ console.error(e); toast('Export failed','error'); }
+};
+
         window.saveEvent = async function(){ const title=document.getElementById('evTitle').value, date=document.getElementById('evDate').value; if(!title||!date) return toast("Title and date required","error"); showLoading(); try{ await addDoc(collection(db,"events"),{title:title,date:new Date(date),location:document.getElementById('evLocation').value,category:document.getElementById('evCategory').value,description:document.getElementById('evDesc').value,attendeeCount:0,createdAt:serverTimestamp(),createdBy:adminUser?.uid}); closeModal('modalEvent'); toast("Event published!"); await loadEvents(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
 
         /* ===== Portal Notices (Announcements) Management ===== */
