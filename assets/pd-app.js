@@ -921,6 +921,79 @@
     }
   };
 
+  /* ------------------------------------------------------------------- fcm */
+  // Web-push registration. Pages expose their Firebase instances as
+  // window.__pdFirebase = { app, auth } and the module does the rest:
+  // dynamic-imports firebase-messaging, fetches a token and stores it in
+  // userTokens/{uid} (the collection admin broadcasts read). The VAPID key
+  // lives in assets/pd-content-data.js (PD_CONTENT.FCM.vapidKey) — replace
+  // the placeholder with the key from Firebase Console → Cloud Messaging →
+  // Web configuration. Until then this module is a no-op.
+  var fcm = {
+    messaging: null,
+    token: null,
+    config: function () {
+      return (window.PD_CONTENT && window.PD_CONTENT.FCM) || {};
+    },
+    app: function () {
+      return window.__pdFirebase && window.__pdFirebase.app ? window.__pdFirebase.app : null;
+    },
+    auth: function () {
+      return window.__pdFirebase && window.__pdFirebase.auth ? window.__pdFirebase.auth : null;
+    },
+    setup: function () {
+      var vapid = fcm.config().vapidKey || '';
+      if (!vapid || vapid.indexOf('YOUR_') === 0) return; // not configured yet
+      var app = fcm.app();
+      if (!app || fcm.messaging) return;
+      import('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js')
+        .then(function (mod) {
+          var messaging;
+          try { messaging = mod.getMessaging(app); } catch (e) { return; }
+          fcm.messaging = messaging;
+          return mod.getToken(messaging, { vapidKey: vapid });
+        })
+        .then(function (token) {
+          if (!token) return;
+          fcm.token = token;
+          fcm.registerToken(token);
+        })
+        .catch(function () { /* blocked or not configured — silent */ });
+    },
+    registerToken: function (token) {
+      var auth = fcm.auth();
+      if (!auth) return;
+      var write = function (uid) {
+        if (!fb || !fb.doc || !fb.setDoc) return;
+        var data = { token: token, uid: uid, active: true, app: 'web' };
+        if (fb.serverTimestamp) data.updatedAt = fb.serverTimestamp();
+        fsSet(fb.doc(fb.db, 'userTokens', uid), data);
+      };
+      if (auth.currentUser) write(auth.currentUser.uid);
+      else if (auth.onAuthStateChanged) auth.onAuthStateChanged(function (u) { if (u) write(u.uid); });
+    },
+    // Daily-devotional push subscription (devotionalSubscribers/{uid}).
+    devotionalOptIn: function (on) {
+      var auth = fcm.auth();
+      if (!auth || !fb || !fb.doc || !fb.setDoc || !auth.currentUser) return Promise.resolve(false);
+      var uid = auth.currentUser.uid;
+      if (!on) {
+        return fsSet(fb.doc(fb.db, 'devotionalSubscribers', uid),
+          { active: false, optedOutAt: fb.serverTimestamp ? fb.serverTimestamp() : Date.now() });
+      }
+      if (!fcm.token) {
+        toast('Enable notifications below first, then tap the bell again.', 'error');
+        return Promise.resolve(false);
+      }
+      var data = { token: fcm.token, uid: uid, active: true };
+      if (fb.serverTimestamp) data.subscribedAt = fb.serverTimestamp();
+      return fsSet(fb.doc(fb.db, 'devotionalSubscribers', uid), data);
+    },
+    init: function () {
+      fcm.setup();
+    }
+  };
+
   /* ------------------------------------------------------------------ news */
   var news = {
     list: function () {
@@ -1077,6 +1150,7 @@
     scripture: scripture,
     radio: radio,
     analytics: analytics,
+    fcm: fcm,
     toast: toast,
     broadcast: broadcast,
     on: on,
@@ -1086,7 +1160,8 @@
         ['ui', ui.init], ['i18n', i18n.init], ['location', location.init],
         ['announcements', announcements.init], ['notifications', notifications.init],
         ['banners', banners.init], ['stats', stats.init], ['live', live.init],
-        ['scripture', scripture.init], ['radio', radio.init], ['analytics', analytics.init]
+        ['scripture', scripture.init], ['radio', radio.init], ['analytics', analytics.init],
+        ['fcm', fcm.init]
       ];
       modules.forEach(function (m) {
         try { m[1](); } catch (e) { /* module failed — continue */ }

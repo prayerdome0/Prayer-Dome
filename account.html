@@ -131,6 +131,11 @@
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 
     <style>
+        .switch input:checked + .slider { background: #0A4D9B; }
+        .switch input:checked + .slider::before { transform: translateX(22px); }
+        .switch .slider::before { content: ""; position: absolute; height: 20px; width: 20px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .3s; }
+    </style>
+    <style>
         :root {
             --accent-green: #0b3d91;
             --accent-green-light: #2563eb;
@@ -681,6 +686,16 @@
                         <span id="emailVerifiedBadge" class="verification-badge unverified" onclick="verifyEmail()"><i class="fas fa-envelope"></i> <span id="emailStatusText">Verify Email</span></span>
                     </div>
                     <div class="membership-badge"><i class="fas fa-id-card"></i> <span id="pIdDisplay">Not Assigned</span></div>
+                    <div style="background: var(--bg-primary); border-radius: 14px; padding: 14px 16px; margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                        <div style="text-align: left;">
+                            <strong style="display:flex; align-items:center; gap:8px;"><i class="fas fa-book-open" style="color: var(--accent-gold);"></i> Daily Devotional Push</strong>
+                            <span style="font-size: .8rem; opacity: .75;">Get today's devotional on your phone each morning.</span>
+                        </div>
+                        <label class="switch" style="position: relative; display: inline-block; width: 48px; height: 26px;">
+                            <input type="checkbox" id="devotionalPushToggle" onchange="toggleAccountDevotionalPush(this.checked)" style="opacity:0; width:0; height:0;">
+                            <span class="slider" style="position:absolute; inset:0; background:#9ca3af; border-radius:999px; transition:.3s; cursor:pointer;"></span>
+                        </label>
+                    </div>
                 </div>
                 <div class="profile-stat-grid">
                     <div class="stat-item"><div class="stat-number" id="pPrayers">0</div><div class="stat-label">PRAYERS</div></div>
@@ -845,6 +860,9 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        window.__pdFirebase = { app, auth };
+        if (window.PDApp) PDApp.setFirestore({ db, doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp });
+        if (window.PDApp) PDApp.fcm.setup();
         const googleProvider = new GoogleAuthProvider();
 
         let currentUserData = null;
@@ -1361,6 +1379,46 @@
             }
             uploadPhoto('profile');
         };
+
+        // Daily devotional push subscription (devotionalSubscribers/{uid}).
+        window.toggleAccountDevotionalPush = async (checked) => {
+            const el = document.getElementById('devotionalPushToggle');
+            if (!window.PDApp || !auth.currentUser) {
+                if (el) el.checked = false;
+                showToast("Please login first", "error");
+                return;
+            }
+            try {
+                if (checked && !('Notification' in window)) {
+                    if (el) el.checked = false;
+                    showToast("Notifications are not supported on this device", "error");
+                    return;
+                }
+                if (checked) {
+                    const perm = await Notification.requestPermission();
+                    if (perm !== 'granted') {
+                        if (el) el.checked = false;
+                        showToast("Please allow notifications to subscribe", "error");
+                        return;
+                    }
+                }
+                const ok = await PDApp.fcm.devotionalOptIn(checked);
+                if (ok) showToast(checked ? "🔔 Daily devotional alerts ON" : "Daily devotional alerts OFF", "success");
+                else { if (el) el.checked = !checked; showToast("Could not update — push service needs its VAPID key configured", "error"); }
+            } catch (e) {
+                console.error(e);
+                if (el) el.checked = !checked;
+                showToast("Something went wrong", "error");
+            }
+        };
+        async function loadAccountDevotionalState() {
+            if (!auth.currentUser || !window.PDApp) return;
+            try {
+                const snap = await getDoc(doc(db, "devotionalSubscribers", auth.currentUser.uid));
+                const el = document.getElementById('devotionalPushToggle');
+                if (el) el.checked = snap.exists() && snap.data().active !== false;
+            } catch (e) { /* rules not deployed yet */ }
+        }
         
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -1373,6 +1431,7 @@
                     await loadProfileData(user);
                     await checkEmailVerification();
                     await handleEmailVerificationLink();
+                    loadAccountDevotionalState();
                 } catch (error) {
                     console.error('Profile loading error:', error);
                     showToast('You are signed in, but we could not load your profile yet. Please refresh.', 'error');
