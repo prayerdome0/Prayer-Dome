@@ -20,7 +20,7 @@
 (function () {
   'use strict';
 
-  var VERSION = '1.0.1';
+  var VERSION = '1.1.0';
   var BRAND_LOGO = 'https://i.ibb.co/TB5Fx4tb/logo-0.png'; // official Prayer Dome mark
   var channel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('pd-app') : null;
   var fb = null;            // Firestore bindings, set via setFirestore()
@@ -849,6 +849,78 @@
     }
   };
 
+  /* ------------------------------------------------------------ analytics */
+  // Privacy-friendly pageview beacon. No cookies, no personal data — one
+  // shape-validated doc per page-load in the `pageviews` collection
+  // (rules: create-only, admin read). Respects Do-Not-Track and an opt-out
+  // flag; queues offline views in localStorage and flushes when Firestore
+  // is available.
+  var analytics = {
+    optOut: function () {
+      try { localStorage.setItem('pd_analytics_off', '1'); } catch (e) {}
+    },
+    optedOut: function () {
+      try { if (localStorage.getItem('pd_analytics_off')) return true; } catch (e) { return true; }
+      return false;
+    },
+    sessionId: function () {
+      var today = new Date().toISOString().slice(0, 10);
+      try {
+        var raw = JSON.parse(localStorage.getItem('pd_session') || '{}');
+        if (raw.day === today && raw.sid) return raw.sid;
+        var sid = uid('s') + '-' + Math.random().toString(36).slice(2, 10);
+        localStorage.setItem('pd_session', JSON.stringify({ day: today, sid: sid }));
+        return sid;
+      } catch (e) { return uid('s'); }
+    },
+    flushQueue: function () {
+      if (!fb || !fb.collection || !fb.addDoc) return;
+      var queue = [];
+      try { queue = JSON.parse(localStorage.getItem('pd_pv_queue') || '[]'); } catch (e) {}
+      if (!queue.length) return;
+      queue.forEach(function (item) { fsAdd(fb.collection(fb.db, 'pageviews'), item); });
+      try { localStorage.removeItem('pd_pv_queue'); } catch (e) {}
+    },
+    record: function (path) {
+      if (analytics.optedOut()) return;
+      if (typeof navigator !== 'undefined' && navigator.doNotTrack === '1') return;
+      var p = path || (typeof location !== 'undefined' ? location.pathname : '/');
+      if (!p || p === '/favicon.ico') return;
+      // One view per path per session (back/forward and SPA re-init skip).
+      var seenKey = 'pd_pv_' + p;
+      try {
+        var seen = JSON.parse(localStorage.getItem('pd_pv_seen') || '[]');
+        if (seen.indexOf(p) !== -1) return;
+        seen.push(p);
+        if (seen.length > 60) seen = seen.slice(-60);
+        localStorage.setItem('pd_pv_seen', JSON.stringify(seen));
+      } catch (e) {}
+      var item = {
+        path: p.slice(0, 120),
+        ts: Date.now(),
+        sid: analytics.sessionId(),
+        ref: (typeof document !== 'undefined' && document.referrer)
+          ? (function () { try { return new URL(document.referrer).hostname; } catch (e) { return ''; } })()
+          : '',
+        mobile: (typeof navigator !== 'undefined' && /Mobi|Android|iPhone/i.test(navigator.userAgent)) ? 1 : 0
+      };
+      if (fb && fb.collection && fb.addDoc) {
+        fsAdd(fb.collection(fb.db, 'pageviews'), item);
+      } else {
+        try {
+          var queue = JSON.parse(localStorage.getItem('pd_pv_queue') || '[]');
+          queue.push(item);
+          if (queue.length > 20) queue = queue.slice(-20);
+          localStorage.setItem('pd_pv_queue', JSON.stringify(queue));
+        } catch (e) {}
+      }
+    },
+    init: function () {
+      analytics.flushQueue();
+      analytics.record();
+    }
+  };
+
   /* ------------------------------------------------------------------ news */
   var news = {
     list: function () {
@@ -1004,6 +1076,7 @@
     news: news,
     scripture: scripture,
     radio: radio,
+    analytics: analytics,
     toast: toast,
     broadcast: broadcast,
     on: on,
@@ -1013,7 +1086,7 @@
         ['ui', ui.init], ['i18n', i18n.init], ['location', location.init],
         ['announcements', announcements.init], ['notifications', notifications.init],
         ['banners', banners.init], ['stats', stats.init], ['live', live.init],
-        ['scripture', scripture.init], ['radio', radio.init]
+        ['scripture', scripture.init], ['radio', radio.init], ['analytics', analytics.init]
       ];
       modules.forEach(function (m) {
         try { m[1](); } catch (e) { /* module failed — continue */ }

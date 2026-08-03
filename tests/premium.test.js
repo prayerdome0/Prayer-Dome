@@ -67,6 +67,16 @@ setTimeout(() => {
     t('live module exposes status API', typeof window.PDApp.live.setStatus === 'function');
     t('news module exposes publish API', typeof window.PDApp.news.publish === 'function');
     t('notifications module exposes push API', typeof window.PDApp.notifications.push === 'function');
+    t('analytics module exposes record API', typeof window.PDApp.analytics.record === 'function');
+    t('analytics module exposes opt-out API', typeof window.PDApp.analytics.optOut === 'function');
+    t('analytics respects Do-Not-Track', (function () {
+      window.navigator.doNotTrack = '1';
+      const before = (window.localStorage.getItem('pd_pv_seen') || '[]');
+      window.PDApp.analytics.record('/analytics-test');
+      const after = (window.localStorage.getItem('pd_pv_seen') || '[]');
+      window.navigator.doNotTrack = undefined;
+      return before === after;
+    })());
     window.PDApp.ui.toggleNotifPanel(true);
     t('notification panel opens', doc.getElementById('pdNotifPanel').classList.contains('open'));
     window.PDApp.notifications.push({ type: 'news', title: 'Smoke Test', message: 'Hello' });

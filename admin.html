@@ -133,6 +133,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
     <style>
         :root {
@@ -401,6 +402,7 @@
         </div>
         <div class="nav-menu">
             <div class="nav-item active" onclick="switchView('dashboard', this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
+            <div class="nav-item" onclick="switchView('analytics', this)"><i class="fas fa-chart-line"></i> Analytics</div>
             <div class="nav-item" onclick="switchView('live', this)"><i class="fas fa-tower-broadcast"></i> Live Broadcast <span class="live-nav-dot" id="navLiveDot"></span></div>
             <div class="nav-item" onclick="switchView('members', this)"><i class="fas fa-users"></i> Members CRM</div>
             <div class="nav-item" onclick="switchView('announcements', this)"><i class="fas fa-bullhorn"></i> Notices</div>
@@ -506,6 +508,36 @@
                 <div class="panel-card">
                     <div class="panel-header"><h3><i class="fas fa-user-clock"></i> Recent Membership Applications</h3><button class="btn btn-outline btn-sm" onclick="switchView('members', document.querySelectorAll('.nav-item')[1])">View All</button></div>
                     <div class="table-responsive"><table><thead> <tr><th>Applicant</th><th>Branch</th><th>Date</th><th>Status</th><th>Action</th> </tr></thead><tbody id="dashPendingMembers"> <tr><td colspan="5" style="text-align: center;"><div class="spinner" style="width:30px;height:30px;"></div></td></tr> </tbody> </table> </div>
+                </div>
+            </div>
+
+            <!-- ANALYTICS VIEW -->
+            <div id="view-analytics" class="section-view">
+                <div class="page-title">
+                    <span><i class="fas fa-chart-line"></i> Analytics</span>
+                    <button class="btn btn-primary btn-sm" onclick="loadAnalytics()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+                <div class="kpi-grid" id="analyticsKpis">
+                    <div class="kpi-card"><div class="kpi-icon blue"><i class="fas fa-eye"></i></div><div class="kpi-details"><h3 id="anaViews7">0</h3><p>Pageviews · 7 days</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon gold"><i class="fas fa-eye"></i></div><div class="kpi-details"><h3 id="anaViews30">0</h3><p>Pageviews · 30 days</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon green"><i class="fas fa-users-viewfinder"></i></div><div class="kpi-details"><h3 id="anaSessions30">0</h3><p>Unique Sessions · 30 days</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon red"><i class="fas fa-mobile-screen"></i></div><div class="kpi-details"><h3 id="anaMobilePct">0%</h3><p>Mobile Share</p></div></div>
+                </div>
+                <div class="kpi-grid" id="analyticsEngagement">
+                    <div class="kpi-card"><div class="kpi-icon blue"><i class="fas fa-users"></i></div><div class="kpi-details"><h3 id="anaMembers">0</h3><p>Approved Members</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon green"><i class="fas fa-hands-praying"></i></div><div class="kpi-details"><h3 id="anaPrayers">0</h3><p>Approved Prayers</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon gold"><i class="fas fa-check-double"></i></div><div class="kpi-details"><h3 id="anaAnswered">0</h3><p>Answered Prayers</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon red"><i class="fas fa-star"></i></div><div class="kpi-details"><h3 id="anaTestimonies">0</h3><p>Testimonies</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon blue"><i class="fas fa-calendar-check"></i></div><div class="kpi-details"><h3 id="anaEvents">0</h3><p>Events</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon green"><i class="fas fa-heart"></i></div><div class="kpi-details"><h3 id="anaOfferings">0</h3><p>Offerings Recorded</p></div></div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-header"><h3><i class="fas fa-chart-area"></i> Pageviews — last 30 days</h3></div>
+                    <div style="height: 260px; position: relative;"><canvas id="anaTrendChart"></canvas></div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-header"><h3><i class="fas fa-chart-bar"></i> Top pages — 30 days</h3></div>
+                    <div style="height: 300px; position: relative;"><canvas id="anaPagesChart"></canvas></div>
                 </div>
             </div>
 
@@ -1090,6 +1122,83 @@
                 const gallerySnap = await getDocs(collection(db, "gallery"));
                 document.getElementById('statGalleryItems').innerText = gallerySnap.size;
             } catch(e) { console.error("Dashboard stats error:", e); }
+        };
+
+        window.anaCharts = {};
+        window.loadAnalytics = async function() {
+            try {
+                const now = Date.now();
+                const since30 = now - 30 * 86400000;
+                const since7 = now - 7 * 86400000;
+                const pvSnap = await getDocs(query(collection(db, "pageviews"), orderBy("ts", "desc"), limit(5000)));
+                let views7 = 0, views30 = 0, mobile7 = 0, mobile30 = 0;
+                const sids7 = new Set(), sids30 = new Set();
+                const byDay = {}, byPath = {};
+                pvSnap.forEach(d => {
+                    const v = d.data(); const ts = Number(v.ts) || 0;
+                    if (!ts || ts < since30) return;
+                    views30++; sids30.add(v.sid || '');
+                    if (v.mobile) mobile30++;
+                    const dt = new Date(ts);
+                    const day = `${dt.getMonth() + 1}/${dt.getDate()}`;
+                    byDay[day] = (byDay[day] || 0) + 1;
+                    const p = (v.path || '/').split('?')[0];
+                    byPath[p] = (byPath[p] || 0) + 1;
+                    if (ts >= since7) { views7++; sids7.add(v.sid || ''); if (v.mobile) mobile7++; }
+                });
+                document.getElementById('anaViews7').innerText = views7.toLocaleString();
+                document.getElementById('anaViews30').innerText = views30.toLocaleString();
+                document.getElementById('anaSessions30').innerText = sids30.size.toLocaleString();
+                document.getElementById('anaMobilePct').innerText = views30 ? Math.round(mobile30 / views30 * 100) + '%' : '0%';
+
+                // 30-day trend
+                const days = [], counts = [];
+                for (let i = 29; i >= 0; i--) {
+                    const dt = new Date(now - i * 86400000);
+                    const key = `${dt.getMonth() + 1}/${dt.getDate()}`;
+                    days.push(key); counts.push(byDay[key] || 0);
+                }
+                const trendCtx = document.getElementById('anaTrendChart');
+                if (trendCtx) {
+                    if (window.anaCharts.trend) window.anaCharts.trend.destroy();
+                    window.anaCharts.trend = new Chart(trendCtx, {
+                        type: 'line',
+                        data: { labels: days, datasets: [{ label: 'Pageviews', data: counts, borderColor: '#0A4D9B', backgroundColor: 'rgba(10,77,155,.12)', fill: true, tension: .35, pointRadius: 2 }] },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                    });
+                }
+                // Top pages
+                const top = Object.entries(byPath).sort((a, b) => b[1] - a[1]).slice(0, 10);
+                const pagesCtx = document.getElementById('anaPagesChart');
+                if (pagesCtx) {
+                    if (window.anaCharts.pages) window.anaCharts.pages.destroy();
+                    window.anaCharts.pages = new Chart(pagesCtx, {
+                        type: 'bar',
+                        data: { labels: top.map(t => t[0]), datasets: [{ label: 'Views', data: top.map(t => t[1]), backgroundColor: '#D4AF37', borderRadius: 4 }] },
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } }
+                    });
+                }
+
+                // Engagement counts from existing collections
+                const [m, pr, te, ev, ne, of] = await Promise.all([
+                    getDocs(query(collection(db, "memberships"), where("status", "==", "approved"))),
+                    getDocs(query(collection(db, "prayers"), where("status", "==", "approved"))),
+                    getDocs(query(collection(db, "testimonies"), where("status", "==", "approved"))),
+                    getDocs(collection(db, "events")),
+                    getDocs(collection(db, "news")),
+                    getDocs(collection(db, "offerings"))
+                ]);
+                let answered = 0, offeringsSum = 0;
+                pr.forEach(d => { if (d.data().answered) answered++; });
+                of.forEach(d => { const a = Number(d.data().amount) || 0; if (a > 0) offeringsSum += a; });
+                const set = (id, v) => { const el = document.getElementById(id); if (el) el.innerText = v; };
+                set('anaMembers', m.size.toLocaleString());
+                set('anaPrayers', pr.size.toLocaleString());
+                set('anaAnswered', answered.toLocaleString());
+                set('anaTestimonies', te.size.toLocaleString());
+                set('anaEvents', ev.size.toLocaleString());
+                set('anaOfferings', of.size.toLocaleString() + ' · ' + (offeringsSum >= 1000 ? (offeringsSum / 1000).toFixed(1) + 'k' : offeringsSum));
+            } catch (e) { console.error("Analytics error:", e); toast("Could not load analytics (check Firestore indexes/permissions)", "error"); }
         };
 
         window.filterMembers = function() {
@@ -2146,6 +2255,7 @@
             if(window.innerWidth <= 992) document.getElementById('sidebar').style.left = '-280px';
             try {
                 if(viewId === 'dashboard') await loadDashboardStats();
+                else if(viewId === 'analytics') await loadAnalytics();
                 else if(viewId === 'live') { watchLiveStatus(); await loadLiveRecordings(); await loadLiveChatPreview(); }
                 else if(viewId === 'members') { await loadDashboardStats(); filterMembers(); }
                 else if(viewId === 'announcements') await loadAnnouncements();
