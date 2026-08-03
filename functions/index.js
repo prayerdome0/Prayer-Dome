@@ -130,3 +130,18 @@ exports.sendTestNotification = functions.firestore
             return null;
         }
     });
+
+// Devotional scheduler — daily publish + push (see devotionals.js)
+const devotionals = require('./devotionals');
+exports.publishDailyDevotionalMorning = devotionals.publishDailyDevotionalMorning();
+exports.publishDailyDevotionalAfternoon = devotionals.publishDailyDevotionalAfternoon();
+exports.publishDailyDevotionalEvening = devotionals.publishDailyDevotionalEvening();
+exports.publishDevotional = devotionals.publishDevotional();
+exports.previewDevotional = devotionals.previewDevotional();
+
+// Online giving — Flutterwave + Paystack (see payments.js)
+const payments = require('./payments');
+exports.createGivingPayment = payments.createPaymentHandler();
+exports.verifyGivingPayment = payments.verifyPaymentHandler();
+exports.paymentWebhookFlutterwave = payments.paymentWebhookHandler('flutterwave');
+exports.paymentWebhookPaystack = payments.paymentWebhookHandler('paystack');

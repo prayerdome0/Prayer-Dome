@@ -11,6 +11,14 @@
 
 window.PD_CONTENT = window.PD_CONTENT || {};
 
+/* --- Web push (FCM) -------------------------------------------------------- */
+/* Replace YOUR_VAPID_KEY with the real key from Firebase Console →
+   Cloud Messaging → Web configuration ("Web push certificates"). Until then
+   push notifications stay off (the module no-ops). See UPGRADE-NOTES.md.  */
+PD_CONTENT.FCM = {
+  vapidKey: 'YOUR_VAPID_KEY'
+};
+
 /* --- Featured theme scripture (Mark 7:37) -------------------------------- */
 PD_CONTENT.THEME_SCRIPTURE = {
   verse: 'Mark 7:37',

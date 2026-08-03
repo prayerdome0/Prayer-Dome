@@ -34,7 +34,9 @@ const excludedFiles = new Set([
   'package-lock.json',
   'vercel.json',
   'firebase.json',
-  'functions_index.js'
+  'functions_index.js',
+  'firestore.rules',
+  'storage.rules'
 ]);
 
 await rm(outputDir, { recursive: true, force: true });

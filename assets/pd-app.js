@@ -20,7 +20,7 @@
 (function () {
   'use strict';
 
-  var VERSION = '1.0.1';
+  var VERSION = '1.1.0';
   var BRAND_LOGO = 'https://i.ibb.co/TB5Fx4tb/logo-0.png'; // official Prayer Dome mark
   var channel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('pd-app') : null;
   var fb = null;            // Firestore bindings, set via setFirestore()
@@ -849,6 +849,151 @@
     }
   };
 
+  /* ------------------------------------------------------------ analytics */
+  // Privacy-friendly pageview beacon. No cookies, no personal data — one
+  // shape-validated doc per page-load in the `pageviews` collection
+  // (rules: create-only, admin read). Respects Do-Not-Track and an opt-out
+  // flag; queues offline views in localStorage and flushes when Firestore
+  // is available.
+  var analytics = {
+    optOut: function () {
+      try { localStorage.setItem('pd_analytics_off', '1'); } catch (e) {}
+    },
+    optedOut: function () {
+      try { if (localStorage.getItem('pd_analytics_off')) return true; } catch (e) { return true; }
+      return false;
+    },
+    sessionId: function () {
+      var today = new Date().toISOString().slice(0, 10);
+      try {
+        var raw = JSON.parse(localStorage.getItem('pd_session') || '{}');
+        if (raw.day === today && raw.sid) return raw.sid;
+        var sid = uid('s') + '-' + Math.random().toString(36).slice(2, 10);
+        localStorage.setItem('pd_session', JSON.stringify({ day: today, sid: sid }));
+        return sid;
+      } catch (e) { return uid('s'); }
+    },
+    flushQueue: function () {
+      if (!fb || !fb.collection || !fb.addDoc) return;
+      var queue = [];
+      try { queue = JSON.parse(localStorage.getItem('pd_pv_queue') || '[]'); } catch (e) {}
+      if (!queue.length) return;
+      queue.forEach(function (item) { fsAdd(fb.collection(fb.db, 'pageviews'), item); });
+      try { localStorage.removeItem('pd_pv_queue'); } catch (e) {}
+    },
+    record: function (path) {
+      if (analytics.optedOut()) return;
+      if (typeof navigator !== 'undefined' && navigator.doNotTrack === '1') return;
+      var p = path || (typeof location !== 'undefined' ? location.pathname : '/');
+      if (!p || p === '/favicon.ico') return;
+      // One view per path per session (back/forward and SPA re-init skip).
+      var seenKey = 'pd_pv_' + p;
+      try {
+        var seen = JSON.parse(localStorage.getItem('pd_pv_seen') || '[]');
+        if (seen.indexOf(p) !== -1) return;
+        seen.push(p);
+        if (seen.length > 60) seen = seen.slice(-60);
+        localStorage.setItem('pd_pv_seen', JSON.stringify(seen));
+      } catch (e) {}
+      var item = {
+        path: p.slice(0, 120),
+        ts: Date.now(),
+        sid: analytics.sessionId(),
+        ref: (typeof document !== 'undefined' && document.referrer)
+          ? (function () { try { return new URL(document.referrer).hostname; } catch (e) { return ''; } })()
+          : '',
+        mobile: (typeof navigator !== 'undefined' && /Mobi|Android|iPhone/i.test(navigator.userAgent)) ? 1 : 0
+      };
+      if (fb && fb.collection && fb.addDoc) {
+        fsAdd(fb.collection(fb.db, 'pageviews'), item);
+      } else {
+        try {
+          var queue = JSON.parse(localStorage.getItem('pd_pv_queue') || '[]');
+          queue.push(item);
+          if (queue.length > 20) queue = queue.slice(-20);
+          localStorage.setItem('pd_pv_queue', JSON.stringify(queue));
+        } catch (e) {}
+      }
+    },
+    init: function () {
+      analytics.flushQueue();
+      analytics.record();
+    }
+  };
+
+  /* ------------------------------------------------------------------- fcm */
+  // Web-push registration. Pages expose their Firebase instances as
+  // window.__pdFirebase = { app, auth } and the module does the rest:
+  // dynamic-imports firebase-messaging, fetches a token and stores it in
+  // userTokens/{uid} (the collection admin broadcasts read). The VAPID key
+  // lives in assets/pd-content-data.js (PD_CONTENT.FCM.vapidKey) — replace
+  // the placeholder with the key from Firebase Console → Cloud Messaging →
+  // Web configuration. Until then this module is a no-op.
+  var fcm = {
+    messaging: null,
+    token: null,
+    config: function () {
+      return (window.PD_CONTENT && window.PD_CONTENT.FCM) || {};
+    },
+    app: function () {
+      return window.__pdFirebase && window.__pdFirebase.app ? window.__pdFirebase.app : null;
+    },
+    auth: function () {
+      return window.__pdFirebase && window.__pdFirebase.auth ? window.__pdFirebase.auth : null;
+    },
+    setup: function () {
+      var vapid = fcm.config().vapidKey || '';
+      if (!vapid || vapid.indexOf('YOUR_') === 0) return; // not configured yet
+      var app = fcm.app();
+      if (!app || fcm.messaging) return;
+      import('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js')
+        .then(function (mod) {
+          var messaging;
+          try { messaging = mod.getMessaging(app); } catch (e) { return; }
+          fcm.messaging = messaging;
+          return mod.getToken(messaging, { vapidKey: vapid });
+        })
+        .then(function (token) {
+          if (!token) return;
+          fcm.token = token;
+          fcm.registerToken(token);
+        })
+        .catch(function () { /* blocked or not configured — silent */ });
+    },
+    registerToken: function (token) {
+      var auth = fcm.auth();
+      if (!auth) return;
+      var write = function (uid) {
+        if (!fb || !fb.doc || !fb.setDoc) return;
+        var data = { token: token, uid: uid, active: true, app: 'web' };
+        if (fb.serverTimestamp) data.updatedAt = fb.serverTimestamp();
+        fsSet(fb.doc(fb.db, 'userTokens', uid), data);
+      };
+      if (auth.currentUser) write(auth.currentUser.uid);
+      else if (auth.onAuthStateChanged) auth.onAuthStateChanged(function (u) { if (u) write(u.uid); });
+    },
+    // Daily-devotional push subscription (devotionalSubscribers/{uid}).
+    devotionalOptIn: function (on) {
+      var auth = fcm.auth();
+      if (!auth || !fb || !fb.doc || !fb.setDoc || !auth.currentUser) return Promise.resolve(false);
+      var uid = auth.currentUser.uid;
+      if (!on) {
+        return fsSet(fb.doc(fb.db, 'devotionalSubscribers', uid),
+          { active: false, optedOutAt: fb.serverTimestamp ? fb.serverTimestamp() : Date.now() });
+      }
+      if (!fcm.token) {
+        toast('Enable notifications below first, then tap the bell again.', 'error');
+        return Promise.resolve(false);
+      }
+      var data = { token: fcm.token, uid: uid, active: true };
+      if (fb.serverTimestamp) data.subscribedAt = fb.serverTimestamp();
+      return fsSet(fb.doc(fb.db, 'devotionalSubscribers', uid), data);
+    },
+    init: function () {
+      fcm.setup();
+    }
+  };
+
   /* ------------------------------------------------------------------ news */
   var news = {
     list: function () {
@@ -1004,6 +1149,8 @@
     news: news,
     scripture: scripture,
     radio: radio,
+    analytics: analytics,
+    fcm: fcm,
     toast: toast,
     broadcast: broadcast,
     on: on,
@@ -1013,7 +1160,8 @@
         ['ui', ui.init], ['i18n', i18n.init], ['location', location.init],
         ['announcements', announcements.init], ['notifications', notifications.init],
         ['banners', banners.init], ['stats', stats.init], ['live', live.init],
-        ['scripture', scripture.init], ['radio', radio.init]
+        ['scripture', scripture.init], ['radio', radio.init], ['analytics', analytics.init],
+        ['fcm', fcm.init]
       ];
       modules.forEach(function (m) {
         try { m[1](); } catch (e) { /* module failed — continue */ }

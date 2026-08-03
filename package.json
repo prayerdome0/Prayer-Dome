@@ -13,13 +13,14 @@
     "mobile:run": "npm run mobile:sync && npx cap run android",
     "mobile:build:debug": "npm run mobile:sync && cd android && ./gradlew assembleDebug",
     "mobile:build:release": "npm run mobile:sync && cd android && ./gradlew bundleRelease assembleRelease",
-    "test": "node tests/assistant.test.js && node tests/content.test.js && node tests/admin.test.js"
+    "test": "node tests/assistant.test.js && node tests/content.test.js && node tests/admin.test.js && node tests/pages.test.js && node tests/premium.test.js && node tests/security.test.js && node tests/devotional.test.js && node tests/payments.test.js"
   },
   "dependencies": {
     "@capacitor/android": "8.5.0",
     "@capacitor/core": "8.5.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "8.5.0"
+    "@capacitor/cli": "8.5.0",
+    "jsdom": "^30.0.1"
   }
 }

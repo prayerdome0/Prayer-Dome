@@ -658,6 +658,12 @@
                 <span id="currentTimeText">Loading...</span>
             </div>
         </div>
+        <div class="devotional-sub-row" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+            <span style="font-size:.85rem; opacity:.8;"><i class="fas fa-bell"></i> Get today's devotional on your phone every morning.</span>
+            <button id="devotionalBell" class="btn btn-outline btn-sm" onclick="toggleDevotionalBell()" style="padding:6px 14px; border-radius:999px; font-size:.85rem; border:1px solid var(--border); background:var(--bg-light); color:var(--text); cursor:pointer;">
+                <i class="fas fa-bell"></i> Notify me daily
+            </button>
+        </div>
         
         <div class="timezone-info" id="timezoneInfo">
             <i class="fas fa-globe"></i> Loading your timezone...
@@ -863,6 +869,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+    // Expose instances to the premium layer (pd-app.js) for FCM registration.
+    window.__pdFirebase = { app, auth };
 
     // Hand the Firestore bindings to the shared premium layer (pd-app.js)
     // so live status, notifications, banners, news and stats sync in real time.
@@ -878,9 +886,25 @@
     let userLocation = null;
 
     // ==================== DEVOTIONAL SYSTEM ====================
+
+    // Published copy from the scheduler (devotional/current) wins when it is
+    // today's; the static client data is the offline fallback.
+    let devotionalOverride = null;
+    async function loadPublishedDevotional() {
+        try {
+            const snap = await getDoc(doc(db, "devotional", "current"));
+            if (snap.exists()) {
+                const d = snap.data();
+                const today = new Date();
+                const key = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+                if (!d.date || d.date === key) devotionalOverride = d;
+            }
+        } catch (e) { /* offline / no rules yet — static fallback */ }
+        updateDevotionalUI();
+    }
     
     function updateDevotionalUI() {
-        const devotional = getDailyDevotional();
+        const devotional = devotionalOverride || getDailyDevotional();
         
         // Update icon and time text
         const timeIcon = document.getElementById('timeIcon');
@@ -942,9 +966,49 @@
         }
     }
     
+    // Daily-devotional push toggle (bell in the devotional card).
+    window.toggleDevotionalBell = async function () {
+        if (!currentUser) {
+            showToast('Sign in to your account first', 'error');
+            setTimeout(() => window.location.href = '/account.html', 900);
+            return;
+        }
+        const btn = document.getElementById('devotionalBell');
+        const on = btn && btn.dataset.on === '1';
+        try {
+            if (on) {
+                const ok = window.PDApp && await PDApp.fcm.devotionalOptIn(false);
+                if (ok) { setBell(false); showToast('Daily devotional alerts turned off'); }
+            } else {
+                if (!('Notification' in window)) { showToast('Notifications are not supported on this device', 'error'); return; }
+                const perm = await Notification.requestPermission();
+                if (perm !== 'granted') { showToast('Please allow notifications to enable daily alerts', 'error'); return; }
+                const ok = window.PDApp && await PDApp.fcm.devotionalOptIn(true);
+                if (ok) { setBell(true); showToast('🔔 Daily devotional alerts on — check back each morning!'); }
+                else showToast('Could not subscribe yet — the push service needs its VAPID key configured (see admin notes)', 'error');
+            }
+        } catch (e) { console.error(e); showToast('Something went wrong — try again', 'error'); }
+    };
+    function setBell(on) {
+        const btn = document.getElementById('devotionalBell');
+        if (!btn) return;
+        btn.dataset.on = on ? '1' : '0';
+        btn.innerHTML = on ? '<i class="fas fa-bell-slash"></i> Daily alerts on' : '<i class="fas fa-bell"></i> Notify me daily';
+        btn.style.borderColor = on ? '#D4AF37' : 'var(--border)';
+        btn.style.background = on ? 'rgba(212,175,55,.15)' : 'var(--bg-light)';
+    }
+    async function refreshDevotionalBellState() {
+        if (!currentUser || !window.PDApp || !db) return;
+        try {
+            const snap = await getDoc(doc(db, "devotionalSubscribers", currentUser.uid));
+            setBell(snap.exists() && snap.data().active !== false);
+        } catch (e) { /* rules not deployed yet */ }
+    }
+
     function initDevotionalSystem() {
         getUserTimezone();
-        updateDevotionalUI();
+        loadPublishedDevotional();
+        if (window.PDApp) PDApp.fcm.setup();
         
         // Check for period changes every minute
         setInterval(() => {
@@ -1371,6 +1435,7 @@
         if (user) {
             await checkAndShowAdminTab(user);
             await loadNotifications();
+            refreshDevotionalBellState();
         }
     });
 

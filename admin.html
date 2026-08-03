@@ -133,6 +133,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
     <style>
         :root {
@@ -400,23 +401,25 @@
             <button class="mobile-toggle" onclick="toggleSidebar()" style="margin-left: auto; color: white;" id="closeSidebarBtn"><i class="fas fa-times"></i></button>
         </div>
         <div class="nav-menu">
-            <div class="nav-item active" onclick="switchView('dashboard', this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
-            <div class="nav-item" onclick="switchView('live', this)"><i class="fas fa-tower-broadcast"></i> Live Broadcast <span class="live-nav-dot" id="navLiveDot"></span></div>
-            <div class="nav-item" onclick="switchView('members', this)"><i class="fas fa-users"></i> Members CRM</div>
-            <div class="nav-item" onclick="switchView('announcements', this)"><i class="fas fa-bullhorn"></i> Notices</div>
-            <div class="nav-item" onclick="switchView('care', this)"><i class="fas fa-hand-holding-heart"></i> Member Care</div>
-            <div class="nav-item" onclick="switchView('gallery', this)"><i class="fas fa-images"></i> Gallery Management</div>
-            <div class="nav-item" onclick="switchView('finance', this)"><i class="fas fa-coins"></i> Financials</div>
-            <div class="nav-item" onclick="switchView('support', this)"><i class="fas fa-hand-holding-heart"></i> Support Claims</div>
-            <div class="nav-item" onclick="switchView('financial_reports', this)"><i class="fas fa-file-alt"></i> Financial Reports</div>
-            <div class="nav-item" onclick="switchView('events', this)"><i class="fas fa-calendar-alt"></i> Events & Cal</div>
-            <div class="nav-item" onclick="switchView('media', this)"><i class="fas fa-camera"></i> Media Upload</div>
-            <div class="nav-item" onclick="switchView('content', this)"><i class="fas fa-comment-dots"></i> Prayers & Testimonies</div>
-            <div class="nav-item" onclick="switchView('news', this)"><i class="fas fa-newspaper"></i> News Center</div>
-            <div class="nav-item" onclick="switchView('banners', this)"><i class="fas fa-photo-film"></i> Hero Banners</div>
-            <div class="nav-item" onclick="switchView('languages', this)"><i class="fas fa-language"></i> Languages</div>
-            <div class="nav-item" onclick="switchView('notifications', this)"><i class="fas fa-bell"></i> Notifications</div>
-            <div class="nav-item" onclick="switchView('contacts', this)"><i class="fas fa-envelope"></i> Contact Messages</div>
+            <div class="nav-item active" data-nav="dashboard" onclick="switchView('dashboard', this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
+            <div class="nav-item" data-nav="analytics" onclick="switchView('analytics', this)"><i class="fas fa-chart-line"></i> Analytics</div>
+            <div class="nav-item" data-nav="live" onclick="switchView('live', this)"><i class="fas fa-tower-broadcast"></i> Live Broadcast <span class="live-nav-dot" id="navLiveDot"></span></div>
+            <div class="nav-item" data-nav="members" onclick="switchView('members', this)"><i class="fas fa-users"></i> Members CRM</div>
+            <div class="nav-item" data-nav="announcements" onclick="switchView('announcements', this)"><i class="fas fa-bullhorn"></i> Notices</div>
+            <div class="nav-item" data-nav="care" onclick="switchView('care', this)"><i class="fas fa-hand-holding-heart"></i> Member Care</div>
+            <div class="nav-item" data-nav="gallery" onclick="switchView('gallery', this)"><i class="fas fa-images"></i> Gallery Management</div>
+            <div class="nav-item" data-nav="finance" onclick="switchView('finance', this)"><i class="fas fa-coins"></i> Financials</div>
+            <div class="nav-item" data-nav="support" onclick="switchView('support', this)"><i class="fas fa-hand-holding-heart"></i> Support Claims</div>
+            <div class="nav-item" data-nav="financial_reports" onclick="switchView('financial_reports', this)"><i class="fas fa-file-alt"></i> Financial Reports</div>
+            <div class="nav-item" data-nav="events" onclick="switchView('events', this)"><i class="fas fa-calendar-alt"></i> Events & Cal</div>
+            <div class="nav-item" data-nav="media" onclick="switchView('media', this)"><i class="fas fa-camera"></i> Media Upload</div>
+            <div class="nav-item" data-nav="content" onclick="switchView('content', this)"><i class="fas fa-comment-dots"></i> Prayers & Testimonies</div>
+            <div class="nav-item" data-nav="news" onclick="switchView('news', this)"><i class="fas fa-newspaper"></i> News Center</div>
+            <div class="nav-item" data-nav="banners" onclick="switchView('banners', this)"><i class="fas fa-photo-film"></i> Hero Banners</div>
+            <div class="nav-item" data-nav="languages" onclick="switchView('languages', this)"><i class="fas fa-language"></i> Languages</div>
+            <div class="nav-item" data-nav="notifications" onclick="switchView('notifications', this)"><i class="fas fa-bell"></i> Notifications</div>
+            <div class="nav-item" data-nav="devotionals" onclick="switchView('devotionals', this)"><i class="fas fa-book-open"></i> Devotionals</div>
+            <div class="nav-item" data-nav="contacts" onclick="switchView('contacts', this)"><i class="fas fa-envelope"></i> Contact Messages</div>
         </div>
         <div class="sidebar-footer">
             <button class="btn btn-outline" style="width: 100%; color: #ef4444; border-color: rgba(239,68,68,0.3);" onclick="logoutAdmin()">
@@ -459,8 +462,8 @@
                             <div style="margin-top:6px; font-size:.8rem; color:rgba(255,255,255,.85);">Mark 7:37 — the primary scripture across the Prayer Dome platform</div>
                         </div>
                         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <button class="btn btn-primary btn-sm" style="background:#d4af37; border-color:#d4af37; color:#fff;" onclick="switchView('live', document.querySelectorAll('.nav-item')[1])"><i class="fas fa-tower-broadcast"></i> Go Live</button>
-                            <button class="btn btn-primary btn-sm" style="background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.3);" onclick="switchView('news', document.querySelectorAll('.nav-item')[12])"><i class="fas fa-newspaper"></i> Publish News</button>
+                            <button class="btn btn-primary btn-sm" style="background:#d4af37; border-color:#d4af37; color:#fff;" onclick="switchView('live', document.querySelector('[data-nav="live"]'))"><i class="fas fa-tower-broadcast"></i> Go Live</button>
+                            <button class="btn btn-primary btn-sm" style="background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.3);" onclick="switchView('news', document.querySelector('[data-nav="news"]'))"><i class="fas fa-newspaper"></i> Publish News</button>
                         </div>
                     </div>
                 </div>
@@ -478,34 +481,110 @@
                     <button class="btn btn-primary btn-sm" onclick="loadDashboardStats()"><i class="fas fa-sync-alt"></i> Refresh</button>
                 </div>
                 <div class="kpi-grid">
-                    <div class="kpi-card" onclick="switchView('live', document.querySelectorAll('.nav-item')[1])" style="border-color: rgba(212,175,55,.35);">
+                    <div class="kpi-card" onclick="switchView('live', document.querySelector('[data-nav="live"]'))" style="border-color: rgba(212,175,55,.35);">
                         <div class="kpi-icon red"><i class="fas fa-tower-broadcast"></i></div>
                         <div class="kpi-details"><h3 id="statLiveStatus" style="font-size:1.35rem;">Offline</h3><p>Live Broadcast</p></div>
                     </div>
-                    <div class="kpi-card" onclick="switchView('members', document.querySelectorAll('.nav-item')[2])">
+                    <div class="kpi-card" onclick="switchView('members', document.querySelector('[data-nav="members"]'))">
                         <div class="kpi-icon blue"><i class="fas fa-users"></i></div>
                         <div class="kpi-details"><h3 id="statTotalMembers">0</h3><p>Total Members</p></div>
                     </div>
-                    <div class="kpi-card" onclick="switchView('members', document.querySelectorAll('.nav-item')[2])">
+                    <div class="kpi-card" onclick="switchView('members', document.querySelector('[data-nav="members"]'))">
                         <div class="kpi-icon gold"><i class="fas fa-clock"></i></div>
                         <div class="kpi-details"><h3 id="statPendingMembers">0</h3><p>Pending Members</p></div>
                     </div>
-                    <div class="kpi-card" onclick="switchView('gallery', document.querySelectorAll('.nav-item')[5])">
+                    <div class="kpi-card" onclick="switchView('gallery', document.querySelector('[data-nav="gallery"]'))">
                         <div class="kpi-icon green"><i class="fas fa-images"></i></div>
                         <div class="kpi-details"><h3 id="statGalleryItems">0</h3><p>Gallery Items</p></div>
                     </div>
-                    <div class="kpi-card" onclick="switchView('support', document.querySelectorAll('.nav-item')[7])">
+                    <div class="kpi-card" onclick="switchView('support', document.querySelector('[data-nav="support"]'))">
                         <div class="kpi-icon red"><i class="fas fa-file-invoice"></i></div>
                         <div class="kpi-details"><h3 id="statPendingClaims">0</h3><p>Support Claims</p></div>
                     </div>
-                    <div class="kpi-card" onclick="switchView('content', document.querySelectorAll('.nav-item')[11])">
+                    <div class="kpi-card" onclick="switchView('content', document.querySelector('[data-nav="content"]'))">
                         <div class="kpi-icon green"><i class="fas fa-pray"></i></div>
                         <div class="kpi-details"><h3 id="statActivePrayers">0</h3><p>Active Prayers</p></div>
                     </div>
                 </div>
                 <div class="panel-card">
-                    <div class="panel-header"><h3><i class="fas fa-user-clock"></i> Recent Membership Applications</h3><button class="btn btn-outline btn-sm" onclick="switchView('members', document.querySelectorAll('.nav-item')[1])">View All</button></div>
+                    <div class="panel-header"><h3><i class="fas fa-user-clock"></i> Recent Membership Applications</h3><button class="btn btn-outline btn-sm" onclick="switchView('members', document.querySelector('[data-nav="members"]'))">View All</button></div>
                     <div class="table-responsive"><table><thead> <tr><th>Applicant</th><th>Branch</th><th>Date</th><th>Status</th><th>Action</th> </tr></thead><tbody id="dashPendingMembers"> <tr><td colspan="5" style="text-align: center;"><div class="spinner" style="width:30px;height:30px;"></div></td></tr> </tbody> </table> </div>
+                </div>
+            </div>
+
+            <!-- ANALYTICS VIEW -->
+            <div id="view-analytics" class="section-view">
+                <div class="page-title">
+                    <span><i class="fas fa-chart-line"></i> Analytics</span>
+                    <button class="btn btn-primary btn-sm" onclick="loadAnalytics()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+                <div class="kpi-grid" id="analyticsKpis">
+                    <div class="kpi-card"><div class="kpi-icon blue"><i class="fas fa-eye"></i></div><div class="kpi-details"><h3 id="anaViews7">0</h3><p>Pageviews · 7 days</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon gold"><i class="fas fa-eye"></i></div><div class="kpi-details"><h3 id="anaViews30">0</h3><p>Pageviews · 30 days</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon green"><i class="fas fa-users-viewfinder"></i></div><div class="kpi-details"><h3 id="anaSessions30">0</h3><p>Unique Sessions · 30 days</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon red"><i class="fas fa-mobile-screen"></i></div><div class="kpi-details"><h3 id="anaMobilePct">0%</h3><p>Mobile Share</p></div></div>
+                </div>
+                <div class="kpi-grid" id="analyticsEngagement">
+                    <div class="kpi-card"><div class="kpi-icon blue"><i class="fas fa-users"></i></div><div class="kpi-details"><h3 id="anaMembers">0</h3><p>Approved Members</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon green"><i class="fas fa-hands-praying"></i></div><div class="kpi-details"><h3 id="anaPrayers">0</h3><p>Approved Prayers</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon gold"><i class="fas fa-check-double"></i></div><div class="kpi-details"><h3 id="anaAnswered">0</h3><p>Answered Prayers</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon red"><i class="fas fa-star"></i></div><div class="kpi-details"><h3 id="anaTestimonies">0</h3><p>Testimonies</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon blue"><i class="fas fa-calendar-check"></i></div><div class="kpi-details"><h3 id="anaEvents">0</h3><p>Events</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon green"><i class="fas fa-heart"></i></div><div class="kpi-details"><h3 id="anaOfferings">0</h3><p>Offerings Recorded</p></div></div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-header"><h3><i class="fas fa-chart-area"></i> Pageviews — last 30 days</h3></div>
+                    <div style="height: 260px; position: relative;"><canvas id="anaTrendChart"></canvas></div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-header"><h3><i class="fas fa-chart-bar"></i> Top pages — 30 days</h3></div>
+                    <div style="height: 300px; position: relative;"><canvas id="anaPagesChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- DEVOTIONALS VIEW -->
+            <div id="view-devotionals" class="section-view">
+                <div class="page-title">
+                    <span><i class="fas fa-book-open"></i> Daily Devotionals</span>
+                    <button class="btn btn-primary btn-sm" onclick="loadDevotionals()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+                <div class="kpi-grid">
+                    <div class="kpi-card"><div class="kpi-icon blue"><i class="fas fa-bell"></i></div><div class="kpi-details"><h3 id="devSubscriberCount">0</h3><p>Push Subscribers</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon gold"><i class="fas fa-clock"></i></div><div class="kpi-details"><h3 id="devLastPublished">—</h3><p>Last Published</p></div></div>
+                    <div class="kpi-card"><div class="kpi-icon green"><i class="fas fa-toggle-on"></i></div><div class="kpi-details"><h3 id="devPushState">—</h3><p>Daily Auto-Push</p></div></div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-sun"></i> Today's Devotional</h3>
+                        <div>
+                            <button class="btn btn-outline btn-sm" onclick="publishDevotionalNow(false)"><i class="fas fa-save"></i> Publish now (no push)</button>
+                            <button class="btn btn-primary btn-sm" onclick="publishDevotionalNow(true)"><i class="fas fa-paper-plane"></i> Publish &amp; push now</button>
+                        </div>
+                    </div>
+                    <div id="devTodayPreview" style="padding: 18px;">
+                        <div class="spinner" style="width:30px;height:30px;"></div>
+                    </div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-header"><h3><i class="fas fa-calendar-week"></i> Schedule</h3></div>
+                    <div class="table-responsive"><table><thead><tr><th>Time (Africa/Lusaka)</th><th>Edition</th><th>Job</th><th>Notes</th></tr></thead>
+                    <tbody>
+                        <tr><td>05:05</td><td>🌅 Morning Devotional</td><td><code>publishDailyDevotionalMorning</code></td><td>Automatic daily run (Cloud Scheduler)</td></tr>
+                        <tr><td>12:05</td><td>☀️ Afternoon Devotional</td><td><code>publishDailyDevotionalAfternoon</code></td><td>Automatic daily run (Cloud Scheduler)</td></tr>
+                        <tr><td>17:05</td><td>🌙 Evening Devotional</td><td><code>publishDailyDevotionalEvening</code></td><td>Automatic daily run (Cloud Scheduler)</td></tr>
+                    </tbody></table></div>
+                    <p style="padding: 0 18px 14px; opacity: .75; font-size: .85rem;">
+                        The daily runs write <code>devotional/current</code> (the home page reads it) and push to
+                        <code>devotionalSubscribers</code> when the auto-push toggle is on. Scheduled runs need
+                        <code>firebase deploy --only functions</code> once; the master toggle below applies to them.
+                    </p>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-header"><h3><i class="fas fa-toggle-on"></i> Master switch — daily auto-push</h3></div>
+                    <div style="padding: 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" id="devPushToggleBtn" onclick="toggleDevotionalPush()">Loading…</button>
+                        <span style="opacity:.8; font-size:.9rem;">Off = scheduled runs still publish the devotional, but skip the push.</span>
+                    </div>
                 </div>
             </div>
 
@@ -743,7 +822,7 @@
             <!-- EVENTS VIEW -->
             <div id="view-events" class="section-view">
                 <div class="page-title"><span><i class="fas fa-calendar-alt"></i> Events Management</span><button class="btn btn-primary" onclick="openModal('modalEvent')"><i class="fas fa-plus"></i> Create Event</button></div>
-                <div class="panel-card"><div class="table-responsive"> <table><thead> <tr><th>Date & Time</th><th>Event Title</th><th>Location</th><th>Category</th><th>Actions</th> </tr></thead><tbody id="listEvents"> <tr><td colspan="5"><div class="spinner" style="width:30px;height:30px;"></div> </td> </tr> </tbody> </table> </div></div>
+                <div class="panel-card"><div class="table-responsive"> <table><thead> <tr><th>Date & Time</th><th>Event Title</th><th>Location</th><th>Category</th><th>RSVPs</th><th>Actions</th> </tr></thead><tbody id="listEvents"> <tr><td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div> </td> </tr> </tbody> </table> </div></div>
             </div>
 
             <!-- MEDIA UPLOAD VIEW -->
@@ -991,6 +1070,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, getDoc, doc, updateDoc, setDoc, deleteDoc, query, where, orderBy, serverTimestamp, increment, addDoc, limit, onSnapshot, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo", authDomain: "prayer-dome.firebaseapp.com", projectId: "prayer-dome", storageBucket: "prayer-dome.firebasestorage.app", messagingSenderId: "198295153196", appId: "1:198295153196:web:1222b31948d7974ba3bf89" };
         const app = initializeApp(firebaseConfig);
@@ -1090,6 +1170,169 @@
                 const gallerySnap = await getDocs(collection(db, "gallery"));
                 document.getElementById('statGalleryItems').innerText = gallerySnap.size;
             } catch(e) { console.error("Dashboard stats error:", e); }
+        };
+
+        window.anaCharts = {};
+        window.loadAnalytics = async function() {
+            try {
+                const now = Date.now();
+                const since30 = now - 30 * 86400000;
+                const since7 = now - 7 * 86400000;
+                const pvSnap = await getDocs(query(collection(db, "pageviews"), orderBy("ts", "desc"), limit(5000)));
+                let views7 = 0, views30 = 0, mobile7 = 0, mobile30 = 0;
+                const sids7 = new Set(), sids30 = new Set();
+                const byDay = {}, byPath = {};
+                pvSnap.forEach(d => {
+                    const v = d.data(); const ts = Number(v.ts) || 0;
+                    if (!ts || ts < since30) return;
+                    views30++; sids30.add(v.sid || '');
+                    if (v.mobile) mobile30++;
+                    const dt = new Date(ts);
+                    const day = `${dt.getMonth() + 1}/${dt.getDate()}`;
+                    byDay[day] = (byDay[day] || 0) + 1;
+                    const p = (v.path || '/').split('?')[0];
+                    byPath[p] = (byPath[p] || 0) + 1;
+                    if (ts >= since7) { views7++; sids7.add(v.sid || ''); if (v.mobile) mobile7++; }
+                });
+                document.getElementById('anaViews7').innerText = views7.toLocaleString();
+                document.getElementById('anaViews30').innerText = views30.toLocaleString();
+                document.getElementById('anaSessions30').innerText = sids30.size.toLocaleString();
+                document.getElementById('anaMobilePct').innerText = views30 ? Math.round(mobile30 / views30 * 100) + '%' : '0%';
+
+                // 30-day trend
+                const days = [], counts = [];
+                for (let i = 29; i >= 0; i--) {
+                    const dt = new Date(now - i * 86400000);
+                    const key = `${dt.getMonth() + 1}/${dt.getDate()}`;
+                    days.push(key); counts.push(byDay[key] || 0);
+                }
+                const trendCtx = document.getElementById('anaTrendChart');
+                if (trendCtx) {
+                    if (window.anaCharts.trend) window.anaCharts.trend.destroy();
+                    window.anaCharts.trend = new Chart(trendCtx, {
+                        type: 'line',
+                        data: { labels: days, datasets: [{ label: 'Pageviews', data: counts, borderColor: '#0A4D9B', backgroundColor: 'rgba(10,77,155,.12)', fill: true, tension: .35, pointRadius: 2 }] },
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+                    });
+                }
+                // Top pages
+                const top = Object.entries(byPath).sort((a, b) => b[1] - a[1]).slice(0, 10);
+                const pagesCtx = document.getElementById('anaPagesChart');
+                if (pagesCtx) {
+                    if (window.anaCharts.pages) window.anaCharts.pages.destroy();
+                    window.anaCharts.pages = new Chart(pagesCtx, {
+                        type: 'bar',
+                        data: { labels: top.map(t => t[0]), datasets: [{ label: 'Views', data: top.map(t => t[1]), backgroundColor: '#D4AF37', borderRadius: 4 }] },
+                        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } }
+                    });
+                }
+
+                // Engagement counts from existing collections
+                const [m, pr, te, ev, ne, of] = await Promise.all([
+                    getDocs(query(collection(db, "memberships"), where("status", "==", "approved"))),
+                    getDocs(query(collection(db, "prayers"), where("status", "==", "approved"))),
+                    getDocs(query(collection(db, "testimonies"), where("status", "==", "approved"))),
+                    getDocs(collection(db, "events")),
+                    getDocs(collection(db, "news")),
+                    getDocs(collection(db, "offerings"))
+                ]);
+                let answered = 0, offeringsSum = 0;
+                pr.forEach(d => { if (d.data().answered) answered++; });
+                of.forEach(d => { const a = Number(d.data().amount) || 0; if (a > 0) offeringsSum += a; });
+                const set = (id, v) => { const el = document.getElementById(id); if (el) el.innerText = v; };
+                set('anaMembers', m.size.toLocaleString());
+                set('anaPrayers', pr.size.toLocaleString());
+                set('anaAnswered', answered.toLocaleString());
+                set('anaTestimonies', te.size.toLocaleString());
+                set('anaEvents', ev.size.toLocaleString());
+                set('anaOfferings', of.size.toLocaleString() + ' · ' + (offeringsSum >= 1000 ? (offeringsSum / 1000).toFixed(1) + 'k' : offeringsSum));
+            } catch (e) { console.error("Analytics error:", e); toast("Could not load analytics (check Firestore indexes/permissions)", "error"); }
+        };
+
+        window.devPushEnabled = null;
+        window.pdCallable = function(name) {
+            try {
+                if (!window.__pdFns) window.__pdFns = getFunctions(app);
+                return httpsCallable(window.__pdFns, name);
+            } catch (e) { return null; }
+        };
+        window.loadDevotionals = async function() {
+            try {
+                const [subs, cur, set] = await Promise.all([
+                    getDocs(query(collection(db, "devotionalSubscribers"), where("active", "!=", false))),
+                    getDoc(doc(db, "devotional", "current")),
+                    getDoc(doc(db, "settings", "devotionalPush"))
+                ]);
+                document.getElementById('devSubscriberCount').innerText = subs.size;
+                const curD = cur.exists() ? cur.data() : null;
+                document.getElementById('devLastPublished').innerText = curD && curD.publishedAt
+                    ? moment(curD.publishedAt.toDate()).format('MMM D, YYYY · HH:mm') + ' · ' + (curD.periodName || curD.period || '')
+                    : 'Never published yet';
+                window.devPushEnabled = set.exists() ? set.data().enabled !== false : true;
+                renderDevPushToggle();
+                // Today's preview — published copy or the scheduled pick.
+                let today = curD;
+                try {
+                    const fn = window.pdCallable('previewDevotional');
+                    if (fn) {
+                        const res = await fn();
+                        if (res && res.data) today = res.data;
+                    }
+                } catch (e) { /* functions not deployed — show published copy */ }
+                const el = document.getElementById('devTodayPreview');
+                if (!today) { el.innerHTML = '<p>Nothing published yet — hit “Publish now”.</p>'; return; }
+                el.innerHTML = `
+                    <div style="margin-bottom:10px;"><span class="badge badge-info">${escapeHTML(today.periodName || today.period || '')}</span>
+                    ${today.isSpecial ? ' <span class="badge badge-warning">✨ Special</span>' : ''}
+                    <span class="badge badge-success">${escapeHTML(today.date || 'today')}</span></div>
+                    <h4 style="margin:0 0 6px; color:var(--accent-gold);">${escapeHTML(today.verse || '')}</h4>
+                    <p style="font-style:italic; margin:0 0 10px;">“${escapeHTML(today.text || '')}”</p>
+                    <p style="margin:0 0 10px;"><strong>Insight:</strong> ${escapeHTML(today.message || '')}</p>
+                    <p style="margin:0;"><strong>Prayer:</strong> ${escapeHTML(today.prayer || '')}</p>`;
+            } catch (e) { console.error(e); toast('Could not load devotionals', 'error'); }
+        };
+        function renderDevPushToggle() {
+            const b = document.getElementById('devPushToggleBtn');
+            if (!b) return;
+            const on = window.devPushEnabled;
+            document.getElementById('devPushState').innerText = on ? 'ON — pushes daily' : 'OFF — publish only';
+            b.innerHTML = on ? '<i class="fas fa-toggle-on"></i> Auto-push is ON — tap to turn off' : '<i class="fas fa-toggle-off"></i> Auto-push is OFF — tap to turn on';
+            b.style.background = on ? '#0A4D9B' : '#6b7280';
+        }
+        window.toggleDevotionalPush = async function() {
+            try {
+                await setDoc(doc(db, "settings", "devotionalPush"),
+                    { enabled: !window.devPushEnabled, updatedAt: serverTimestamp(), updatedBy: adminUser?.email || 'admin' }, { merge: true });
+                window.devPushEnabled = !window.devPushEnabled;
+                renderDevPushToggle();
+                toast('Auto-push ' + (window.devPushEnabled ? 'enabled' : 'disabled'), 'success');
+                await logAdminActivity('devotional_push_toggle', { enabled: window.devPushEnabled });
+            } catch (e) { console.error(e); toast('Could not save the switch', 'error'); }
+        };
+        window.publishDevotionalNow = async function(force) {
+            try {
+                const fn = window.pdCallable('publishDevotional');
+                if (fn) {
+                    const res = await fn({ force: !!force });
+                    if (res && res.data) {
+                        toast(`Published ${res.data.period} · pushed to ${res.data.sent}/${res.data.subscribers}`, 'success');
+                        await logAdminActivity('devotional_publish', { period: res.data.period, sent: res.data.sent });
+                    }
+                } else {
+                    // Functions not deployed yet — write the doc directly.
+                    const today = new Date();
+                    const key = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+                    await setDoc(doc(db, "devotional", "current"), {
+                        date: key, period: 'manual', periodName: 'Manual publish',
+                        verse: 'Mark 7:37', text: 'He hath done all things well: he maketh both the deaf to hear, and the dumb to speak.',
+                        message: 'Published manually from the admin dashboard.',
+                        prayer: 'Amen.',
+                        publishedAt: serverTimestamp()
+                    }, { merge: true });
+                    toast('Published (functions not deployed — push skipped)', 'success');
+                }
+                loadDevotionals();
+            } catch (e) { console.error(e); toast('Publish failed: ' + (e.message || e), 'error'); }
         };
 
         window.filterMembers = function() {
@@ -1325,7 +1568,43 @@
         window.approveClaim = async function(id){ if(!confirm("Approve claim?")) return; await updateDoc(doc(db,"supportClaims",id),{status:'approved',approvedBy:adminUser?.uid,approvedAt:serverTimestamp()}); toast("Claim approved!"); await loadSupport(); await loadDashboardStats(); };
         window.rejectClaim = async function(id){ const reason=prompt("Reason:"); if(!reason) return; await updateDoc(doc(db,"supportClaims",id),{status:'rejected',rejectReason:reason,rejectedAt:serverTimestamp(),rejectedBy:adminUser?.uid}); toast("Claim rejected!"); await loadSupport(); await loadDashboardStats(); };
         
-        window.loadEvents = async function(){ const tbody=document.getElementById('listEvents'); if(tbody) tbody.innerHTML='<td colspan="5"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try{ const snap=await getDocs(query(collection(db,"events"),orderBy("date","desc"))); let html=''; snap.forEach(d=>{ const data=d.data(); html+=`<tr><td>${data.date?moment(data.date.toDate()).format('MMM D, YYYY HH:mm'):'N/A'}</td><td><strong>${escapeHTML(data.title)}</strong></td><td>${escapeHTML(data.location)}</td><td>${data.category}</td><td><button class="btn btn-sm btn-danger" onclick="deleteRecord('events','${d.id}')">Delete</button></td></tr>`; }); if(tbody) tbody.innerHTML=html||'<td colspan="5">No events<\/td>'; } catch(e){ console.error(e); } };
+        window.loadEvents = async function(){ const tbody=document.getElementById('listEvents'); if(tbody) tbody.innerHTML='<td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try{ const snap=await getDocs(query(collection(db,"events"),orderBy("date","desc"))); let html=''; snap.forEach(d=>{ const data=d.data(); const n=data.attendeeCount||0; const max=data.maxAttendees>0?' / '+data.maxAttendees:''; const safeTitle=String(data.title||'event').replace(/'/g,"\\'"); html+=`<tr><td>${data.date?moment(data.date.toDate()).format('MMM D, YYYY HH:mm'):'N/A'}</td><td><strong>${escapeHTML(data.title)}</strong></td><td>${escapeHTML(data.location)}</td><td>${data.category}</td><td><span class="badge badge-info">${n}${max}</span></td><td style="white-space:nowrap;"><button class="btn btn-sm btn-outline" onclick="exportEventRsvps('${d.id}','${safeTitle}')" title="Download attendee CSV"><i class="fas fa-file-csv"></i></button><button class="btn btn-sm btn-danger" onclick="deleteRecord('events','${d.id}')"><i class="fas fa-trash"></i></button></td></tr>`; }); if(tbody) tbody.innerHTML=html||'<td colspan="6">No events</td>'; } catch(e){ console.error(e); } };
+
+window.exportEventRsvps = async function(eventId, eventTitle){
+  try{
+    const [evSnap, rsvpSnap] = await Promise.all([
+      getDoc(doc(db,"events",eventId)),
+      getDocs(query(collection(db,"userEvents"), where("eventId","==",eventId)))
+    ]);
+    const ev = evSnap.exists()?evSnap.data():{};
+    const rows = [["Name","Email","RSVP Date","Attended"]];
+    for (const d of rsvpSnap.docs) {
+      const r = d.data();
+      let name = r.name || r.userName || r.userId || '', email = r.email || '';
+      if (r.userId) {
+        try { const ms = await getDoc(doc(db,"memberships",r.userId)); if (ms.exists()) { name = ms.data().fullName || name; email = ms.data().email || email; } } catch(e){}
+      }
+      rows.push([String(name||'').replace(/,/g,' '), email, r.rsvpedAt?moment(r.rsvpedAt.toDate()).format('YYYY-MM-DD HH:mm'):'', r.attended?'Yes':'No']);
+    }
+    if (rows.length === 1 && !Array.isArray(ev.attendees)) { toast('No RSVPs for this event yet','error'); return; }
+    // Fall back to the attendees array when userEvents is incomplete.
+    if (rows.length === 1 && Array.isArray(ev.attendees)) {
+      for (const uid of ev.attendees) {
+        let name = uid, email = '';
+        try { const ms = await getDoc(doc(db,"memberships",uid)); if (ms.exists()) { name = ms.data().fullName || name; email = ms.data().email || email; } } catch(e){}
+        rows.push([String(name).replace(/,/g,' '), email, (ev.rsvpTimestamps&&ev.rsvpTimestamps[uid])?moment(ev.rsvpTimestamps[uid].toDate()).format('YYYY-MM-DD HH:mm'):'', '']);
+      }
+    }
+    const csv = rows.map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'rsvps-' + (eventTitle||'event').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '.csv';
+    document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500);
+    toast(`Exported ${rows.length-1} RSVPs`, 'success');
+  } catch(e){ console.error(e); toast('Export failed','error'); }
+};
+
         window.saveEvent = async function(){ const title=document.getElementById('evTitle').value, date=document.getElementById('evDate').value; if(!title||!date) return toast("Title and date required","error"); showLoading(); try{ await addDoc(collection(db,"events"),{title:title,date:new Date(date),location:document.getElementById('evLocation').value,category:document.getElementById('evCategory').value,description:document.getElementById('evDesc').value,attendeeCount:0,createdAt:serverTimestamp(),createdBy:adminUser?.uid}); closeModal('modalEvent'); toast("Event published!"); await loadEvents(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
 
         /* ===== Portal Notices (Announcements) Management ===== */
@@ -2146,6 +2425,8 @@
             if(window.innerWidth <= 992) document.getElementById('sidebar').style.left = '-280px';
             try {
                 if(viewId === 'dashboard') await loadDashboardStats();
+                else if(viewId === 'analytics') await loadAnalytics();
+                else if(viewId === 'devotionals') await loadDevotionals();
                 else if(viewId === 'live') { watchLiveStatus(); await loadLiveRecordings(); await loadLiveChatPreview(); }
                 else if(viewId === 'members') { await loadDashboardStats(); filterMembers(); }
                 else if(viewId === 'announcements') await loadAnnouncements();
