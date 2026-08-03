@@ -68,7 +68,7 @@ const privateRead = [
   'wallets', 'financialReports', 'deposits', 'withdrawals', 'activePlans',
   'offerings', 'supportClaims', 'memberCareRequests', 'userTokens',
   'userEvents', 'userQuiz', 'bibleNotes', 'bibleProgress', 'adminLogs',
-  'test_notifications', 'contactMessages', 'users'
+  'test_notifications', 'contactMessages', 'users', 'giving'
 ];
 privateRead.forEach(c => {
   const b = byName[c];
@@ -109,6 +109,12 @@ ok('pageviews create-only (no update/delete)',
 ok('pageviews shape validation present (validBeacon helper)',
   /function validBeacon\(\)/.test(RULES)
   && /request\.resource\.data\.path is string/.test(RULES));
+
+/* ------------------------------------------------------------ giving docs  */
+const giving = byName['giving'];
+ok('giving is server-write-only (no client writes)',
+  giving && /allow create: if false/.test(giving.body)
+  && /allow update: if false/.test(giving.body));
 
 /* --------------------------------------------------------------- private DM */
 const dm = byName['privateChats'];

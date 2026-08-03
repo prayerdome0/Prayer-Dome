@@ -38,6 +38,14 @@
         "function": "share"
       },
       {
+        "source": "/api/payment-webhook-flutterwave",
+        "function": "paymentWebhookFlutterwave"
+      },
+      {
+        "source": "/api/payment-webhook-paystack",
+        "function": "paymentWebhookPaystack"
+      },
+      {
         "source": "/bible",
         "destination": "/bible.html"
       },

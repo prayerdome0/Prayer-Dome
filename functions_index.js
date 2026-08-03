@@ -1,7 +1,13 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const shareHandler = require('./share');
 
 admin.initializeApp();
+
+// Dynamic social sharing pages for news and testimony links.
+// Hosting rewrites /news/{id}, /testimony/{id}, and /share/{type}/{id} here
+// so Facebook, WhatsApp and other crawlers receive article-specific OG tags.
+exports.share = functions.https.onRequest((req, res) => shareHandler(req, res));
 
 // Send notifications when a new document is added to 'notifications' collection
 exports.sendPushNotification = functions.firestore
@@ -34,7 +40,7 @@ exports.sendPushNotification = functions.firestore
             },
             data: {
                 click_action: 'FLUTTER_NOTIFICATION_CLICK',
-                screen: 'bible'
+                screen: type || 'news'
             }
         };
         
@@ -46,7 +52,6 @@ exports.sendPushNotification = functions.firestore
             
             console.log(`Sent to ${response.successCount} devices, failed: ${response.failureCount}`);
             
-            // Update notification status in Firestore
             await snap.ref.update({
                 status: 'sent',
                 sentAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -54,7 +59,6 @@ exports.sendPushNotification = functions.firestore
                 failureCount: response.failureCount
             });
             
-            // Handle failed tokens (remove invalid ones)
             if (response.failureCount > 0) {
                 const failedTokens = [];
                 response.responses.forEach((resp, idx) => {
@@ -64,7 +68,6 @@ exports.sendPushNotification = functions.firestore
                     }
                 });
                 
-                // Remove invalid tokens from userTokens collection
                 for (const failedToken of failedTokens) {
                     const tokensQuery = await admin.firestore()
                         .collection('userTokens')
@@ -93,7 +96,7 @@ exports.sendTestNotification = functions.firestore
     .document('test_notifications/{testId}')
     .onCreate(async (snap, context) => {
         const test = snap.data();
-        const { title, message, token, userId } = test;
+        const { title, message, token } = test;
         
         if (!token) return null;
         
@@ -116,6 +119,7 @@ exports.sendTestNotification = functions.firestore
                 status: 'sent',
                 sentAt: admin.firestore.FieldValue.serverTimestamp()
             });
+            return response;
             
         } catch (error) {
             console.error('Test notification failed:', error);
@@ -123,5 +127,21 @@ exports.sendTestNotification = functions.firestore
                 status: 'failed',
                 error: error.message
             });
+            return null;
         }
     });
+
+// Devotional scheduler — daily publish + push (see devotionals.js)
+const devotionals = require('./devotionals');
+exports.publishDailyDevotionalMorning = devotionals.publishDailyDevotionalMorning();
+exports.publishDailyDevotionalAfternoon = devotionals.publishDailyDevotionalAfternoon();
+exports.publishDailyDevotionalEvening = devotionals.publishDailyDevotionalEvening();
+exports.publishDevotional = devotionals.publishDevotional();
+exports.previewDevotional = devotionals.previewDevotional();
+
+// Online giving — Flutterwave + Paystack (see payments.js)
+const payments = require('./payments');
+exports.createGivingPayment = payments.createPaymentHandler();
+exports.verifyGivingPayment = payments.verifyPaymentHandler();
+exports.paymentWebhookFlutterwave = payments.paymentWebhookHandler('flutterwave');
+exports.paymentWebhookPaystack = payments.paymentWebhookHandler('paystack');

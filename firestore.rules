@@ -330,6 +330,16 @@ service cloud.firestore {
       allow delete: if isFinance();
     }
 
+    // Online giving records (Flutterwave/Paystack) — written ONLY by the
+    // payment Cloud Functions (admin SDK bypasses rules); clients may read
+    // their own records; finance may read everything.
+    match /giving/{txRef} {
+      allow read: if isOwner(resource.data.userId) || isFinance();
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
     /* ------------------------------------------------------------- contact */
 
     match /contactMessages/{id} {

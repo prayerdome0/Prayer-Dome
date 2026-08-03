@@ -321,3 +321,141 @@ the real home page DOM. `tests/content.test.js` extended to 150 assertions
   your licensed streams in Admin → Media before promoting the feature.
 - Tumbuka/siSwati/Bemba/Nyanja strings remain community drafts until reviewed
   by fluent speakers (the draft badge shows automatically).
+
+---
+
+## 10. Round 2 — Security, Analytics, Devotionals, Payments, Events
+
+Everything in this pass is live in the repo and covered by tests
+(**327 passing** across `assistant`, `content`, `admin`, `pages`, `premium`,
+`security`, `devotional`, `payments`).
+
+### 10.1 Firestore & Storage security rules (the big one)
+
+The repo previously had **no rules files at all** — every collection was
+world-readable/writable by default. Now:
+
+- `firestore.rules` — 37 collections mapped:
+  - Role helpers read `memberships/{uid}` (`isAdmin`, `isFinance`,
+    `isApprovedMember`) — one `get()` per rule evaluation.
+  - Moderated content (`prayers`, `testimonies`, `gallery`) is created
+    `pending` by signed-in users, world-read only when `approved`, admins
+    moderate. Users can still tap "prayed" without touching moderation fields.
+  - Private data (wallets, financial reports, support claims, bible notes,
+    quiz, tokens, DMs…) is owner-scoped; finance/admin can read.
+  - `giving` is **server-write-only** (payment Cloud Functions write via the
+    admin SDK; clients can never create/update/delete).
+  - `pageviews` is create-only, shape-validated (`validBeacon()`), admin-read.
+  - Public content (news, events, live, banners, announcements, devotional,
+    settings, communityStats…) is public-read + admin-write.
+- `storage.rules` — `public/*` world-read, `chat/{uid}/*` owner-write,
+  `uploads/{uid}/*` owner-write, `admin/*` admin-only.
+
+**Deploy (do this first):**
+
+```bash
+firebase deploy --only firestore:rules,storage
+```
+
+Optional live enforcement tests:
+
+```bash
+npm i -D @firebase/rules-unit-testing
+firebase emulators:exec "node tests/firestore-emulator.test.js"
+```
+
+> The emulator test self-skips when the emulator isn't running, so `npm test`
+> stays green in plain CI.
+
+### 10.2 Privacy-friendly analytics + admin dashboard
+
+- `pd-app.js` gained an `analytics` module (v1.1.0): one shape-validated doc
+  per page-load in `pageviews` (path, timestamp, session id, referrer host,
+  mobile flag). No cookies, no personal data, honours Do-Not-Track, queues
+  offline views in localStorage, `PDApp.analytics.optOut()` available.
+- **Admin → Analytics**: 30-day pageview trend + top-pages charts
+  (Chart.js), sessions/mobile KPIs, and engagement counters (members,
+  prayers, answered prayers, testimonies, events, offerings).
+- No setup needed — it works the moment the rules are deployed. If you'd
+  rather use Plausible/Umami/GA4 later, delete the `analytics` module from
+  `pd-app.js` and drop in their snippet instead.
+
+### 10.3 Devotional scheduler + the FCM pipeline (fixed)
+
+**Important find:** no page ever saved an FCM token, so the admin
+notification composer and all push features were silently dead (0 tokens).
+Fixed:
+
+- `pd-app.js` `fcm` module registers the browser token into
+  `userTokens/{uid}` (the collection admin broadcasts read). Pages expose
+  `window.__pdFirebase = { app, auth }` (home, account, live).
+- Daily devotional push: **VAPID key required** — get it from Firebase
+  Console → Project settings → Cloud Messaging → *Web push certificates*,
+  then paste into `assets/pd-content-data.js` (`PD_CONTENT.FCM.vapidKey`).
+  Until then everything degrades gracefully (in-app devotional still works).
+- Cloud Functions (`functions/devotionals.js`): scheduled publishes at
+  05:05 / 12:05 / 17:05 **Africa/Lusaka** write `devotional/current`
+  (the home page reads it when it matches today) and push to
+  `devotionalSubscribers` subscribers. Invalid tokens are retired
+  automatically.
+- Subscribing: home devotional card bell or Account → Daily Devotional Push.
+- **Admin → Devotionals**: subscriber count, last published, today's
+  preview, *Publish now* / *Publish & push now*, and the master
+  auto-push switch (`settings/devotionalPush`).
+
+```bash
+firebase deploy --only functions
+```
+
+> Scheduled functions use Cloud Scheduler — first deploy creates the jobs
+> (Blaze plan required).
+
+### 10.4 Online giving — Flutterwave + Paystack
+
+- **give.html → Pay Online**: card + mobile money (MTN MoMo, Airtel, Zamtel)
+  through Flutterwave or Paystack; ZMW / SZL / USD / ZAR; one-time or
+  recurring (needs a payment plan id); automatic email receipts; return
+  verification with a celebration.
+- All secrets stay **server-side** in Cloud Functions env vars:
+
+```bash
+firebase functions:config:set flutterwave.secret_key="FLWSECK-..." \
+    paystack.secret_key="sk_live_..." \
+    flutterwave.plan_id="" paystack.plan_id=""   # optional, for recurring
+firebase deploy --only functions
+```
+
+- Webhooks (set in each provider's dashboard):
+  - Flutterwave → `https://prayerdome.net/api/payment-webhook-flutterwave`
+  - Paystack → `https://prayerdome.net/api/payment-webhook-paystack`
+  - Both verify signatures (Flutterwave `verif-hash`, Paystack HMAC-SHA512)
+    before marking `giving/{txRef}` successful and notifying the finance team.
+- Until the keys are set, the card shows a friendly "use WhatsApp/MTN MoMo"
+  fallback — nothing breaks.
+
+### 10.5 Events upgrades
+
+- Events page: **.ics download** (Apple Calendar / Outlook / Thunderbird)
+  next to the Google Calendar link, per event.
+- Admin → Events: RSVP count + capacity in the table, and a **CSV export**
+  of attendees (name, email, RSVP date, attended) — works from either
+  `userEvents` or the legacy `attendees` array.
+
+### 10.6 Housekeeping
+
+- `npm test` now runs **all eight suites** (was missing `pages` and
+  `premium`); jsdom is a devDependency.
+- Admin nav shortcuts were fragile index lookups (`[12]`) that any nav
+  addition would silently break — now `data-nav` attributes.
+- `functions_index.js` (root) synced with `functions/index.js`.
+- Analytics/devotionals nav items added without breaking the shortcuts.
+
+### 10.7 Deploy checklist (new stuff)
+
+```bash
+firebase deploy --only firestore:rules,storage   # 1. security (do first)
+firebase deploy --only functions                 # 2. devotionals + payments
+# 3. paste VAPID key into assets/pd-content-data.js → deploy hosting
+firebase deploy --only hosting
+# 4. set merchant keys (10.4) and webhook URLs in provider dashboards
+# 5. check Admin → Analytics after a few visits
