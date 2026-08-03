@@ -138,3 +138,10 @@ exports.publishDailyDevotionalAfternoon = devotionals.publishDailyDevotionalAfte
 exports.publishDailyDevotionalEvening = devotionals.publishDailyDevotionalEvening();
 exports.publishDevotional = devotionals.publishDevotional();
 exports.previewDevotional = devotionals.previewDevotional();
+
+// Online giving — Flutterwave + Paystack (see payments.js)
+const payments = require('./payments');
+exports.createGivingPayment = payments.createPaymentHandler();
+exports.verifyGivingPayment = payments.verifyPaymentHandler();
+exports.paymentWebhookFlutterwave = payments.paymentWebhookHandler('flutterwave');
+exports.paymentWebhookPaystack = payments.paymentWebhookHandler('paystack');

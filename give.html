@@ -623,6 +623,47 @@
         </div>
 
         <div class="methods-grid">
+            <!-- ONLINE PAYMENT CARD (Flutterwave / Paystack) -->
+            <div class="method-card" style="grid-column: 1 / -1;">
+                <div class="method-header" style="background: linear-gradient(135deg, #0A4D9B, #0a3d7a); color: #fff; border-radius: 16px 16px 0 0;">
+                    <h2><i class="fas fa-globe"></i> Pay Online — Card or Mobile Money</h2>
+                    <p>Secure checkout · MTN MoMo, Airtel, Zamtel, Visa, Mastercard</p>
+                </div>
+                <div class="method-body">
+                    <div class="amount-selector">
+                        <button class="amt-chip" onclick="setA('online', 20)">20</button>
+                        <button class="amt-chip" onclick="setA('online', 50)">50</button>
+                        <button class="amt-chip" onclick="setA('online', 100)">100</button>
+                        <button class="amt-chip" onclick="setA('online', 250)">250</button>
+                    </div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+                        <input type="number" id="onlineAmt" class="custom-input" placeholder="Amount" style="flex:1; min-width:140px;">
+                        <select id="onlineCur" class="custom-input" style="flex:0 0 110px;">
+                            <option value="ZMW">ZMW</option>
+                            <option value="SZL">SZL (E)</option>
+                            <option value="USD">USD</option>
+                            <option value="ZAR">ZAR</option>
+                        </select>
+                        <select id="onlineProvider" class="custom-input" style="flex:0 0 190px;">
+                            <option value="flutterwave">Flutterwave (MoMo + Card)</option>
+                            <option value="paystack">Paystack (Card + MoMo)</option>
+                        </select>
+                    </div>
+                    <input type="text" id="onlineName" class="custom-input" placeholder="Your full name" style="margin-bottom:10px;">
+                    <input type="email" id="onlineEmail" class="custom-input" placeholder="Your email (for receipt)" style="margin-bottom:10px;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+                        <label style="display:flex; align-items:center; gap:8px; font-size:.9rem; cursor:pointer;">
+                            <input type="checkbox" id="onlineRecurring" style="width:auto;"> <i class="fas fa-sync-alt"></i> Make this a monthly gift
+                        </label>
+                        <span id="onlineProviderState" style="font-size:.8rem; opacity:.75;"></span>
+                    </div>
+                    <button class="btn-donate" style="background: linear-gradient(135deg, #D4AF37, #b8942f); color:#fff;" onclick="payOnline()">
+                        <i class="fas fa-lock"></i> PAY SECURELY NOW
+                    </button>
+                    <p style="font-size:.75rem; opacity:.6; margin-top:10px;">Payments are processed by Flutterwave / Paystack. Receipts are emailed to you automatically. Recurring gifts need a payment plan set up in the dashboard — until then the toggle acts as a one-time gift.</p>
+                </div>
+            </div>
+
             <!-- WHATSAPP PAYMENT CARD -->
             <div class="method-card">
                 <div class="method-header whatsapp">
@@ -750,6 +791,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js";
 
         const firebaseConfig = { 
             apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo", 
@@ -888,8 +930,87 @@
         window.setA = (type, v) => {
             if (type === 'wa') document.getElementById('waAmt').value = v;
             if (type === 'momo') document.getElementById('momoAmt').value = v;
+            if (type === 'online') document.getElementById('onlineAmt').value = v;
             updateMessagePreview();
         };
+
+        // ==================== ONLINE PAYMENT (Flutterwave / Paystack) ====================
+        let pdFns = null;
+        function pdCallable(name) { try { if (!pdFns) pdFns = getFunctions(app); return httpsCallable(pdFns, name); } catch (e) { return null; } }
+
+        onAuthStateChanged(auth, user => {
+            currentUser = user;
+            const nameEl = document.getElementById('onlineName');
+            const emailEl = document.getElementById('onlineEmail');
+            if (user) {
+                if (nameEl && !nameEl.value) nameEl.value = user.displayName || '';
+                if (emailEl && !emailEl.value) emailEl.value = user.email || '';
+            }
+        });
+
+        window.payOnline = async () => {
+            const amount = parseFloat(document.getElementById('onlineAmt').value);
+            const currency = document.getElementById('onlineCur').value;
+            const provider = document.getElementById('onlineProvider').value;
+            const name = document.getElementById('onlineName').value.trim();
+            const email = document.getElementById('onlineEmail').value.trim();
+            const recurring = document.getElementById('onlineRecurring').checked;
+            const stateEl = document.getElementById('onlineProviderState');
+
+            if (!amount || amount <= 0) { toast("Enter a valid amount", "error"); return; }
+            if (name.length < 2) { toast("Enter your full name", "error"); return; }
+            if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { toast("Enter a valid email for your receipt", "error"); return; }
+
+            const fn = pdCallable('createGivingPayment');
+            if (!fn) { toast("Online payments are not configured yet — use WhatsApp or MTN MoMo below", "error"); return; }
+            try {
+                if (stateEl) stateEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating secure checkout…';
+                const res = await fn({
+                    provider, amount, currency, name, email,
+                    recurring,
+                    meta: { userId: currentUser ? currentUser.uid : '' }
+                });
+                const data = res.data || {};
+                if (!data.configured) {
+                    if (stateEl) stateEl.innerHTML = '<i class="fas fa-info-circle"></i> Online checkout not configured yet — use WhatsApp or MTN MoMo below.';
+                    toast("Online checkout needs the merchant keys configured — using manual giving for now", "error");
+                    return;
+                }
+                // Remember the reference so the return page can verify.
+                try { sessionStorage.setItem('pd_giving_txref', data.txRef); } catch (e) {}
+                toast("Opening secure checkout…", "success");
+                window.open(data.checkoutUrl, '_blank');
+            } catch (e) {
+                console.error(e);
+                toast("Could not start checkout: " + (e.message || 'try again'), "error");
+                if (stateEl) stateEl.innerHTML = '';
+            }
+        };
+
+        // Returning from the provider's checkout page — verify the payment.
+        (async function verifyReturningPayment() {
+            const txRef = sessionStorage.getItem('pd_giving_txref');
+            if (!txRef) return;
+            try {
+                const params = new URLSearchParams(location.search);
+                if (params.get('status') !== 'return') return;
+                toast("Verifying your gift…", "success");
+                const fn = pdCallable('verifyGivingPayment');
+                if (fn) {
+                    const res = await fn({ txRef });
+                    const status = res.data && res.data.status;
+                    if (status === 'successful') {
+                        confetti({ particleCount: 120, spread: 80 });
+                        toast("🎉 Thank you! Your gift is confirmed. God bless you!", "success");
+                    } else if (status === 'pending') {
+                        toast("Your gift is being confirmed — you'll get a receipt by email shortly", "success");
+                    } else {
+                        toast("Payment was not completed — no charge was made. You can try again.", "error");
+                    }
+                }
+            } catch (e) { console.error(e); }
+            finally { sessionStorage.removeItem('pd_giving_txref'); }
+        })();
 
         function updateMessagePreview() {
             const amount = document.getElementById('waAmt').value;
