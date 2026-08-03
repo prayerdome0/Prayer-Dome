@@ -1,0 +1,52 @@
+rules_version = '2';
+
+// ============================================================================
+// Prayer Dome — Firebase Storage Security Rules
+// ----------------------------------------------------------------------------
+// Deploy:  firebase deploy --only storage
+// Used by chat image uploads (chat.html / Chat.html). Path conventions:
+//   chat/{uid}/{filename}      — private chat image, owner writes, participants read
+//   uploads/{uid}/{filename}   — general authenticated uploads
+//   public/{path}              — anything intended to be world-readable
+//   admin/{path}               — admin-only media
+// ============================================================================
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn()
+        && firestore.get(/databases/(default)/documents/memberships/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Public gallery / event images — world readable, signed-in uploads.
+    match /public/{allPaths=**} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // Chat attachments: only the owner writes; everyone reads chat media.
+    match /chat/{uid}/{filename} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    // General authenticated upload area.
+    match /uploads/{uid}/{filename} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Admin-only media (receipts, reports, banners).
+    match /admin/{allPaths=**} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Everything else is denied by default.
+  }
+}
