@@ -277,6 +277,40 @@
           "value": "public, max-age=604800, stale-while-revalidate=86400"
         }
       ]
+    },
+    {
+      "source": "/(.*).pdf",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/pdf"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, stale-while-revalidate=86400"
+        },
+        {
+          "key": "Content-Disposition",
+          "value": "inline; filename=\"Prayer-Dome-User-Guide.pdf\""
+        }
+      ]
+    },
+    {
+      "source": "/Prayer-Dome-User-Guide.pdf",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/pdf"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, stale-while-revalidate=86400"
+        },
+        {
+          "key": "Content-Disposition",
+          "value": "inline; filename=\"Prayer-Dome-User-Guide.pdf\""
+        }
+      ]
     }
   ]
 }
