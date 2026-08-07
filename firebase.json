@@ -90,6 +90,30 @@
         "destination": "/testimony.html"
       },
       {
+        "source": "/lessons",
+        "destination": "/lessons.html"
+      },
+      {
+        "source": "/stories",
+        "destination": "/stories.html"
+      },
+      {
+        "source": "/resources",
+        "destination": "/resources.html"
+      },
+      {
+        "source": "/resource-view",
+        "destination": "/resource-view.html"
+      },
+      {
+        "source": "/teaching",
+        "destination": "/lessons.html"
+      },
+      {
+        "source": "/academy",
+        "destination": "/lessons.html"
+      },
+      {
         "source": "/quiz",
         "destination": "/quiz.html"
       },

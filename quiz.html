@@ -6,7 +6,7 @@
     <!-- PD-SEO:START -->
     <!-- Managed by seo/apply-seo.py from seo/pages.json. Do not hand-edit this block. -->
     <title>Bible Quiz | Test Your Bible Knowledge Free | Prayer Dome</title>
-    <meta name="description" content="Play the Prayer Dome Bible quiz. Hundreds of questions across the Old and New Testament, with scores, streaks and leaderboards.">
+    <meta name="description" content="Play Prayer Dome Bible and teaching quizzes with levels, scores, streaks, leaderboards and printable completion certificates.">
     <meta name="keywords" content="bible quiz, bible trivia, bible questions and answers, christian quiz game, test bible knowledge">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
@@ -23,7 +23,7 @@
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Prayer Dome">
     <meta property="og:title" content="Bible Quiz | Test Your Bible Knowledge Free | Prayer Dome">
-    <meta property="og:description" content="Play the Prayer Dome Bible quiz. Hundreds of questions across the Old and New Testament, with scores, streaks and leaderboards.">
+    <meta property="og:description" content="Play Prayer Dome Bible and teaching quizzes with levels, scores, streaks, leaderboards and printable completion certificates.">
     <meta property="og:url" content="https://prayerdome.net/quiz">
     <meta property="og:image" content="https://prayerdome.net/assets/og-image.png">
     <meta property="og:image:width" content="1200">
@@ -35,7 +35,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@prayerdome">
     <meta name="twitter:title" content="Bible Quiz | Test Your Bible Knowledge Free | Prayer Dome">
-    <meta name="twitter:description" content="Play the Prayer Dome Bible quiz. Hundreds of questions across the Old and New Testament, with scores, streaks and leaderboards.">
+    <meta name="twitter:description" content="Play Prayer Dome Bible and teaching quizzes with levels, scores, streaks, leaderboards and printable completion certificates.">
     <meta name="twitter:image" content="https://prayerdome.net/assets/og-image.png">
 
     <!-- Performance hints -->
@@ -93,7 +93,7 @@
   "@type": "WebPage",
   "url": "https://prayerdome.net/quiz",
   "name": "Bible Quiz | Test Your Bible Knowledge Free | Prayer Dome",
-  "description": "Play the Prayer Dome Bible quiz. Hundreds of questions across the Old and New Testament, with scores, streaks and leaderboards.",
+  "description": "Play Prayer Dome Bible and teaching quizzes with levels, scores, streaks, leaderboards and printable completion certificates.",
   "isPartOf": {
     "@id": "https://prayerdome.net/#website"
   },
@@ -552,6 +552,7 @@
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
     <script src="/assets/pd-content-data.js" defer></script>
+    <script src="/assets/pd-academy-data.js" defer></script>
     <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
@@ -582,13 +583,25 @@
         <div class="stats-bar glass-card">
             <div class="score-display">
                 <div class="score-box"><i class="fas fa-star"></i> <span id="totalScore">0</span> Pts</div>
-                <div class="level-box"><i class="fas fa-map-marker-alt"></i> Level <span id="currentLevelDisplay">1</span>/30</div>
+                <div class="level-box"><i class="fas fa-map-marker-alt"></i> Level <span id="currentLevelDisplay">1</span>/<span id="totalLevelsDisplay">7</span></div>
                 <div class="streak-counter" id="streakCounter"><i class="fas fa-fire"></i> Streak: 0</div>
             </div>
             <button class="btn-modern" style="padding: 10px 20px; font-size: 0.85rem; background: var(--bg-primary); color: var(--text-main); border: 1px solid var(--border-color); box-shadow: none;" onclick="resetProgress()">
                 <i class="fas fa-redo-alt"></i> Reset
             </button>
         </div>
+
+        <!-- Teaching-linked quizzes -->
+        <section class="pd-acad-card" style="margin-bottom:26px">
+            <div class="pd-acad-section-head" style="margin-top:0">
+                <div>
+                    <h2 style="font-family:Playfair Display,serif;color:var(--accent-green)"><i class="fas fa-graduation-cap"></i> Teaching Quizzes & Certificates</h2>
+                    <p>Complete a lesson in the Academy, then pass its 6-question quiz with 80% or higher to unlock a printable certificate.</p>
+                </div>
+                <a class="btn-modern" href="/lessons.html" style="background:var(--accent-green);color:white"><i class="fas fa-book-open"></i> Open Lessons</a>
+            </div>
+            <div id="academyQuizGrid" class="pd-acad-grid pd-acad-grid-3"></div>
+        </section>
 
         <!-- Level Map Grid -->
         <div id="levelMap" style="display: block;">
@@ -655,6 +668,23 @@
                 <button class="btn-modern" id="modalActionBtn" onclick="continueToMap()" style="flex: 1; min-width: 150px;">Continue <i class="fas fa-map-marked-alt"></i></button>
                 <button class="btn-modern" style="background: var(--bg-primary); color: var(--text-main); border: 2px solid var(--border-color); flex: 1; min-width: 150px; box-shadow: none;" onclick="retryLevel()"><i class="fas fa-redo-alt"></i> Retry</button>
             </div>
+        </div>
+    </div>
+
+
+    <div class="modal" id="academyQuizModal">
+        <div class="modal-content" style="max-width:760px;text-align:left">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:start;margin-bottom:16px">
+                <div>
+                    <span class="pd-acad-chip gold" id="academyModalTrack">Teaching</span>
+                    <h2 id="academyModalTitle" style="font-family:Playfair Display,serif;color:var(--accent-green);margin:10px 0">Quiz</h2>
+                    <p style="color:var(--text-sub)" id="academyModalDesc"></p>
+                </div>
+                <button class="btn-modern" style="padding:8px 12px;background:var(--bg-primary);color:var(--text-main);border:1px solid var(--border-color);box-shadow:none" onclick="closeAcademyQuiz()"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="academyModalQuestions"></div>
+            <button class="btn-modern" style="width:100%;margin-top:16px;background:linear-gradient(135deg,var(--accent-green),var(--accent-gold));color:white" onclick="submitAcademyModalQuiz()"><i class="fas fa-certificate"></i> Submit for Certificate</button>
+            <div id="academyModalResult"></div>
         </div>
     </div>
 
@@ -789,12 +819,13 @@
             };
         }
 
-        // Create 30 levels with 10 unique questions each (no repeats across levels)
+        // Build enough levels from the current question library. Teaching-linked
+        // certificate quizzes are surfaced separately in the Academy section.
+        const QUESTIONS_PER_LEVEL = 10;
         const allQuestions = shuffleArray([...rawQuestions]);
         const levelQuestions = {};
-        const TOTAL_LEVELS = 30;
-        const QUESTIONS_PER_LEVEL = 10;
-        
+        const TOTAL_LEVELS = Math.max(1, Math.floor(allQuestions.length / QUESTIONS_PER_LEVEL));
+
         for (let lvl = 1; lvl <= TOTAL_LEVELS; lvl++) {
             const startIdx = (lvl - 1) * QUESTIONS_PER_LEVEL;
             const levelQ = allQuestions.slice(startIdx, startIdx + QUESTIONS_PER_LEVEL);
@@ -855,6 +886,8 @@
         function initUI() {
             document.getElementById('totalScore').innerText = userProgress.totalScore;
             document.getElementById('currentLevelDisplay').innerText = userProgress.currentLevel;
+            const totalEl = document.getElementById('totalLevelsDisplay');
+            if (totalEl) totalEl.innerText = TOTAL_LEVELS;
             renderMap();
         }
 
@@ -1186,6 +1219,59 @@
         }
 
         window.addEventListener('beforeunload', () => saveProgress());
+
+        function academyProgress(){ try{ return JSON.parse(localStorage.getItem('pd_academy_progress'))||{completedLessons:[],passedQuizzes:{},certificates:[]}; }catch(e){ return {completedLessons:[],passedQuizzes:{},certificates:[]}; } }
+        function saveAcademyProgress(p){ localStorage.setItem('pd_academy_progress', JSON.stringify(p)); renderAcademyQuizzes(); }
+        function escapeAcademyHtml(v){ const d=document.createElement('div'); d.textContent=v==null?'':String(v); return d.innerHTML; }
+        function academyName(){ return localStorage.getItem('pd_certificate_name') || 'Prayer Dome Member'; }
+        function renderAcademyQuizzes(){
+            const root=document.getElementById('academyQuizGrid'); if(!root || !window.PD_ACADEMY) return;
+            const progress=academyProgress();
+            root.innerHTML=PD_ACADEMY.DATA.quizzes.map(q=>{
+                const lesson=PD_ACADEMY.getLesson(q.lessonId); const passed=progress.passedQuizzes && progress.passedQuizzes[q.id];
+                return `<button class="pd-acad-card pd-lift" onclick="openAcademyQuiz('${q.id}')" style="text-align:left;cursor:pointer">
+                    <div class="pd-acad-icon gold"><i class="fas ${passed?'fa-certificate':'fa-star'}"></i></div>
+                    <h3>${q.title}</h3><p>${q.track} · ${q.questions.length} questions · Pass 80%</p>
+                    <div class="pd-acad-meta"><span class="pd-acad-chip ${passed?'gold':''}">${passed?'Certificate earned':'Ready to take'}</span>${lesson?`<span class="pd-acad-chip">${lesson.minutes} min lesson</span>`:''}</div>
+                </button>`;
+            }).join('');
+        }
+        window.openAcademyQuiz=function(id){
+            const q=PD_ACADEMY.getQuiz(id); if(!q) return;
+            document.getElementById('academyModalTrack').textContent=q.track;
+            document.getElementById('academyModalTitle').textContent=q.title;
+            document.getElementById('academyModalDesc').textContent=q.description;
+            document.getElementById('academyModalResult').innerHTML='';
+            document.getElementById('academyModalQuestions').innerHTML=q.questions.map((raw,i)=>{
+                const opts=shuffleArray([{t:raw[1],c:raw[5]===0},{t:raw[2],c:raw[5]===1},{t:raw[3],c:raw[5]===2},{t:raw[4],c:raw[5]===3}]);
+                return `<div class="pd-acad-quiz-q"><p>${i+1}. ${raw[0]}</p>${opts.map(o=>`<label class="pd-acad-option"><input type="radio" name="aq-${id}-${i}" value="${o.c?1:0}"><span>${o.t}</span></label>`).join('')}</div>`;
+            }).join('');
+            document.getElementById('academyQuizModal').style.display='flex';
+        };
+        window.closeAcademyQuiz=function(){ document.getElementById('academyQuizModal').style.display='none'; };
+        window.submitAcademyModalQuiz=function(){
+            const title=document.getElementById('academyModalTitle').textContent;
+            const q=PD_ACADEMY.DATA.quizzes.find(x=>x.title===title); if(!q) return;
+            let score=0; const total=q.questions.length;
+            q.questions.forEach((raw,i)=>{
+                const selected=document.querySelector(`input[name="aq-${q.id}-${i}"]:checked`);
+                if(selected && selected.value === '1') score++;
+            });
+            const percent=Math.round(score/total*100); const result=document.getElementById('academyModalResult');
+            if(percent>=80){
+                const p=academyProgress(); p.passedQuizzes=q.id in (p.passedQuizzes||{})?p.passedQuizzes:(p.passedQuizzes||{});
+                if(!p.passedQuizzes[q.id]) p.passedQuizzes[q.id]={score:percent,date:new Date().toISOString(),lessonId:q.lessonId};
+                const lesson=PD_ACADEMY.getLesson(q.lessonId); if(lesson && !p.completedLessons.includes(lesson.id)) p.completedLessons.push(lesson.id);
+                const certId='PD-'+q.lessonId.toUpperCase()+'-'+Date.now().toString(36).toUpperCase();
+                p.certificates=p.certificates||[]; p.certificates.push({id:certId,lessonId:q.lessonId,title:q.title,score:percent,date:new Date().toISOString(),name:academyName()});
+                saveAcademyProgress(p);
+                result.innerHTML=`<div class="pd-acad-cert"><i class="fas fa-award" style="font-size:3rem;color:#d4af37"></i><h3>Certificate of Completion</h3><p>This certifies that</p><div class="name">${escapeAcademyHtml(academyName())}</div><p>has completed</p><h3>${q.title}</h3><p>Score: ${percent}% · Certificate ID: ${certId}</p><p>“He does everything blamelessly.” — Mark 7:37</p><button class="btn-modern no-print" onclick="window.print()" style="background:var(--accent-gold);color:#1f2937"><i class="fas fa-print"></i> Print / Save Certificate</button></div>`;
+            } else {
+                result.innerHTML=`<div class="pd-acad-callout"><strong>Try again.</strong> You scored ${percent}%. Review the linked lesson and aim for 80% or higher.</div>`;
+            }
+        };
+        document.addEventListener('DOMContentLoaded', renderAcademyQuizzes);
+
         console.log('✅ Prayer Dome Quiz v2 - 30 Levels, Unique Questions, Randomized Answers!');
     </script>
 </body>

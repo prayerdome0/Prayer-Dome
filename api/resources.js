@@ -1,0 +1,3 @@
+'use strict';
+const academy=require('./academy');
+module.exports=function(req,res){const data=academy.getAcademyData();const base=((req&&req.headers&&req.headers['x-forwarded-proto'])||'https')+'://'+((req&&req.headers&&req.headers.host)||'prayerdome.net');const out={success:true,count:data.resources.length,resources:data.resources.map(r=>({...r,url:base+r.url,downloadUrl:base+(r.downloadUrl||r.url)}))};if(res){res.statusCode=200;res.setHeader('Content-Type','application/json');res.setHeader('Cache-Control','public, max-age=300, stale-while-revalidate=3600');res.end(JSON.stringify(out,null,2));}return out;};

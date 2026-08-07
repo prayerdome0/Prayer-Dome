@@ -77,6 +77,30 @@
     };
   }
 
+  /* --------------------------------------------------------- academy nav */
+  var academyNav = {
+    links: [
+      { href: '/lessons.html', icon: 'fa-graduation-cap', label: 'Teaching', match: 'lessons' },
+      { href: '/stories.html', icon: 'fa-book-open-reader', label: 'Stories', match: 'stories' },
+      { href: '/quiz.html', icon: 'fa-star', label: 'Quizzes', match: 'quiz' },
+      { href: '/resources.html', icon: 'fa-folder-open', label: 'Resources', match: 'resources' }
+    ],
+    init: function () {
+      var nav = $('#pdDrawer .pd-drawer-nav');
+      if (!nav || nav.dataset.academyNav === 'ready') return;
+      var drawerHtml = nav.innerHTML;
+      if (drawerHtml.indexOf('/lessons.html') === -1) {
+        var prayerLink = $('a[href="/bible.html"], a[href="/sermons.html"]', nav);
+        var html = academyNav.links.map(function (l) {
+          return '<a class="pd-drawer-link" href="' + l.href + '"><i class="fas ' + l.icon + '"></i> ' + esc(l.label) + '</a>';
+        }).join('');
+        if (prayerLink) prayerLink.insertAdjacentHTML('afterend', html);
+        else nav.insertAdjacentHTML('beforeend', html);
+      }
+      nav.dataset.academyNav = 'ready';
+    }
+  };
+
   /* ------------------------------------------------------------ Firestore */
   function setFirestore(bindings) {
     if (bindings && bindings.db) fb = bindings;
@@ -230,6 +254,9 @@
         'nav.sermons': { en: 'Sermons', tum: 'Maupharazgi', ssw: 'Tintshumayelo', bem: 'Icilengo', nya: 'Ulaliki' },
         'nav.assistant': { en: 'Assistant', tum: 'Wovwiri', ssw: 'Umsiti', bem: 'Umwafwilisha', nya: 'Wothandiza' },
         'nav.news': { en: 'News', tum: 'Nkhani', ssw: 'Tindzaba', bem: 'Ifyashi', nya: 'Nkhani' },
+        'nav.teaching': { en: 'Teaching', tum: 'Masambiro', ssw: 'Kufundzisa', bem: 'Amasambilo', nya: 'Kuphunzitsa' },
+        'nav.stories': { en: 'Stories', tum: 'Nkhani', ssw: 'Tindzaba', bem: 'Ifyano', nya: 'Nkhani' },
+        'nav.resources': { en: 'Resources', tum: 'Vya Kukhwaska', ssw: 'Tinsita', bem: 'Ifyakubomfya', nya: 'Zothandizira' },
         'nav.account': { en: 'Account', tum: 'Akaunti', ssw: 'I-akhawunti', bem: 'Akaunti', nya: 'Akaunti' },
         'nav.media': { en: 'Media', tum: 'Vyakuwona', ssw: 'Imidiya', bem: 'Imediya', nya: 'Media' },
         'app.tagline': {
@@ -1002,6 +1029,7 @@
     stats: stats,
     live: live,
     news: news,
+    academyNav: academyNav,
     scripture: scripture,
     radio: radio,
     toast: toast,
@@ -1013,7 +1041,7 @@
         ['ui', ui.init], ['i18n', i18n.init], ['location', location.init],
         ['announcements', announcements.init], ['notifications', notifications.init],
         ['banners', banners.init], ['stats', stats.init], ['live', live.init],
-        ['scripture', scripture.init], ['radio', radio.init]
+        ['scripture', scripture.init], ['radio', radio.init], ['academyNav', academyNav.init]
       ];
       modules.forEach(function (m) {
         try { m[1](); } catch (e) { /* module failed — continue */ }
