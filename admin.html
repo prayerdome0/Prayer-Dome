@@ -410,11 +410,14 @@
             <div class="nav-item" onclick="switchView('support', this)"><i class="fas fa-hand-holding-heart"></i> Support Claims</div>
             <div class="nav-item" onclick="switchView('financial_reports', this)"><i class="fas fa-file-alt"></i> Financial Reports</div>
             <div class="nav-item" onclick="switchView('events', this)"><i class="fas fa-calendar-alt"></i> Events & Cal</div>
+            <div class="nav-item" onclick="switchView('devotionals', this)"><i class="fas fa-book-open"></i> Devotionals</div>
             <div class="nav-item" onclick="switchView('media', this)"><i class="fas fa-camera"></i> Media Upload</div>
             <div class="nav-item" onclick="switchView('content', this)"><i class="fas fa-comment-dots"></i> Prayers & Testimonies</div>
             <div class="nav-item" onclick="switchView('news', this)"><i class="fas fa-newspaper"></i> News Center</div>
+            <div class="nav-item" onclick="switchView('sermons', this)"><i class="fas fa-microphone-lines"></i> Sermon Center</div>
             <div class="nav-item" onclick="switchView('banners', this)"><i class="fas fa-photo-film"></i> Hero Banners</div>
             <div class="nav-item" onclick="switchView('languages', this)"><i class="fas fa-language"></i> Languages</div>
+            <div class="nav-item" onclick="switchView('translations', this)"><i class="fas fa-language"></i> Translation Review</div>
             <div class="nav-item" onclick="switchView('notifications', this)"><i class="fas fa-bell"></i> Notifications</div>
             <div class="nav-item" onclick="switchView('contacts', this)"><i class="fas fa-envelope"></i> Contact Messages</div>
         </div>
@@ -746,6 +749,23 @@
                 <div class="panel-card"><div class="table-responsive"> <table><thead> <tr><th>Date & Time</th><th>Event Title</th><th>Location</th><th>Category</th><th>Actions</th> </tr></thead><tbody id="listEvents"> <tr><td colspan="5"><div class="spinner" style="width:30px;height:30px;"></div> </td> </tr> </tbody> </table> </div></div>
             </div>
 
+            <!-- DEVOTIONALS VIEW -->
+            <div id="view-devotionals" class="section-view">
+                <div class="page-title"><span><i class="fas fa-book-open"></i> Devotional Scheduler</span><button class="btn btn-primary" onclick="openModal('modalDevotional')"><i class="fas fa-plus"></i> Schedule Devotional</button></div>
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-calendar-day"></i> Scheduled Devotionals <span style="font-weight:400; font-size:.7rem; color:var(--text-sub);">— publish a devotional for any future date; it auto-appears on the app on that day</span></h3>
+                        <button class="btn btn-outline btn-sm" onclick="loadAdminDevotionals()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Publish Date</th><th>Title</th><th>Scripture</th><th>Author</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody id="listAdminDevotionals"><tr><td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div></td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- MEDIA UPLOAD VIEW -->
             <div id="view-media" class="section-view">
                 <div class="page-title"><span><i class="fas fa-camera"></i> Media Upload</span><button class="btn btn-primary" onclick="uploadMedia()"><i class="fas fa-cloud-upload-alt"></i> Upload Image</button></div>
@@ -774,9 +794,47 @@
                 </div>
             </div>
 
+            <!-- TRANSLATION REVIEW VIEW -->
+            <div id="view-translations" class="section-view">
+                <div class="page-title"><span><i class="fas fa-language"></i> Translation Review Console</span><button class="btn btn-primary btn-sm" onclick="loadTranslationReview()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-check-circle"></i> Scripture Translations — Elder Review Queue</h3>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <select id="transLangFilter" class="form-control" style="width:130px; padding:6px 10px;" onchange="loadTranslationReview()">
+                                <option value="all">All Languages</option>
+                                <option value="tum">Tumbuka</option>
+                                <option value="ssw">siSwati</option>
+                                <option value="bem">Bemba</option>
+                                <option value="nya">Nyanja</option>
+                            </select>
+                            <select id="transStatusFilter" class="form-control" style="width:130px; padding:6px 10px;" onchange="loadTranslationReview()">
+                                <option value="all">All Status</option>
+                                <option value="pending">⏳ Pending Review</option>
+                                <option value="reviewed">✅ Reviewed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p style="padding:0 25px 18px; font-size:.82rem; color:var(--text-sub); line-height:1.6;">
+                        <i class="fas fa-info-circle" style="color:var(--accent-gold);"></i>
+                        Tumbuka, siSwati, Bemba and Nyanja scripture translations are community drafts.
+                        A fluent speaker (elder) should review each one, then click <strong>Sign Off</strong> to mark it as verified.
+                        Reviewed translations get the <strong>reviewed</strong> badge removed from the member-facing pages.
+                    </p>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Verse Ref</th><th>English (source)</th><th>Translation</th><th>Language</th><th>Status</th><th>Reviewed By</th><th>Review Date</th><th>Actions</th></tr></thead>
+                            <tbody id="listTranslationReview"><tr><td colspan="8"><div class="spinner" style="width:30px;height:30px;"></div></td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- NOTIFICATIONS VIEW -->
             <div id="view-notifications" class="section-view">
                 <div class="page-title"><i class="fas fa-bell"></i> Broadcast Notifications</div>
+
+                <!-- Global Announcement Composer -->
                 <div class="panel-card" style="max-width: 650px;">
                     <div class="panel-header"><h3><i class="fas fa-broadcast-tower"></i> Create Global Announcement</h3></div>
                     <div style="padding: 25px;">
@@ -788,6 +846,43 @@
                         <button class="btn btn-outline" style="width: 100%;" onclick="testNotification()"><i class="fas fa-flask"></i> Test Notification (Send to Me)</button>
                         <p style="font-size: 0.7rem; margin-top: 15px; color: var(--text-sub); text-align: center;">
                             <i class="fas fa-info-circle"></i> Every broadcast also triggers an instant in-app notification for everyone currently using the app — no login required.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Prayer Reminder Scheduler -->
+                <div class="panel-card">
+                    <div class="panel-header"><h3><i class="fas fa-clock"></i> Prayer Reminder Scheduler</h3><button class="btn btn-outline btn-sm" onclick="loadReminderStats()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
+                    <p style="padding: 0 25px 18px; font-size:.82rem; color:var(--text-sub); line-height:1.6;">
+                        <i class="fas fa-info-circle" style="color:var(--accent-gold);"></i>
+                        Members can opt into a daily prayer reminder at a time of their choice.
+                        This page shows how many members have active reminders. The dispatch Cloud Function
+                        runs every 15 minutes and sends push notifications to members whose reminder time matches.
+                    </p>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px; padding:0 25px 25px;">
+                        <div class="kpi-card" style="cursor:default; padding:20px;">
+                            <div class="kpi-icon gold"><i class="fas fa-bell"></i></div>
+                            <div class="kpi-details"><h3 id="reminderTotal">—</h3><p>Total Reminders Active</p></div>
+                        </div>
+                        <div class="kpi-card" style="cursor:default; padding:20px;">
+                            <div class="kpi-icon blue"><i class="fas fa-moon"></i></div>
+                            <div class="kpi-details"><h3 id="reminderMorning">—</h3><p>Morning (05–10)</p></div>
+                        </div>
+                        <div class="kpi-card" style="cursor:default; padding:20px;">
+                            <div class="kpi-icon green"><i class="fas fa-sun"></i></div>
+                            <div class="kpi-details"><h3 id="reminderAfternoon">—</h3><p>Afternoon (11–15)</p></div>
+                        </div>
+                        <div class="kpi-card" style="cursor:default; padding:20px;">
+                            <div class="kpi-icon red"><i class="fas fa-star-and-crescent"></i></div>
+                            <div class="kpi-details"><h3 id="reminderEvening">—</h3><p>Evening (16–22)</p></div>
+                        </div>
+                    </div>
+                    <div style="padding: 0 25px 25px;">
+                        <p style="font-size:.78rem; color:var(--text-sub); margin-bottom:12px;">
+                            <i class="fas fa-check-circle" style="color:var(--accent-green);"></i>
+                            The reminder dispatch Cloud Function runs every 15 minutes in the background.
+                            To configure it, go to the Firebase Console → Functions → <code>prayerReminderDispatch</code>
+                            and confirm the schedule is active.
                         </p>
                     </div>
                 </div>
@@ -810,6 +905,23 @@
                     <div class="table-responsive">
                         <table><thead><tr><th>Date</th><th>Title</th><th>Category</th><th>Featured</th><th>Status</th><th>Actions</th></tr></thead>
                         <tbody id="listAdminNews"><tr><td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div></td></tr></tbody></table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SERMON CENTER VIEW -->
+            <div id="view-sermons" class="section-view">
+                <div class="page-title"><span><i class="fas fa-microphone-lines"></i> Sermon Center</span><button class="btn btn-primary" onclick="openModal('modalSermon')"><i class="fas fa-plus"></i> Publish Sermon</button></div>
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-list"></i> Published Sermons <span style="font-weight:400; font-size:.7rem; color:var(--text-sub);">— narrated sermons &amp; Bible stories, read aloud with scripture, prayer and reflection</span></h3>
+                        <button class="btn btn-outline btn-sm" onclick="loadAdminSermons()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Date</th><th>Title</th><th>Scripture</th><th>Speaker</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody id="listAdminSermons"><tr><td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div></td></tr></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -954,6 +1066,58 @@
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeModal('modalBanner')">Cancel</button>
                 <button class="btn btn-primary" onclick="saveBanner()"><i class="fas fa-save"></i> Save Banner</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERMON COMPOSER MODAL -->
+    <div id="modalSermon" class="modal-overlay">
+        <div class="modal-card" style="max-width: 720px;">
+            <div class="modal-header"><h2><i class="fas fa-microphone-lines"></i> Publish Narrated Sermon</h2><button class="modal-close" onclick="closeModal('modalSermon')"><i class="fas fa-times"></i></button></div>
+            <div class="modal-body">
+                <div class="form-group"><label>Sermon Title *</label><input type="text" id="serTitle" class="form-control" placeholder="e.g. The Power of Faith" maxlength="140"></div>
+                <div class="form-group"><label>Subtitle / Context</label><input type="text" id="serSubtitle" class="form-control" placeholder="e.g. A study of Hebrews 11"></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                    <div class="form-group"><label>Speaker</label><input type="text" id="serSpeaker" class="form-control" placeholder="Pastor John Phiri" value="Prayer Dome Ministry Team"></div>
+                    <div class="form-group"><label>Scripture Reference *</label><input type="text" id="serScripture" class="form-control" placeholder="e.g. Hebrews 11:1-6"></div>
+                </div>
+                <div class="form-group"><label>Topics (comma-separated)</label><input type="text" id="serTopics" class="form-control" placeholder="faith, healing, prayer"></div>
+                <div class="form-group"><label>Short Summary (shown on cards)</label><textarea id="serSummary" class="form-control" rows="2" placeholder="One or two sentence summary…” maxlength="240"></textarea></div>
+                <div class="form-group"><label>Key Highlight Verse</label><textarea id="serKeyVerse" class="form-control" rows="2" placeholder="The most powerful verse from this sermon…"></textarea></div>
+                <div class="form-group">
+                    <label>Sermon Narrative — separate paragraphs by double returns *</label>
+                    <textarea id="serStory" class="form-control" rows="12" placeholder="Write the narrated story. Keep paragraphs short (2-4 sentences) so the speech-highlight playback works accurately."></textarea>
+                </div>
+                <div class="form-group"><label>Concluding Prayer</label><textarea id="serPrayer" class="form-control" rows="3" placeholder="A prayer to close the sermon…"></textarea></div>
+                <div class="form-group"><label>Reflection Questions (one per line)</label><textarea id="serReflection" class="form-control" rows="3" placeholder="What does this teach us about God?\nHow can I apply this to my life today?\nWho do I need to forgive?"></textarea></div>
+                <input type="hidden" id="sermonEditId" value="">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('modalSermon')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveSermon()"><i class="fas fa-cloud-arrow-up"></i> PUBLISH TO SERMON CENTER</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DEVOTIONAL SCHEDULER MODAL -->
+    <div id="modalDevotional" class="modal-overlay">
+        <div class="modal-card" style="max-width: 600px;">
+            <div class="modal-header"><h2><i class="fas fa-book-open"></i> Schedule Devotional</h2><button class="modal-close" onclick="closeModal('modalDevotional')"><i class="fas fa-times"></i></button></div>
+            <div class="modal-body">
+                <div class="form-group"><label>Title *</label><input type="text" id="devTitle" class="form-control" placeholder="e.g. A House of Prayer" maxlength="120"></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                    <div class="form-group"><label>Publish Date *</label><input type="date" id="devDate" class="form-control"></div>
+                    <div class="form-group"><label>Author</label><input type="text" id="devAuthor" class="form-control" placeholder="Pastor John Phiri" value="Prayer Dome Ministry Team"></div>
+                </div>
+                <div class="form-group"><label>Scripture Reference *</label><input type="text" id="devScriptureRef" class="form-control" placeholder="e.g. Mark 11:17"></div>
+                <div class="form-group"><label>Scripture Text</label><textarea id="devScriptureText" class="form-control" rows="2" placeholder="My house shall be called of all nations the house of prayer..."></textarea></div>
+                <div class="form-group"><label>Thought / Reflection *</label><textarea id="devThought" class="form-control" rows="4" placeholder="Write the devotional thought…"></textarea></div>
+                <div class="form-group"><label>Prayer</label><textarea id="devPrayer" class="form-control" rows="3" placeholder="A closing prayer for the reader…"></textarea></div>
+                <input type="hidden" id="devotionalEditId" value="">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('modalDevotional')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveDevotional()"><i class="fas fa-calendar-check"></i> SCHEDULE DEVOTIONAL</button>
             </div>
         </div>
     </div>
@@ -1448,6 +1612,203 @@
             toast('Story deleted');
             loadAdminNews();
         };
+
+        // ==================== SERMON CENTER (admin) ====================
+        window.loadAdminSermons = function() {
+            const tbody = document.getElementById('listAdminSermons');
+            if(!tbody) return;
+            const col = collection(db, 'sermons');
+            getDocs(query(col, orderBy('createdAt', 'desc'), limit(50))).then(snap => {
+                if(snap.empty){ tbody.innerHTML = '<td colspan="6">No sermons published yet — publish your first one above.</td>'; return; }
+                tbody.innerHTML = snap.docs.map(d => {
+                    const s = d.data();
+                    const when = s.createdAt ? moment(s.createdAt.toDate()).format('MMM D, YYYY') : '—';
+                    const status = s.published !== false ? '<span class="badge badge-success">Published</span>' : '<span class="badge badge-warning">Draft</span>';
+                    return `<tr>
+                        <td>${when}</td>
+                        <td><strong>${escapeHTML(s.title||'Untitled')}</strong><br><small style="color:var(--text-sub);">${escapeHTML((s.summary||'').substring(0,60))}…</small></td>
+                        <td style="font-family:monospace;font-size:.78rem;">${escapeHTML(s.scripture||'—')}</td>
+                        <td>${escapeHTML(s.speaker||'—')}</td>
+                        <td>${status}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline" onclick="editSermon('${d.id}')"><i class="fas fa-pen"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteSermon('${d.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            }).catch(e => { console.error(e); tbody.innerHTML = '<td colspan="6">Error loading sermons</td>'; });
+        };
+
+        window.saveSermon = async function() {
+            const title = document.getElementById('serTitle').value.trim();
+            const scripture = document.getElementById('serScripture').value.trim();
+            if(!title || !scripture){ toast('Title and scripture reference are required.', 'error'); return; }
+            showLoading();
+            try {
+                const rawStory = document.getElementById('serStory').value;
+                const storyParagraphs = rawStory.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+                const rawReflect = document.getElementById('serReflection').value;
+                const reflections = rawReflect.split('\n').map(r => r.trim()).filter(Boolean);
+                const topics = document.getElementById('serTopics').value.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
+                const sermonDoc = {
+                    title: title,
+                    subtitle: document.getElementById('serSubtitle').value.trim(),
+                    speaker: document.getElementById('serSpeaker').value.trim() || 'Prayer Dome Ministry Team',
+                    scripture: scripture,
+                    topics: topics,
+                    summary: document.getElementById('serSummary').value.trim(),
+                    keyVerse: document.getElementById('serKeyVerse').value.trim(),
+                    story: storyParagraphs,
+                    prayer: document.getElementById('serPrayer').value.trim(),
+                    reflection: reflections,
+                    published: true,
+                    createdAt: serverTimestamp(),
+                    createdBy: adminUser?.email || 'admin'
+                };
+                const editId = document.getElementById('sermonEditId').value;
+                if(editId) {
+                    await setDoc(doc(db, 'sermons', editId), sermonDoc, { merge: true });
+                    toast('Sermon updated ✅');
+                } else {
+                    await addDoc(collection(db, 'sermons'), sermonDoc);
+                    toast('Sermon published — now live on /sermons ✅');
+                    await logAdminActivity('sermon_published', { title });
+                }
+                closeModal('modalSermon');
+                document.getElementById('serTitle').value = '';
+                document.getElementById('serSubtitle').value = '';
+                document.getElementById('serSpeaker').value = 'Prayer Dome Ministry Team';
+                document.getElementById('serScripture').value = '';
+                document.getElementById('serTopics').value = '';
+                document.getElementById('serSummary').value = '';
+                document.getElementById('serKeyVerse').value = '';
+                document.getElementById('serStory').value = '';
+                document.getElementById('serPrayer').value = '';
+                document.getElementById('serReflection').value = '';
+                document.getElementById('sermonEditId').value = '';
+                loadAdminSermons();
+            } catch(e) { toast('Error: ' + e.message, 'error'); }
+            finally { hideLoading(); }
+        };
+
+        window.editSermon = async function(id) {
+            try {
+                const snap = await getDoc(doc(db, 'sermons', id));
+                if(!snap.exists()) return toast('Sermon not found', 'error');
+                const s = snap.data();
+                document.getElementById('sermonEditId').value = id;
+                document.getElementById('serTitle').value = s.title || '';
+                document.getElementById('serSubtitle').value = s.subtitle || '';
+                document.getElementById('serSpeaker').value = s.speaker || 'Prayer Dome Ministry Team';
+                document.getElementById('serScripture').value = s.scripture || '';
+                document.getElementById('serTopics').value = (s.topics || []).join(', ');
+                document.getElementById('serSummary').value = s.summary || '';
+                document.getElementById('serKeyVerse').value = s.keyVerse || '';
+                document.getElementById('serStory').value = (s.story || []).join('\n\n');
+                document.getElementById('serPrayer').value = s.prayer || '';
+                document.getElementById('serReflection').value = (s.reflection || []).join('\n');
+                openModal('modalSermon');
+            } catch(e) { toast('Error: ' + e.message, 'error'); }
+        };
+
+        window.deleteSermon = function(id) {
+            if(!confirm('Delete this sermon permanently? This cannot be undone.')) return;
+            deleteDoc(doc(db, 'sermons', id)).then(() => { toast('Sermon deleted'); loadAdminSermons(); }).catch(e => toast(e.message, 'error'));
+        };
+
+        // ==================== DEVOTIONAL SCHEDULER (admin) ====================
+        window.loadAdminDevotionals = function() {
+            const tbody = document.getElementById('listAdminDevotionals');
+            if(!tbody) return;
+            const col = collection(db, 'devotionals');
+            getDocs(query(col, orderBy('publishDate', 'desc'), limit(50))).then(snap => {
+                if(snap.empty){ tbody.innerHTML = '<td colspan="6">No devotionals scheduled yet.</td>'; return; }
+                tbody.innerHTML = snap.docs.map(d => {
+                    const dv = d.data();
+                    const when = dv.publishDate ? moment(dv.publishDate.toDate()).format('MMM D, YYYY') : '—';
+                    const isPast = dv.publishDate && dv.publishDate.toDate() < new Date();
+                    const status = dv.published === false ? '<span class="badge badge-warning">Draft</span>'
+                        : isPast ? '<span class="badge badge-success">Live</span>'
+                        : '<span class="badge badge-info">Scheduled</span>';
+                    return `<tr>
+                        <td>${when}</td>
+                        <td><strong>${escapeHTML(dv.title||'Untitled')}</strong></td>
+                        <td style="font-family:monospace;font-size:.78rem;">${escapeHTML(dv.scriptureRef||'—')}</td>
+                        <td>${escapeHTML(dv.author||'—')}</td>
+                        <td>${status}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline" onclick="editDevotional('${d.id}')"><i class="fas fa-pen"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteDevotional('${d.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            }).catch(e => { console.error(e); tbody.innerHTML = '<td colspan="6">Error loading devotionals</td>'; });
+        };
+
+        window.saveDevotional = async function() {
+            const title = document.getElementById('devTitle').value.trim();
+            const scriptureRef = document.getElementById('devScriptureRef').value.trim();
+            const publishDate = document.getElementById('devDate').value;
+            if(!title || !scriptureRef || !publishDate){ toast('Title, scripture reference and publish date are required.', 'error'); return; }
+            showLoading();
+            try {
+                const devDoc = {
+                    title: title,
+                    publishDate: new Date(publishDate),
+                    scriptureRef: scriptureRef,
+                    scriptureText: document.getElementById('devScriptureText').value.trim(),
+                    thought: document.getElementById('devThought').value.trim(),
+                    prayer: document.getElementById('devPrayer').value.trim(),
+                    author: document.getElementById('devAuthor').value.trim() || 'Prayer Dome Ministry Team',
+                    published: true,
+                    createdAt: serverTimestamp(),
+                    createdBy: adminUser?.email || 'admin'
+                };
+                const editId = document.getElementById('devotionalEditId').value;
+                if(editId) {
+                    await setDoc(doc(db, 'devotionals', editId), devDoc, { merge: true });
+                    toast('Devotional updated ✅');
+                } else {
+                    await addDoc(collection(db, 'devotionals'), devDoc);
+                    toast('Devotional scheduled for ' + publishDate + ' ✅');
+                    await logAdminActivity('devotional_scheduled', { title, date: publishDate });
+                }
+                closeModal('modalDevotional');
+                document.getElementById('devTitle').value = '';
+                document.getElementById('devDate').value = '';
+                document.getElementById('devAuthor').value = 'Prayer Dome Ministry Team';
+                document.getElementById('devScriptureRef').value = '';
+                document.getElementById('devScriptureText').value = '';
+                document.getElementById('devThought').value = '';
+                document.getElementById('devPrayer').value = '';
+                document.getElementById('devotionalEditId').value = '';
+                loadAdminDevotionals();
+            } catch(e) { toast('Error: ' + e.message, 'error'); }
+            finally { hideLoading(); }
+        };
+
+        window.editDevotional = async function(id) {
+            try {
+                const snap = await getDoc(doc(db, 'devotionals', id));
+                if(!snap.exists()) return toast('Devotional not found', 'error');
+                const dv = snap.data();
+                document.getElementById('devotionalEditId').value = id;
+                document.getElementById('devTitle').value = dv.title || '';
+                document.getElementById('devDate').value = dv.publishDate ? dv.publishDate.toDate().toISOString().split('T')[0] : '';
+                document.getElementById('devAuthor').value = dv.author || 'Prayer Dome Ministry Team';
+                document.getElementById('devScriptureRef').value = dv.scriptureRef || '';
+                document.getElementById('devScriptureText').value = dv.scriptureText || '';
+                document.getElementById('devThought').value = dv.thought || '';
+                document.getElementById('devPrayer').value = dv.prayer || '';
+                openModal('modalDevotional');
+            } catch(e) { toast('Error: ' + e.message, 'error'); }
+        };
+
+        window.deleteDevotional = function(id) {
+            if(!confirm('Delete this devotional? This cannot be undone.')) return;
+            deleteDoc(doc(db, 'devotionals', id)).then(() => { toast('Devotional deleted'); loadAdminDevotionals(); }).catch(e => toast(e.message, 'error'));
+        };
+
         window.uploadNewsImage = function() {
             if(typeof cloudinary === 'undefined') return toast('Cloudinary not loaded', 'error');
             cloudinary.createUploadWidget({ cloudName:'prayerdome', uploadPreset:'news_images', folder:'news', maxFileSize:8*1024*1024 }, (error, result) => {
@@ -1572,6 +1933,58 @@
             toast(code.toUpperCase() + (on ? ' enabled — appears in the app language selector' : ' disabled'));
         };
 
+        // ==================== TRANSLATION REVIEW (admin) ====================
+        window.loadTranslationReview = function() {
+            const tbody = document.getElementById('listTranslationReview');
+            if(!tbody || !window.PDApp) return;
+            const langFilter = document.getElementById('transLangFilter').value;
+            const statusFilter = document.getElementById('transStatusFilter').value;
+            const all = PDApp.store.get('translations', 'DEFAULT_TRANSLATIONS') || [];
+            let filtered = all;
+            if(langFilter !== 'all') filtered = filtered.filter(t => t.lang === langFilter);
+            if(statusFilter === 'pending') filtered = filtered.filter(t => !t.reviewed);
+            if(statusFilter === 'reviewed') filtered = filtered.filter(t => t.reviewed);
+            if(!filtered.length){ tbody.innerHTML = '<td colspan="8">No translations found.</td>'; return; }
+            tbody.innerHTML = filtered.map(t => {
+                const reviewed = t.reviewed ? '<span class="badge badge-success">✅ Reviewed</span>' : '<span class="badge badge-warning">⏳ Pending</span>';
+                const reviewedBy = t.reviewedBy ? escapeHTML(t.reviewedBy) : '—';
+                const reviewedAt = t.reviewedAt ? moment(new Date(t.reviewedAt)).format('MMM D, YYYY') : '—';
+                return `<tr>
+                    <td style="font-family:monospace;font-size:.78rem;">${escapeHTML(t.verseRef||'')}</td>
+                    <td style="max-width:200px; font-size:.82rem;">${escapeHTML(t.english||'')}</td>
+                    <td style="max-width:200px; font-size:.82rem; color:${t.lang==='tum'?'#d4af37':t.lang==='ssw'?'#0A4D9B':t.lang==='bem'?'#e91e63':'#4CAF50'};">${escapeHTML(t.translation||'')}</td>
+                    <td><span class="badge badge-info">${t.lang.toUpperCase()}</span> ${t.lang==='tum'?'Chitumbuka':t.lang==='ssw'?'siSwati':t.lang==='bem'?'Ichibemba':'Chichewa'}</td>
+                    <td>${reviewed}</td>
+                    <td>${reviewedBy}</td>
+                    <td>${reviewedAt}</td>
+                    <td>${t.reviewed ? '' : `<button class="btn btn-sm btn-primary" onclick="signOffTranslation('${t.id}','${t.verseRef}','${t.lang}')"><i class="fas fa-check-circle"></i> Sign Off</button>`}</td>
+                </tr>`;
+            }).join('');
+        };
+
+        window.signOffTranslation = async function(verseId, langCode, approvedBy) {
+            if(!adminUser) return toast('Admin login required', 'error');
+            const db = firebase.firestore ? firebase.firestore() : (window.firebase && window.firebase.firestore ? window.firebase.firestore() : null);
+            if(!db) return toast('Firestore not available', 'error');
+            try {
+                const ref = doc(db, 'translations', verseId);
+                await updateDoc(ref, {
+                    reviewed: { [langCode]: true },
+                    reviewer: { [langCode]: approvedBy || adminUser.email },
+                    reviewedAt: { [langCode]: new Date().toISOString() }
+                });
+                const all = PDApp.store.get('translations', 'DEFAULT_TRANSLATIONS') || [];
+                const updated = all.map(t => t.verseRef === verseId ? Object.assign({}, t, {
+                    reviewed: Object.assign({}, t.reviewed, { [langCode]: true }),
+                    reviewer: Object.assign({}, t.reviewer, { [langCode]: approvedBy || adminUser.email }),
+                    reviewedAt: Object.assign({}, t.reviewedAt, { [langCode]: new Date().toISOString() })
+                }) : t);
+                PDApp.store.set('translations', updated);
+                toast(langCode.toUpperCase() + ' translation for ' + verseId + ' signed off by ' + (approvedBy || adminUser.email));
+                loadTranslationReview();
+            } catch(e) { toast('Error: ' + e.message, 'error'); }
+        };
+
         // ==================== PODCASTS & RADIO (admin) ====================
         window.loadAdminPodcasts = function() {
             const tbody = document.getElementById('listAdminPodcasts');
@@ -1677,6 +2090,32 @@
                 await logAdminActivity('notification_sent', { title, type, recipients: tokens.length });
                 confetti({ particleCount: 150, spread: 100 });
             } catch (error) { console.error("Error saving notification:", error); toast("Error: " + error.message, "error"); } finally { hideLoading(); }
+        };
+
+        window.loadReminderStats = async function() {
+            const totalEl = document.getElementById('reminderTotal');
+            const morningEl = document.getElementById('reminderMorning');
+            const afternoonEl = document.getElementById('reminderAfternoon');
+            const eveningEl = document.getElementById('reminderEvening');
+            if(!totalEl) return;
+            try {
+                const snap = await getDocs(collection(db, 'userReminders'));
+                let total = 0, morning = 0, afternoon = 0, evening = 0;
+                snap.forEach(d => {
+                    const ud = d.data();
+                    if(ud.reminderTime && ud.notifications !== false) {
+                        total++;
+                        const [h] = ud.reminderTime.split(':').map(Number);
+                        if(h >= 5 && h < 11) morning++;
+                        else if(h >= 11 && h < 16) afternoon++;
+                        else evening++;
+                    }
+                });
+                if(totalEl) totalEl.textContent = total;
+                if(morningEl) morningEl.textContent = morning;
+                if(afternoonEl) afternoonEl.textContent = afternoon;
+                if(eveningEl) eveningEl.textContent = evening;
+            } catch(e) { console.error('Reminder stats error:', e); }
         };
 
         window.testNotification = async function() {
@@ -2158,6 +2597,9 @@
                 else if(viewId === 'financial_reports') await loadFinancialReports();
                 else if(viewId === 'contacts') await loadContactMessages();
                 else if(viewId === 'news') await loadAdminNews();
+                else if(viewId === 'sermons') await loadAdminSermons();
+                else if(viewId === 'translations') await loadTranslationReview();
+                else if(viewId === 'devotionals') await loadAdminDevotionals();
                 else if(viewId === 'banners') await loadAdminBanners();
                 else if(viewId === 'languages') await loadAdminLanguages();
                 else if(viewId === 'media') { await loadAdminPodcasts(); loadAdminRadio(); }

@@ -1,132 +1,386 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const shareHandler = require('./share');
+const crypto = require('crypto');
 
 admin.initializeApp();
 
 // Dynamic social sharing pages for news and testimony links.
-// Hosting rewrites /news/{id}, /testimony/{id}, and /share/{type}/{id} here
-// so Facebook, WhatsApp and other crawlers receive article-specific OG tags.
 exports.share = functions.https.onRequest((req, res) => shareHandler(req, res));
 
-// Send notifications when a new document is added to 'notifications' collection
-exports.sendPushNotification = functions.firestore
-    .document('notifications/{notificationId}')
-    .onCreate(async (snap, context) => {
-        const notification = snap.data();
-        const { title, message, tokens, type } = notification;
-        
-        if (!tokens || tokens.length === 0) {
-            console.log('No tokens to send to');
-            return null;
-        }
-        
-        // Filter out invalid tokens (FCM will reject them)
-        const validTokens = tokens.filter(token => token && token.length > 20);
-        
-        if (validTokens.length === 0) {
-            console.log('No valid tokens');
-            return null;
-        }
-        
-        const payload = {
-            notification: {
-                title: title,
-                body: message,
-                icon: 'https://i.ibb.co/TB5Fx4tb/logo-0.png',
-                badge: 'https://i.ibb.co/TB5Fx4tb/logo-0.png',
-                vibrate: '200,100,200',
-                sound: 'default'
-            },
-            data: {
-                click_action: 'FLUTTER_NOTIFICATION_CLICK',
-                screen: type || 'news'
-            }
-        };
-        
-        try {
-            const response = await admin.messaging().sendEachForMulticast({
-                tokens: validTokens,
-                ...payload
-            });
-            
-            console.log(`Sent to ${response.successCount} devices, failed: ${response.failureCount}`);
-            
-            await snap.ref.update({
-                status: 'sent',
-                sentAt: admin.firestore.FieldValue.serverTimestamp(),
-                successCount: response.successCount,
-                failureCount: response.failureCount
-            });
-            
-            if (response.failureCount > 0) {
-                const failedTokens = [];
-                response.responses.forEach((resp, idx) => {
-                    if (!resp.success) {
-                        failedTokens.push(validTokens[idx]);
-                        console.error(`Failed token: ${validTokens[idx]}`, resp.error);
-                    }
-                });
-                
-                for (const failedToken of failedTokens) {
-                    const tokensQuery = await admin.firestore()
-                        .collection('userTokens')
-                        .where('token', '==', failedToken)
-                        .get();
-                    
-                    tokensQuery.forEach(doc => {
-                        doc.ref.update({ active: false, invalidReason: 'token_expired' });
-                    });
-                }
-            }
-            
-            return response;
-        } catch (error) {
-            console.error('Error sending notifications:', error);
-            await snap.ref.update({
-                status: 'failed',
-                error: error.message
-            });
-            return null;
-        }
-    });
+// ==========================================
+// Secure Server-Side Cloudinary Signing
+// ==========================================
+// Call this from the client to get a secure upload signature.
+// The API secret never leaves the server.
+exports.getCloudinarySignature = functions.https.onCall((data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      'unauthenticated',
+      'You must be signed in to perform this action.'
+    );
+  }
 
-// Test notification handler
-exports.sendTestNotification = functions.firestore
-    .document('test_notifications/{testId}')
-    .onCreate(async (snap, context) => {
-        const test = snap.data();
-        const { title, message, token } = test;
-        
-        if (!token) return null;
-        
-        const payload = {
-            notification: {
-                title: title,
-                body: message,
-                icon: 'https://i.ibb.co/TB5Fx4tb/logo-0.png'
-            }
-        };
-        
-        try {
-            const response = await admin.messaging().send({
-                token: token,
-                ...payload
-            });
-            
-            console.log('Test notification sent:', response);
-            await snap.ref.update({
-                status: 'sent',
-                sentAt: admin.firestore.FieldValue.serverTimestamp()
-            });
-            return response;
-            
-        } catch (error) {
-            console.error('Test notification failed:', error);
-            await snap.ref.update({
-                status: 'failed',
-                error: error.message
-            });
-            return null;
+  const cloudName = functions.config().cloudinary?.cloud_name || 'prayerdome';
+  const apiKey = functions.config().cloudinary?.api_key;
+  const apiSecret = functions.config().cloudinary?.api_secret;
+
+  if (!apiKey || !apiSecret) {
+    throw new functions.https.HttpsError(
+      'failed-precondition',
+      'Cloudinary is not configured. Ask an admin to set firebase functions:config:set cloudinary.api_key=... cloudinary.api_secret=...'
+    );
+  }
+
+  const timestamp = Math.round((new Date()).getTime() / 1000);
+  const params = {
+    timestamp: timestamp,
+    upload_preset: data.upload_preset || 'live_streams',
+    folder: data.folder || 'user_uploads'
+  };
+
+  const signature = crypto.createHash('sha1')
+    .update(JSON.stringify(params) + apiSecret)
+    .digest('hex');
+
+  return {
+    signature: signature,
+    timestamp: timestamp,
+    apiKey: apiKey,
+    cloudName: cloudName
+  };
+});
+
+// ==========================================
+// Hybrid Cloud LLM Prayer Assistant (Gemini)
+// ==========================================
+// Server-side Gemini call that acts as primary counselor.
+// The browser-based matcher in ai-prayer.html remains the
+// offline fallback. Keep both — never call the model directly
+// from the browser.
+exports.askAIAssistant = functions.https.onCall(async (data, context) => {
+  const userPrompt = (data && data.prompt) ? data.prompt.trim() : '';
+  if (!userPrompt) {
+    throw new functions.https.HttpsError('invalid-argument', 'Prompt query cannot be empty.');
+  }
+
+  const apiKey = functions.config().gemini && functions.config().gemini.key;
+  if (!apiKey) {
+    throw new functions.https.HttpsError(
+      'failed-precondition',
+      'AI Assistant is not configured yet. Set it with: firebase functions:config:set gemini.key=YOUR_KEY'
+    );
+  }
+
+  const { GoogleGenerativeAI } = require('@google/generative-ai');
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-1.5-flash',
+    systemInstruction: `
+      You are the Prayer Dome AI Assistant — a comforting, wise, and encouraging
+      Christian pastoral companion. Respond to the user's situation with:
+
+      1. A short, warm, pastoral paragraph (1-2 sentences) acknowledging their situation.
+      2. Exactly 2-3 accurate KJV Bible scriptures relevant to their situation.
+         Format each as: "Verse text" — Reference.
+         Only use real, verifiable KJV scriptures. Do not invent verses.
+      3. A heartfelt, personalized prayer of 4-5 sentences addressed to God.
+      4. A one-line word of encouragement.
+
+      Tone: quiet, warm, pastoral, never preachy or clinical.
+      Do NOT give medical, financial, or legal advice.
+      If the user expresses self-harm intent, respond ONLY with:
+        "I hear how much pain you are in. Please reach out right now to someone who can stay with you.
+         In the US: call or text 988. In the UK: call 111 or 999. In Zambia: call 911 or 999.
+         In Eswatini: call 911 or 999. You are not alone — please reach out to a pastor, family member,
+         or friend right now. God loves you and there are people who want to help."
+      Keep the full response under 400 words.
+    `
+  });
+
+  try {
+    const result = await model.generateContent(userPrompt);
+    const response = result.response.text();
+    return { success: true, response };
+  } catch (err) {
+    console.error('AI Assistant error:', err);
+    throw new functions.https.HttpsError('internal', 'Unable to generate a response right now. Please try again in a moment.');
+  }
+});
+
+// ==========================================
+// Scheduled Devotional Dispatcher
+// ==========================================
+// Runs once per day (configure the schedule in Firebase Console
+// after deploying). Loads today's devotional from Firestore and
+// sends a notification to all users who opted in.
+exports.dailyDevotionalNotification = functions.pubsub
+  .schedule('0 6 * * *') // 06:00 UTC daily — adjust to your timezone
+  .timeZone('Africa/Lusaka')
+  .onRun(async () => {
+    const db = admin.firestore();
+    const today = new Date().toISOString().split('T')[0];
+
+    try {
+      const devQ = await db.collection('devotionals')
+        .where('publishDate', '==', today)
+        .limit(1)
+        .get();
+
+      if (devQ.empty) {
+        console.log('No devotional scheduled for today:', today);
+        return null;
+      }
+
+      const dev = devQ.docs[0].data();
+      const tokensSnap = await db.collection('userTokens')
+        .where('active', '!=', false)
+        .get();
+
+      const tokens = [];
+      tokensSnap.forEach(doc => {
+        const d = doc.data();
+        if (d.token && d.notifications !== false) tokens.push(d.token);
+      });
+
+      if (tokens.length === 0) {
+        console.log('No active push tokens for devotional dispatch.');
+        return null;
+      }
+
+      const payload = {
+        notification: {
+          title: '📖 Daily Devotional — Prayer Dome',
+          body: dev.title ? `${dev.title}: ${dev.thought ? dev.thought.substring(0, 80) + '…' : 'Read today\'s word.'}` : 'Your daily devotional is ready.',
+          icon: 'https://i.ibb.co/TB5Fx4tb/logo-0.png',
+          badge: 'https://i.ibb.co/TB5Fx4tb/logo-0.png'
+        },
+        data: {
+          click_action: 'FLUTTER_NOTIFICATION_CLICK',
+          screen: 'devotional',
+          devId: devQ.docs[0].id
+        },
+        tokens: tokens
+      };
+
+      const response = await admin.messaging().sendEachForMulticast(payload);
+      console.log(`Devotional notification sent to ${response.successCount}/${tokens.length} devices.`);
+
+      // Log the dispatch.
+      await db.collection('devotionalLogs').add({
+        date: today,
+        title: dev.title,
+        sentCount: response.successCount,
+        failureCount: response.failureCount,
+        dispatchedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      return null;
+    } catch (err) {
+      console.error('Daily devotional dispatch failed:', err);
+      return null;
+    }
+  });
+
+// ==========================================
+// Prayer Reminder Notification Scheduler
+// ==========================================
+// Users can schedule a daily prayer reminder time. This function
+// runs every 15 minutes and sends reminders to users whose
+// reminder time matches the current window.
+exports.prayerReminderDispatch = functions.pubsub
+  .schedule('*/15 * * * *')
+  .timeZone('Africa/Lusaka')
+  .onRun(async () => {
+    const db = admin.firestore();
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+    try {
+      // Find users whose reminder window contains the current time.
+      // reminderTime is stored as "HH:MM" in local time (Africa/Lusaka).
+      const usersSnap = await db.collection('userReminders')
+        .where('reminderTime', '!=', null)
+        .get();
+
+      const dispatches = [];
+      usersSnap.forEach(doc => {
+        const ud = doc.data();
+        if (!ud.reminderTime || ud.reminderTime === '') return;
+        const [rh, rm] = ud.reminderTime.split(':').map(Number);
+        const userMinutes = rh * 60 + rm;
+        // Send if within 15 minutes of the scheduled time (to account
+        // for the 15-min poll interval).
+        const diff = Math.abs(currentMinutes - userMinutes);
+        if (diff <= 15 || diff >= 1385) { // also catch midnight wrap
+          dispatches.push({ id: doc.id, ...ud });
         }
-    });
+      });
+
+      if (dispatches.length === 0) return null;
+
+      const tokens = [];
+      for (const ud of dispatches) {
+        if (ud.fcmToken && ud.notifications !== false) {
+          tokens.push({ token: ud.fcmToken, userId: ud.userId });
+        }
+      }
+
+      if (tokens.length === 0) return null;
+
+      const payload = {
+        notification: {
+          title: '🙏 Prayer Time — Prayer Dome',
+          body: 'Take a moment to lift your requests to God. He is listening.',
+          icon: 'https://i.ibb.co/TB5Fx4tb/logo-0.png',
+          badge: 'https://i.ibb.co/TB5Fx4tb/logo-0.png'
+        },
+        data: {
+          click_action: 'FLUTTER_NOTIFICATION_CLICK',
+          screen: 'prayer'
+        },
+        tokens: tokens.map(t => t.token)
+      };
+
+      const response = await admin.messaging().sendEachForMulticast(payload);
+      console.log(`Prayer reminders sent to ${response.successCount}/${tokens.length} users.`);
+
+      // Log each dispatch.
+      const batch = db.batch();
+      for (const t of tokens) {
+        const logRef = db.collection('reminderLogs').doc();
+        batch.set(logRef, {
+          userId: t.userId,
+          sentAt: admin.firestore.FieldValue.serverTimestamp(),
+          success: true
+        });
+      }
+      await batch.commit();
+
+      return null;
+    } catch (err) {
+      console.error('Prayer reminder dispatch failed:', err);
+      return null;
+    }
+  });
+
+// ==========================================
+// Send Push Notification (existing — kept)
+// ==========================================
+exports.sendPushNotification = functions.firestore
+  .document('notifications/{notificationId}')
+  .onCreate(async (snap, context) => {
+    const notification = snap.data();
+    const { title, message, tokens, type } = notification;
+
+    if (!tokens || tokens.length === 0) {
+      console.log('No tokens to send to');
+      return null;
+    }
+
+    const validTokens = tokens.filter(token => token && token.length > 20);
+    if (validTokens.length === 0) {
+      console.log('No valid tokens');
+      return null;
+    }
+
+    const payload = {
+      notification: {
+        title: title,
+        body: message,
+        icon: 'https://i.ibb.co/TB5Fx4tb/logo-0.png',
+        badge: 'https://i.ibb.co/TB5Fx4tb/logo-0.png',
+        vibrate: '200,100,200',
+        sound: 'default'
+      },
+      data: {
+        click_action: 'FLUTTER_NOTIFICATION_CLICK',
+        screen: type || 'news'
+      }
+    };
+
+    try {
+      const response = await admin.messaging().sendEachForMulticast({
+        tokens: validTokens,
+        ...payload
+      });
+
+      console.log(`Sent to ${response.successCount} devices, failed: ${response.failureCount}`);
+
+      await snap.ref.update({
+        status: 'sent',
+        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+        successCount: response.successCount,
+        failureCount: response.failureCount
+      });
+
+      if (response.failureCount > 0) {
+        const failedTokens = [];
+        response.responses.forEach((resp, idx) => {
+          if (!resp.success) {
+            failedTokens.push(validTokens[idx]);
+            console.error(`Failed token: ${validTokens[idx]}`, resp.error);
+          }
+        });
+
+        for (const failedToken of failedTokens) {
+          const tokensQuery = await admin.firestore()
+            .collection('userTokens')
+            .where('token', '==', failedToken)
+            .get();
+
+          tokensQuery.forEach(doc => {
+            doc.ref.update({ active: false, invalidReason: 'token_expired' });
+          });
+        }
+      }
+
+      return response;
+    } catch (error) {
+      console.error('Error sending notifications:', error);
+      await snap.ref.update({
+        status: 'failed',
+        error: error.message
+      });
+      return null;
+    }
+  });
+
+// Test notification handler (existing — kept)
+exports.sendTestNotification = functions.firestore
+  .document('test_notifications/{testId}')
+  .onCreate(async (snap, context) => {
+    const test = snap.data();
+    const { title, message, token } = test;
+
+    if (!token) return null;
+
+    const payload = {
+      notification: {
+        title: title,
+        body: message,
+        icon: 'https://i.ibb.co/TB5Fx4tb/logo-0.png'
+      }
+    };
+
+    try {
+      const response = await admin.messaging().send({
+        token: token,
+        ...payload
+      });
+
+      console.log('Test notification sent:', response);
+      await snap.ref.update({
+        status: 'sent',
+        sentAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+      return response;
+    } catch (error) {
+      console.error('Test notification failed:', error);
+      await snap.ref.update({
+        status: 'failed',
+        error: error.message
+      });
+      return null;
+    }
+  });

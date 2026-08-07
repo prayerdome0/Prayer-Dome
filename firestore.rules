@@ -1,0 +1,201 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==========================================
+    // Core Authorization Helpers
+    // ==========================================
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        getUserData().role == 'admin';
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // ==========================================
+    // Collection-Specific Rules
+    // ==========================================
+
+    // Users and Profiles
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Announcements & Hero Banners (Public Read, Admin Write)
+    match /announcements/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /banners/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // News and Articles
+    match /news/{id} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Live Streaming State and Chat
+    match /liveStatus/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /liveChat/{id} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+    match /liveRecordings/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Prayer Wall (Strict Moderation Rules)
+    match /prayers/{id} {
+      allow read: if resource.data.status == 'approved' ||
+                   (isSignedIn() && resource.data.userId == request.auth.uid) ||
+                   isAdmin();
+      allow create: if isSignedIn();
+      allow update: if isAdmin() ||
+                    (isSignedIn() && resource.data.userId == request.auth.uid &&
+                     request.resource.data.status == 'pending');
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+    }
+
+    // Testimonies (Approved only for public)
+    match /testimonies/{id} {
+      allow read: if resource.data.status == 'approved' || isAdmin();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    // Devotionals
+    match /devotionals/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Community Stats
+    match /communityStats/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Device Tokens for Push Notifications
+    match /userTokens/{tokenId} {
+      allow read, write: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn();
+    }
+
+    // Sermons
+    match /sermons/{id} {
+      allow read: if resource.data.published != false || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Memberships
+    match /memberships/{id} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.auth.uid == id;
+      allow update: if isOwner(id) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Offerings / Deposits / Withdrawals
+    match /offerings/{id} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    match /deposits/{id} {
+      allow read: if isSignedIn() || isAdmin();
+      allow create: if isSignedIn();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    match /withdrawals/{id} {
+      allow read: if isSignedIn() || isAdmin();
+      allow create: if isSignedIn();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    match /wallets/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Support Claims
+    match /supportClaims/{id} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Contact Messages
+    match /contactMessages/{id} {
+      allow read: if isAdmin();
+      allow create: if true;
+      allow delete: if isAdmin();
+    }
+
+    // Gallery
+    match /gallery/{id} {
+      allow read: if resource.data.status == 'approved' || isAdmin();
+      allow create: if isSignedIn();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Events
+    match /events/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Admin Logs
+    match /adminLogs/{id} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Notifications
+    match /notifications/{id} {
+      allow read: if isSignedIn();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Test Notifications
+    match /test_notifications/{id} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Translations
+    match /translations/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
