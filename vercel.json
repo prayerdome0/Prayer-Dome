@@ -4,6 +4,30 @@
   "trailingSlash": false,
   "rewrites": [
     {
+      "source": "/resource-view",
+      "destination": "/resource-view.html"
+    },
+    {
+      "source": "/lessons",
+      "destination": "/lessons.html"
+    },
+    {
+      "source": "/stories",
+      "destination": "/stories.html"
+    },
+    {
+      "source": "/resources",
+      "destination": "/resources.html"
+    },
+    {
+      "source": "/academy",
+      "destination": "/lessons.html"
+    },
+    {
+      "source": "/teaching",
+      "destination": "/lessons.html"
+    },
+    {
       "source": "/news/:id",
       "destination": "/api/share?type=news&id=:id"
     },

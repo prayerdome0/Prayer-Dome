@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resource Viewer | Prayer Dome</title>
+  <meta name="description" content="Read and print Prayer Dome resource documents.">
+  <link rel="canonical" href="https://prayerdome.net/resource-view">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9B%AA%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Merriweather:wght@400;700&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/assets/pd-brand.css">
+  <script src="/assets/pd-motion.js" defer></script><script src="/assets/pd-content-data.js" defer></script>
+  <script src="/assets/pd-academy-data.js" defer></script><script src="/assets/pd-app.js" defer></script>
+  <style>
+    body{background:#f4f7fb;color:#0f172a}.rv-wrap{max-width:980px;margin:24px auto 120px;padding:0 18px}.rv-toolbar{position:sticky;top:74px;z-index:20;display:flex;gap:10px;justify-content:space-between;align-items:center;background:rgba(255,255,255,.9);backdrop-filter:blur(16px);border:1px solid rgba(15,23,42,.1);border-radius:20px;padding:12px 16px;margin-bottom:18px;box-shadow:var(--pd-shadow-sm)}.rv-title{font-family:Playfair Display,serif;font-size:1.2rem;color:#0A4D9B;margin:0}.rv-doc{background:#fff;border-radius:28px;padding:48px;box-shadow:var(--pd-shadow);border:1px solid rgba(15,23,42,.08);font-family:Merriweather,Georgia,serif;line-height:1.85}.rv-doc h1{font-family:Playfair Display,serif;color:#0A4D9B;font-size:2.6rem;line-height:1.1;margin-top:0}.rv-doc h2{font-family:Playfair Display,serif;color:#0a3d7a;margin-top:32px}.rv-doc ul{padding-left:24px}.rv-actions{display:flex;gap:10px;flex-wrap:wrap}.rv-btn{border:0;border-radius:999px;padding:10px 14px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;gap:8px;align-items:center}.rv-primary{background:#d4af37;color:#1f2937}.rv-ghost{background:#eef4ff;color:#0A4D9B}@media(max-width:700px){.rv-doc{padding:26px}.rv-doc h1{font-size:2rem}.rv-toolbar{align-items:flex-start;flex-direction:column}}@media print{.pd-topbar,.pd-drawer,.pd-aurora,.rv-toolbar,.pd-acad-hero,footer{display:none!important}.rv-wrap{margin:0;max-width:none}.rv-doc{box-shadow:none;border:0;padding:0}}
+  </style>
+</head>
+<body>
+<div class="pd-aurora" aria-hidden="true"><span></span></div>
+<aside class="pd-drawer" id="pdDrawer" aria-label="Main menu"><nav class="pd-drawer-nav"><a class="pd-drawer-link" href="/"><i class="fas fa-home"></i> Home</a><a class="pd-drawer-link" href="/resources"><i class="fas fa-folder-open"></i> Resources</a><a class="pd-drawer-link" href="/lessons"><i class="fas fa-graduation-cap"></i> Teaching</a><a class="pd-drawer-link" href="/quiz"><i class="fas fa-star"></i> Quizzes</a></nav></aside>
+<header class="pd-topbar" style="position:sticky;top:0;z-index:50"><button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="fas fa-bars"></i></button><a href="/" class="pd-topbar-center"><span class="pd-topbar-word">PRAYER DOME</span></a><a class="theme-toggle-btn" href="/resources"><i class="fas fa-arrow-left"></i></a></header>
+<main class="rv-wrap">
+  <section class="pd-acad-hero" style="margin-bottom:18px;padding:30px"><span class="pd-acad-eyebrow"><i class="fas fa-file-lines"></i> Document</span><h1 id="rvHero" style="font-size:clamp(1.7rem,4vw,2.8rem)">Resource Viewer</h1><p>Read online, print, or use your browser’s “Save as PDF” option to download a polished copy.</p></section>
+  <div class="rv-toolbar"><h2 class="rv-title" id="rvTitle">Loading...</h2><div class="rv-actions"><a class="rv-btn rv-ghost" id="downloadMd" href="#" download><i class="fas fa-download"></i> Markdown</a><button class="rv-btn rv-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> Print / Save PDF</button></div></div>
+  <article class="rv-doc" id="rvDoc">Loading document...</article>
+</main>
+<script>
+function mdToHtml(md){return md.split(/\n\n+/).map(function(block){block=block.trim();if(!block)return'';if(/^#\s+/.test(block))return '<h1>'+escapeHtml(block.replace(/^#\s+/,''))+'</h1>';if(/^##\s+/.test(block))return '<h2>'+escapeHtml(block.replace(/^##\s+/,''))+'</h2>';if(/^-\s+/.test(block))return '<ul>'+block.split(/\n/).map(x=>'<li>'+inline(x.replace(/^-\s+/,''))+'</li>').join('')+'</ul>';return '<p>'+inline(block)+'</p>';}).join('');function inline(t){return escapeHtml(t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');}}
+function escapeHtml(v){const d=document.createElement('div');d.textContent=v;return d.innerHTML;}
+(async function(){const p=new URLSearchParams(location.search);const file=p.get('file')||'/documents/prayer-dome-constitution.md';const safe=file.startsWith('/documents/')?file:'/documents/prayer-dome-constitution.md';const title=p.get('title')||decodeURIComponent(safe.split('/').pop().replace(/[-_]/g,' ').replace(/\.md$/,''));document.getElementById('rvTitle').textContent=title;document.getElementById('rvHero').textContent=title;document.getElementById('downloadMd').href=safe;document.getElementById('downloadMd').download=safe.split('/').pop();try{const md=await fetch(safe).then(r=>r.text());document.getElementById('rvDoc').innerHTML=mdToHtml(md);}catch(e){document.getElementById('rvDoc').innerHTML='<p>Unable to load this document. Please use the Markdown download link.</p>';}})();
+</script>
+</body>
+</html>

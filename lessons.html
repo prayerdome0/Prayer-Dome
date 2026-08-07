@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Teaching & Lessons | Prayer Dome Academy</title>
+  <meta name="description" content="Grow spiritually with detailed Prayer Dome lessons, linked quizzes and certificates. Learn biblical foundations, prayer, the Holy Spirit, character and mission.">
+  <link rel="canonical" href="https://prayerdome.net/lessons">
+  <meta property="og:title" content="Teaching & Lessons | Prayer Dome Academy">
+  <meta property="og:description" content="Comprehensive spiritual growth lessons with linked quizzes and certificates.">
+  <meta property="og:url" content="https://prayerdome.net/lessons">
+  <meta property="og:image" content="/assets/og-image.png">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9B%AA%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/assets/pd-brand.css">
+  <script src="/assets/pd-motion.js" defer></script>
+  <script src="/assets/pd-content-data.js" defer></script>
+  <script src="/assets/pd-academy-data.js" defer></script>
+  <script src="/assets/pd-app.js" defer></script>
+  <script src="/assets/pd-academy.js" defer></script>
+</head>
+<body class="pd-acad-page">
+<div class="pd-aurora" aria-hidden="true"><span></span></div>
+
+<aside class="pd-drawer" id="pdDrawer" aria-label="Main menu">
+  <nav class="pd-drawer-nav">
+    <a class="pd-drawer-link" href="/"><i class="fas fa-home"></i> Home</a>
+    <a class="pd-drawer-link" href="/lessons"><i class="fas fa-graduation-cap"></i> Teaching</a>
+    <a class="pd-drawer-link" href="/stories"><i class="fas fa-book-open-reader"></i> Stories</a>
+    <a class="pd-drawer-link" href="/quiz"><i class="fas fa-star"></i> Quizzes</a>
+    <a class="pd-drawer-link" href="/resources"><i class="fas fa-folder-open"></i> Resources</a>
+    <a class="pd-drawer-link" href="/sermons"><i class="fas fa-microphone-lines"></i> Sermons</a>
+    <a class="pd-drawer-link" href="/prayer"><i class="fas fa-hands-praying"></i> Prayer Wall</a>
+    <a class="pd-drawer-link" href="/account"><i class="fas fa-user-circle"></i> Account</a>
+  </nav>
+</aside>
+<header class="pd-topbar" style="position:sticky;top:0;z-index:50">
+  <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+  <a href="/" class="pd-topbar-center"><span class="pd-topbar-word">PRAYER DOME</span></a>
+  <div class="pd-topbar-right"><a class="theme-toggle-btn" href="/resources"><i class="fas fa-folder-open"></i></a><a class="theme-toggle-btn" href="/quiz"><i class="fas fa-star"></i></a></div>
+</header>
+
+<main class="pd-acad-wrap" data-page="lessons">
+  <section class="pd-acad-hero">
+    <span class="pd-acad-eyebrow"><i class="fas fa-graduation-cap"></i> Prayer Dome Academy</span>
+    <h1>Lessons that help members grow, serve and walk in faith.</h1>
+    <p>Study clear biblical pathways, reflect on practical questions, mark your progress, take linked quizzes, and earn certificates as you build confidence in God’s Word.</p>
+    <div class="pd-acad-hero-actions">
+      <a class="pd-acad-btn pd-acad-btn-primary" href="#lessonList"><i class="fas fa-book-open"></i> Start Learning</a>
+      <a class="pd-acad-btn pd-acad-btn-secondary" href="/quiz"><i class="fas fa-certificate"></i> Bible Quiz Journey</a>
+      <label class="pd-acad-btn pd-acad-btn-ghost" style="cursor:text">Certificate name: <input id="certificateName" class="pd-acad-search" style="padding:8px 10px;max-width:220px;border-radius:12px;border:0" placeholder="Your name"></label>
+    </div>
+  </section>
+
+  <section class="pd-acad-grid pd-acad-grid-4 pd-acad-stats">
+    <div class="pd-acad-stat"><strong data-acad-lesson-count>0</strong><span>Detailed lessons</span></div>
+    <div class="pd-acad-stat"><strong data-acad-quiz-count>0</strong><span>Linked quizzes</span></div>
+    <div class="pd-acad-stat"><strong data-acad-cert-count>0</strong><span>Certificates earned</span></div>
+    <div class="pd-acad-stat"><strong data-acad-progress>0%</strong><span>Your progress</span><div class="pd-acad-progress"><span data-acad-progress-bar></span></div></div>
+  </section>
+
+  <div class="pd-acad-section-head">
+    <div><h2>Choose a growth track</h2><p>Each track combines teaching, reflection, action steps and a short knowledge check.</p></div>
+  </div>
+  <section class="pd-acad-grid pd-acad-grid-3" id="trackGrid"></section>
+
+  <div class="pd-acad-section-head">
+    <div><h2>Lesson library</h2><p>Open any lesson, complete the reading, and use the quiz to confirm your understanding.</p></div>
+  </div>
+  <section class="pd-acad-lesson-layout">
+    <div class="pd-acad-list" id="lessonList" aria-label="Lesson list"></div>
+    <article class="pd-acad-reader" id="lessonReader">Loading lessons...</article>
+  </section>
+</main>
+
+<footer style="text-align:center;padding:30px;color:var(--pd-acad-muted)"><strong style="color:var(--pd-acad-blue)">Prayer Dome</strong> · A House of Prayer for All Nations</footer>
+</body>
+</html>

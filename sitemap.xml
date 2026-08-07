@@ -68,6 +68,24 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://prayerdome.net/lessons</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://prayerdome.net/stories</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://prayerdome.net/resources</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://prayerdome.net/quiz</loc>
     <lastmod>2026-08-02</lastmod>
     <changefreq>weekly</changefreq>
