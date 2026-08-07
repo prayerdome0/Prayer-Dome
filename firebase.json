@@ -156,6 +156,14 @@
       {
         "source": "/radio",
         "destination": "/radio.html"
+      },
+      {
+        "source": "/documents",
+        "destination": "/documents/index.html"
+      },
+      {
+        "source": "/documents/**",
+        "destination": "/documents/index.html"
       }
     ],
     "redirects": [

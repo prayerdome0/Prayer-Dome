@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teaching Documents | Prayer Dome Zambia</title>
+    <meta name="description" content="Teaching documents and resources from Pastor Zacheus Simbaya and Prayer Dome Zambia.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent-green: #0A4D9B;
+            --accent-gold: #d4af37;
+            --bg-primary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--accent-green), #0a3d7a);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+        }
+        .header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 5px; }
+        .header p { opacity: 0.9; font-size: 0.9rem; }
+        .logo-area {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        .logo-ring {
+            width: 50px; height: 50px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            flex: 1;
+            width: 100%;
+        }
+        .documents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .doc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .doc-card:hover {
+            border-color: var(--accent-gold);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            transform: translateY(-3px);
+        }
+        .doc-icon {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, var(--accent-gold), #b45309);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+        .doc-card h3 {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: var(--accent-green);
+        }
+        .doc-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+        .doc-meta {
+            font-size: 0.75rem;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .doc-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            background: var(--bg-primary);
+            padding: 3px 8px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--accent-gold);
+            margin-bottom: 20px;
+            display: block;
+        }
+        .empty-state h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        .footer {
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .footer a {
+            color: var(--accent-green);
+            text-decoration: none;
+        }
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.4rem; }
+            .documents-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-area">
+            <div class="logo-ring"><i class="fas fa-file-pdf"></i></div>
+        </div>
+        <h1>Prayer Dome Zambia Teaching Library</h1>
+        <p>Documents and resources from Pastor Zacheus Simbaya</p>
+    </header>
+
+    <div class="main">
+        <div class="documents-grid">
+            <!-- Document 1 -->
+            <div class="doc-card">
+                <span class="doc-status"><i class="fas fa-lock"></i> Coming Soon</span>
+                <div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
+                <h3>Foundations of Faith</h3>
+                <p>Core biblical teaching series covering the essential doctrines of the Christian faith. Perfect for new believers and those wanting to strengthen their foundation.</p>
+                <div class="doc-meta">
+                    <span><i class="fas fa-file-alt"></i> 24 pages</span>
+                    <span>PDF</span>
+                </div>
+            </div>
+
+            <!-- Document 2 -->
+            <div class="doc-card">
+                <span class="doc-status"><i class="fas fa-lock"></i> Coming Soon</span>
+                <div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
+                <h3>The Power of Night Prayer</h3>
+                <p>A comprehensive guide to nighttime intercession. Learn why the night season is strategic for prayer, how to pray effectively, and the spiritual covers you can pray over your family and nation.</p>
+                <div class="doc-meta">
+                    <span><i class="fas fa-file-alt"></i> 18 pages</span>
+                    <span>PDF</span>
+                </div>
+            </div>
+
+            <!-- Document 3 -->
+            <div class="doc-card">
+                <span class="doc-status"><i class="fas fa-lock"></i> Coming Soon</span>
+                <div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
+                <h3>Prayer Changes Everything</h3>
+                <p>This teaching walks you through the principles of effective prayer. Understand how to pray according to God's will, build faith, and see real transformation in your life through prayer.</p>
+                <div class="doc-meta">
+                    <span><i class="fas fa-file-alt"></i> 22 pages</span>
+                    <span>PDF</span>
+                </div>
+            </div>
+
+            <!-- Document 4 -->
+            <div class="doc-card">
+                <span class="doc-status"><i class="fas fa-lock"></i> Coming Soon</span>
+                <div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
+                <h3>Holy Spirit & Spiritual Gifts</h3>
+                <p>Understanding the person and work of the Holy Spirit, and how to walk in the gifts He has given to the Body of Christ. Includes teaching on prophecy, healing, and discernment.</p>
+                <div class="doc-meta">
+                    <span><i class="fas fa-file-alt"></i> 20 pages</span>
+                    <span>PDF</span>
+                </div>
+            </div>
+
+            <!-- Document 5 -->
+            <div class="doc-card">
+                <span class="doc-status"><i class="fas fa-lock"></i> Coming Soon</span>
+                <div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
+                <h3>Praise & Worship</h3>
+                <p>The heart of gathered worship — exploring what it means to praise God authentically, lead others into His presence, and cultivate a lifestyle of worship beyond Sunday services.</p>
+                <div class="doc-meta">
+                    <span><i class="fas fa-file-alt"></i> 15 pages</span>
+                    <span>PDF</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding: 30px; background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border);">
+            <p style="color: var(--text-secondary); margin-bottom: 15px;">
+                <i class="fas fa-envelope" style="color: var(--accent-green);"></i>
+                Looking for a specific teaching or need a document in a different format?
+            </p>
+            <a href="mailto:info@prayerdome.net" style="color: var(--accent-green); font-weight: 600; text-decoration: none; border: 2px solid var(--accent-green); padding: 10px 25px; border-radius: 30px; display: inline-block;">
+                <i class="fas fa-envelope"></i> Contact Prayer Dome Zambia
+            </a>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 Prayer Dome Ministry — <a href="/about.html">About</a> | <a href="/">Home</a></p>
+        <p>"He does everything blamelessly." — Mark 7:37</p>
+    </footer>
+</body>
+</html>
