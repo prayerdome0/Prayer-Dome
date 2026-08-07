@@ -121,7 +121,21 @@
         var certId = 'PD-' + lesson.id.toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
         state.certificates.push({ id: certId, lessonId: lesson.id, title: lesson.title, score: percent, date: new Date().toISOString(), name: memberName() });
         saveState(state);
-        result.innerHTML = '<div class="pd-acad-cert"><i class="fas fa-award" style="font-size:3rem;color:#d4af37"></i><h3>Certificate of Completion</h3><p>This certifies that</p><div class="name">' + esc(memberName()) + '</div><p>has successfully completed</p><h3>' + esc(lesson.title) + '</h3><p>Score: ' + percent + '% · Certificate ID: ' + esc(certId) + '</p><p>“He does everything blamelessly.” — Mark 7:37</p><button class="pd-acad-btn pd-acad-btn-primary no-print" onclick="window.print()"><i class="fas fa-print"></i> Print / Save Certificate</button></div>';
+        result.innerHTML = '<div class="pd-acad-cert">' +
+          '<img class="pd-acad-cert-logo" src="/assets/logo.png" alt="Prayer Dome logo">' +
+          '<span class="pd-acad-cert-brand">Prayer Dome Academy</span>' +
+          '<h3>Certificate of Completion</h3>' +
+          '<p>This certifies that</p>' +
+          '<div class="name">' + esc(memberName()) + '</div>' +
+          '<p>has successfully completed</p>' +
+          '<h3 class="cert-course">' + esc(lesson.title) + '</h3>' +
+          '<p class="cert-meta">Score: ' + percent + '% · Certificate ID: ' + esc(certId) + '</p>' +
+          '<p class="pd-acad-cert-verse">“He does everything blamelessly.” — Mark 7:37</p>' +
+          '<div class="pd-acad-cert-foot">' +
+            '<div class="pd-acad-cert-sign"><span class="sig">Prayer Dome</span><em>Ministry Team</em></div>' +
+            '<div class="pd-acad-cert-seal"><i class="fas fa-award"></i></div>' +
+          '</div>' +
+          '<button class="pd-acad-btn pd-acad-btn-primary no-print" onclick="window.print()"><i class="fas fa-print"></i> Print / Save Certificate</button></div>';
         updateOverview(); renderLessonList($('#lessonList'), lesson.id);
       } else {
         result.innerHTML = '<div class="pd-acad-callout"><strong>Almost there.</strong> You scored ' + percent + '%. Review the lesson and try again—80% is required to earn your certificate.</div>';

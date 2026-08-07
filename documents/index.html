@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teaching Documents | Prayer Dome Zambia</title>
-    <meta name="description" content="Teaching documents and resources from Pastor Zacheus Simbaya and Prayer Dome Zambia.">
+    <title>Document Library | Prayer Dome</title>
+    <meta name="description" content="Download Prayer Dome PDF guides: statement of faith, new believers guide, prayer watch guide, serving teams handbook, small group guide and the app user guide.">
+    <link rel="icon" href="/assets/logo.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <style>
         :root {
             --accent-green: #0A4D9B;
@@ -16,10 +18,11 @@
             --text-primary: #0f172a;
             --text-secondary: #64748b;
             --border: #e2e8f0;
+            --ease: cubic-bezier(.16, 1, .3, 1);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
@@ -27,34 +30,35 @@
             flex-direction: column;
         }
         .header {
-            background: linear-gradient(135deg, var(--accent-green), #0a3d7a);
+            background: linear-gradient(135deg, var(--accent-green), #07244d);
             color: white;
-            padding: 20px 30px;
+            padding: 34px 30px 30px;
             text-align: center;
+            border-bottom: 3px solid var(--accent-gold);
         }
-        .header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 5px; }
-        .header p { opacity: 0.9; font-size: 0.9rem; }
-        .logo-area {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 15px;
-        }
+        .header h1 { font-family: 'Playfair Display', serif; font-size: 1.9rem; margin: 6px 0 6px; }
+        .header p { opacity: 0.9; font-size: 0.92rem; font-weight: 500; }
+        .logo-area { display: flex; justify-content: center; margin-bottom: 12px; }
         .logo-ring {
-            width: 50px; height: 50px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
+            width: 76px; height: 76px;
+            background: rgba(255,255,255,0.12);
+            border: 2px solid rgba(212,175,55,.65);
+            border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,.25);
         }
+        .logo-ring img { width: 88%; height: 88%; object-fit: contain; }
         .main {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 30px 20px;
+            padding: 34px 20px;
             flex: 1;
             width: 100%;
         }
+        .intro { text-align: center; color: var(--text-secondary); font-size: .95rem; margin-bottom: 26px; }
         .documents-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -64,15 +68,25 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 20px;
-            transition: all 0.2s;
+            padding: 22px;
+            transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s var(--ease);
             position: relative;
             overflow: hidden;
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            animation: docRise .7s var(--ease) both;
         }
+        .doc-card:nth-child(2) { animation-delay: .08s; }
+        .doc-card:nth-child(3) { animation-delay: .16s; }
+        .doc-card:nth-child(4) { animation-delay: .24s; }
+        .doc-card:nth-child(5) { animation-delay: .32s; }
+        .doc-card:nth-child(6) { animation-delay: .40s; }
+        @keyframes docRise { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
         .doc-card:hover {
             border-color: var(--accent-gold);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-            transform: translateY(-3px);
+            box-shadow: 0 14px 34px rgba(10,77,155,0.12);
+            transform: translateY(-4px);
         }
         .doc-icon {
             width: 48px; height: 48px;
@@ -85,52 +99,47 @@
             font-size: 1.3rem;
             margin-bottom: 15px;
         }
-        .doc-card h3 {
-            font-size: 1rem;
-            margin-bottom: 8px;
-            color: var(--accent-green);
-        }
-        .doc-card p {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            line-height: 1.5;
-            margin-bottom: 10px;
-        }
+        .doc-card h3 { font-size: 1rem; margin-bottom: 8px; color: var(--accent-green); }
+        .doc-card p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 12px; }
         .doc-meta {
             font-size: 0.75rem;
             color: var(--accent-gold);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            font-weight: 700;
         }
         .doc-status {
             position: absolute;
             top: 15px;
             right: 15px;
             font-size: 0.7rem;
-            color: var(--text-secondary);
-            background: var(--bg-primary);
-            padding: 3px 8px;
+            color: var(--accent-green);
+            background: #eef4ff;
+            padding: 4px 10px;
             border-radius: 20px;
+            border: 1px solid #d5e4ff;
+            font-weight: 700;
+        }
+        .contact-band {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            background: var(--bg-card);
+            border-radius: 16px;
             border: 1px solid var(--border);
         }
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-secondary);
+        .contact-band a {
+            color: var(--accent-green);
+            font-weight: 600;
+            text-decoration: none;
+            border: 2px solid var(--accent-green);
+            padding: 10px 25px;
+            border-radius: 30px;
+            display: inline-block;
+            transition: all .3s var(--ease);
         }
-        .empty-state i {
-            font-size: 3rem;
-            color: var(--accent-gold);
-            margin-bottom: 20px;
-            display: block;
-        }
-        .empty-state h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            color: var(--text-primary);
-            margin-bottom: 10px;
-        }
+        .contact-band a:hover { background: var(--accent-green); color: #fff; }
         .footer {
             background: var(--bg-card);
             border-top: 1px solid var(--border);
@@ -139,95 +148,84 @@
             font-size: 0.8rem;
             color: var(--text-secondary);
         }
-        .footer a {
-            color: var(--accent-green);
-            text-decoration: none;
-        }
+        .footer a { color: var(--accent-green); text-decoration: none; }
         @media (max-width: 768px) {
             .header h1 { font-size: 1.4rem; }
             .documents-grid { grid-template-columns: 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .doc-card { animation: none !important; }
         }
     </style>
 </head>
 <body>
     <header class="header">
         <div class="logo-area">
-            <div class="logo-ring"><i class="fas fa-file-pdf"></i></div>
+            <div class="logo-ring"><img src="/assets/logo.png" alt="Prayer Dome logo"></div>
         </div>
-        <h1>Prayer Dome Zambia Teaching Library</h1>
-        <p>Documents and resources from Pastor Zacheus Simbaya</p>
+        <h1>Prayer Dome Document Library</h1>
+        <p>Ministry guides and handbooks — polished PDF booklets, ready to read, print and share</p>
     </header>
 
     <div class="main">
+        <p class="intro">Every download below is a professionally formatted PDF — open it in your browser, save it, or print it for your group.</p>
         <div class="documents-grid">
-            <!-- Document 1 -->
-            <div class="doc-card">
-                <span class="doc-status"><i class="fas fa-lock"></i> Coming Soon</span>
-                <div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
-                <h3>Foundations of Faith</h3>
-                <p>Core biblical teaching series covering the essential doctrines of the Christian faith. Perfect for new believers and those wanting to strengthen their foundation.</p>
-                <div class="doc-meta">
-                    <span><i class="fas fa-file-alt"></i> 24 pages</span>
-                    <span>PDF</span>
-                </div>
-            </div>
+            <a class="doc-card" href="/documents/statement-of-faith.pdf" target="_blank" rel="noopener">
+                <span class="doc-status"><i class="fas fa-file-pdf"></i> PDF</span>
+                <div class="doc-icon"><i class="fas fa-cross"></i></div>
+                <h3>Prayer Dome Statement of Faith</h3>
+                <p>A concise summary of what Prayer Dome believes and teaches — the Bible, God, Jesus Christ, salvation, the Holy Spirit and the Church.</p>
+                <div class="doc-meta"><span><i class="fas fa-tag"></i> Doctrine</span><span>2026 edition</span></div>
+            </a>
 
-            <!-- Document 2 -->
-            <div class="doc-card">
-                <span class="doc-status"><i class="fas fa-lock"></i> Coming Soon</span>
-                <div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
-                <h3>The Power of Night Prayer</h3>
-                <p>A comprehensive guide to nighttime intercession. Learn why the night season is strategic for prayer, how to pray effectively, and the spiritual covers you can pray over your family and nation.</p>
-                <div class="doc-meta">
-                    <span><i class="fas fa-file-alt"></i> 18 pages</span>
-                    <span>PDF</span>
-                </div>
-            </div>
+            <a class="doc-card" href="/documents/new-believers-guide.pdf" target="_blank" rel="noopener">
+                <span class="doc-status"><i class="fas fa-file-pdf"></i> PDF</span>
+                <div class="doc-icon"><i class="fas fa-seedling"></i></div>
+                <h3>New Believer’s Growth Guide</h3>
+                <p>Seven practical first steps: prayer, daily Bible reading, church family, obedience, sharing your story, serving and the Holy Spirit.</p>
+                <div class="doc-meta"><span><i class="fas fa-tag"></i> Discipleship</span><span>2026 edition</span></div>
+            </a>
 
-            <!-- Document 3 -->
-            <div class="doc-card">
-                <span class="doc-status"><i class="fas fa-lock"></i> Coming Soon</span>
-                <div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
-                <h3>Prayer Changes Everything</h3>
-                <p>This teaching walks you through the principles of effective prayer. Understand how to pray according to God's will, build faith, and see real transformation in your life through prayer.</p>
-                <div class="doc-meta">
-                    <span><i class="fas fa-file-alt"></i> 22 pages</span>
-                    <span>PDF</span>
-                </div>
-            </div>
+            <a class="doc-card" href="/documents/prayer-watch-guide.pdf" target="_blank" rel="noopener">
+                <span class="doc-status"><i class="fas fa-file-pdf"></i> PDF</span>
+                <div class="doc-icon"><i class="fas fa-moon"></i></div>
+                <h3>Prayer Watch Guide</h3>
+                <p>A simple prayer pattern, ready-made prayer points and practical safeguards for personal and corporate intercession.</p>
+                <div class="doc-meta"><span><i class="fas fa-tag"></i> Prayer</span><span>2026 edition</span></div>
+            </a>
 
-            <!-- Document 4 -->
-            <div class="doc-card">
-                <span class="doc-status"><i class="fas fa-lock"></i> Coming Soon</span>
-                <div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
-                <h3>Holy Spirit & Spiritual Gifts</h3>
-                <p>Understanding the person and work of the Holy Spirit, and how to walk in the gifts He has given to the Body of Christ. Includes teaching on prophecy, healing, and discernment.</p>
-                <div class="doc-meta">
-                    <span><i class="fas fa-file-alt"></i> 20 pages</span>
-                    <span>PDF</span>
-                </div>
-            </div>
+            <a class="doc-card" href="/documents/serving-teams-handbook.pdf" target="_blank" rel="noopener">
+                <span class="doc-status"><i class="fas fa-file-pdf"></i> PDF</span>
+                <div class="doc-icon"><i class="fas fa-people-group"></i></div>
+                <h3>Serving Teams Handbook</h3>
+                <p>Serving values, team expectations and growth steps for prayer, worship, media, ushering, children, follow-up and admin teams.</p>
+                <div class="doc-meta"><span><i class="fas fa-tag"></i> Ministry</span><span>2026 edition</span></div>
+            </a>
 
-            <!-- Document 5 -->
-            <div class="doc-card">
-                <span class="doc-status"><i class="fas fa-lock"></i> Coming Soon</span>
-                <div class="doc-icon"><i class="fas fa-file-pdf"></i></div>
-                <h3>Praise & Worship</h3>
-                <p>The heart of gathered worship — exploring what it means to praise God authentically, lead others into His presence, and cultivate a lifestyle of worship beyond Sunday services.</p>
-                <div class="doc-meta">
-                    <span><i class="fas fa-file-alt"></i> 15 pages</span>
-                    <span>PDF</span>
-                </div>
-            </div>
+            <a class="doc-card" href="/documents/small-group-guide.pdf" target="_blank" rel="noopener">
+                <span class="doc-status"><i class="fas fa-file-pdf"></i> PDF</span>
+                <div class="doc-icon"><i class="fas fa-comments"></i></div>
+                <h3>Small Group Discussion Guide</h3>
+                <p>Meeting pattern, discussion questions and a group covenant to help small groups grow in the Word, prayer and mission.</p>
+                <div class="doc-meta"><span><i class="fas fa-tag"></i> Groups</span><span>2026 edition</span></div>
+            </a>
+
+            <a class="doc-card" href="/Prayer-Dome-User-Guide.pdf" target="_blank" rel="noopener">
+                <span class="doc-status"><i class="fas fa-file-pdf"></i> PDF</span>
+                <div class="doc-icon"><i class="fas fa-mobile-screen"></i></div>
+                <h3>Prayer Dome App User Guide</h3>
+                <p>A friendly walkthrough of every feature: prayer wall, Bible reader, sermons, live services, academy, quizzes and more.</p>
+                <div class="doc-meta"><span><i class="fas fa-tag"></i> App Guide</span><span>2026 edition</span></div>
+            </a>
         </div>
 
-        <div style="text-align: center; margin-top: 40px; padding: 30px; background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border);">
+        <div class="contact-band">
             <p style="color: var(--text-secondary); margin-bottom: 15px;">
                 <i class="fas fa-envelope" style="color: var(--accent-green);"></i>
                 Looking for a specific teaching or need a document in a different format?
             </p>
-            <a href="mailto:info@prayerdome.net" style="color: var(--accent-green); font-weight: 600; text-decoration: none; border: 2px solid var(--accent-green); padding: 10px 25px; border-radius: 30px; display: inline-block;">
-                <i class="fas fa-envelope"></i> Contact Prayer Dome Zambia
+            <a href="mailto:info@prayerdome.net">
+                <i class="fas fa-envelope"></i> Contact Prayer Dome
             </a>
         </div>
     </div>

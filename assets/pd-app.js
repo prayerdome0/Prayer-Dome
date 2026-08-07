@@ -21,7 +21,7 @@
   'use strict';
 
   var VERSION = '1.0.1';
-  var BRAND_LOGO = 'https://i.ibb.co/TB5Fx4tb/logo-0.png'; // official Prayer Dome mark
+  var BRAND_LOGO = '/assets/logo.png'; // official Prayer Dome mark
   var channel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('pd-app') : null;
   var fb = null;            // Firestore bindings, set via setFirestore()
   var listeners = [];

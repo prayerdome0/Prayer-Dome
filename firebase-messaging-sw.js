@@ -21,8 +21,8 @@ messaging.onBackgroundMessage((payload) => {
     const notificationTitle = payload.notification?.title || 'Prayer Dome';
     const notificationOptions = {
         body: payload.notification?.body || 'New Bible verse available',
-        icon: 'https://i.ibb.co/TB5Fx4tb/logo-0.png',
-        badge: 'https://i.ibb.co/TB5Fx4tb/logo-0.png',
+        icon: '/assets/logo.png',
+        badge: '/assets/logo.png',
         tag: 'prayer-dome-verse',
         renotify: true,
         requireInteraction: true,
