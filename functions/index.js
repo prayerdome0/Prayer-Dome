@@ -95,8 +95,8 @@ exports.dailyDevotionalNotification = functions.pubsub
         notification: {
           title: '📖 Daily Devotional — Prayer Dome',
           body: dev.title ? `${dev.title}: ${dev.thought ? dev.thought.substring(0, 80) + '…' : 'Read today\'s word.'}` : 'Your daily devotional is ready.',
-          icon: 'https://i.ibb.co/TB5Fx4tb/logo-0.png',
-          badge: 'https://i.ibb.co/TB5Fx4tb/logo-0.png'
+          icon: '/assets/logo.png',
+          badge: '/assets/logo.png'
         },
         data: {
           click_action: 'FLUTTER_NOTIFICATION_CLICK',
@@ -175,8 +175,8 @@ exports.prayerReminderDispatch = functions.pubsub
         notification: {
           title: '🙏 Prayer Time — Prayer Dome',
           body: 'Take a moment to lift your requests to God. He is listening.',
-          icon: 'https://i.ibb.co/TB5Fx4tb/logo-0.png',
-          badge: 'https://i.ibb.co/TB5Fx4tb/logo-0.png'
+          icon: '/assets/logo.png',
+          badge: '/assets/logo.png'
         },
         data: {
           click_action: 'FLUTTER_NOTIFICATION_CLICK',
@@ -231,8 +231,8 @@ exports.sendPushNotification = functions.firestore
       notification: {
         title: title,
         body: message,
-        icon: 'https://i.ibb.co/TB5Fx4tb/logo-0.png',
-        badge: 'https://i.ibb.co/TB5Fx4tb/logo-0.png',
+        icon: '/assets/logo.png',
+        badge: '/assets/logo.png',
         vibrate: '200,100,200',
         sound: 'default'
       },
@@ -302,7 +302,7 @@ exports.sendTestNotification = functions.firestore
       notification: {
         title: title,
         body: message,
-        icon: 'https://i.ibb.co/TB5Fx4tb/logo-0.png'
+        icon: '/assets/logo.png'
       }
     };
 

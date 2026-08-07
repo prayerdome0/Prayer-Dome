@@ -218,7 +218,7 @@ function render(meta) {
     publisher: { '@type': 'Organization', name: 'Prayer Dome' }
   }).replace(/</g, '\\u003c')}</script>
   <meta http-equiv="refresh" content="0;url=${target}">
-  <style>body{font-family:Inter,Arial,sans-serif;background:#f8fafc;color:#0f172a;display:grid;min-height:100vh;place-items:center;text-align:center;padding:24px}a{color:#0A4D9B;font-weight:700}</style>
+  <style>body{font-family:Montserrat,Arial,sans-serif;background:#f8fafc;color:#0f172a;display:grid;min-height:100vh;place-items:center;text-align:center;padding:24px}a{color:#0A4D9B;font-weight:700}</style>
 </head>
 <body>
   <main>

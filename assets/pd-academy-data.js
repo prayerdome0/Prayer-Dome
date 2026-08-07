@@ -124,76 +124,76 @@
 
   var resources = [
     {
-      id: 'constitution',
-      title: 'Prayer Dome Constitution',
-      description: 'Core governance, purpose, beliefs, membership and leadership reference document.',
-      category: 'Governance',
-      format: 'MD',
-      icon: 'fa-scale-balanced',
-      size: '12 KB',
-      version: '2026 edition',
-      url: '/resource-view?file=/documents/prayer-dome-constitution.md&title=Prayer%20Dome%20Constitution',
-      downloadUrl: '/documents/prayer-dome-constitution.md'
-    },
-    {
       id: 'statement-of-faith',
-      title: 'Statement of Faith',
+      title: 'Prayer Dome Statement of Faith',
       description: 'A concise summary of what Prayer Dome believes and teaches.',
       category: 'Doctrine',
-      format: 'MD',
+      format: 'PDF',
       icon: 'fa-cross',
-      size: '8 KB',
+      size: '57 KB',
       version: '2026 edition',
-      url: '/resource-view?file=/documents/statement-of-faith.md&title=Statement%20of%20Faith',
-      downloadUrl: '/documents/statement-of-faith.md'
+      url: '/documents/statement-of-faith.pdf',
+      downloadUrl: '/documents/statement-of-faith.pdf'
     },
     {
       id: 'new-believers-guide',
       title: 'New Believer’s Growth Guide',
       description: 'A practical guide for prayer, Bible reading, fellowship, baptism and service.',
       category: 'Discipleship',
-      format: 'MD',
+      format: 'PDF',
       icon: 'fa-seedling',
-      size: '10 KB',
+      size: '57 KB',
       version: '2026 edition',
-      url: '/resource-view?file=/documents/new-believers-guide.md&title=New%20Believer%E2%80%99s%20Growth%20Guide',
-      downloadUrl: '/documents/new-believers-guide.md'
+      url: '/documents/new-believers-guide.pdf',
+      downloadUrl: '/documents/new-believers-guide.pdf'
     },
     {
       id: 'prayer-watch-guide',
       title: 'Prayer Watch Guide',
       description: 'Simple schedules, prayer points and safeguards for personal and corporate intercession.',
       category: 'Prayer',
-      format: 'MD',
+      format: 'PDF',
       icon: 'fa-moon',
-      size: '9 KB',
+      size: '56 KB',
       version: '2026 edition',
-      url: '/resource-view?file=/documents/prayer-watch-guide.md&title=Prayer%20Watch%20Guide',
-      downloadUrl: '/documents/prayer-watch-guide.md'
+      url: '/documents/prayer-watch-guide.pdf',
+      downloadUrl: '/documents/prayer-watch-guide.pdf'
     },
     {
       id: 'serving-teams-handbook',
       title: 'Serving Teams Handbook',
       description: 'Expectations, values and practical guidance for ushers, media, worship, prayer and pastoral teams.',
       category: 'Ministry',
-      format: 'MD',
+      format: 'PDF',
       icon: 'fa-people-group',
-      size: '11 KB',
+      size: '56 KB',
       version: '2026 edition',
-      url: '/resource-view?file=/documents/serving-teams-handbook.md&title=Serving%20Teams%20Handbook',
-      downloadUrl: '/documents/serving-teams-handbook.md'
+      url: '/documents/serving-teams-handbook.pdf',
+      downloadUrl: '/documents/serving-teams-handbook.pdf'
     },
     {
       id: 'small-group-guide',
       title: 'Small Group Discussion Guide',
       description: 'Lesson discussion format, reflection questions and outreach planning for groups.',
       category: 'Groups',
-      format: 'MD',
+      format: 'PDF',
       icon: 'fa-comments',
-      size: '9 KB',
+      size: '56 KB',
       version: '2026 edition',
-      url: '/resource-view?file=/documents/small-group-guide.md&title=Small%20Group%20Discussion%20Guide',
-      downloadUrl: '/documents/small-group-guide.md'
+      url: '/documents/small-group-guide.pdf',
+      downloadUrl: '/documents/small-group-guide.pdf'
+    },
+    {
+      id: 'user-guide',
+      title: 'Prayer Dome App User Guide',
+      description: 'A friendly walkthrough of every feature: prayer wall, Bible, sermons, live services and more.',
+      category: 'App Guide',
+      format: 'PDF',
+      icon: 'fa-mobile-screen',
+      size: '64 KB',
+      version: '2026 edition',
+      url: '/Prayer-Dome-User-Guide.pdf',
+      downloadUrl: '/Prayer-Dome-User-Guide.pdf'
     }
   ];
 

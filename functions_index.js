@@ -27,8 +27,8 @@ exports.sendPushNotification = functions.firestore
             notification: {
                 title: title,
                 body: message,
-                icon: 'https://i.ibb.co/TB5Fx4tb/logo-0.png',
-                badge: 'https://i.ibb.co/TB5Fx4tb/logo-0.png',
+                icon: '/assets/logo.png',
+                badge: '/assets/logo.png',
                 vibrate: '200,100,200',
                 sound: 'default'
             },
@@ -101,7 +101,7 @@ exports.sendTestNotification = functions.firestore
             notification: {
                 title: title,
                 body: message,
-                icon: 'https://i.ibb.co/TB5Fx4tb/logo-0.png'
+                icon: '/assets/logo.png'
             }
         };
         

@@ -314,7 +314,7 @@
           },
           {
             "key": "Content-Disposition",
-            "value": "inline; filename=\"Prayer-Dome-User-Guide.pdf\""
+            "value": "inline"
           }
         ]
       },

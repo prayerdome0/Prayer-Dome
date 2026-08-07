@@ -13,6 +13,9 @@
 (function () {
   'use strict';
 
+  /* Mark JS as live immediately so CSS can safely pre-hide reveal targets. */
+  document.documentElement.classList.add('pd-js');
+
   var reduce = window.matchMedia &&
                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -119,10 +122,110 @@
     Array.prototype.forEach.call(nodes, function (el) {
       if (reduce || !observer) { revealNow(el); } else { observer.observe(el); }
     });
+    autoScan(scope);
   }
 
-  /* Auto-stagger children of [data-pd-stagger] so authors don't have to
-     hand-write a delay on every card. */
+  /* ---------------------------------------------------------------------
+   * 3b. Automatic entrance motion for every page.
+   *     - `main` rises softly once on load (.pd-page-enter).
+   *     - top-level `main > section|article` blocks fade/slide in as they
+   *       enter the viewport, staggered in source order.
+   *     Opt out per-page with data-pd-no-auto-reveal / data-pd-no-enter
+   *     on <body>, or per-block with data-pd-no-reveal.
+   * ------------------------------------------------------------------- */
+  var autoObserver = null;
+
+  function autoRevealNow(el) {
+    el.classList.add('is-visible');
+    el.classList.remove('pd-auto-reveal');
+  }
+
+  function ensureAutoObserver() {
+    if (autoObserver || !('IntersectionObserver' in window)) return;
+    autoObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var el = entry.target;
+        autoRevealNow(el);
+        autoObserver.unobserve(el);
+      });
+    }, { rootMargin: '0px 0px -6% 0px', threshold: 0.06 });
+  }
+
+  /* Blocks that get the fade-rise treatment as they enter the viewport.
+     Sections lead wherever a page defines them; common card classes cover
+     the div-based pages. Elements inside an already-revealed ancestor are
+     skipped so animations never nest. */
+  var AUTO_TARGETS =
+    'main > section:not([data-pd-no-reveal]), ' +
+    'main > article:not([data-pd-no-reveal]), ' +
+    '.container > section:not([data-pd-no-reveal]), ' +
+    '.main-container > section:not([data-pd-no-reveal]), ' +
+    '.app-wrapper > section:not([data-pd-no-reveal]), ' +
+    '.content > section:not([data-pd-no-reveal]), ' +
+    '[class*="-grid"] > *:not([data-pd-no-reveal]), ' +
+    '.tab-content:not([data-pd-no-reveal]), ' +
+    '.content-card:not([data-pd-no-reveal]), ' +
+    '.news-card:not([data-pd-no-reveal]), ' +
+    '.panel-card:not([data-pd-no-reveal]), ' +
+    '.stat-card:not([data-pd-no-reveal]), ' +
+    '.kpi-card:not([data-pd-no-reveal]), ' +
+    '.settings-card:not([data-pd-no-reveal]), ' +
+    '.glass-card:not([data-pd-no-reveal]), ' +
+    '.hero-card:not([data-pd-no-reveal]), ' +
+    '.benefit-card:not([data-pd-no-reveal])';
+
+  function autoScan(root) {
+    if (reduce || !('IntersectionObserver' in window)) return;
+    if (document.body.hasAttribute('data-pd-no-auto-reveal')) return;
+    var scope = root || document;
+    if (!scope.querySelectorAll) return;
+    var blocks = scope.querySelectorAll(AUTO_TARGETS);
+    var i = 0;
+    Array.prototype.forEach.call(blocks, function (el) {
+      if (el.hasAttribute('data-pd-auto-done')) return;
+      var parent = el.parentElement && el.parentElement.closest('.pd-auto-reveal');
+      if (parent) return;
+      el.classList.add('pd-auto-reveal');
+      el.setAttribute('data-pd-auto-done', '1');
+      el.style.transitionDelay = Math.min(i * 70, 350) + 'ms';
+      i += 1;
+      ensureAutoObserver();
+      if (autoObserver) autoObserver.observe(el);
+      else autoRevealNow(el);
+    });
+  }
+
+  function mountAutoReveal() {
+    if (reduce) return;
+    if (!document.body.hasAttribute('data-pd-no-enter')) {
+      var hero = document.querySelector('main') ||
+                 document.querySelector('.container') ||
+                 document.querySelector('.main-container') ||
+                 document.querySelector('.app-wrapper') ||
+                 document.querySelector('.page-wrapper');
+      if (hero && !hero.classList.contains('pd-page-enter')) {
+        hero.classList.add('pd-page-enter');
+      }
+    }
+    autoScan(document);
+
+    /* Pages that render lists after first paint (radio, news, sermons…)
+       get the same treatment: re-scan (cheap, done-marked) when new nodes
+       appear so fresh cards rise in as well. */
+    if (window.MutationObserver && !document.body.hasAttribute('data-pd-no-auto-reveal')) {
+      var scheduled = false;
+      new MutationObserver(function () {
+        if (scheduled) return;
+        scheduled = true;
+        setTimeout(function () {
+          scheduled = false;
+          autoScan(document);
+        }, 120);
+      }).observe(document.body, { childList: true, subtree: true });
+    }
+  }
+
   function applyStagger() {
     var groups = document.querySelectorAll('[data-pd-stagger]');
     Array.prototype.forEach.call(groups, function (group) {
@@ -261,6 +364,7 @@
     mountProgress();
     applyStagger();
     mountReveal();
+    mountAutoReveal();
     mountTilt();
     mountCounters();
     mountParallax();
