@@ -329,7 +329,8 @@ const PD_SERMONS = [
       'Jesus did not come to make bad people good. He came to make dead people live. There is a difference, and it is a big difference.',
       'A person who is good with some bad habits can improve. A person who is dead in trespasses and sins cannot improve — they need resurrection.',
       'And this is what the world around us does not understand. It thinks Christianity is a list of things you stop doing. It is not. It is the beginning of a life you were not living before.',
-      'In our Zambia branch, many of you come to Prayer Dome carrying real burdens. It is evening, it is dark, the sun has set, and the rent is still due, and the child is sick, and the business is slow, and the marriage is tired.'
+      'In our Zambia branch, many of you come to Prayer Dome carrying real burdens. It is evening, it is dark, the sun has set, and the rent is still due, and the child is sick, and the business is slow, and the marriage is tired.',
+      'When we open our hearts to Jesus, He restores our peace and gives us strength to overcome every obstacle in abundant grace.'
     ],
     prayer: 'Lord, I receive the abundant life Jesus came to give me. Not money in my account — peace in my heart. Not just good days — a purpose that outlasts my problems. Make me alive today. Amen.',
     reflection: [
@@ -353,7 +354,11 @@ const PD_SERMONS = [
     summary: 'Every night in Lusaka and beyond, Prayer Dome Zambia gathers to pray. Here is why it matters and how to join.',
     keyVerse: 'He that dwelleth in the secret place of the most High shall abide under the shadow of the Almighty. I will say of the LORD, He is my refuge and my fortress: my God; in him will I trust. — Psalm 91:1-2',
     story: [
-      'There is a difference between praying in the morning when you are fresh and everyone is watching — and praying at night when you are tired, the house is quiet, and only God receives the effort.'
+      'There is a difference between praying in the morning when you are fresh and everyone is watching — and praying at night when you are tired, the house is quiet, and only God receives the effort.',
+      'In our Zambia night prayer gathers, believers intercede not just for personal breakthroughs, but for the healing of communities and families.',
+      'Night prayer trains our spirits to remain watchful. While others sleep, intercessors stand upon the watchtower to declare protection over their homes.',
+      'When you pray consistently, the spiritual atmosphere around your house changes. Depression lifts, fear vanishes, and divine peace takes over.',
+      'Do not underestimate the power of a quiet prayer spoken in faith. God sees in secret and He rewards openly.'
     ],
     prayer: 'Father, teach me to pray at night when the world is asleep and my only audience is You. Let my prayers be a covering over my family, my church, and my nation. Zambia, be covered in prayer. Amen.',
     reflection: [
