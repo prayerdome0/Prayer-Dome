@@ -765,6 +765,8 @@
         </div>
     </div>
 
+    <input type="file" id="accountDirectFileInput" accept="image/*,application/pdf,*/*" style="display:none;" onchange="handleAccountDirectUpload(event)">
+
     <!-- Password Reset Modal -->
     <div id="resetModal" class="modern-modal">
         <div class="modern-modal-content">
@@ -1299,59 +1301,68 @@
             }
         }
 
-        window.uploadPhoto = async (context) => {
-            if (typeof cloudinary === 'undefined') {
-                showToast("Cloudinary not loaded. Please refresh the page.", "error");
-                return;
+        window.uploadPhoto = (context) => {
+            const fileInput = document.getElementById('accountDirectFileInput');
+            if (fileInput) {
+                fileInput.dataset.context = context || 'profile';
+                fileInput.click();
             }
-            
-            const uploadWidget = cloudinary.createUploadWidget({
-                cloudName: 'prayerdome',
-                uploadPreset: 'profile_photos',
-                folder: context === 'register' ? 'profile_photos/temp' : `profile_photos/${auth.currentUser?.uid}`,
-                cropping: true,
-                croppingAspectRatio: 1,
-                multiple: false,
-                maxFileSize: 5 * 1024 * 1024,
-                clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp']
-            }, async (error, result) => {
-                if (error) {
-                    console.error("Cloudinary error:", error);
-                    showToast("Upload failed. Please try again.", "error");
-                    return;
-                }
-                
-                if (result && result.event === "success") {
-                    const url = result.info.secure_url;
-                    
-                    if (context === 'register') {
-                        document.getElementById('uploadedPhoto').value = url;
-                        document.getElementById('regPreview').src = url;
-                        showToast("Photo uploaded!", "success");
-                    } 
-                    else if (context === 'profile') {
-                        showLoading();
-                        try {
-                            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
-                                photoURL: url,
-                                updatedAt: serverTimestamp()
-                            });
-                            await updateProfile(auth.currentUser, { photoURL: url });
-                            document.getElementById('pPhoto').src = url;
-                            document.getElementById('editPhotoPreview').src = url;
-                            currentPhotoUrl = url;
-                            showToast("Profile photo updated!", "success");
-                            confetti({ particleCount: 80, spread: 60 });
-                        } catch (err) {
-                            console.error("Save photo error:", err);
-                            showToast("Failed to save photo: " + err.message, "error");
-                        } finally {
-                            hideLoading();
+        };
+
+        window.handleAccountDirectUpload = async (event) => {
+            const file = event.target.files[0];
+            const context = event.target.dataset.context || 'profile';
+            if (!file) return;
+
+            showLoading("Uploading file directly to Cloudinary...");
+            try {
+                const cloudName = 'prayerdome';
+                const presetsToTry = ['profile_photos', 'gallery_uploads', 'donation_proofs', 'ml_default'];
+                let url = null;
+                for (const preset of presetsToTry) {
+                    try {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        formData.append('upload_preset', preset);
+                        formData.append('folder', context === 'register' ? 'profile_photos/temp' : `profile_photos/${auth.currentUser?.uid || 'user'}`);
+                        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const data = await response.json();
+                        if (response.ok && data.secure_url) {
+                            url = data.secure_url;
+                            break;
                         }
+                    } catch (err) {
+                        console.warn(`Error trying preset ${preset}:`, err);
                     }
                 }
-            });
-            uploadWidget.open();
+                if (!url) throw new Error("Upload failed. Please check your network connection.");
+
+                if (context === 'register') {
+                    document.getElementById('uploadedPhoto').value = url;
+                    document.getElementById('regPreview').src = url;
+                    showToast("Photo uploaded successfully!", "success");
+                } else if (context === 'profile') {
+                    await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+                        photoURL: url,
+                        updatedAt: serverTimestamp()
+                    });
+                    await updateProfile(auth.currentUser, { photoURL: url });
+                    document.getElementById('pPhoto').src = url;
+                    document.getElementById('editPhotoPreview').src = url;
+                    currentPhotoUrl = url;
+                    showToast("Profile photo updated!", "success");
+                    confetti({ particleCount: 80, spread: 60 });
+                }
+            } catch (error) {
+                console.error("Direct upload error:", error);
+                showToast(error.message || "Upload failed. Please try again.", "error");
+            } finally {
+                hideLoading();
+                event.target.value = '';
+            }
         };
         
         window.changeProfilePhoto = () => {

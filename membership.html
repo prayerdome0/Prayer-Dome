@@ -131,6 +131,7 @@
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     
     <style>
@@ -559,8 +560,138 @@
         <button class="tab-btn" onclick="switchMainTab('card')"><i class="fas fa-credit-card"></i> My ID Card</button>
     </div>
 
+    <!-- MY MEMBERSHIP INFORMATION (EDIT FULL MEMBERSHIP PROFILE) -->
+    <div id="myMembershipContainer" class="card" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 25px; gap: 15px; border-bottom: 2px solid var(--border-color); padding-bottom: 18px;">
+            <div>
+                <h2 class="form-title" style="margin: 0;"><i class="fas fa-user-edit"></i> My Membership Information</h2>
+                <p class="form-subtitle" style="margin: 4px 0 0;">Review and update everything in your membership profile</p>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-secondary" style="width: auto; padding: 10px 18px;" onclick="switchMainTab('card')">
+                    <i class="fas fa-id-card"></i> View My ID Card
+                </button>
+                <button class="btn-back" style="width: auto; padding: 10px 18px; margin: 0; background: var(--accent-gold); color: #000; font-weight: bold;" onclick="startRegisteringSomeoneElse()">
+                    <i class="fas fa-user-plus"></i> Register Another Person
+                </button>
+            </div>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px 24px; margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+            <div style="display: flex; align-items: center; gap: 18px;">
+                <div style="position: relative;">
+                    <img id="editPhotoPreview" src="https://via.placeholder.com/80" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-gold); cursor: pointer;" onclick="triggerEditPhotoFileInput()">
+                    <div style="position: absolute; bottom: 0; right: 0; background: var(--accent-gold); color: #000; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer;" onclick="triggerEditPhotoFileInput()"><i class="fas fa-camera"></i></div>
+                </div>
+                <div>
+                    <h3 id="editMemberNameHeader" style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.4rem;">MEMBER NAME</h3>
+                    <p id="editMemberIdHeader" style="margin: 4px 0 0; color: var(--accent-gold); font-family: monospace; font-weight: bold; font-size: 1.1rem;">ID: ---</p>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <span id="editStatusBadgeHeader" class="status-badge status-approved" style="margin: 0;"><i class="fas fa-check-circle"></i> ACTIVE MEMBER</span>
+                <p id="editBranchHeader" style="margin: 8px 0 0; font-size: 0.9rem; color: var(--text-sub);"><i class="fas fa-church"></i> Global</p>
+            </div>
+        </div>
+
+        <div style="background: var(--bg-primary); border: 1px dashed var(--border-color); border-radius: 18px; padding: 18px; margin-bottom: 25px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h4 style="margin: 0 0 5px; color: var(--accent-gold); font-size: 0.95rem;"><i class="fas fa-cloud-upload-alt"></i> Membership Files & Photos</h4>
+                    <p style="margin: 0; font-size: 0.8rem; color: var(--text-sub);">Upload files directly from your device to Cloudinary (No popup required)</p>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="triggerEditPhotoFileInput()">
+                        <i class="fas fa-camera"></i> Change Profile Photo
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" style="background: var(--bg-primary); border: 1px solid var(--accent-gold);" onclick="triggerEditDocFileInput()">
+                        <i class="fas fa-file-upload"></i> Upload Supporting Doc / ID
+                    </button>
+                </div>
+            </div>
+            <input type="file" id="editPhotoFileInput" accept="image/*" style="display: none;" onchange="handleDirectFileUpload(event, 'update_photo')">
+            <input type="file" id="editDocFileInput" accept="*/*" style="display: none;" onchange="handleDirectFileUpload(event, 'update_doc')">
+            <div id="editUploadedDocsList" style="margin-top: 12px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+
+        <form id="editMembershipForm">
+            <div class="section-h"><i class="fas fa-user-circle"></i> Personal Details</div>
+            <div class="form-grid">
+                <div class="form-group"><label><i class="fas fa-signature"></i> Full Name *</label><input type="text" id="editFullName" required placeholder="e.g., John Doe"></div>
+                <div class="form-group"><label><i class="fas fa-calendar-alt"></i> Date of Birth *</label><input type="date" id="editDob" required></div>
+                <div class="form-group"><label><i class="fas fa-venus-mars"></i> Gender</label><select id="editGender"><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                <div class="form-group"><label><i class="fas fa-id-card"></i> Identity No (NID/Passport) *</label><input type="text" id="editIdNo" required placeholder="National ID or Passport Number"></div>
+                <div class="form-group"><label><i class="fas fa-phone-alt"></i> Phone Number</label><input type="tel" id="editPhone" placeholder="+268... (optional)"></div>
+                <div class="form-group"><label><i class="fas fa-envelope"></i> Email</label><input type="email" id="editEmail" placeholder="Email (optional)"></div>
+            </div>
+
+            <div class="section-h"><i class="fas fa-briefcase"></i> Status & Occupation</div>
+            <div class="form-grid">
+                <div class="form-group"><label><i class="fas fa-heart"></i> Marital Status</label><select id="editMarital"><option value="Single">Single</option><option value="Married">Married</option><option value="Divorced">Divorced</option><option value="Widowed">Widowed</option></select></div>
+                <div class="form-group"><label><i class="fas fa-child"></i> Number of Dependants</label><input type="number" id="editDependants" value="0"></div>
+                <div class="form-group"><label><i class="fas fa-briefcase"></i> Occupation</label><input type="text" id="editJob" placeholder="e.g., Teacher, Business"></div>
+                <div class="form-group"><label><i class="fas fa-church"></i> Current Branch</label><select id="editBranch"><option value="Zambia - Chama">🇿🇲 Zambia - Chama</option><option value="Eswatini - Manzini">🇸🇿 Eswatini - Manzini</option><option value="Ireland - Cork">🇮🇪 Ireland - Cork</option><option value="Online Global">🌍 Online Global</option></select></div>
+            </div>
+
+            <div class="section-h"><i class="fas fa-pray"></i> Spiritual History</div>
+            <div class="form-grid">
+                <div class="form-group"><label><i class="fas fa-cross"></i> Born Again?</label><select id="editBornAgain"><option value="Yes">Yes</option><option value="No">No</option></select></div>
+                <div class="form-group"><label><i class="fas fa-calendar-day"></i> Date Born Again</label><input type="date" id="editBornDate"></div>
+                <div class="form-group"><label><i class="fas fa-water"></i> Water Baptised?</label><select id="editWaterBapt"><option value="Yes">Yes</option><option value="No">No</option></select></div>
+                <div class="form-group"><label><i class="fas fa-calendar-day"></i> Date of Baptism</label><input type="date" id="editBaptDate"></div>
+            </div>
+            
+            <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox" id="editHolySpirit"> <i class="fas fa-dove"></i> Baptised with Holy Spirit?</label>
+                <label class="checkbox-item"><input type="checkbox" id="editTongues"> <i class="fas fa-microphone-alt"></i> Speak in Tongues?</label>
+                <label class="checkbox-item"><input type="checkbox" id="editGifts"> <i class="fas fa-gift"></i> Discovered Spiritual Gifts?</label>
+            </div>
+            <textarea id="editGiftNames" placeholder="If yes, name your spiritual gifts..." rows="2"></textarea>
+
+            <div class="section-h"><i class="fas fa-hands-helping"></i> Ministry Choice</div>
+            <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Usher"> 🚪 Usher</label>
+                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Instruments"> 🎵 Instruments</label>
+                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Praise"> 🎤 Praise & Worship</label>
+                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Compassionate"> ❤️ Compassionate</label>
+                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Intercessor"> 🙏 Intercessor</label>
+                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Preaching"> 📖 Preaching</label>
+            </div>
+
+            <div class="section-h"><i class="fas fa-pen-alt"></i> Personal Testimony / Bio</div>
+            <textarea id="editBio" placeholder="Share your testimony, personal notes, or prayer requests..." rows="3"></textarea>
+
+            <div class="section-h"><i class="fas fa-pen-fancy"></i> Signature</div>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
+                <div style="flex: 1; min-width: 200px;">
+                    <label style="font-size: 0.8rem; font-weight: bold; color: var(--text-sub); display: block; margin-bottom: 6px;">CURRENT SIGNATURE ON FILE</label>
+                    <div id="existingSigPreview" style="background: #fff; border-radius: 12px; padding: 10px; min-height: 80px; display: flex; align-items: center; justify-content: center;"></div>
+                </div>
+                <div style="flex: 2; min-width: 250px;">
+                    <label style="font-size: 0.8rem; font-weight: bold; color: var(--text-sub); display: block; margin-bottom: 6px;">DRAW NEW SIGNATURE (OPTIONAL)</label>
+                    <canvas id="edit-sig-pad" class="sig-canvas" style="height: 100px;"></canvas>
+                    <button type="button" onclick="clearEditSig()" style="font-size: 11px; background:none; border:none; color:var(--accent-red); cursor:pointer; margin-top: 8px;"><i class="fas fa-eraser"></i> Clear New Signature</button>
+                </div>
+            </div>
+
+            <div style="margin-top: 35px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <button type="button" class="btn btn-primary" id="updateMemberBtn" onclick="updateMembershipInformation()">
+                    <i class="fas fa-save"></i> SAVE & UPDATE MEMBERSHIP INFORMATION
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="switchMainTab('card')">
+                    <i class="fas fa-credit-card"></i> GO TO MY ID CARD
+                </button>
+            </div>
+        </form>
+    </div>
+
     <!-- Step 1: EXISTING OR NEW MEMBER -->
     <div id="step1Container" class="card">
+        <div id="backToMyMemBanner" style="display: none; margin-bottom: 20px;">
+            <button class="btn btn-secondary" style="width: 100%; background: var(--card-gradient); border: 1px solid var(--accent-gold);" onclick="openUpdateMembershipView()">
+                <i class="fas fa-user-check"></i> Return to My Membership Information
+            </button>
+        </div>
         <div class="step-indicator">
             <div class="step active" id="step1Indicator">
                 <div class="step-number">1</div>
@@ -707,15 +838,23 @@
         <p class="form-subtitle" id="formSubtitle">Please fill in all required information</p>
         
         <div class="photo-upload-area">
-            <div class="photo-preview" onclick="uploadProfilePhoto()">
+            <div class="photo-preview" onclick="triggerRegPhotoFileInput()">
                 <img id="photoPreview" src="https://via.placeholder.com/150" alt="Profile Photo">
                 <div class="photo-overlay"><i class="fas fa-camera"></i> Change Photo</div>
             </div>
-            <button type="button" class="upload-btn-small" onclick="uploadProfilePhoto()">
-                <i class="fas fa-camera"></i> Upload Photo
-            </button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                <button type="button" class="upload-btn-small" onclick="triggerRegPhotoFileInput()">
+                    <i class="fas fa-camera"></i> Upload Photo (From File)
+                </button>
+                <button type="button" class="upload-btn-small" style="background: var(--bg-primary); border: 1px solid var(--accent-gold);" onclick="triggerRegDocFileInput()">
+                    <i class="fas fa-file-upload"></i> Upload Supporting Doc / ID (Optional)
+                </button>
+            </div>
+            <input type="file" id="regPhotoFileInput" accept="image/*" style="display: none;" onchange="handleDirectFileUpload(event, 'register_photo')">
+            <input type="file" id="regDocFileInput" accept="*/*" style="display: none;" onchange="handleDirectFileUpload(event, 'register_doc')">
+            <div id="regUploadedDocsList" style="margin-top: 8px; font-size: 0.85rem; width: 100%;"></div>
             <input type="hidden" id="uploadedPhotoUrl">
-            <p style="font-size: 0.75rem; color: var(--text-sub);"><i class="fas fa-info-circle"></i> Upload a clear photo for the ID card</p>
+            <p style="font-size: 0.75rem; color: var(--text-sub);"><i class="fas fa-info-circle"></i> Upload files directly from your device to Cloudinary without popups</p>
         </div>
         
         <form id="mForm">
@@ -877,9 +1016,14 @@
                 <div id="statusBadge" class="status-badge status-pending"><i class="fas fa-clock"></i> NO MEMBERSHIP</div>
             </div>
         </div>
-        <button class="btn btn-primary" style="margin-top: 25px;" onclick="downloadID()">
-            <i class="fas fa-download"></i> SAVE ID TO GALLERY
-        </button>
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 25px;">
+            <button class="btn btn-primary" style="width: auto; padding: 14px 28px;" onclick="downloadID()">
+                <i class="fas fa-file-pdf"></i> DOWNLOAD ID CARD (PDF)
+            </button>
+            <button class="btn btn-secondary" style="width: auto; padding: 14px 28px;" onclick="openUpdateMembershipView()">
+                <i class="fas fa-edit"></i> UPDATE MEMBERSHIP INFO
+            </button>
+        </div>
         <div class="badge-spotlight" id="badgeSpotlight" style="display: none;">
             <span class="badge-icon" id="badgeIcon">🏅</span>
             <div class="badge-label" id="badgeLabel">STAR MEMBER</div>
@@ -913,6 +1057,11 @@
     let retrievedMembershipData = null;
     let isExistingMember = false;
     let isRegisteringForSelf = true;
+    let uploadedEditPhotoUrl = null;
+    let uploadedDocs = [];
+    let uploadedEditDocs = [];
+    let isRegisteringOtherMode = false;
+    let editCanvas, editCtx, isEditSigModified = false;
 
     // Recognition badges that admins can award to members (shown on the portal)
     const MEMBER_BADGES = {
@@ -942,6 +1091,7 @@
             window.location.href = 'account.html';
         }
         initSigPad();
+        initEditSigPad();
     });
 
     // Live admin-managed content: notices + member care requests
@@ -1067,6 +1217,7 @@
             if (membershipSnap.exists()) {
                 currentMemberData = membershipSnap.data();
                 renderCard(currentMemberData);
+                populateEditMembershipForm(currentMemberData);
                 switchMainTab('card');
                 // Only show toast if they just logged in or membership was approved
                 if (currentMemberData.status === 'approved') {
@@ -1177,34 +1328,343 @@
         }
     };
 
-    window.uploadProfilePhoto = () => {
-        if (typeof cloudinary === 'undefined') {
-            showToast("Cloudinary not loaded. Please refresh.", "error");
+    async function uploadFileDirectlyToCloudinary(file, folderName = 'membership_files') {
+        const cloudName = 'prayerdome';
+        const presetsToTry = ['profile_photos', 'gallery_uploads', 'donation_proofs', 'signatures', 'ml_default'];
+        
+        for (const preset of presetsToTry) {
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', preset);
+                if (folderName) formData.append('folder', folderName);
+                
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                if (response.ok && data.secure_url) {
+                    console.log(`Uploaded via preset ${preset}:`, data.secure_url);
+                    return data.secure_url;
+                }
+                console.warn(`Preset ${preset} failed:`, data.error?.message);
+            } catch (err) {
+                console.warn(`Error trying preset ${preset}:`, err);
+            }
+        }
+        throw new Error("Failed to upload file to Cloudinary. Please check your network connection.");
+    }
+
+    window.triggerRegPhotoFileInput = () => {
+        const el = document.getElementById('regPhotoFileInput');
+        if (el) el.click();
+    };
+    window.uploadProfilePhoto = window.triggerRegPhotoFileInput;
+
+    window.triggerRegDocFileInput = () => {
+        const el = document.getElementById('regDocFileInput');
+        if (el) el.click();
+    };
+
+    window.triggerEditPhotoFileInput = () => {
+        const el = document.getElementById('editPhotoFileInput');
+        if (el) el.click();
+    };
+
+    window.triggerEditDocFileInput = () => {
+        const el = document.getElementById('editDocFileInput');
+        if (el) el.click();
+    };
+
+    window.handleDirectFileUpload = async (event, context) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (file.size > 15 * 1024 * 1024) {
+            showToast("File size should be less than 15MB", "error");
+            event.target.value = '';
             return;
         }
-        const uploadWidget = cloudinary.createUploadWidget({
-            cloudName: 'prayerdome',
-            uploadPreset: 'profile_photos',
-            folder: `profile_photos/${currentUser?.uid || 'temp'}`,
-            cropping: true,
-            croppingAspectRatio: 1,
-            multiple: false,
-            maxFileSize: 5 * 1024 * 1024,
-            clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp']
-        }, async (error, result) => {
-            if (error) {
-                showToast("Upload failed. Please try again.", "error");
+
+        showLoading("Uploading file directly to Cloudinary...");
+        try {
+            const folder = context.includes('photo') ? `profile_photos/${currentUser?.uid || 'temp'}` : `membership_docs/${currentUser?.uid || 'temp'}`;
+            const url = await uploadFileDirectlyToCloudinary(file, folder);
+            
+            if (context === 'register_photo') {
+                uploadedPhotoUrl = url;
+                const prev = document.getElementById('photoPreview');
+                if (prev) prev.src = url;
+                const hid = document.getElementById('uploadedPhotoUrl');
+                if (hid) hid.value = url;
+                showToast("Photo uploaded successfully!", "success");
+            } else if (context === 'update_photo') {
+                uploadedEditPhotoUrl = url;
+                const prev1 = document.getElementById('editPhotoPreview');
+                if (prev1) prev1.src = url;
+                const prev2 = document.getElementById('updatePhotoPreview');
+                if (prev2) prev2.src = url;
+                showToast("Photo uploaded successfully!", "success");
+            } else if (context === 'register_doc') {
+                uploadedDocs.push({ name: file.name, url: url });
+                renderUploadedDocsList('regUploadedDocsList', uploadedDocs, 'reg');
+                showToast(`File ${file.name} uploaded!`, "success");
+            } else if (context === 'update_doc') {
+                uploadedEditDocs.push({ name: file.name, url: url });
+                renderUploadedDocsList('editUploadedDocsList', uploadedEditDocs, 'edit');
+                showToast(`File ${file.name} uploaded!`, "success");
+            }
+        } catch (err) {
+            console.error("Direct upload error:", err);
+            showToast(err.message || "Error uploading file", "error");
+        } finally {
+            hideLoading();
+            event.target.value = '';
+        }
+    };
+
+    function renderUploadedDocsList(containerId, docsArray, type) {
+        const c = document.getElementById(containerId);
+        if (!c) return;
+        if (docsArray.length === 0) {
+            c.innerHTML = '';
+            return;
+        }
+        c.innerHTML = docsArray.map((d, i) => `
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.06);border-radius:10px;margin-top:6px;">
+                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;"><i class="fas fa-file-alt"></i> ${escapeHtmlPortal(d.name || 'Document')}</span>
+                <div style="display:flex;gap:8px;">
+                    <a href="${d.url}" target="_blank" style="color:var(--accent-blue);font-size:0.8rem;"><i class="fas fa-external-link-alt"></i> View</a>
+                    <button type="button" onclick="removeUploadedDoc(${i}, '${type}')" style="background:none;border:none;color:var(--accent-red);cursor:pointer;"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    window.removeUploadedDoc = (index, type) => {
+        if (type === 'reg') {
+            uploadedDocs.splice(index, 1);
+            renderUploadedDocsList('regUploadedDocsList', uploadedDocs, 'reg');
+        } else {
+            uploadedEditDocs.splice(index, 1);
+            renderUploadedDocsList('editUploadedDocsList', uploadedEditDocs, 'edit');
+        }
+    };
+
+    window.openUpdateMembershipView = () => {
+        isRegisteringOtherMode = false;
+        switchMainTab('membership');
+    };
+
+    window.startRegisteringSomeoneElse = () => {
+        isRegisteringOtherMode = true;
+        const myMem = document.getElementById('myMembershipContainer');
+        if (myMem) myMem.style.display = 'none';
+        lastWizardId = 'step1Container';
+        const st1 = document.getElementById('step1Container');
+        if (st1) st1.style.display = 'block';
+        const st2E = document.getElementById('step2ExistingContainer');
+        if (st2E) st2E.style.display = 'none';
+        const st2N = document.getElementById('step2NewContainer');
+        if (st2N) st2N.style.display = 'none';
+        const st3 = document.getElementById('step3Container');
+        if (st3) st3.style.display = 'none';
+        const banner = document.getElementById('backToMyMemBanner');
+        if (banner) banner.style.display = 'block';
+    };
+
+    function populateEditMembershipForm(data) {
+        if (!data) return;
+        document.getElementById('editFullName').value = data.fullName || '';
+        document.getElementById('editDob').value = data.dateOfBirth || data.dob || '';
+        document.getElementById('editGender').value = data.gender || 'Male';
+        document.getElementById('editIdNo').value = data.identityNumber || data.idNumber || '';
+        document.getElementById('editPhone').value = data.phone || '';
+        document.getElementById('editEmail').value = data.email || '';
+        document.getElementById('editMarital').value = data.maritalStatus || 'Single';
+        document.getElementById('editDependants').value = data.dependants || 0;
+        document.getElementById('editJob').value = data.occupation || '';
+        document.getElementById('editBranch').value = data.branch || 'Zambia - Chama';
+        document.getElementById('editBornAgain').value = data.bornAgain || 'Yes';
+        document.getElementById('editBornDate').value = data.bornAgainDate || '';
+        document.getElementById('editWaterBapt').value = data.waterBaptism || 'Yes';
+        document.getElementById('editBaptDate').value = data.baptismDate || '';
+        document.getElementById('editHolySpirit').checked = !!data.holySpiritBaptism;
+        document.getElementById('editTongues').checked = !!data.speaksTongues;
+        document.getElementById('editGifts').checked = !!data.spiritualGifts;
+        document.getElementById('editGiftNames').value = (Array.isArray(data.giftNames) ? data.giftNames.join(', ') : (data.giftNames || ''));
+        document.getElementById('editBio').value = data.bio || '';
+
+        const mins = Array.isArray(data.ministries) ? data.ministries : [];
+        document.querySelectorAll('input[name="editMin"]').forEach(cb => {
+            cb.checked = mins.includes(cb.value);
+        });
+
+        const nameHeader = document.getElementById('editMemberNameHeader');
+        if (nameHeader) nameHeader.innerText = data.fullName || 'MEMBER';
+        const idHeader = document.getElementById('editMemberIdHeader');
+        if (idHeader) idHeader.innerText = data.membershipId ? `ID: ${data.membershipId}` : 'ID: Pending';
+
+        const statusText = data.status === 'approved' ? '<i class="fas fa-check-circle"></i> ACTIVE MEMBER' : '<i class="fas fa-clock"></i> PENDING APPROVAL';
+        const statusClass = data.status === 'approved' ? 'status-badge status-approved' : 'status-badge status-pending';
+        
+        const sh = document.getElementById('editStatusBadgeHeader');
+        if (sh) { sh.innerHTML = statusText; sh.className = statusClass; }
+
+        const bh = document.getElementById('editBranchHeader');
+        if (bh) bh.innerHTML = `<i class="fas fa-church"></i> ${escapeHtmlPortal(data.branch || 'Global')}`;
+
+        uploadedEditPhotoUrl = data.photoUrl || data.photoURL || null;
+        const p1 = document.getElementById('editPhotoPreview');
+        if (p1) p1.src = uploadedEditPhotoUrl || 'https://via.placeholder.com/80';
+
+        const sigPrev = document.getElementById('existingSigPreview');
+        if (sigPrev) {
+            if (data.signature) {
+                sigPrev.innerHTML = `<img src="${data.signature}" style="max-height: 70px; max-width: 100%; border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; padding: 4px; background: #fff;">`;
+            } else {
+                sigPrev.innerHTML = `<p style="color: var(--text-sub); font-size: 0.8rem; margin: 0;">No existing signature</p>`;
+            }
+        }
+
+        uploadedEditDocs = Array.isArray(data.supportingDocs) ? [...data.supportingDocs] : [];
+        renderUploadedDocsList('editUploadedDocsList', uploadedEditDocs, 'edit');
+    }
+
+    window.updateMembershipInformation = async () => {
+        if (!currentUser) {
+            showToast("Please login first", "error");
+            window.location.href = 'account.html';
+            return;
+        }
+
+        const requiredFields = ['editFullName', 'editDob', 'editIdNo'];
+        for (let field of requiredFields) {
+            if (!document.getElementById(field).value.trim()) {
+                showToast("Please fill in all required fields marked with *", "error");
                 return;
             }
-            if (result && result.event === "success") {
-                const url = result.info.secure_url;
-                uploadedPhotoUrl = url;
-                document.getElementById('photoPreview').src = url;
-                document.getElementById('uploadedPhotoUrl').value = url;
-                showToast("Photo uploaded successfully!", "success");
+        }
+
+        showLoading("Updating membership information...");
+        try {
+            let signatureData = currentMemberData?.signature || "";
+            if (isEditSigModified && editCanvas) {
+                signatureData = editCanvas.toDataURL();
             }
-        });
-        uploadWidget.open();
+
+            const giftNamesVal = document.getElementById('editGiftNames').value.trim();
+            const ministriesVal = Array.from(document.querySelectorAll('input[name="editMin"]:checked')).map(cb => cb.value);
+
+            const updatedData = {
+                fullName: document.getElementById('editFullName').value.trim(),
+                dateOfBirth: document.getElementById('editDob').value,
+                gender: document.getElementById('editGender').value,
+                identityNumber: document.getElementById('editIdNo').value.trim(),
+                phone: document.getElementById('editPhone').value.trim(),
+                email: document.getElementById('editEmail').value.trim(),
+                maritalStatus: document.getElementById('editMarital').value,
+                dependants: parseInt(document.getElementById('editDependants').value) || 0,
+                occupation: document.getElementById('editJob').value.trim(),
+                branch: document.getElementById('editBranch').value,
+                bornAgain: document.getElementById('editBornAgain').value,
+                bornAgainDate: document.getElementById('editBornDate').value || null,
+                waterBaptism: document.getElementById('editWaterBapt').value,
+                baptismDate: document.getElementById('editBaptDate').value || null,
+                holySpiritBaptism: document.getElementById('editHolySpirit').checked,
+                speaksTongues: document.getElementById('editTongues').checked,
+                spiritualGifts: document.getElementById('editGifts').checked,
+                giftNames: giftNamesVal,
+                ministries: ministriesVal,
+                bio: document.getElementById('editBio').value.trim(),
+                photoUrl: uploadedEditPhotoUrl || currentMemberData?.photoUrl || "https://via.placeholder.com/150",
+                signature: signatureData,
+                supportingDocs: uploadedEditDocs,
+                updatedAt: serverTimestamp()
+            };
+
+            await setDoc(doc(db, "memberships", currentUser.uid), updatedData, { merge: true });
+
+            await setDoc(doc(db, "users", currentUser.uid), {
+                fullName: updatedData.fullName,
+                phone: updatedData.phone,
+                email: updatedData.email || currentUser.email,
+                photoURL: updatedData.photoUrl,
+                branch: updatedData.branch,
+                ministries: updatedData.ministries,
+                updatedAt: serverTimestamp()
+            }, { merge: true });
+
+            await updateProfile(currentUser, {
+                displayName: updatedData.fullName,
+                photoURL: updatedData.photoUrl
+            }).catch(() => {});
+
+            currentMemberData = { ...currentMemberData, ...updatedData };
+            renderCard(currentMemberData);
+
+            hideLoading();
+            showToast("✅ Membership information updated successfully!", "success");
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+            
+            switchMainTab('card');
+        } catch (err) {
+            console.error("Update membership error:", err);
+            hideLoading();
+            showToast("Error updating membership: " + err.message, "error");
+        }
+    };
+
+    function initEditSigPad() {
+        editCanvas = document.getElementById('edit-sig-pad');
+        if (!editCanvas) return;
+        editCtx = editCanvas.getContext('2d');
+        editCanvas.width = editCanvas.offsetWidth || 300;
+        editCanvas.height = editCanvas.offsetHeight || 100;
+        editCtx.strokeStyle = '#000';
+        editCtx.lineWidth = 2;
+
+        let drawing = false;
+        const getPos = (e) => {
+            const rect = editCanvas.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+            const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        };
+
+        const start = (e) => {
+            e.preventDefault();
+            drawing = true;
+            isEditSigModified = true;
+            const p = getPos(e);
+            editCtx.beginPath();
+            editCtx.moveTo(p.x, p.y);
+        };
+        const draw = (e) => {
+            if (!drawing) return;
+            e.preventDefault();
+            const p = getPos(e);
+            editCtx.lineTo(p.x, p.y);
+            editCtx.stroke();
+        };
+        const stop = () => drawing = false;
+
+        editCanvas.addEventListener('mousedown', start);
+        editCanvas.addEventListener('mousemove', draw);
+        editCanvas.addEventListener('mouseup', stop);
+        editCanvas.addEventListener('touchstart', start);
+        editCanvas.addEventListener('touchmove', draw);
+        editCanvas.addEventListener('touchend', stop);
+    }
+
+    window.clearEditSig = () => {
+        if (editCtx && editCanvas) {
+            editCtx.clearRect(0, 0, editCanvas.width, editCanvas.height);
+            isEditSigModified = false;
+            showToast("New signature cleared", "info");
+        }
     };
 
     window.registerNewMember = async () => {
@@ -1289,6 +1749,7 @@
                 titheCommitment: true,
                 signature: signatureData,
                 photoUrl: photoUrl,
+                supportingDocs: uploadedDocs,
                 status: 'pending', // Pending admin approval
                 role: 'member',
                 uid: targetUid,
@@ -1547,10 +2008,19 @@
             const el = document.getElementById(id);
             if (el) el.style.display = 'none';
         });
+        const myMemContainer = document.getElementById('myMembershipContainer');
+        if (myMemContainer) myMemContainer.style.display = 'none';
 
         if (tab === 'membership') {
-            const el = document.getElementById(lastWizardId);
-            if (el) el.style.display = 'block';
+            if (currentMemberData && !isRegisteringOtherMode) {
+                if (myMemContainer) myMemContainer.style.display = 'block';
+                populateEditMembershipForm(currentMemberData);
+            } else {
+                const el = document.getElementById(lastWizardId);
+                if (el) el.style.display = 'block';
+                const banner = document.getElementById('backToMyMemBanner');
+                if (banner) banner.style.display = currentMemberData ? 'block' : 'none';
+            }
         } else {
             const target = document.getElementById(portalTabs[tab]);
             if (target) target.style.display = 'block';
@@ -1566,17 +2036,41 @@
     };
 
     window.downloadID = () => {
-        const element = document.getElementById('captureArea');
-        if (!element) return;
+        const element = document.getElementById('digitalCard') || document.getElementById('captureArea');
+        if (!element) {
+            showToast("ID Card element not found", "error");
+            return;
+        }
+        showLoading("Generating ID Card PDF...");
         html2canvas(element, { useCORS: true, scale: 3, backgroundColor: null }).then(canvas => {
-            const a = document.createElement('a');
-            a.href = canvas.toDataURL("image/png");
-            a.download = `PrayerDome-ID-${moment().format('YYYYMMDD-HHmmss')}.png`;
-            a.click();
-            showToast("ID Card saved to gallery!", "success");
+            const imgData = canvas.toDataURL("image/png");
+            const jsPDFClass = window.jspdf ? window.jspdf.jsPDF : (window.jsPDF || null);
+            if (!jsPDFClass) {
+                const a = document.createElement('a');
+                a.href = imgData;
+                a.download = `PrayerDome-ID-${currentMemberData?.membershipId || 'Card'}-${moment().format('YYYYMMDD-HHmmss')}.png`;
+                a.click();
+                hideLoading();
+                showToast("Downloaded ID Card image", "success");
+                return;
+            }
+            const imgWidth = canvas.width;
+            const imgHeight = canvas.height;
+            const orientation = imgWidth > imgHeight ? 'l' : 'p';
+            const pdf = new jsPDFClass({
+                orientation: orientation,
+                unit: 'px',
+                format: [imgWidth, imgHeight]
+            });
+            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+            const fileName = `PrayerDome-ID-${currentMemberData?.membershipId || 'Card'}-${moment().format('YYYYMMDD-HHmmss')}.pdf`;
+            pdf.save(fileName);
+            hideLoading();
+            showToast("✅ ID Card downloaded as PDF!", "success");
         }).catch(err => {
             console.error("Download error:", err);
-            showToast("Error downloading ID.", "error");
+            hideLoading();
+            showToast("Error downloading ID Card PDF.", "error");
         });
     };
     
