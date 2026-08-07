@@ -659,10 +659,10 @@
 
             <!-- MTN MOMO CARD -->
             <div class="method-card">
-                <div class="method-header momo">
-                    <h2><i class="fas fa-mobile-alt"></i> MTN MoMo</h2>
-                    <p>Eswatini & Zambia Direct</p>
-                </div>
+            <div class="method-header momo">
+                <h2><i class="fas fa-mobile-alt"></i> MTN MoMo</h2>
+                <p>Eswatini &amp; Zambia Direct — Supporting Prayer Dome Zambia</p>
+            </div>
                 <div class="method-body">
                     <div class="info-box">
                         <div class="info-row">
@@ -673,6 +673,14 @@
                         <div class="info-row">
                             <span class="info-label">Account Name</span>
                             <span class="info-value">PRAYER DOME CHURCH</span>
+                        </div>
+                        <div class="info-row" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border);">
+                            <span class="info-label" style="color: var(--accent-gold);">🇿🇲 Zambia Branch</span>
+                            <span class="info-value" style="font-size: 0.75rem; color: var(--accent-gold);">Pastor Zacheus Simbaya — info@prayerdome.net</span>
+                        </div>
+                        <div class="info-row" style="font-size: 0.8rem; color: var(--text-secondary);">
+                            <span class="info-label">Daily Night Service</span>
+                            <span class="info-value" style="font-size: 0.8rem;">Every night — 8:00 PM CAT</span>
                         </div>
                     </div>
                     <div class="upload-zone" onclick="openCloudinary()">
@@ -1003,8 +1011,10 @@
         };
         
         window.toggleDarkMode = () => document.body.classList.toggle('dark-mode');
-        
+
+        // ----------------------------------------------------------------
         // Initialize exchange rates on page load
+        // ----------------------------------------------------------------
         fetchExchangeRates();
         setInterval(fetchExchangeRates, 3600000); // Refresh every hour
         updateMessagePreview();

@@ -191,9 +191,31 @@ export const devotionalsDB = {
             text: "May the God of hope fill you with all joy and peace as you trust in him, so that you may overflow with hope by the power of the Holy Spirit.", 
             message: "As you close your eyes tonight, receive God's gift of hope. He is the God of hope - not disappointment, not discouragement. Let His joy and peace fill you, overflowing into hope that will carry you through tomorrow. The Holy Spirit is your source of supernatural hope.", 
             prayer: "God of hope, fill me with joy and peace as I trust in You. Let hope overflow in my heart by the power of Your Spirit. Thank You that my future is bright because You are in it. I receive Your hope tonight. In Jesus' name, Amen." 
+        },
+
+        // ========== ZAMBIA BRANCH DEVOTIONALS ==========
+        {
+            verse: "Psalm 134:1-2",
+            text: "Praise the Lord, all you servants of the Lord who minister by night. Lift up your hands in the holy place and praise the Lord.",
+            message: "There is something special about praying at night when the world is quiet. In Zambia, believers gather at night because they know the night is the opportune time for intercession. God does not sleep. He is watching over Zambia and over every prayer you lift up tonight. Your nighttime prayer is a covering over your nation.",
+            prayer: "Lord of Hosts, I praise You as I lift my hands in the holy place tonight. Let my prayer be like incense before You. Cover Zambia with Your fire. Let this night prayer be heard in heaven. I stand with Prayer Dome Zambia tonight. Amen.",
+            branchZambia: true
+        },
+        {
+            verse: "Isaiah 62:6-7",
+            text: "I have posted watchmen on your walls, Jerusalem, who will never be silent day or night. You who call on the Lord, give yourselves no rest, and give Him no rest until He establishes Jerusalem and makes her the praise of the earth.",
+            message: "God has posted watchmen on the walls of our cities. In Zambia, we are those watchmen. Our nightly prayers are not in vain - they are strategic assignments from God. When you pray at night, you are standing on the wall, watching, interceding. Do not give God rest until He establishes what He promised for your family, your church, your nation.",
+            prayer: "Lord, I accept my assignment as a watchman. I will not give You rest until Your promises are established in my life and in Zambia. Let my night prayers move the hearts of leaders and bring revival to our nation. I stand on the wall tonight. Amen.",
+            branchZambia: true
+        },
+        {
+            verse: "Psalm 91:5-6",
+            text: "You will not fear the terror of the night, nor the arrow that flies by day, nor the pestilence that stalks in darkness, nor the plague that destroys at midday.",
+            message: "Night can be a time of fear. But God's promise is clear: you will not fear. The same God who protects you in the day watches over you in the night. Zambia faces challenges, but we do not walk in fear. We walk in the assurance of God's protection. The night cannot surprise God.",
+            prayer: "Father, I reject the terror of the night. I declare that I will not fear, because You are with me. Let Your angels encamp around my home tonight. Protect me from every harm, visible and invisible. I walk in Your peace. Amen.",
+            branchZambia: true
         }
-    ]
-};
+    ];
 
 // Seasonal/Holiday Specials
 export const seasonalDevotionals = {

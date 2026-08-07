@@ -151,3 +151,40 @@ PD_CONTENT.DEFAULT_STATS = {
 
 /* --- Language availability (mirrors translation-data.js) ------------------ */
 PD_CONTENT.DEFAULT_LANGUAGES = ['en', 'tum', 'ssw', 'bem', 'nya'];
+
+/* --- Scripture translations seed ----------------------------------------- */
+/* Elders review these from Admin → Translation Review and sign each off.     */
+PD_CONTENT.DEFAULT_TRANSLATIONS = [
+  {
+    id: 'ts-1',
+    verseRef: 'Mark 7:37',
+    english: 'He does everything blamelessly.',
+    translation: 'Wacita vinthu vyose makora.',
+    lang: 'tum',
+    reviewed: false
+  },
+  {
+    id: 'ts-2',
+    verseRef: 'Mark 7:37',
+    english: 'He does everything blamelessly.',
+    translation: 'Wente konkhe kuhle.',
+    lang: 'ssw',
+    reviewed: false
+  },
+  {
+    id: 'ts-3',
+    verseRef: 'Mark 7:37',
+    english: 'He does everything blamelessly.',
+    translation: 'Atenda ifintu fyonse bwino.',
+    lang: 'bem',
+    reviewed: false
+  },
+  {
+    id: 'ts-4',
+    verseRef: 'Mark 7:37',
+    english: 'He does everything blamelessly.',
+    translation: 'Iye wachita zonse bwino.',
+    lang: 'nya',
+    reviewed: false
+  }
+];
