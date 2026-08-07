@@ -52,63 +52,6 @@ exports.getCloudinarySignature = functions.https.onCall((data, context) => {
 });
 
 // ==========================================
-// Hybrid Cloud LLM Prayer Assistant (Gemini)
-// ==========================================
-// Server-side Gemini call that acts as primary counselor.
-// The browser-based matcher in ai-prayer.html remains the
-// offline fallback. Keep both — never call the model directly
-// from the browser.
-exports.askAIAssistant = functions.https.onCall(async (data, context) => {
-  const userPrompt = (data && data.prompt) ? data.prompt.trim() : '';
-  if (!userPrompt) {
-    throw new functions.https.HttpsError('invalid-argument', 'Prompt query cannot be empty.');
-  }
-
-  const apiKey = functions.config().gemini && functions.config().gemini.key;
-  if (!apiKey) {
-    throw new functions.https.HttpsError(
-      'failed-precondition',
-      'AI Assistant is not configured yet. Set it with: firebase functions:config:set gemini.key=YOUR_KEY'
-    );
-  }
-
-  const { GoogleGenerativeAI } = require('@google/generative-ai');
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
-    systemInstruction: `
-      You are the Prayer Dome AI Assistant — a comforting, wise, and encouraging
-      Christian pastoral companion. Respond to the user's situation with:
-
-      1. A short, warm, pastoral paragraph (1-2 sentences) acknowledging their situation.
-      2. Exactly 2-3 accurate KJV Bible scriptures relevant to their situation.
-         Format each as: "Verse text" — Reference.
-         Only use real, verifiable KJV scriptures. Do not invent verses.
-      3. A heartfelt, personalized prayer of 4-5 sentences addressed to God.
-      4. A one-line word of encouragement.
-
-      Tone: quiet, warm, pastoral, never preachy or clinical.
-      Do NOT give medical, financial, or legal advice.
-      If the user expresses self-harm intent, respond ONLY with:
-        "I hear how much pain you are in. Please reach out right now to someone who can stay with you.
-         In the US: call or text 988. In the UK: call 111 or 999. In Zambia: call 911 or 999.
-         In Eswatini: call 911 or 999. You are not alone — please reach out to a pastor, family member,
-         or friend right now. God loves you and there are people who want to help."
-      Keep the full response under 400 words.
-    `
-  });
-
-  try {
-    const result = await model.generateContent(userPrompt);
-    const response = result.response.text();
-    return { success: true, response };
-  } catch (err) {
-    console.error('AI Assistant error:', err);
-    throw new functions.https.HttpsError('internal', 'Unable to generate a response right now. Please try again in a moment.');
-  }
-});
-
-// ==========================================
 // Scheduled Devotional Dispatcher
 // ==========================================
 // Runs once per day (configure the schedule in Firebase Console

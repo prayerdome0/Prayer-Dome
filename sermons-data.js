@@ -309,6 +309,57 @@ const PD_SERMONS = [
       'What "good reason" do you most often use to avoid getting involved?',
       'Who is the person you would least like to receive help from — and what does that reveal?'
     ]
+  },
+
+  {
+    id: 'abundant-life',
+    title: 'The Abundant Life Jesus Promised',
+    subtitle: 'What it really means to have life to the full',
+    series: 'Foundations of Faith',
+    speaker: 'Pastor Zacheus Simbaya',
+    scripture: 'John 10:10',
+    topics: ['abundant life', 'purpose', 'blessing', 'zambia'],
+    image: '/assets/sermons/sermon-abundant.jpg',
+    tint: 'gold',
+    minutes: 4,
+    featured: true,
+    summary: 'Jesus said He came to give life, and life to the full. But what does that actually look like on a Tuesday morning in Zambia?',
+    keyVerse: 'The thief cometh not, but for to steal, and to kill, and to destroy: I am come that they might have life, and that they might have it more abundantly. — John 10:10',
+    story: [
+      'Jesus did not come to make bad people good. He came to make dead people live. There is a difference, and it is a big difference.',
+      'A person who is good with some bad habits can improve. A person who is dead in trespasses and sins cannot improve — they need resurrection.',
+      'And this is what the world around us does not understand. It thinks Christianity is a list of things you stop doing. It is not. It is the beginning of a life you were not living before.',
+      'In our Zambia branch, many of you come to Prayer Dome carrying real burdens. It is evening, it is dark, the sun has set, and the rent is still due, and the child is sick, and the business is slow, and the marriage is tired.'
+    ],
+    prayer: 'Lord, I receive the abundant life Jesus came to give me. Not money in my account — peace in my heart. Not just good days — a purpose that outlasts my problems. Make me alive today. Amen.',
+    reflection: [
+      'What area of your life feels most "bare" right now?',
+      'Jesus has been in your situation before. What would change if you believed that today?'
+    ]
+  },
+
+  {
+    id: 'zambia-prayer-warrior',
+    title: 'Prayer Changes the atmosphere in Zambia',
+    subtitle: 'Why we pray at night — the Zambia story',
+    series: 'Prayer Fundamentals',
+    speaker: 'Pastor Zacheus Simbaya',
+    scripture: 'Psalm 91:1-2',
+    topics: ['prayer', 'zambia', 'night service', 'intercession'],
+    image: '/assets/sermons/sermon-prayer.jpg',
+    tint: 'dawn',
+    minutes: 5,
+    featured: false,
+    summary: 'Every night in Lusaka and beyond, Prayer Dome Zambia gathers to pray. Here is why it matters and how to join.',
+    keyVerse: 'He that dwelleth in the secret place of the most High shall abide under the shadow of the Almighty. I will say of the LORD, He is my refuge and my fortress: my God; in him will I trust. — Psalm 91:1-2',
+    story: [
+      'There is a difference between praying in the morning when you are fresh and everyone is watching — and praying at night when you are tired, the house is quiet, and only God receives the effort.'
+    ],
+    prayer: 'Father, teach me to pray at night when the world is asleep and my only audience is You. Let my prayers be a covering over my family, my church, and my nation. Zambia, be covered in prayer. Amen.',
+    reflection: [
+      'What time do you pray when no one is watching?',
+      'Who in your family needs a prayer covering tonight?'
+    ]
   }
 ];
 

@@ -137,8 +137,6 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-    <!-- Flutterwave Inline Checkout — for card + mobile money (Zambia & Eswatini) -->
-    <script src="https://checkout.flutterwave.com/v3.js"></script>
 
     <style>
         :root {
@@ -661,10 +659,10 @@
 
             <!-- MTN MOMO CARD -->
             <div class="method-card">
-                <div class="method-header momo">
-                    <h2><i class="fas fa-mobile-alt"></i> MTN MoMo</h2>
-                    <p>Eswatini & Zambia Direct</p>
-                </div>
+            <div class="method-header momo">
+                <h2><i class="fas fa-mobile-alt"></i> MTN MoMo</h2>
+                <p>Eswatini &amp; Zambia Direct — Supporting Prayer Dome Zambia</p>
+            </div>
                 <div class="method-body">
                     <div class="info-box">
                         <div class="info-row">
@@ -675,6 +673,14 @@
                         <div class="info-row">
                             <span class="info-label">Account Name</span>
                             <span class="info-value">PRAYER DOME CHURCH</span>
+                        </div>
+                        <div class="info-row" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border);">
+                            <span class="info-label" style="color: var(--accent-gold);">🇿🇲 Zambia Branch</span>
+                            <span class="info-value" style="font-size: 0.75rem; color: var(--accent-gold);">Pastor Zacheus Simbaya — info@prayerdome.net</span>
+                        </div>
+                        <div class="info-row" style="font-size: 0.8rem; color: var(--text-secondary);">
+                            <span class="info-label">Daily Night Service</span>
+                            <span class="info-value" style="font-size: 0.8rem;">Every night — 8:00 PM CAT</span>
                         </div>
                     </div>
                     <div class="upload-zone" onclick="openCloudinary()">
@@ -693,42 +699,6 @@
                         <i class="fas fa-paper-plane"></i> SUBMIT OFFERING
                     </button>
                 </div>
-            </div>
-        </div>
-
-        <!-- FLUTTERWAVE — Card + Mobile Money (Zambia MoMo + Eswatini) -->
-        <div class="method-card" id="flutterwaveCard">
-            <div class="method-header" style="background: linear-gradient(135deg, #009444, #00713a); color: white;">
-                <h2><i class="fas fa-credit-card"></i> All Payment Methods</h2>
-                <p>Card, MTN MoMo, Airtel Money &amp; more — one secure checkout</p>
-            </div>
-            <div class="method-body">
-                <p style="font-size:.85rem; color:var(--text-sub); margin-bottom:18px; line-height:1.6;">
-                    Pay with <strong>Visa / Mastercard / UnionPay</strong>, or use
-                    <strong>MTN MoMo</strong> or <strong>Airtel Money</strong> in Zambia and Eswatini.
-                    Your payment is processed securely by Flutterwave — Prayer Dome never sees your card details.
-                </p>
-                <div class="amount-selector">
-                    <button class="amt-chip" onclick="setA('flw', 20)">E20</button>
-                    <button class="amt-chip" onclick="setA('flw', 50)">E50</button>
-                    <button class="amt-chip" onclick="setA('flw', 100)">E100</button>
-                    <button class="amt-chip" onclick="setA('flw', 250)">E250</button>
-                </div>
-                <input type="number" id="flwAmt" class="custom-input" placeholder="Custom Amount (E)">
-                <div style="display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap;">
-                    <label style="font-size:.8rem; display:flex; align-items:center; gap:6px; cursor:pointer;">
-                        <input type="radio" name="flwCurrency" value="SZL" checked onchange="updateFlwAmount()"> SZL — Eswatini
-                    </label>
-                    <label style="font-size:.8rem; display:flex; align-items:center; gap:6px; cursor:pointer;">
-                        <input type="radio" name="flwCurrency" value="ZMW" onchange="updateFlwAmount()"> ZMW — Zambia
-                    </label>
-                </div>
-                <button class="btn-donate" style="background: linear-gradient(135deg, #009444, #00713a); color:white;" onclick="makeFlutterwavePayment()">
-                    <i class="fas fa-lock"></i> SECURE CHECKOUT — FLUTTERWAVE
-                </button>
-                <p style="font-size:.65rem; color:var(--text-sub); text-align:center; margin-top:12px;">
-                    <i class="fas fa-shield-alt"></i> Secured by Flutterwave. Prayer Dome does not store your card details.
-                </p>
             </div>
         </div>
 
@@ -1043,138 +1013,11 @@
         window.toggleDarkMode = () => document.body.classList.toggle('dark-mode');
 
         // ----------------------------------------------------------------
-        // Flutterwave Secure Checkout
-        // ----------------------------------------------------------------
-        // Replace PUBLIC_KEY below with your live Flutterwave public key
-        // (starts with FLWPUBK-...). Get it from:
-        //   https://dashboard.flutterwave.com/#/settings/developer-api-keys
-        // The private key stays server-side — never put it in page source.
-        const FLW_PUBLIC_KEY = 'FLWPUBK-e8df99166a9df55998a4ff8217bb4ec0-X'; // ← replace
-
-        window.makeFlutterwavePayment = function () {
-            const amountInput = document.getElementById('flwAmt');
-            const amount = parseFloat(amountInput.value);
-            if (!amount || amount <= 0) {
-                toast('Please enter a valid amount.', 'error');
-                return;
-            }
-
-            const currencyEl = document.querySelector('input[name="flwCurrency"]:checked');
-            const currency = currencyEl ? currencyEl.value : 'SZL';
-
-            // Build a meaningful tx_ref so reconciliation is easy.
-            const txRef = 'PD-GIVE-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
-
-            // Gather donor info if logged in.
-            const customer = {
-                email: currentUser ? (currentUser.email || 'support@prayerdome.net') : 'support@prayerdome.net',
-                phone_number: '+26876581804',
-                name: currentUser ? (currentUser.displayName || 'Prayer Dome Family') : 'Prayer Dome Family'
-            };
-
-            FlutterwaveCheckout({
-                public_key: FLW_PUBLIC_KEY,
-                tx_ref: txRef,
-                amount: amount,
-                currency: currency,
-                payment_options: 'card, mobilemoneyzambia, mobilemoneyeswatini, ussd',
-                customer: customer,
-                customizations: {
-                    title: 'Prayer Dome Ministry',
-                    description: 'Support the spread of the Gospel across the nations.',
-                    logo: 'https://i.ibb.co/TB5Fx4tb/logo-0.png',
-                    remark: 'God bless your generosity.',
-                    paymentBgColour: '#009444',
-                    bottomText: 'Prayer Dome',
-                    bgColor: '#f8fafc'
-                },
-                callback: function (response) {
-                    console.log('Flutterwave callback:', response);
-                    if (response.status === 'successful' || response.charge_response_code === '00') {
-                        // Payment succeeded — record it in Firestore.
-                        saveDonationReceipt(response, amount, currency).then(() => {
-                            showOfferingSuccessModal(amount, currency);
-                        }).catch(err => {
-                            console.error('Receipt save error:', err);
-                            showOfferingSuccessModal(amount, currency);
-                        });
-                    } else {
-                        toast('Payment was not completed. Please try again.', 'error');
-                    }
-                },
-                onclose: function () {
-                    console.log('Flutterwave window closed.');
-                },
-                meta: [
-                    { metaname: 'transaction_type', metavalue: 'offering' },
-                    { metaname: 'platform', metavalue: 'prayerdome-web' }
-                ],
-                // Prefer mobile money for Zambia / Eswatini visitors.
-                prefer_payment_core: ['mobilemoneyzambia', 'mobilemoneyeswatini', 'card']
-            });
-        };
-
-        function saveDonationReceipt(flwResponse, amount, currency) {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    await addDoc(collection(db, 'offerings'), {
-                        donor: currentUser ? currentUser.displayName : 'Anonymous',
-                        donorEmail: currentUser ? currentUser.email : flwResponse.customer?.email || 'anonymous',
-                        amount: amount,
-                        currency: currency,
-                        method: 'Flutterwave (' + (flwResponse.payment_type?.name || 'card') + ')',
-                        transactionRef: flwResponse.tx_ref,
-                        flarepayId: flwResponse.id,
-                        receipt: flwResponse.verification?.receipt || '',
-                        status: 'completed',
-                        timestamp: serverTimestamp()
-                    });
-                    resolve();
-                } catch (err) {
-                    reject(err);
-                }
-            });
-        }
-
-        function showOfferingSuccessModal(amount, currency) {
-            const overlay = document.createElement('div');
-            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
-            overlay.innerHTML =
-                '<div style="background:var(--bg-card);border-radius:28px;padding:36px;max-width:420px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,0.4);animation:fadeInUp 0.4s ease;">' +
-                '<div style="font-size:3rem;margin-bottom:12px;">🙏</div>' +
-                '<h2 style="font-family:\'Playfair Display\',serif;font-size:1.5rem;margin-bottom:8px;color:var(--accent-green);">Thank You!</h2>' +
-                '<p style="color:var(--text-sub);font-size:.9rem;line-height:1.6;margin-bottom:20px;">' +
-                'Your gift of <strong>' + amount.toFixed(2) + ' ' + currency + '</strong> has been received. God bless you abundantly.' +
-                '<br><br>Your offering helps spread the Gospel and transform lives.' +
-                '</p>' +
-                '<div style="background:var(--bg-light);border-radius:16px;padding:12px;margin-bottom:20px;word-break:break-all;font-size:.8rem;color:var(--text-sub);">' +
-                '<span style="font-weight:800;color:var(--accent-gold);">Transaction Ref:</span> ' +
-                '<span style="font-family:monospace;">PD-GIVE-' + Date.now().toString(36) + '</span>' +
-                '</div>' +
-                '<button onclick="this.closest(\'div[style]\').remove();window.location.href=\'index.html\'" style="background:linear-gradient(135deg,var(--accent-green),var(--accent-green-light));color:white;border:none;padding:14px 32px;border-radius:50px;font-weight:800;cursor:pointer;font-size:1rem;width:100%;box-shadow:0 8px 24px rgba(10,77,155,0.3);">' +
-                '<i class="fas fa-home"></i> Return Home</button>' +
-                '</div>';
-            document.body.appendChild(overlay);
-            confetti({ particleCount: 80, spread: 70, origin: { y: 0.5 } });
-        }
-
-        function updateFlwAmount() {
-            // Sync the Flutterwave card's amount chips with the input.
-            const chips = document.querySelectorAll('#flutterwaveCard .amt-chip');
-            chips.forEach(chip => {
-                chip.onclick = function () {
-                    document.getElementById('flwAmt').value = this.getAttribute('onclick').match(/setA\('flw',\s*(\d+)/)[1];
-                };
-            });
-        }
-
-        // ----------------------------------------------------------------
         // Initialize exchange rates on page load
         // ----------------------------------------------------------------
         fetchExchangeRates();
         setInterval(fetchExchangeRates, 3600000); // Refresh every hour
         updateMessagePreview();
-        updateFlwAmount();
     </script>
 </body>
 </html>
