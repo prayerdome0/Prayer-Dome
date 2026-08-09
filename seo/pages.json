@@ -240,6 +240,43 @@
       "schema": "webpage",
       "priority": "0.7",
       "changefreq": "weekly"
+    },
+    "lessons.html": {
+      "path": "/lessons",
+      "title": "Teaching & Lessons | Prayer Dome Academy",
+      "description": "Grow spiritually with detailed Prayer Dome lessons, linked quizzes and certificates. Learn biblical foundations, prayer, the Holy Spirit, character and mission.",
+      "keywords": "Christian lessons, Bible teaching, discipleship courses, prayer lessons, Bible quizzes, Christian certificates",
+      "schema": "webpage",
+      "priority": "0.9",
+      "changefreq": "weekly"
+    },
+    "stories.html": {
+      "path": "/stories",
+      "title": "Inspiring Faith Stories | Prayer Dome",
+      "description": "Read meaningful and inspiring Prayer Dome stories of prayer, provision, forgiveness, service and faith in action.",
+      "keywords": "Christian stories, faith stories, prayer testimonies, discipleship stories, inspiring Christian reading",
+      "schema": "webpage",
+      "priority": "0.8",
+      "changefreq": "weekly",
+      "image": "https://prayerdome.net/assets/testimonies/hero-praise.jpg"
+    },
+    "resources.html": {
+      "path": "/resources",
+      "title": "Resources & Downloads | Prayer Dome",
+      "description": "Download Prayer Dome PDF guides: statement of faith, new believers guide, prayer watch guide, ministry handbooks and the app user guide.",
+      "keywords": "Christian PDF guides, statement of faith, prayer guide, new believers guide, ministry resources",
+      "schema": "webpage",
+      "priority": "0.7",
+      "changefreq": "monthly"
+    },
+    "privacy.html": {
+      "path": "/privacy",
+      "title": "Privacy Policy | Prayer Dome",
+      "description": "Prayer Dome privacy policy and information about how we handle account and community data.",
+      "keywords": "Prayer Dome privacy policy, church app privacy, data privacy",
+      "schema": "webpage",
+      "priority": "0.4",
+      "changefreq": "yearly"
     }
   }
 }
