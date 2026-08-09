@@ -4,10 +4,10 @@
   "private": true,
   "description": "Prayer Dome web app and Android package",
   "engines": {
-    "node": ">=22"
+    "node": "22.x"
   },
   "scripts": {
-    "postinstall": "npm --prefix functions install --no-audit --no-fund",
+    "postinstall": "node scripts/install-functions.mjs",
     "mobile:prepare": "node scripts/prepare-mobile.mjs",
     "mobile:sync": "npm run mobile:prepare && npx cap sync android",
     "mobile:open": "npm run mobile:sync && npx cap open android",
@@ -16,8 +16,8 @@
     "mobile:build:release": "npm run mobile:sync && cd android && ./gradlew bundleRelease assembleRelease",
     "test": "node tests/assistant.test.js && node tests/content.test.js && node tests/academy.test.js && node tests/admin.test.js && node tests/certificate.test.js && node tests/pages.test.js && node tests/premium.test.js && node tests/challenge.test.js && node tests/certificates.test.js",
     "lint": "node scripts/validate-production.mjs && python3 seo/apply-seo.py --check",
-    "functions:verify": "npm --prefix functions run verify",
-    "build": "npm run lint && npm test && npm run functions:verify"
+    "functions:verify": "npm --prefix functions install --no-audit --no-fund && npm --prefix functions run verify",
+    "verify:all": "npm run lint && npm test && npm run functions:verify"
   },
   "dependencies": {
     "@capacitor/android": "8.5.0",
