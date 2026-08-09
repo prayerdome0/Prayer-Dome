@@ -1,7 +1,9 @@
-const functions = require('firebase-functions');
+const functions = require('firebase-functions/v1');
 const admin = require('firebase-admin');
 
-admin.initializeApp();
+if (!admin.getApps().length) {
+    admin.initializeApp();
+}
 
 // Send notifications when a new document is added to 'notifications' collection
 exports.sendPushNotification = functions.firestore

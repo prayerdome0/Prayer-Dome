@@ -7,6 +7,7 @@
     "node": ">=22"
   },
   "scripts": {
+    "postinstall": "npm --prefix functions install --no-audit --no-fund",
     "mobile:prepare": "node scripts/prepare-mobile.mjs",
     "mobile:sync": "npm run mobile:prepare && npx cap sync android",
     "mobile:open": "npm run mobile:sync && npx cap open android",
@@ -25,5 +26,8 @@
   "devDependencies": {
     "@capacitor/cli": "8.5.0",
     "jsdom": "^26.1.0"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
   }
 }
