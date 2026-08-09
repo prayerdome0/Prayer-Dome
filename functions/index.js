@@ -6,7 +6,9 @@ const admin = require('firebase-admin');
 const shareHandler = require('./share');
 const crypto = require('crypto');
 
-admin.initializeApp();
+if (!admin.getApps().length) {
+  admin.initializeApp();
+}
 
 // Dynamic social sharing pages for news and testimony links.
 exports.share = functions.https.onRequest((req, res) => shareHandler(req, res));
