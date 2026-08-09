@@ -1,4 +1,7 @@
-const functions = require('firebase-functions');
+// Use the v1 compatibility surface because these exports intentionally use
+// first-generation triggers (pubsub.schedule, firestore.document and onCall).
+// firebase-functions v7 no longer exposes that surface from the package root.
+const functions = require('firebase-functions/v1');
 const admin = require('firebase-admin');
 const shareHandler = require('./share');
 const crypto = require('crypto');
