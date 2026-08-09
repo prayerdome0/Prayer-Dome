@@ -135,7 +135,18 @@
             '<div class="pd-acad-cert-sign"><span class="sig">Prayer Dome</span><em>Ministry Team</em></div>' +
             '<div class="pd-acad-cert-seal"><i class="fas fa-award"></i></div>' +
           '</div>' +
-          '<button class="pd-acad-btn pd-acad-btn-primary no-print" onclick="window.print()"><i class="fas fa-print"></i> Print / Save Certificate</button></div>';
+          '<div class="pd-acad-cert-actions no-print">' +
+          '<button class="pd-acad-btn pd-acad-btn-primary" id="downloadCertBtn"><i class="fas fa-download"></i> Download Certificate</button> ' +
+          '<button class="pd-acad-btn pd-acad-btn-secondary" onclick="window.print()"><i class="fas fa-print"></i> Print / Save</button>' +
+          '</div></div>';
+        var dlBtn = $('#downloadCertBtn');
+        if (dlBtn) {
+          if (window.PDCertificate) {
+            window.PDCertificate.bindButton(dlBtn, { name: memberName(), course: lesson.title, score: percent, id: certId, date: new Date().toISOString() });
+          } else {
+            dlBtn.style.display = 'none';
+          }
+        }
         updateOverview(); renderLessonList($('#lessonList'), lesson.id);
       } else {
         result.innerHTML = '<div class="pd-acad-callout"><strong>Almost there.</strong> You scored ' + percent + '%. Review the lesson and try again—80% is required to earn your certificate.</div>';
