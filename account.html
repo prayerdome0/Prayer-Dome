@@ -572,6 +572,7 @@
     <script src="/assets/pd-motion.js" defer></script>
     <script src="/assets/pd-content-data.js" defer></script>
     <script src="/assets/pd-app.js" defer></script>
+    <script src="/assets/pd-certificate.js" defer></script>
 </head>
 <body>
 
@@ -697,6 +698,24 @@
                 </div>
                 <div style="background: var(--bg-primary); border-radius: 20px; padding: 20px; margin: 15px 0;"><p id="pBioDisplay">No bio added yet.</p></div>
                 <div style="background: var(--bg-primary); border-radius: 20px; padding: 20px; margin: 15px 0;"><div id="pMinistriesDisplay">Not specified</div></div>
+
+                <!-- MY CERTIFICATES -->
+                <div class="certificates-block" style="background: var(--bg-primary); border-radius: 20px; padding: 20px; margin: 15px 0; border: 1px solid rgba(212,175,55,.35);">
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 4px;">
+                        <h3 style="margin: 0; font-family: 'Playfair Display', serif; color: var(--accent-gold);"><i class="fas fa-award"></i> My Certificates</h3>
+                        <span style="font-size: .72rem; color: var(--text-sub);">Earn them by passing Academy quizzes with 80% or higher.</span>
+                    </div>
+                    <p style="font-size: .78rem; color: var(--text-sub); margin: 2px 0 14px;">Download or print your certificates anytime — the ministry team can see that you earned them.</p>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 16px;">
+                        <label style="font-size: .78rem; font-weight: 700; color: var(--text-main);">Name on certificate</label>
+                        <input type="text" id="certNameInput" placeholder="Full name shown on your certificates" style="flex: 1; min-width: 200px;" maxlength="60">
+                        <button class="btn btn-outline" style="width: auto;" onclick="saveCertName()"><i class="fas fa-save"></i> Save Name</button>
+                    </div>
+                    <div id="myCertificatesList" class="certificates-list">
+                        <div class="certificates-empty" style="text-align:center; padding: 18px; color: var(--text-sub);"><i class="fas fa-spinner fa-spin"></i> Loading your certificates…</div>
+                    </div>
+                </div>
+
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                     <button onclick="toggleEdit(true)" class="btn btn-primary" style="flex: 2;">Edit Profile</button>
                     <button onclick="handleLogout()" class="btn btn-outline" style="flex: 1; color: #ef4444;">Logout</button>
@@ -833,7 +852,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, GoogleAuthProvider, signInWithPopup, sendEmailVerification, sendPasswordResetEmail, deleteUser } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, query, where, orderBy, limit, getDocs, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo",
@@ -895,6 +914,8 @@
         }
 
         // Helper Functions
+        window.escapeHtml = (str) => { const d = document.createElement('div'); d.textContent = str == null ? '' : String(str); return d.innerHTML; };
+
         window.showToast = (msg, type) => {
             const container = document.getElementById('toastContainer');
             const t = document.createElement('div');
@@ -1283,7 +1304,103 @@
                 updateVerificationStatus();
             }
             document.getElementById('pIdDisplay').innerText = memberSnap.exists() ? memberSnap.data().membershipId : "Pending";
+
+            // Certificate name: prefer the profile-saved name, else the local quiz name.
+            const certNameInput = document.getElementById('certNameInput');
+            if (certNameInput) {
+                certNameInput.value = data.certName || localStorage.getItem('pd_certificate_name') || data.fullName || '';
+            }
         }
+
+        // ==================== MY CERTIFICATES ====================
+
+        window.saveCertName = async function () {
+            const input = document.getElementById('certNameInput');
+            const name = (input?.value || '').trim();
+            if (!name) return showToast('Enter the name you want on your certificate', 'error');
+            localStorage.setItem('pd_certificate_name', name);
+            if (auth.currentUser) {
+                try {
+                    await updateDoc(doc(db, "users", auth.currentUser.uid), { certName: name });
+                } catch (e) { /* offline — local name still applies */ }
+            }
+            showToast('Certificate name saved: ' + name);
+            loadMyCertificates(); // re-render so new names flow into the list
+        };
+
+        function certLocalList() {
+            try {
+                const p = JSON.parse(localStorage.getItem('pd_academy_progress')) || { certificates: [] };
+                return Array.isArray(p.certificates) ? p.certificates : [];
+            } catch (e) { return []; }
+        }
+
+        async function loadMyCertificates() {
+            const listEl = document.getElementById('myCertificatesList');
+            if (!listEl) return;
+            let certs = certLocalList().map(c => ({ ...c, course: c.course || c.title || 'Prayer Dome Academy Lesson' }));
+            if (auth.currentUser) {
+                try {
+                    const snap = await getDocs(query(collection(db, "certificates"), where("userId", "==", auth.currentUser.uid), orderBy("date", "desc"), limit(100)));
+                    snap.forEach(d => {
+                        const c = d.data();
+                        if (c && c.id && !certs.some(x => x.id === c.id)) {
+                            certs.push({ id: c.id, lessonId: c.lessonId, title: c.course || c.title, course: c.course || c.title, score: c.score, date: c.date, name: c.name, downloads: c.downloads || 0 });
+                        }
+                    });
+                } catch (e) { /* offline — local list only */ }
+            }
+            if (!certs.length) {
+                listEl.innerHTML = '<div class="certificates-empty" style="text-align:center; padding: 18px; color: var(--text-sub);"><i class="fas fa-award"></i> No certificates yet. Pass an Academy quiz with 80% or higher to earn your first one — visit the <a href="/quiz.html" style="color: var(--accent-gold);">Quiz Centre</a>.</div>';
+                return;
+            }
+            const certName = (document.getElementById('certNameInput')?.value || '').trim() || 'Prayer Dome Member';
+            listEl.innerHTML = certs.map(c => {
+                const name = c.name && c.name !== 'Prayer Dome Member' ? c.name : certName;
+                const date = c.date ? new Date(c.date).toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
+                return `<div class="cert-card" style="display:flex; gap:14px; align-items:center; flex-wrap:wrap; background: var(--bg-secondary, rgba(10,77,155,.04)); border:1px solid rgba(212,175,55,.3); border-radius:16px; padding:14px; margin-bottom:10px;">
+                    <div style="width:46px; height:46px; border-radius:14px; background: linear-gradient(135deg, #0A4D9B, #0a3d7a); display:flex; align-items:center; justify-content:center; color:#f6df8a; font-size:1.25rem; flex-shrink:0;"><i class="fas fa-certificate"></i></div>
+                    <div style="flex:1; min-width:180px;">
+                        <h4 style="margin:0 0 2px; font-size:.95rem; color: var(--text-main);">${escapeHtml(c.course || c.title || 'Prayer Dome Academy')}</h4>
+                        <p style="margin:0; font-size:.75rem; color: var(--text-sub);">Score ${Math.round(c.score || 0)}% · Issued ${date}</p>
+                        <p style="margin:2px 0 0; font-size:.68rem; color: var(--accent-gold); font-family:monospace;">${escapeHtml(c.id || '')}</p>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="btn btn-primary btn-sm cert-download-btn" data-cert-id="${escapeHtml(c.id || '')}" data-cert-course="${escapeHtml(c.course || c.title || 'Prayer Dome Academy Lesson')}" data-cert-score="${Math.round(c.score || 0)}" data-cert-date="${escapeHtml(c.date || '')}" data-cert-name="${escapeHtml(name)}"><i class="fas fa-download"></i> Download</button>
+                        <button class="btn btn-outline btn-sm" onclick="printCertificate('${escapeHtml(c.id || '')}','${escapeHtml(c.course || c.title || 'Prayer Dome Academy Lesson')}',${Math.round(c.score || 0)},'${escapeHtml(c.date || '')}','${escapeHtml(name)}')"><i class="fas fa-print"></i> Print</button>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Bind download buttons (generates PNG + bumps the tracked download count).
+            listEl.querySelectorAll('.cert-download-btn').forEach(btn => {
+                if (!window.PDCertificate) return;
+                const opts = {
+                    id: btn.dataset.certId, course: btn.dataset.certCourse, score: btn.dataset.certScore,
+                    date: btn.dataset.certDate, name: btn.dataset.certName,
+                    onDownload: function (o) {
+                        if (auth.currentUser && o && o.id) {
+                            updateDoc(doc(db, "certificates", o.id), { downloads: increment(1), lastDownloadedAt: new Date().toISOString() }).catch(() => {});
+                        }
+                    }
+                };
+                PDCertificate.bindButton(btn, opts);
+            });
+        }
+
+        window.printCertificate = async function (id, course, score, date, name) {
+            if (!window.PDCertificate) return showToast('Printing is not available in this browser — use Download instead.', 'error');
+            try {
+                const dataUrl = await PDCertificate.preview({ id, course, score, date, name });
+                const win = window.open('', '_blank');
+                if (!win) return showToast('Popup blocked — allow popups or use Download instead.', 'error');
+                win.document.write(`<!DOCTYPE html><html><head><title>Certificate ${escapeHtml(id)}</title><style>body{margin:0;display:flex;justify-content:center;background:#f3f0e6}img{width:100%;max-width:1000px}</style></head><body><img src="${dataUrl}" onload="window.print()" alt="Prayer Dome certificate"></body></html>`);
+                win.document.close();
+            } catch (e) {
+                console.error(e);
+                showToast('Could not print — use Download instead.', 'error');
+            }
+        };
 
         function updateVerificationStatus() {
             if (!auth.currentUser) return;
@@ -1382,6 +1499,7 @@
                 try {
                     await ensureUserProfile(user);
                     await loadProfileData(user);
+                    await loadMyCertificates();
                     await checkEmailVerification();
                     await handleEmailVerificationLink();
                 } catch (error) {

@@ -226,9 +226,13 @@ t('every html page loads the shared app layer', missingAppLayer.length === 0,
 
 // Home page premium shell.
 ['pd-topbar', 'pdMenuBtn', 'pdDrawer', 'pdSplash', 'pdLocationCard',
- 'pdAnnouncementBar', 'pdNotifBell', 'data-pd-hero', 'data-pd-stat',
+ 'pdAnnouncementBar', 'pdNotifBell', 'data-pd-hero', 'weeklyChallenge',
  'pd-lang-select', 'Mark 7:37'].forEach(id =>
   t('index.html contains ' + id, indexHtml.includes(id)));
+t('home page no longer shows the community stats strip',
+  !indexHtml.includes('data-pd-stat'));
+t('home page weekly challenge is data-driven',
+  indexHtml.includes('PDChallenge.prayToday') && indexHtml.includes('getWeeklyChallenge'));
 t('index.html loads pd-app.js before its own module',
   indexHtml.indexOf('pd-app.js') < indexHtml.indexOf('firebase-app.js'));
 t('home page shows the featured scripture card',
@@ -247,6 +251,17 @@ t('admin notification composer supports all content types',
     adminHtml.includes('value="' + tp + '"')));
 t('admin live view offers in-app device broadcast',
   adminHtml.includes('OPEN CAMERA & GO LIVE'));
+t('admin certificates tracker exists and is wired in',
+  ['view-certificates', 'loadCertificates', 'exportCertificatesCSV',
+   'certTotalDownloads', 'switchView(\'certificates\''].every(s => adminHtml.includes(s)));
+
+// Account page: personal certificate library.
+const accountHtml = fs.readFileSync(path.join(ROOT, 'account.html'), 'utf8');
+t('account page loads the certificate generator',
+  accountHtml.includes('pd-certificate.js'));
+t('account page has a My Certificates section',
+  accountHtml.includes('myCertificatesList') && accountHtml.includes('My Certificates') &&
+  accountHtml.includes('PDCertificate.bindButton'));
 
 // Live page: reactions, follow, device streams, upcoming streams.
 ['sendReaction', 'followStream', 'deviceLiveState', 'upcomingGrid',

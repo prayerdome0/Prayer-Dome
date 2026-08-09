@@ -55,7 +55,10 @@ function runHarness(opts, { logoOk = true, toBlobOk = true } = {}) {
         if (tag === 'canvas') {
           const ctx = makeCtx();
           const canvas = { width: 0, height: 0, getContext: () => { logs.drew = ctx; return ctx; } };
-          if (toBlobOk) canvas.toBlob = cb => cb({ fake: true });
+          if (toBlobOk) {
+            canvas.toBlob = cb => cb({ fake: true });
+            canvas.toDataURL = () => 'data:image/png;base64,AAAA';
+          }
           return canvas;
         }
         return { style: {}, click() { logs.saved.push(this.download); }, remove() {} };
@@ -100,6 +103,23 @@ function assertOpsSane(ops) {
   let rejected = false;
   try { await h4.PC.download({ name: 'x', course: 'y' }); } catch (e) { rejected = true; }
   t('download() rejects cleanly when canvas export fails', rejected);
+
+  // preview() renders a data URL (used for the account-page Print flow)
+  const h5 = runHarness({ name: 'Print Me', course: 'Prayer 101', score: 85, id: 'PD-PRINT-1' });
+  const previewUrl = await h5.PC.preview({ name: 'Print Me', course: 'Prayer 101', score: 85, id: 'PD-PRINT-1' });
+  t('preview() returns a PNG data URL', typeof previewUrl === 'string' && previewUrl.startsWith('data:image/png;base64,'));
+
+  // bindButton() fires the onDownload tracking hook after a successful download
+  let tracked = null;
+  const h6 = runHarness({ name: 'Tracked', course: 'Prayer 101', score: 80, id: 'PD-TRACK-1' });
+  const btn = {
+    addEventListener(type, fn) { this.fn = fn; },
+    disabled: false,
+    innerHTML: ''
+  };
+  h6.PC.bindButton(btn, { name: 'Tracked', course: 'Prayer 101', score: 80, id: 'PD-TRACK-1', onDownload: (o) => { tracked = o; } });
+  await btn.fn();
+  t('onDownload hook fires with the certificate options', !!tracked && tracked.id === 'PD-TRACK-1');
 
   console.log(`\n${pass} passed, ${fail} failed`);
   process.exit(fail ? 1 : 0);

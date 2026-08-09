@@ -321,3 +321,56 @@ the real home page DOM. `tests/content.test.js` extended to 150 assertions
   your licensed streams in Admin → Media before promoting the feature.
 - Tumbuka/siSwati/Bemba/Nyanja strings remain community drafts until reviewed
   by fluent speakers (the draft badge shows automatically).
+
+---
+
+## 10. This pass — Prayer Challenge + tracked certificates
+
+### 10.1 Home page: stats out, Weekly Prayer Challenge in
+
+- The community-stats strip was **removed from the home page** (stats still
+  appear on the Team page and Admin dashboard KPIs — nothing else changed).
+- In its place: an interactive **Weekly Prayer Challenge** card:
+  - 12 rotating challenges (title, focus, scripture, 7 daily tasks), auto-
+    switching every Monday.
+  - **"I prayed today"** button, day chips, SVG progress ring (X/7), confetti
+    on completion, and a Share button.
+  - Persists per member: `localStorage` + Firestore
+    `prayerChallenges/{uid}` (new rules added), so progress follows the user
+    across devices and sessions.
+  - Data + week math live in `PD_CONTENT.WEEKLY_CHALLENGES` /
+    `PD_CONTENT.getWeeklyChallenge()` / `weekStart()` / `weekKey()` in
+    `assets/pd-content-data.js`; the card UI is `#weeklyChallenge` in
+    `index.html` with styles in `assets/pd-brand.css` (`.pd-challenge-*`).
+
+### 10.2 Certificates: personal library + admin tracking
+
+- **Earning** (`quiz.html`): a passed Academy quiz now writes the certificate
+  to Firestore `certificates` (member, email, course, score, certificate ID,
+  date, downloads counter).
+- **Download counting**: `PDCertificate.bindButton()` gained an `onDownload`
+  hook; quiz and account pages bump `downloads` (Firestore `increment`) on
+  every successful download. `PDCertificate.render()` / `preview()` were added
+  for the print flow.
+- **Account page** (`account.html`): new **My Certificates** block — merged
+  list from localStorage + Firestore, Download PNG and Print per certificate,
+  and an editable **name on certificate** (saved to profile `certName`).
+- **Admin** (`admin.html`): new **Certificates** nav item + view —
+  issued/monthly/download KPIs, searchable table, CSV export, delete.
+  Wired into `switchView` / `deleteRecord`.
+- **Security** (`firestore.rules`): `certificates` (owner read/update, admin
+  read/delete) and `prayerChallenges` (owner/admin) rules added.
+
+### 10.3 Tests
+
+- `tests/challenge.test.js` (new, jsdom) — runs the real home-page module
+  against a stubbed Firebase and verifies the challenge card renders,
+  persists and updates (11 assertions).
+- `tests/certificates.test.js` (new, jsdom) — verifies the account
+  certificates list rendering + download binding and the admin tracker
+  (table, KPIs, search, CSV) (12 assertions).
+- `tests/certificate.test.js` extended — `preview()` data URL + `onDownload`
+  hook coverage (11 assertions).
+- `tests/content.test.js`, `tests/admin.test.js`, `tests/premium.test.js`
+  updated for the removed stats strip / new challenge & certificates wiring.
+- Full suite: **296 passing** (incl. jsdom tests), 0 failing.
