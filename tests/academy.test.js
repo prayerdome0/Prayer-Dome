@@ -29,6 +29,7 @@ const requiredFiles = [
   path.join('api', 'academy.js'),
   path.join('assets', 'pd-academy.js'),
   path.join('assets', 'pd-academy-data.js'),
+  path.join('assets', 'pd-certificate.js'),
   'lessons.html', 'stories.html', 'resources.html', 'resource-view.html'
 ];
 for (const f of requiredFiles) t(f + ' exists', fs.existsSync(path.join(ROOT, f)));
@@ -43,6 +44,19 @@ for (const f of ['lessons', 'stories', 'quizzes', 'resources', 'progress', 'acad
 
 const quizHtml = fs.readFileSync(path.join(ROOT, 'quiz.html'), 'utf8');
 t('quiz page includes academy teaching quizzes', quizHtml.includes('Teaching Quizzes & Certificates') && quizHtml.includes('academyQuizGrid'));
+t('quiz page supports certificate downloads', quizHtml.includes('pd-certificate.js') && quizHtml.includes('PDCertificate.bindButton') && quizHtml.includes('Download Certificate'));
+
+const lessonsHtml = fs.readFileSync(path.join(ROOT, 'lessons.html'), 'utf8');
+t('lessons page supports certificate downloads', lessonsHtml.includes('pd-certificate.js'));
+
+const academyJs = fs.readFileSync(path.join(ROOT, 'assets', 'pd-academy.js'), 'utf8');
+t('academy runtime offers certificate downloads', academyJs.includes('PDCertificate.bindButton') && academyJs.includes('Download Certificate'));
+
+(function () {
+  const sandbox = { window: {}, console };
+  vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'assets', 'pd-certificate.js'), 'utf8'), sandbox);
+  t('certificate module exposes download API', sandbox.window.PDCertificate && typeof sandbox.window.PDCertificate.download === 'function' && typeof sandbox.window.PDCertificate.bindButton === 'function');
+})();
 
 const indexHtml = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 t('home links teaching, stories and resources', ['/lessons.html', '/stories.html', '/resources.html'].every(u => indexHtml.includes(u)));
