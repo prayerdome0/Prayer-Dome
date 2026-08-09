@@ -34,3 +34,13 @@ if (messagingInit) {
 } else {
   console.log('PASS  admin module does not require unsupported WebView messaging APIs');
 }
+
+for (const s of ['view-certificates', 'loadCertificates', 'renderCertificates',
+  'exportCertificatesCSV', "collection(db, \"certificates\")"]) {
+  if (html.includes(s)) {
+    console.log('PASS  admin.html includes ' + s);
+  } else {
+    console.error('FAIL  admin.html is missing ' + s);
+    process.exitCode = 1;
+  }
+}

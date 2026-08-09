@@ -696,7 +696,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, getDocs, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -1266,9 +1266,37 @@
                 const certId='PD-'+q.lessonId.toUpperCase()+'-'+Date.now().toString(36).toUpperCase();
                 p.certificates=p.certificates||[]; p.certificates.push({id:certId,lessonId:q.lessonId,title:q.title,score:percent,date:new Date().toISOString(),name:academyName()});
                 saveAcademyProgress(p);
+                // Record the certificate in Firestore so it appears in the member's
+                // account page and in the admin Certificates tracker.
+                if (auth.currentUser) {
+                    setDoc(doc(db, "certificates", certId), {
+                        id: certId,
+                        userId: auth.currentUser.uid,
+                        email: auth.currentUser.email || '',
+                        name: academyName(),
+                        course: q.title,
+                        lessonId: q.lessonId,
+                        score: percent,
+                        date: new Date().toISOString(),
+                        downloads: 0,
+                        source: 'academy-quiz',
+                        createdAt: serverTimestamp()
+                    }, { merge: true }).catch(() => {});
+                }
                 result.innerHTML=`<div class="pd-acad-cert"><img class="pd-acad-cert-logo" src="/assets/logo.png" alt="Prayer Dome logo"><span class="pd-acad-cert-brand">Prayer Dome Academy</span><h3>Certificate of Completion</h3><p>This certifies that</p><div class="name">${escapeAcademyHtml(academyName())}</div><p>has completed</p><h3 class="cert-course">${q.title}</h3><p class="cert-meta">Score: ${percent}% · Certificate ID: ${certId}</p><p class="pd-acad-cert-verse">“He does everything blamelessly.” — Mark 7:37</p><div class="pd-acad-cert-foot"><div class="pd-acad-cert-sign"><span class="sig">Prayer Dome</span><em>Ministry Team</em></div><div class="pd-acad-cert-seal"><i class="fas fa-award"></i></div></div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn-modern no-print" id="academyModalDownloadCert" style="background:linear-gradient(135deg,var(--accent-green),var(--accent-gold));color:#fff"><i class="fas fa-download"></i> Download Certificate</button><button class="btn-modern no-print" onclick="window.print()" style="background:var(--accent-gold);color:#1f2937"><i class="fas fa-print"></i> Print / Save</button></div></div>`;
                 const pdCertDl=document.getElementById('academyModalDownloadCert');
-                if(pdCertDl){ if(window.PDCertificate){ PDCertificate.bindButton(pdCertDl,{name:academyName(),course:q.title,score:percent,id:certId,date:new Date().toISOString()}); } else { pdCertDl.style.display='none'; } }
+                if(pdCertDl){
+                    if(window.PDCertificate){
+                        PDCertificate.bindButton(pdCertDl,{
+                            name:academyName(),course:q.title,score:percent,id:certId,date:new Date().toISOString(),
+                            onDownload:function(){
+                                if(auth.currentUser){
+                                    updateDoc(doc(db,"certificates",certId),{ downloads:increment(1), lastDownloadedAt:new Date().toISOString() }).catch(()=>{});
+                                }
+                            }
+                        });
+                    } else { pdCertDl.style.display='none'; }
+                }
             } else {
                 result.innerHTML=`<div class="pd-acad-callout"><strong>Try again.</strong> You scored ${percent}%. Review the linked lesson and aim for 80% or higher.</div>`;
             }

@@ -627,14 +627,32 @@
     <!-- Featured Scripture — Mark 7:37 (permanent theme) -->
     <section style="margin: 26px 16px 0;" data-pd-scripture aria-label="Featured scripture"></section>
 
-    <!-- Community Statistics -->
-    <section class="pd-stats-strip" style="margin-top: 16px;" aria-label="Community statistics">
-        <div class="pd-stat-item"><div class="pd-stat-value" data-pd-stat="members">0</div><div class="pd-stat-label" data-pd-t="stat.members">Members</div></div>
-        <div class="pd-stat-item"><div class="pd-stat-value" data-pd-stat="prayerRequests">0</div><div class="pd-stat-label" data-pd-t="stat.prayers">Prayer Requests</div></div>
-        <div class="pd-stat-item"><div class="pd-stat-value" data-pd-stat="testimonies">0</div><div class="pd-stat-label" data-pd-t="stat.testimonies">Testimonies</div></div>
-        <div class="pd-stat-item"><div class="pd-stat-value" data-pd-stat="countriesReached">0</div><div class="pd-stat-label" data-pd-t="stat.countries">Countries Reached</div></div>
-        <div class="pd-stat-item"><div class="pd-stat-value" data-pd-stat="liveViewers">0</div><div class="pd-stat-label" data-pd-t="stat.live">Live Viewers</div></div>
-        <div class="pd-stat-item"><div class="pd-stat-value" data-pd-stat="prayerGroups">0</div><div class="pd-stat-label" data-pd-t="stat.groups">Prayer Groups</div></div>
+    <!-- Weekly Prayer Challenge -->
+    <section class="pd-challenge" id="weeklyChallenge" aria-label="Weekly prayer challenge">
+        <div class="pd-challenge-glow"></div>
+        <div class="pd-challenge-head">
+            <div class="pd-challenge-ribbon"><i class="fas fa-fire"></i> THIS WEEK'S PRAYER CHALLENGE</div>
+            <div class="pd-challenge-dates" id="challengeDates">Loading…</div>
+        </div>
+        <div class="pd-challenge-body">
+            <div class="pd-challenge-main">
+                <h3 class="pd-challenge-title" id="challengeTitle"><i class="fas fa-dove"></i> Loading…</h3>
+                <p class="pd-challenge-focus" id="challengeFocus">Loading this week's focus…</p>
+                <p class="pd-challenge-verse" id="challengeVerse">“…” <span id="challengeVerseRef">—</span></p>
+            </div>
+            <div class="pd-challenge-side">
+                <div class="pd-challenge-ring-wrap">
+                    <svg class="pd-challenge-ring" viewBox="0 0 120 120" aria-hidden="true">
+                        <circle class="pd-challenge-ring-bg" cx="60" cy="60" r="52"></circle>
+                        <circle class="pd-challenge-ring-fg" id="challengeRingFg" cx="60" cy="60" r="52"></circle>
+                    </svg>
+                    <div class="pd-challenge-ring-label"><strong id="challengeDoneCount">0</strong><span>/7 days</span></div>
+                </div>
+                <button class="pd-challenge-today" id="challengePrayToday" onclick="PDChallenge.prayToday()"><i class="fas fa-hands-praying"></i> <span id="challengePrayTodayLabel">I prayed today</span></button>
+                <div class="pd-challenge-share" onclick="PDChallenge.share()"><i class="fas fa-share-alt"></i> Share challenge</div>
+            </div>
+        </div>
+        <div class="pd-challenge-days" id="challengeDays"><!-- 7 day chips rendered by JS --></div>
     </section>
 
     <!-- Founder Card with Larger Photo -->
@@ -1376,6 +1394,149 @@
         if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
     };
 
+    // ==================== WEEKLY PRAYER CHALLENGE ====================
+    const PDChallenge = {
+        weekKey: null,
+        challenge: null,
+        todayIndex: -1,
+        days: null,
+
+        init() {
+            const el = document.getElementById('weeklyChallenge');
+            if (!el || !window.PD_CONTENT || !PD_CONTENT.getWeeklyChallenge) return;
+            this.weekKey = PD_CONTENT.weekKey(new Date());
+            this.challenge = PD_CONTENT.getWeeklyChallenge(new Date());
+            if (!this.challenge) return;
+            this.todayIndex = (new Date().getDay() + 6) % 7; // Mon=0 … Sun=6
+            this.days = this.loadLocal();
+            this.render();
+            this.syncFromCloud();
+        },
+
+        loadLocal() {
+            const empty = [false, false, false, false, false, false, false];
+            try {
+                const raw = localStorage.getItem('pd_challenge_' + this.weekKey);
+                const data = raw ? JSON.parse(raw) : null;
+                return data && Array.isArray(data.days) && data.days.length === 7 ? data.days.slice() : empty;
+            } catch (e) { return empty; }
+        },
+
+        saveLocal() {
+            try {
+                localStorage.setItem('pd_challenge_' + this.weekKey,
+                    JSON.stringify({ days: this.days, updatedAt: new Date().toISOString() }));
+            } catch (e) {}
+        },
+
+        // Best-effort merge of this week's state from Firestore when signed in,
+        // then push local progress up so it follows the member across devices.
+        async syncFromCloud() {
+            if (!auth.currentUser) return;
+            try {
+                const snap = await getDoc(doc(db, 'prayerChallenges', auth.currentUser.uid));
+                const cloud = snap.exists() && snap.data() ? snap.data()[this.weekKey] : null;
+                if (cloud && Array.isArray(cloud.days) && cloud.days.length === 7) {
+                    let changed = false;
+                    this.days = this.days.map((d, i) => {
+                        const nd = d || !!cloud.days[i];
+                        if (nd !== d) changed = true;
+                        return nd;
+                    });
+                    if (changed) { this.saveLocal(); this.render(); }
+                }
+                if (this.days.some(Boolean)) {
+                    await setDoc(doc(db, 'prayerChallenges', auth.currentUser.uid), {
+                        [this.weekKey]: { days: this.days, updatedAt: new Date().toISOString() }
+                    }, { merge: true }).catch(() => {});
+                }
+            } catch (e) { /* offline — local storage is the source of truth */ }
+        },
+
+        render() {
+            const c = this.challenge;
+            const title = document.getElementById('challengeTitle');
+            const focus = document.getElementById('challengeFocus');
+            const verse = document.getElementById('challengeVerse');
+            const verseRef = document.getElementById('challengeVerseRef');
+            const dates = document.getElementById('challengeDates');
+            const daysEl = document.getElementById('challengeDays');
+            const ring = document.getElementById('challengeRingFg');
+            const count = document.getElementById('challengeDoneCount');
+            const btn = document.getElementById('challengePrayToday');
+            const btnLabel = document.getElementById('challengePrayTodayLabel');
+
+            if (title) title.innerHTML = `<i class="fas ${c.icon || 'fa-dove'}"></i> ${escapeHtml(c.title)}`;
+            if (focus) focus.textContent = c.focus;
+            if (verse) verse.innerHTML = `“${escapeHtml(c.verse)}” <span id="challengeVerseRef">— ${escapeHtml(c.verseRef)}</span>`;
+
+            const start = PD_CONTENT.weekStart(new Date());
+            const end = new Date(start); end.setDate(end.getDate() + 6);
+            const fmt = (d) => d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+            if (dates) dates.textContent = `${fmt(start)} — ${fmt(end)}, ${start.getFullYear()}`;
+
+            const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            if (daysEl) {
+                daysEl.innerHTML = c.tasks.map((task, i) => `
+                    <div class="pd-challenge-day ${this.days[i] ? 'done' : ''}${i === this.todayIndex ? ' is-today' : ''}">
+                        <div class="pd-challenge-day-name">${DAY_NAMES[i]}${i === this.todayIndex ? ' · Today' : ''}</div>
+                        <div class="pd-challenge-day-check">${this.days[i] ? '<i class="fas fa-check-circle"></i>' : (i === this.todayIndex ? '<i class="far fa-circle"></i>' : '')}</div>
+                        <div class="pd-challenge-day-tip">${escapeHtml(task)}</div>
+                    </div>`).join('');
+            }
+
+            const done = this.days.filter(Boolean).length;
+            if (count) count.textContent = done;
+            if (ring) {
+                const CIRC = 2 * Math.PI * 52;
+                ring.style.strokeDashoffset = String(CIRC - (CIRC * done) / 7);
+            }
+            if (btn && btnLabel) {
+                const todayDone = !!this.days[this.todayIndex];
+                btn.classList.toggle('done', todayDone);
+                btnLabel.textContent = todayDone ? 'Done for today ✓' : 'I prayed today';
+            }
+        },
+
+        async prayToday() {
+            if (!this.challenge || this.todayIndex < 0) return;
+            this.days[this.todayIndex] = !this.days[this.todayIndex];
+            this.saveLocal();
+            this.render();
+            const done = this.days.filter(Boolean).length;
+            if (this.days[this.todayIndex]) {
+                showToast('🙏 Amen! Day ' + (this.todayIndex + 1) + ' marked — keep going!');
+            } else {
+                showToast('Unmarked — it\'s never too late to pray today.');
+            }
+            if (done === 7) {
+                if (window.confetti) confetti({ particleCount: 180, spread: 90, origin: { y: 0.6 } });
+                showToast('🎉 You completed this week\'s challenge — glory to God!');
+            }
+            if (auth.currentUser) {
+                try {
+                    await setDoc(doc(db, 'prayerChallenges', auth.currentUser.uid), {
+                        [this.weekKey]: { days: this.days, updatedAt: new Date().toISOString() }
+                    }, { merge: true });
+                } catch (e) {}
+            }
+        },
+
+        share() {
+            const c = this.challenge;
+            if (!c) return;
+            const text = `🔥 Prayer Dome Weekly Challenge: ${c.title}\n\n${c.focus}\n\n“${c.verse}” — ${c.verseRef}\n\nPray with me this week! 🙏`;
+            if (navigator.share) { navigator.share({ title: 'Prayer Dome Challenge', text }).catch(() => {}); }
+            else if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => showToast('Challenge copied — share it!'));
+            } else {
+                prompt('Copy the challenge:', text);
+            }
+        }
+    };
+    window.PDChallenge = PDChallenge;
+    document.addEventListener('DOMContentLoaded', () => PDChallenge.init());
+
     // ==================== INITIALIZATION ====================
     
     onAuthStateChanged(auth, async (user) => {
@@ -1383,6 +1544,7 @@
         if (user) {
             await checkAndShowAdminTab(user);
             await loadNotifications();
+            if (window.PDChallenge && PDChallenge.weekKey) PDChallenge.syncFromCloud();
         }
     });
 

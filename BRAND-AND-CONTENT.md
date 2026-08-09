@@ -250,3 +250,45 @@ that reduced-motion is honoured.
    tiles. They look fine, but images would be better.
 4. **Rotate the Cloudinary secret in `live-stream-config.js`** — still committed
    and still public to every visitor. Flagged in the previous pass; unchanged.
+
+## 8. Weekly Prayer Challenge (home page)
+
+The community-stats strip on the home page was replaced by an interactive
+**Weekly Prayer Challenge** card (`index.html` → `#weeklyChallenge`):
+
+- Rotates through a pool of 12 challenges (`PD_CONTENT.WEEKLY_CHALLENGES` in
+  `assets/pd-content-data.js`), changing every Monday by ISO week number.
+- Each challenge has a title, focus, guiding scripture, and 7 daily tasks
+  (one chip per day, with the current day highlighted).
+- Members tap **"I prayed today"** to mark the day; a progress ring fills
+  (X/7), the day chips tick off, and completing all 7 fires confetti.
+- Progress persists in `localStorage` (`pd_challenge_<weekKey>`) and, when
+  signed in, syncs to Firestore `prayerChallenges/{uid}` so it follows the
+  member across devices. Rules are in `firestore.rules`.
+- The card includes a one-tap **Share challenge** (Web Share API, clipboard
+  fallback).
+
+The `pd-app.js` stats module is untouched — the Admin dashboard KPIs and the
+Team page still use `data-pd-stat` live numbers.
+
+## 9. Certificates — download & admin tracking
+
+Certificates were previously generated in the browser only (`assets/pd-certificate.js`)
+and never recorded anywhere. Now:
+
+- **Earning** — passing an Academy quiz at 80%+ still unlocks the printable
+  certificate, but the certificate is now also written to the Firestore
+  `certificates` collection (member id/email, course, score, certificate ID,
+  date, `downloads: 0`). Rules: members may read/update their own, admins
+  read/delete all.
+- **Personal library** — the Account page (`account.html`) has a new
+  **"My Certificates"** section: every certificate earned (local + Firestore)
+  is listed with course, score, date and ID, plus **Download PNG** and
+  **Print** buttons (new `PDCertificate.preview()` renders a printable image).
+  The **name on certificate** is editable and saved to the profile.
+- **Admin tracker** — a new **Certificates** tab in `admin.html` shows every
+  issued certificate (date, member, email, course, score, certificate ID,
+  download count) with search, monthly/issued/download KPIs, CSV export, and
+  delete. Every download bumps the `downloads` counter via the new
+  `onDownload` hook in `pd-certificate.js`, so the ministry can see which
+  certificates are actually being used.

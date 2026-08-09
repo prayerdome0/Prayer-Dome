@@ -250,7 +250,7 @@
     });
   }
 
-  function download(opts) {
+  function render(opts) {
     opts = opts || {};
     return loadLogo().then(function (logo) {
       var canvas = document.createElement('canvas');
@@ -259,6 +259,13 @@
       var ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('Canvas is not supported in this browser.');
       draw(ctx, opts, logo);
+      return canvas;
+    });
+  }
+
+  function download(opts) {
+    opts = opts || {};
+    return render(opts).then(function (canvas) {
       return toBlobP(canvas);
     }).then(function (blob) {
       if (!blob) throw new Error('Could not generate the certificate image.');
@@ -274,9 +281,14 @@
       if (btn.disabled) return;
       btn.disabled = true;
       btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Preparing…';
-      download(opts).then(function () {
+      return download(opts).then(function () {
         btn.innerHTML = '<i class="fas fa-check"></i> Downloaded';
         setTimeout(function () { btn.innerHTML = original; btn.disabled = false; }, 2200);
+        // Optional tracking hook (e.g. bump the download counter in Firestore)
+        if (typeof opts.onDownload === 'function') {
+          try { opts.onDownload(opts); }
+          catch (e) { if (window.console) console.error('Certificate tracking hook failed', e); }
+        }
       }).catch(function (err) {
         btn.innerHTML = original;
         btn.disabled = false;
@@ -289,6 +301,12 @@
   window.PDCertificate = {
     download: download,
     bindButton: bindButton,
+    render: render,
+    preview: function (opts) {
+      return render(opts).then(function (canvas) {
+        return canvas.toDataURL('image/png');
+      });
+    },
     _draw: draw // exposed for tests
   };
 })();

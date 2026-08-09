@@ -45,6 +45,7 @@ for (const f of ['lessons', 'stories', 'quizzes', 'resources', 'progress', 'acad
 const quizHtml = fs.readFileSync(path.join(ROOT, 'quiz.html'), 'utf8');
 t('quiz page includes academy teaching quizzes', quizHtml.includes('Teaching Quizzes & Certificates') && quizHtml.includes('academyQuizGrid'));
 t('quiz page supports certificate downloads', quizHtml.includes('pd-certificate.js') && quizHtml.includes('PDCertificate.bindButton') && quizHtml.includes('Download Certificate'));
+t('quiz page records earned certificates for admin tracking', quizHtml.includes('doc(db, "certificates", certId)') && quizHtml.includes('increment(1)'));
 
 const lessonsHtml = fs.readFileSync(path.join(ROOT, 'lessons.html'), 'utf8');
 t('lessons page supports certificate downloads', lessonsHtml.includes('pd-certificate.js'));

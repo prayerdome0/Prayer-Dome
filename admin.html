@@ -422,6 +422,7 @@
             <div class="nav-item" onclick="switchView('translations', this)"><i class="fas fa-language"></i> Translation Review</div>
             <div class="nav-item" onclick="switchView('notifications', this)"><i class="fas fa-bell"></i> Notifications</div>
             <div class="nav-item" onclick="switchView('contacts', this)"><i class="fas fa-envelope"></i> Contact Messages</div>
+            <div class="nav-item" onclick="switchView('certificates', this)"><i class="fas fa-award"></i> Certificates</div>
         </div>
         <div class="sidebar-footer">
             <button class="btn btn-outline" style="width: 100%; color: #ef4444; border-color: rgba(239,68,68,0.3);" onclick="logoutAdmin()">
@@ -465,7 +466,7 @@
                         </div>
                         <div style="display:flex; gap:10px; flex-wrap:wrap;">
                             <button class="btn btn-primary btn-sm" style="background:#d4af37; border-color:#d4af37; color:#fff;" onclick="switchView('live', document.querySelectorAll('.nav-item')[1])"><i class="fas fa-tower-broadcast"></i> Go Live</button>
-                            <button class="btn btn-primary btn-sm" style="background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.3);" onclick="switchView('news', document.querySelectorAll('.nav-item')[12])"><i class="fas fa-newspaper"></i> Publish News</button>
+                            <button class="btn btn-primary btn-sm" style="background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.3);" onclick="switchView('news', document.querySelectorAll('.nav-item')[13])"><i class="fas fa-newspaper"></i> Publish News</button>
                         </div>
                     </div>
                 </div>
@@ -899,6 +900,29 @@
                 </div>
             </div>
 
+            <!-- CERTIFICATES TRACKER VIEW -->
+            <div id="view-certificates" class="section-view">
+                <div class="page-title"><span><i class="fas fa-award"></i> Certificates Tracker</span><button class="btn btn-primary" onclick="loadCertificates()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
+                <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
+                    <div class="kpi-card" style="cursor: default;"><div class="kpi-icon blue"><i class="fas fa-certificate"></i></div><div class="kpi-details"><h3 id="certTotalIssued">0</h3><p>Certificates Issued</p></div></div>
+                    <div class="kpi-card" style="cursor: default;"><div class="kpi-icon gold"><i class="fas fa-calendar-week"></i></div><div class="kpi-details"><h3 id="certThisMonth">0</h3><p>Issued This Month</p></div></div>
+                    <div class="kpi-card" style="cursor: default;"><div class="kpi-icon green"><i class="fas fa-download"></i></div><div class="kpi-details"><h3 id="certTotalDownloads">0</h3><p>Total Downloads</p></div></div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-list"></i> Issued Certificates <span style="font-weight:400; font-size:.7rem; color:var(--text-sub);">— every Academy certificate earned by members, tracked live (score, ID, download count)</span></h3>
+                        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                            <input type="text" id="certSearchInput" placeholder="Search member, course or ID…" oninput="filterCertificates()" style="padding:8px 12px; border-radius:10px; border:1px solid var(--border); background:var(--bg-input); min-width:200px;">
+                            <button class="btn btn-outline btn-sm" onclick="exportCertificatesCSV()"><i class="fas fa-file-csv"></i> Export CSV</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table><thead><tr><th>Date</th><th>Member</th><th>Course</th><th>Score</th><th>Certificate ID</th><th>Downloads</th><th>Actions</th></tr></thead>
+                        <tbody id="certificatesList"><tr><td colspan="7"><div class="spinner" style="width:30px;height:30px;"></div></td></tr></tbody></table>
+                    </div>
+                </div>
+            </div>
+
             <!-- NEWS CENTER VIEW -->
             <div id="view-news" class="section-view">
                 <div class="page-title"><span><i class="fas fa-newspaper"></i> Christian News Center</span><button class="btn btn-primary" onclick="openModal('modalNews')"><i class="fas fa-plus"></i> Publish News</button></div>
@@ -1239,6 +1263,96 @@
                 });
                 tbody.innerHTML = html;
             } catch(e) { console.error(e); tbody.innerHTML = '<td colspan="6">Error loading messages</td>'; }
+        };
+
+        /* ==================== CERTIFICATES TRACKER ==================== */
+        let allCertificatesCache = [];
+
+        window.loadCertificates = async function () {
+            const tbody = document.getElementById('certificatesList');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="7"><div class="spinner" style="width:30px;height:30px;"></div></td></tr>';
+            try {
+                const snapshot = await getDocs(query(collection(db, "certificates"), orderBy("date", "desc"), limit(300)));
+                allCertificatesCache = [];
+                snapshot.forEach(d => {
+                    const c = d.data();
+                    c.id = c.id || d.id;
+                    c._docId = d.id;
+                    allCertificatesCache.push(c);
+                });
+                renderCertificates();
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="7">Error loading certificates</td></tr>';
+            }
+        };
+
+        window.renderCertificates = function () {
+            const tbody = document.getElementById('certificatesList');
+            if (!tbody) return;
+            const q = (document.getElementById('certSearchInput')?.value || '').trim().toLowerCase();
+            const rows = allCertificatesCache.filter(c => !q ||
+                (c.name || '').toLowerCase().includes(q) ||
+                (c.email || '').toLowerCase().includes(q) ||
+                (c.course || c.title || '').toLowerCase().includes(q) ||
+                (c.id || '').toLowerCase().includes(q));
+
+            document.getElementById('certTotalIssued').innerText = allCertificatesCache.length;
+            const now = new Date();
+            const monthCount = allCertificatesCache.filter(c => {
+                const d = c.date ? new Date(c.date) : null;
+                return d && !isNaN(d) && d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+            }).length;
+            document.getElementById('certThisMonth').innerText = monthCount;
+            document.getElementById('certTotalDownloads').innerText = allCertificatesCache.reduce((s, c) => s + (Number(c.downloads) || 0), 0);
+
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="7">No certificates yet. When members pass Academy quizzes at 80% or higher, their certificates appear here automatically.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = rows.map(c => {
+                const d = c.date ? new Date(c.date) : null;
+                const dateStr = d && !isNaN(d) ? moment(d).format('MMM D, YYYY') : 'N/A';
+                return `<tr>
+                    <td>${dateStr}</td>
+                    <td><strong>${escapeHTML(c.name || 'Member')}</strong>${c.userId ? '' : ' <span class="badge badge-warning">Unlinked</span>'}<p style="margin:0; font-size:.7rem; color:var(--text-sub);">${escapeHTML(c.email || '')}</p></td>
+                    <td style="white-space:normal; max-width:260px;">${escapeHTML(c.course || c.title || 'Prayer Dome Academy')}</td>
+                    <td><span class="badge badge-gold">${Math.round(c.score || 0)}%</span></td>
+                    <td style="font-family:monospace; font-size:.75rem;">${escapeHTML(c.id || '')}</td>
+                    <td>${Number(c.downloads) || 0}</td>
+                    <td><button class="btn btn-sm btn-danger" onclick="deleteCertificate('${c._docId}')"><i class="fas fa-trash"></i> Delete</button></td>
+                </tr>`;
+            }).join('');
+        };
+
+        window.filterCertificates = function () { renderCertificates(); };
+
+        window.deleteCertificate = async function (docId) {
+            if (!docId || !confirm('Delete this certificate record? The member will still keep their own copy on their account.')) return;
+            try {
+                await deleteDoc(doc(db, "certificates", docId));
+                toast('Certificate record deleted');
+                loadCertificates();
+            } catch (e) { toast(e.message, 'error'); }
+        };
+
+        window.exportCertificatesCSV = function () {
+            if (!allCertificatesCache.length) return toast('Nothing to export yet', 'error');
+            const head = ['Date', 'Name', 'Email', 'Course', 'Score %', 'Certificate ID', 'Downloads'];
+            const rows = allCertificatesCache.map(c => [
+                c.date || '', c.name || '', c.email || '', c.course || c.title || '',
+                Math.round(c.score || 0), c.id || '', Number(c.downloads) || 0
+            ]);
+            const csv = '\uFEFF' + [head, ...rows].map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'prayer-dome-certificates.csv';
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 400);
+            toast('CSV exported — ' + rows.length + ' certificates');
         };
 
         window.loadDashboardStats = async function() {
@@ -2208,7 +2322,7 @@
         window.viewDoc = function(url,type){ const img=document.getElementById('docImagePreview'), pdf=document.getElementById('docPdfBtn'); if(url.toLowerCase().includes('.pdf')){ if(img) img.style.display='none'; if(pdf){ pdf.style.display='inline-flex'; pdf.href=url; } } else { if(img){ img.style.display='block'; img.src=url; } if(pdf) pdf.style.display='none'; } openModal('modalViewDoc'); };
         window.exportFinancialReports = function() { toast("Export feature - CSV export ready", "info"); };
         window.uploadMedia = function(){ window.uploadGalleryImage(); };
-        window.deleteRecord = async function(col,id){ if(!confirm("Delete permanently?")) return; showLoading(); try{ await deleteDoc(doc(db,col,id)); toast("Deleted"); if(col==='events') await loadEvents(); if(col==='gallery') await loadGallery(); if(col==='prayers'||col==='testimonies') await loadContent(); if(col==='contactMessages') await loadContactMessages(); if(col==='announcements') await loadAnnouncements(); if(col==='memberCareRequests') await loadCareRequests(); if(col==='liveRecordings') await loadLiveRecordings(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
+        window.deleteRecord = async function(col,id){ if(!confirm("Delete permanently?")) return; showLoading(); try{ await deleteDoc(doc(db,col,id)); toast("Deleted"); if(col==='events') await loadEvents(); if(col==='gallery') await loadGallery(); if(col==='prayers'||col==='testimonies') await loadContent(); if(col==='contactMessages') await loadContactMessages(); if(col==='certificates') await loadCertificates(); if(col==='announcements') await loadAnnouncements(); if(col==='memberCareRequests') await loadCareRequests(); if(col==='liveRecordings') await loadLiveRecordings(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
         
         function setupAdminRealtimeListeners() {
             const membershipsQuery = query(collection(db, "memberships"), where("status", "==", "pending"));
@@ -2626,6 +2740,7 @@
                 else if(viewId === 'content') await loadContent();
                 else if(viewId === 'financial_reports') await loadFinancialReports();
                 else if(viewId === 'contacts') await loadContactMessages();
+                else if(viewId === 'certificates') await loadCertificates();
                 else if(viewId === 'news') await loadAdminNews();
                 else if(viewId === 'sermons') await loadAdminSermons();
                 else if(viewId === 'translations') await loadTranslationReview();
