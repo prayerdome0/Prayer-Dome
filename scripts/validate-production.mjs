@@ -19,7 +19,7 @@ import { join, relative, extname } from 'node:path';
 import { tmpdir } from 'node:os';
 
 const root = process.cwd();
-const ignoredDirectories = new Set(['.git', 'android', 'node_modules']);
+const ignoredDirectories = new Set(['.git', 'android', 'dist', 'node_modules']);
 const sourceFiles = [];
 
 function walk(directory) {

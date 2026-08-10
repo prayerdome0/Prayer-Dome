@@ -1,0 +1,32 @@
+# Upload only files required to build or run the Vercel deployment.
+# The build writes the public website to dist/, so repository documentation,
+# mobile sources, tests, Firebase configuration, and tooling are never served.
+/*
+!api/
+!assets/
+!documents/
+!functions/
+!scripts/
+!*.html
+!ai-prayer-data.js
+!devotional-data.js
+!firebase-messaging-sw.js
+!live-stream-config.js
+!sermons-data.js
+!sw.js
+!translation-data.js
+!Prayer-Dome-User-Guide.pdf
+!manifest.json
+!robots.txt
+!sitemap.xml
+!package.json
+!vercel.json
+
+# api/share.js reuses this dependency-free handler. The rest of the Firebase
+# Functions package is not needed by Vercel.
+functions/*
+!functions/share.js
+
+# Only the public-bundle builder is needed during the Vercel build.
+scripts/*
+!scripts/build-vercel.mjs

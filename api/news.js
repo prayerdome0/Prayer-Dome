@@ -1,34 +1,33 @@
 'use strict';
 
 /**
- * News API endpoint.
- * Returns the 20 most recent published news stories as JSON.
- * Used by the News Center (/news.html) and any external consumers.
+ * Public News API.
  *
- * This module reuses the PDApp news store when running client-side,
- * and falls back to a static JSON response for server-side/SSR usage.
+ * The same seed module is consumed in the browser and in this function. Live
+ * administrator edits continue to come from Firestore in the browser; this
+ * endpoint provides a reliable, non-empty public fallback for server-side and
+ * external consumers.
  */
 
-const DEFAULT_NEWS = (typeof window !== 'undefined' && window.PD_CONTENT && window.PD_CONTENT.DEFAULT_NEWS)
-  ? window.PD_CONTENT.DEFAULT_NEWS
-  : [];
+const CONTENT = (typeof window !== 'undefined' && window.PD_CONTENT)
+  ? window.PD_CONTENT
+  : require('../assets/pd-content-data.js');
+const DEFAULT_NEWS = Array.isArray(CONTENT.DEFAULT_NEWS) ? CONTENT.DEFAULT_NEWS : [];
 
 function getNews() {
-  // When running in Node (serverless), PD_CONTENT won't be available.
-  // In that case return the static seed — admin edits live in Firestore
-  // and are fetched client-side by pd-app.js.
-  if (typeof module !== 'undefined' && module.exports) {
-    return DEFAULT_NEWS.filter(function (n) { return n && n.published !== false; });
+  if (typeof window === 'undefined') {
+    return DEFAULT_NEWS.filter(function (item) { return item && item.published !== false; });
   }
-  // Browser: use the live store from pd-app.js if available.
+
   try {
     var store = window.PDApp && window.PDApp.store;
     if (store) {
       var all = store.get('news', 'DEFAULT_NEWS') || [];
-      return all.filter(function (n) { return n && n.published !== false; });
+      return all.filter(function (item) { return item && item.published !== false; });
     }
-  } catch (e) { /* fall through */ }
-  return DEFAULT_NEWS.filter(function (n) { return n && n.published !== false; });
+  } catch (_error) { /* use the built-in fallback */ }
+
+  return DEFAULT_NEWS.filter(function (item) { return item && item.published !== false; });
 }
 
 function serialize(item) {
@@ -42,42 +41,46 @@ function serialize(item) {
     socialImage: item.socialImage || item.featuredImage || item.image || '/assets/og-image.png',
     author: item.author || 'Prayer Dome Media Team',
     date: item.date ? (typeof item.date === 'string' ? item.date : item.date.toISOString()) : null,
-    featured: !!item.featured,
-    published: !!item.published,
+    featured: Boolean(item.featured),
+    published: item.published !== false,
     url: '/news/' + encodeURIComponent(item.id || '')
   };
 }
 
-// Browser export
+function send(res, status, payload, method) {
+  const body = JSON.stringify(payload, null, 2);
+  if (!res) return body;
+  res.statusCode = status;
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('Cache-Control', status === 200
+    ? 'public, max-age=0, s-maxage=300, stale-while-revalidate=3600'
+    : 'no-store');
+  if (method === 'HEAD') return res.end();
+  return res.end(body);
+}
+
+function handler(req, res) {
+  const method = (req && req.method) || 'GET';
+  if (method !== 'GET' && method !== 'HEAD') {
+    if (res && res.setHeader) res.setHeader('Allow', 'GET, HEAD');
+    return send(res, 405, { success: false, error: 'Method not allowed' }, method);
+  }
+
+  const items = getNews().slice(0, 20).map(serialize);
+  return send(res, 200, {
+    success: true,
+    count: items.length,
+    stories: items
+  }, method);
+}
+
 if (typeof window !== 'undefined') {
   window.PDApp = window.PDApp || {};
   window.PDApp.getNews = getNews;
 }
 
-// Serverless function handler (Netlify / Vercel / Firebase)
-function handler(req, res) {
-  var items = getNews().slice(0, 20).map(serialize);
-  var body = JSON.stringify({
-    success: true,
-    count: items.length,
-    stories: items
-  }, null, 2);
-
-  if (req && req.headers && req.headers['accept'] === 'application/json') {
-    res && res.setHeader('Content-Type', 'application/json');
-    res && res.end(body);
-    return body;
-  }
-
-  // Default: return JSON
-  if (res) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(body);
-  }
-  return body;
-}
-
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = handler;
   module.exports.handler = handler;
+  module.exports.getNews = getNews;
 }

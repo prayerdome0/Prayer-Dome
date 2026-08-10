@@ -9,7 +9,12 @@
    Plain global script — load BEFORE pd-app.js.
    ========================================================================== */
 
-window.PD_CONTENT = window.PD_CONTENT || {};
+/* Keep one data object in browsers and export the same object when this file
+   is loaded by a Node.js serverless function.  Previously this seed file was
+   browser-only, which made /api/news and /api/radio return empty arrays on
+   Vercel even though the website showed the seeded content. */
+var PD_CONTENT = (typeof window !== 'undefined' && window.PD_CONTENT) || {};
+if (typeof window !== 'undefined') window.PD_CONTENT = PD_CONTENT;
 
 /* --- Featured theme scripture (Mark 7:37) -------------------------------- */
 PD_CONTENT.THEME_SCRIPTURE = {
@@ -436,3 +441,7 @@ PD_CONTENT.weekKey = function (date) {
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
   return y + '-W' + pad(week);
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = PD_CONTENT;
+}
