@@ -1,8 +1,9 @@
 # Dependencies
 node_modules/
 
-# Capacitor-generated web bundle
+# Generated web bundles
 mobile/www/
+dist/
 
 # Android signing material
 android/keystore.properties
