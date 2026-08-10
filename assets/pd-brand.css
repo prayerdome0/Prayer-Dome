@@ -97,6 +97,29 @@ body.dark-mode {
 }
 
 /* ==========================================================================
+   0b. No sideways scrolling, anywhere
+   The app is read on phones as narrow as 320px. A single wide card used to
+   drag the whole page sideways, so every page now scrolls vertically only and
+   nothing is allowed to grow past the viewport. Elements that genuinely need
+   to scroll horizontally (wide admin tables, filter chip rows) opt back in
+   with .pd-scroll-x.
+   ========================================================================== */
+/* The guard lives on <body>, not <html>. When <html> is `overflow: visible`
+   the browser propagates the body's overflow to the viewport, so sideways
+   scrolling is blocked while <body> itself stays a normal block — which is
+   what keeps every sticky header in the app sticking. `:where()` keeps the
+   specificity at zero so any page can still opt out. */
+:where(body) { overflow-x: hidden; max-width: 100%; }
+
+:where(img, video, canvas, svg, iframe) { max-width: 100%; }
+
+.pd-scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/* ==========================================================================
    1. Aurora backdrop
    Drop <div class="pd-aurora" aria-hidden="true"></div> as the first child of
    <body>. It sits behind everything and never intercepts clicks.

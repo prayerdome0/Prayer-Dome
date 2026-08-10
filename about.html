@@ -156,11 +156,7 @@
             --radius-sm: 14px;
         }
 
-        /* The page scrolls vertically only — never sideways, on any device. */
-        html {
-            overflow-x: hidden;
-            -webkit-text-size-adjust: 100%;
-        }
+        html { -webkit-text-size-adjust: 100%; }
 
         body {
             font-family: 'Montserrat', sans-serif;
@@ -168,6 +164,10 @@
             color: var(--text-primary);
             transition: background 0.3s, color 0.3s;
             min-height: 100vh;
+            /* The page scrolls vertically only — never sideways, on any
+               device. The guard sits on <body> (not <html>) so the browser
+               propagates it to the viewport and the sticky header still
+               sticks. */
             overflow-x: hidden;
             max-width: 100%;
         }

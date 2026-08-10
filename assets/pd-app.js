@@ -641,6 +641,7 @@
        3. Once an item is read it must never come back as new — read state is
           stored per notification id and applied to the Firestore mirror too. */
   var READ_KEY = 'pd_notif_read_ids';
+  var READ_SIG_KEY = 'pd_notif_read_sigs';
   var SHOWN_KEY = 'pd_notif_shown_ids';
 
   function idList(key) { var v = lsGet(key, []); return Array.isArray(v) ? v : []; }
@@ -654,6 +655,20 @@
   function signature(n) {
     return [n.type || 'general', (n.title || '').trim(), (n.message || '').trim()].join('|');
   }
+  /* Once a member marks something read it must never come back as new — not
+     even if the same announcement later arrives under a different id (a local
+     push adopted by Firestore, a re-sent broadcast, a second device). So we
+     remember both the id and a content signature. */
+  function isRead(n) {
+    if (!n) return false;
+    if (n.id && idList(READ_KEY).indexOf(n.id) > -1) return true;
+    return idList(READ_SIG_KEY).indexOf(signature(n)) > -1;
+  }
+  function rememberRead(n) {
+    if (!n) return;
+    rememberId(READ_KEY, n.id, 300);
+    rememberId(READ_SIG_KEY, signature(n), 300);
+  }
 
   var notifications = {
     items: lsGet('pd_notifications', []),
@@ -665,9 +680,8 @@
       notifications.listEl = $('#pdNotifList');
       notifications.panelEl = $('#pdNotifPanel');
       // Apply stored read state on boot so nothing reappears as "new".
-      var readIds = idList(READ_KEY);
       notifications.items = notifications.items.map(function (n) {
-        if (readIds.indexOf(n.id) > -1) n.read = true;
+        if (isRead(n)) n.read = true;
         return n;
       });
       if (notifications.listEl) notifications.render();
@@ -716,7 +730,7 @@
               id: d.id, type: x.type || 'general', title: x.title || 'Update',
               message: x.message || '', link: x.link || null,
               time: x.createdAt ? (x.createdAt.toDate ? x.createdAt.toDate().toISOString() : new Date(x.createdAt).toISOString()) : new Date().toISOString(),
-              read: idList(READ_KEY).indexOf(d.id) > -1
+              read: false
             });
           });
           if (remote.length) notifications.merge(remote);
@@ -727,7 +741,6 @@
     /* Merge remote items without duplicating what is already local and without
        resurrecting anything the member already read. */
     merge: function (remote) {
-      var readIds = idList(READ_KEY);
       var seenIds = {};
       var seenSignatures = {};
       var merged = [];
@@ -738,7 +751,7 @@
         if (seenIds[n.id] || seenSignatures[sig]) return;
         seenIds[n.id] = true;
         seenSignatures[sig] = true;
-        if (readIds.indexOf(n.id) > -1) n.read = true;
+        if (isRead(n)) n.read = true;
         merged.push(n);
       });
 
@@ -863,8 +876,9 @@
         message: item.message || '',
         link: item.link || null,
         time: item.time || now,
-        read: idList(READ_KEY).indexOf(item.id) > -1
+        read: false
       };
+      n.read = isRead(n);
       // Never store the same announcement twice (e.g. local push + Firestore mirror).
       var sig = signature(n);
       var duplicate = notifications.items.filter(function (existing) {
@@ -895,7 +909,7 @@
           if (!ref || !ref.id) return;
           var wasRead = n.read;
           n.id = ref.id;
-          if (wasRead) rememberId(READ_KEY, ref.id, 300);
+          if (wasRead) rememberRead(n);
           lsSet('pd_notifications', notifications.items);
         }).catch(function () {});
       }
@@ -937,7 +951,7 @@
     markRead: function (id) {
       rememberId(READ_KEY, id, 300);
       notifications.items = notifications.items.map(function (n) {
-        if (n.id === id) n.read = true;
+        if (n.id === id) { n.read = true; rememberRead(n); }
         return n;
       });
       lsSet('pd_notifications', notifications.items);
@@ -954,7 +968,7 @@
     markAllRead: function () {
       notifications.items.forEach(function (n) {
         n.read = true;
-        rememberId(READ_KEY, n.id, 300);
+        rememberRead(n);
       });
       lsSet('pd_notifications', notifications.items);
       if (navigator.serviceWorker && navigator.serviceWorker.ready) {
@@ -970,7 +984,7 @@
 
     clear: function () {
       // Remember what was cleared so the Firestore mirror cannot resurrect it.
-      notifications.items.forEach(function (n) { rememberId(READ_KEY, n.id, 300); });
+      notifications.items.forEach(function (n) { rememberRead(n); });
       notifications.items = [];
       lsSet('pd_notifications', []);
       notifications.render();
