@@ -133,6 +133,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="/assets/pd-cloud-video.js"></script>
 
     <style>
         :root {
@@ -401,7 +402,9 @@
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
     <script src="/assets/pd-content-data.js" defer></script>
-    <script src="/assets/pd-app.js" defer></script>
+    <script src="/assets/pd-verse-data.js" defer></script>
+<script src="/assets/pd-verse-alerts.js" defer></script>
+<script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
 
@@ -440,6 +443,8 @@
             <div class="nav-item" onclick="switchView('financial_reports', this)"><i class="fas fa-file-alt"></i> Financial Reports</div>
             <div class="nav-item" onclick="switchView('events', this)"><i class="fas fa-calendar-alt"></i> Events & Cal</div>
             <div class="nav-item" onclick="switchView('devotionals', this)"><i class="fas fa-book-open"></i> Devotionals</div>
+            <div class="nav-item" onclick="switchView('verses', this)"><i class="fas fa-book-bible"></i> Daily Verses</div>
+            <div class="nav-item" onclick="switchView('aivideo', this)"><i class="fas fa-wand-magic-sparkles"></i> AI Video Studio</div>
             <div class="nav-item" onclick="switchView('media', this)"><i class="fas fa-camera"></i> Media Upload</div>
             <div class="nav-item" onclick="switchView('content', this)"><i class="fas fa-comment-dots"></i> Prayers & Testimonies</div>
             <div class="nav-item" onclick="switchView('news', this)"><i class="fas fa-newspaper"></i> News Center</div>
@@ -604,10 +609,25 @@
                         </div>
                         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
                             <button class="btn-go-live" id="btnDeviceGoLive" onclick="adminDeviceGoLive()"><i class="fas fa-video"></i> OPEN CAMERA & GO LIVE</button>
-                            <button class="btn-end-live" id="btnDeviceEndLive" onclick="adminDeviceEndLive()" style="display:none;"><i class="fas fa-stop-circle"></i> STOP & SAVE REPLAY</button>
+                            <button class="btn-end-live" id="btnDeviceEndLive" onclick="adminDeviceEndLive()" style="display:none;"><i class="fas fa-stop-circle"></i> STOP & SAVE TO CLOUD</button>
                             <button class="btn-end-live" id="btnDeviceToggleCam" onclick="adminDeviceToggleCam()" style="display:none;"><i class="fas fa-camera-rotate"></i> Flip Camera</button>
                         </div>
-                        <p style="font-size:.72rem; opacity:.75; margin-top:10px;"><i class="fas fa-circle-info"></i> Broadcasts from this device are saved as replays and shared through the app instantly (Firestore + same-network tabs). For large audiences, use the RTMP path above with OBS/Larix.</p>
+
+                        <!-- Cloud recording status — the replay never touches this device -->
+                        <div id="cloudRecordBox" style="display:none; margin-top:14px; background:rgba(255,255,255,.07); border:1px solid rgba(246,223,138,.35); border-radius:16px; padding:14px 16px;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+                                <strong style="font-size:.86rem; color:#f6df8a;"><i class="fas fa-cloud-arrow-up"></i> Cloud recording</strong>
+                                <span id="cloudRecordState" style="font-size:.74rem; opacity:.85;">Waiting to start…</span>
+                            </div>
+                            <div style="height:8px; background:rgba(0,0,0,.35); border-radius:99px; overflow:hidden; margin-top:10px;">
+                                <div id="cloudRecordBar" style="height:100%; width:0%; background:linear-gradient(90deg,#0A4D9B,#f6df8a); transition:width .4s ease;"></div>
+                            </div>
+                            <p id="cloudRecordHint" style="font-size:.7rem; opacity:.75; margin-top:8px;">
+                                <i class="fas fa-shield-halved"></i> Nothing is saved to this phone or computer — every part is uploaded to Prayer Dome cloud storage while you broadcast.
+                            </p>
+                        </div>
+
+                        <p style="font-size:.72rem; opacity:.75; margin-top:10px;"><i class="fas fa-circle-info"></i> Broadcasts from this device are recorded <strong>directly into Prayer Dome cloud storage</strong> in rolling parts, so members can watch the replay in the app from any device. Nothing is stored locally. For large audiences, use the RTMP path above with OBS/Larix.</p>
                     </div>
                 </div>
 
@@ -786,6 +806,69 @@
                         <table>
                             <thead><tr><th>Publish Date</th><th>Title</th><th>Scripture</th><th>Author</th><th>Status</th><th>Actions</th></tr></thead>
                             <tbody id="listAdminDevotionals"><tr><td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div></td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DAILY VERSE SCHEDULER -->
+            <div id="view-verses" class="section-view">
+                <div class="page-title"><span><i class="fas fa-book-bible"></i> Daily Bible Verse Scheduler</span><button class="btn btn-primary" onclick="openModal('modalVerse')"><i class="fas fa-plus"></i> Schedule Special Verse</button></div>
+
+                <div class="panel-card" style="margin-bottom:18px;">
+                    <div class="panel-header"><h3><i class="fas fa-clock"></i> How members receive verses</h3></div>
+                    <div style="padding:16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:14px;">
+                        <div style="background:rgba(10,77,155,.08); border-radius:14px; padding:14px;"><strong>🌅 Morning</strong><p style="font-size:.76rem; color:var(--text-sub); margin-top:4px;">Default 06:30 — new mercies &amp; direction</p></div>
+                        <div style="background:rgba(10,77,155,.08); border-radius:14px; padding:14px;"><strong>☀️ Midday</strong><p style="font-size:.76rem; color:var(--text-sub); margin-top:4px;">Default 12:00 — strength for the day</p></div>
+                        <div style="background:rgba(10,77,155,.08); border-radius:14px; padding:14px;"><strong>🌤️ Afternoon</strong><p style="font-size:.76rem; color:var(--text-sub); margin-top:4px;">Default 15:30 — peace &amp; encouragement</p></div>
+                        <div style="background:rgba(10,77,155,.08); border-radius:14px; padding:14px;"><strong>🌙 Evening</strong><p style="font-size:.76rem; color:var(--text-sub); margin-top:4px;">Default 20:00 — rest &amp; thanksgiving</p></div>
+                    </div>
+                    <p style="padding:0 16px 16px; font-size:.74rem; color:var(--text-sub);"><i class="fas fa-circle-info"></i> Members switch verses on in <strong>Account → Notification Settings</strong> and can change each time. A special verse scheduled below replaces the rotation for that date, for everyone.</p>
+                </div>
+
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-calendar-star"></i> Special Verses <span style="font-weight:400; font-size:.7rem; color:var(--text-sub);">— holidays, church programmes, fasting seasons and events</span></h3>
+                        <button class="btn btn-outline btn-sm" onclick="loadVerseSchedule()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Date</th><th>Occasion</th><th>Reference</th><th>Verse</th><th>Slots</th><th>Actions</th></tr></thead>
+                            <tbody id="listVerseSchedule"><tr><td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div></td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI VIDEO STUDIO -->
+            <div id="view-aivideo" class="section-view">
+                <div class="page-title"><span><i class="fas fa-wand-magic-sparkles"></i> AI Video Studio</span><button class="btn btn-primary" onclick="openModal('modalAiVideo')"><i class="fas fa-plus"></i> New AI Video</button></div>
+
+                <div class="panel-card" style="margin-bottom:18px;">
+                    <div class="panel-header"><h3><i class="fas fa-lightbulb"></i> Two ways to create</h3></div>
+                    <div style="padding:16px; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); gap:16px;">
+                        <div style="background:rgba(212,175,55,.08); border:1px solid rgba(212,175,55,.35); border-radius:16px; padding:16px;">
+                            <strong><i class="fas fa-clapperboard"></i> Built-in Scripture Studio</strong>
+                            <p style="font-size:.78rem; color:var(--text-sub); margin:8px 0 12px;">Type a script, pick imagery and a narration voice — Prayer Dome renders a narrated video in the browser and uploads it to cloud storage. No third-party subscription, no watermark.</p>
+                            <a class="btn btn-outline btn-sm" href="/ai-video.html" target="_blank"><i class="fas fa-arrow-up-right-from-square"></i> Open Scripture Studio</a>
+                        </div>
+                        <div style="background:rgba(10,77,155,.08); border:1px solid rgba(10,77,155,.3); border-radius:16px; padding:16px;">
+                            <strong><i class="fas fa-link"></i> Publish from an AI provider</strong>
+                            <p style="font-size:.78rem; color:var(--text-sub); margin:8px 0 12px;">Made a sermon or Bible story with Runway, Pika, HeyGen, Synthesia or Sora? Paste the finished video URL and publish it into the app library with a title, description and thumbnail.</p>
+                            <button class="btn btn-outline btn-sm" onclick="openModal('modalAiVideo')"><i class="fas fa-plus"></i> Add a video</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-film"></i> Published AI Videos</h3>
+                        <button class="btn btn-outline btn-sm" onclick="loadAiVideos()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>Created</th><th>Title</th><th>Category</th><th>Source</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody id="listAiVideos"><tr><td colspan="6"><div class="spinner" style="width:30px;height:30px;"></div></td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -1025,7 +1108,7 @@
             <div class="modal-body" style="max-height:80vh; overflow-y:auto;">
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
                     <div>
-                        <div style="text-align:center"><img id="fullMemberPhoto" src="https://via.placeholder.com/100" style="width:100px;height:100px;border-radius:50%;"><button class="btn btn-sm btn-outline" onclick="changeMemberPhoto()">Change Photo</button></div>
+                        <div style="text-align:center"><img id="fullMemberPhoto" src="/assets/avatar-default.svg" style="width:100px;height:100px;border-radius:50%;"><button class="btn btn-sm btn-outline" onclick="changeMemberPhoto()">Change Photo</button></div>
                         <div class="form-group"><label>Full Name</label><input type="text" id="fullMemberName" class="form-control"></div>
                         <div class="form-group"><label>Email</label><input type="email" id="fullMemberEmail" class="form-control" readonly></div>
                         <div class="form-group"><label>Phone</label><input type="tel" id="fullMemberPhone" class="form-control"></div>
@@ -1172,6 +1255,69 @@
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeModal('modalDevotional')">Cancel</button>
                 <button class="btn btn-primary" onclick="saveDevotional()"><i class="fas fa-calendar-check"></i> SCHEDULE DEVOTIONAL</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalVerse" class="modal-overlay">
+        <div class="modal-card" style="max-width: 600px;">
+            <div class="modal-header"><h2><i class="fas fa-book-bible"></i> Schedule a Special Verse</h2><button class="modal-close" onclick="closeModal('modalVerse')"><i class="fas fa-times"></i></button></div>
+            <div class="modal-body">
+                <p style="font-size:.8rem; color:var(--text-sub); margin-bottom:14px;">On this date the verse below replaces the normal rotation on every member's device.</p>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                    <div class="form-group"><label>Date *</label><input type="date" id="verseDate" class="form-control"></div>
+                    <div class="form-group"><label>Which sends?</label>
+                        <select id="verseSlots" class="form-control">
+                            <option value="all">All four (morning, midday, afternoon, evening)</option>
+                            <option value="morning">Morning only</option>
+                            <option value="midday">Midday only</option>
+                            <option value="afternoon">Afternoon only</option>
+                            <option value="evening">Evening only</option>
+                            <option value="morning,evening">Morning &amp; evening</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group"><label>Occasion / Title</label><input type="text" id="verseTitle" class="form-control" placeholder="e.g. Good Friday, National Fasting Week, Youth Camp" maxlength="80"></div>
+                <div class="form-group"><label>Scripture Reference *</label><input type="text" id="verseRef" class="form-control" placeholder="e.g. Isaiah 53:5" maxlength="60"></div>
+                <div class="form-group"><label>Verse Text *</label><textarea id="verseText" class="form-control" rows="4" placeholder="But he was wounded for our transgressions…" maxlength="600"></textarea></div>
+                <div class="form-group"><label>Translation</label><input type="text" id="verseTranslation" class="form-control" value="KJV" maxlength="20"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('modalVerse')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveVerseSchedule()"><i class="fas fa-calendar-check"></i> SCHEDULE VERSE</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalAiVideo" class="modal-overlay">
+        <div class="modal-card" style="max-width: 640px;">
+            <div class="modal-header"><h2><i class="fas fa-wand-magic-sparkles"></i> Publish an AI Video</h2><button class="modal-close" onclick="closeModal('modalAiVideo')"><i class="fas fa-times"></i></button></div>
+            <div class="modal-body">
+                <div class="form-group"><label>Title *</label><input type="text" id="aivTitle" class="form-control" placeholder="e.g. The Prodigal Son — an AI Bible story" maxlength="120"></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                    <div class="form-group"><label>Category</label>
+                        <select id="aivCategory" class="form-control">
+                            <option value="sermon">Sermon</option>
+                            <option value="bible-story">Bible Story</option>
+                            <option value="devotional">Devotional</option>
+                            <option value="inspiration">Inspirational Message</option>
+                            <option value="promo">Promotional</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Made with</label><input type="text" id="aivProvider" class="form-control" placeholder="Prayer Dome Studio / Runway / HeyGen…" value="Prayer Dome Studio"></div>
+                </div>
+                <div class="form-group"><label>Video URL *</label><input type="url" id="aivUrl" class="form-control" placeholder="https://res.cloudinary.com/prayerdome/video/upload/…"></div>
+                <div class="form-group"><label>Thumbnail URL</label><input type="url" id="aivThumb" class="form-control" placeholder="https://…/thumbnail.jpg"></div>
+                <div class="form-group"><label>Description</label><textarea id="aivDesc" class="form-control" rows="3" placeholder="A short description shown in the app and in social previews…" maxlength="400"></textarea></div>
+                <div class="form-group"><label>Scripture Reference</label><input type="text" id="aivScripture" class="form-control" placeholder="e.g. Luke 15:11-32" maxlength="60"></div>
+                <label style="display:flex; align-items:center; gap:10px; font-size:.85rem; cursor:pointer;">
+                    <input type="checkbox" id="aivDisclosure" checked>
+                    <i class="fas fa-robot" style="color: var(--accent-gold);"></i> Show the "AI-assisted" badge to members (recommended and honest)
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('modalAiVideo')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveAiVideo()"><i class="fas fa-cloud-arrow-up"></i> PUBLISH VIDEO</button>
             </div>
         </div>
     </div>
@@ -1583,7 +1729,7 @@
                 const statusClass = m.status==='approved' ? 'badge-success' : (m.status==='suspended' ? 'badge-danger' : (m.status==='rejected' ? 'badge-danger' : 'badge-warning'));
                 const statusText = m.status==='approved' ? 'Active' : (m.status==='suspended' ? 'Suspended' : (m.status==='rejected' ? 'Rejected' : 'Pending'));
                 const roleBadge = m.role==='admin'?'<span class="badge badge-success">Admin</span>':m.role==='finance'?'<span class="badge badge-info">Finance</span>':'<span class="badge badge-info">Member</span>';
-                html += `<tr><td><div class="user-cell"><img src="${m.photoUrl||'https://via.placeholder.com/40'}" class="user-img"><div><h4>${escapeHTML(m.fullName)}</h4><p>${escapeHTML(m.email)}</p></div></div></td><td style="font-family:monospace;color:var(--accent-gold);">${m.membershipId||'N/A'}</td><td>${escapeHTML(m.phone||'N/A')}</td><td>${roleBadge}</td><td><span class="badge ${statusClass}">${statusText}</span></td><td>${m.createdAt?moment(m.createdAt.toDate()).format('MMM D, YYYY'):'N/A'}</td><td><button class="btn btn-sm btn-primary" onclick="viewFullMemberDetails('${m.id}')">View/Edit</button>${m.status==='pending' ? `<button class="btn btn-sm btn-success" onclick="approveMember('${m.id}')">Approve</button>` : ''}</td></tr>`;
+                html += `<tr><td><div class="user-cell"><img src="${m.photoUrl||'/assets/avatar-default.svg'}" class="user-img"><div><h4>${escapeHTML(m.fullName)}</h4><p>${escapeHTML(m.email)}</p></div></div></td><td style="font-family:monospace;color:var(--accent-gold);">${m.membershipId||'N/A'}</td><td>${escapeHTML(m.phone||'N/A')}</td><td>${roleBadge}</td><td><span class="badge ${statusClass}">${statusText}</span></td><td>${m.createdAt?moment(m.createdAt.toDate()).format('MMM D, YYYY'):'N/A'}</td><td><button class="btn btn-sm btn-primary" onclick="viewFullMemberDetails('${m.id}')">View/Edit</button>${m.status==='pending' ? `<button class="btn btn-sm btn-success" onclick="approveMember('${m.id}')">Approve</button>` : ''}</td></tr>`;
                 count++;
             });
             tbody.innerHTML = count>0?html:'<tr><td colspan="7">No members found</td></tr>';
@@ -1659,7 +1805,7 @@
                 document.getElementById('fullMemberMinistries').value=ministriesDisplay; 
                 document.getElementById('fullMemberBio').value=member.bio||''; 
                 document.getElementById('fullMemberAdminNotes').value=member.adminNotes||''; 
-                document.getElementById('fullMemberPhoto').src=member.photoUrl||'https://via.placeholder.com/100'; 
+                document.getElementById('fullMemberPhoto').src=member.photoUrl||'/assets/avatar-default.svg'; 
                 document.getElementById('editMemberId').value=uid; 
                 const sigDisplay=document.getElementById('signatureDisplay'); 
                 sigDisplay.innerHTML=member.signatureUrl?`<img src="${member.signatureUrl}" style="max-width:100%;max-height:80px;">`:'<p>No signature on file</p>'; 
@@ -2185,6 +2331,163 @@
         window.deleteDevotional = function(id) {
             if(!confirm('Delete this devotional? This cannot be undone.')) return;
             deleteDoc(doc(db, 'devotionals', id)).then(() => { toast('Devotional deleted'); loadAdminDevotionals(); }).catch(e => toast(e.message, 'error'));
+        };
+
+        // ==================== DAILY VERSE SCHEDULER (admin) ====================
+        const VERSE_SLOT_LABELS = { morning: '🌅 Morning', midday: '☀️ Midday', afternoon: '🌤️ Afternoon', evening: '🌙 Evening' };
+
+        window.loadVerseSchedule = function() {
+            const tbody = document.getElementById('listVerseSchedule');
+            if(!tbody) return;
+            getDocs(query(collection(db, 'verseSchedule'), orderBy('date', 'desc'), limit(60))).then(snap => {
+                if(snap.empty){ tbody.innerHTML = '<tr><td colspan="6">No special verses scheduled yet. The normal four-times-a-day rotation is running.</td></tr>'; return; }
+                tbody.innerHTML = snap.docs.map(d => {
+                    const v = d.data();
+                    const slots = Array.isArray(v.slots) && v.slots.length ? v.slots : ['morning','midday','afternoon','evening'];
+                    const slotHtml = slots.map(s => `<span class="badge badge-info" style="margin:1px;">${VERSE_SLOT_LABELS[s] || s}</span>`).join(' ');
+                    const isPast = v.date && v.date < new Date().toISOString().split('T')[0];
+                    const dateLabel = v.date ? moment(v.date, 'YYYY-MM-DD').format('ddd, MMM D, YYYY') : (d.id || '—');
+                    return `<tr${isPast ? ' style="opacity:.6;"' : ''}>
+                        <td><strong>${escapeHTML(dateLabel)}</strong>${isPast ? '<br><span style="font-size:.68rem;color:var(--text-sub);">past</span>' : ''}</td>
+                        <td>${escapeHTML(v.title || '—')}</td>
+                        <td style="font-family:monospace;font-size:.78rem;">${escapeHTML(v.reference || '—')}</td>
+                        <td style="max-width:280px;font-size:.78rem;">${escapeHTML((v.text || '').slice(0, 140))}${(v.text||'').length > 140 ? '…' : ''}</td>
+                        <td>${slotHtml}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline" onclick="editVerseSchedule('${d.id}')"><i class="fas fa-pen"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteVerseSchedule('${d.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            }).catch(e => { console.error(e); tbody.innerHTML = '<tr><td colspan="6">Error loading the verse schedule</td></tr>'; });
+        };
+
+        window.saveVerseSchedule = async function() {
+            const date = document.getElementById('verseDate').value;
+            const reference = document.getElementById('verseRef').value.trim();
+            const text = document.getElementById('verseText').value.trim();
+            if(!date || !reference || !text){ toast('Date, scripture reference and verse text are required.', 'error'); return; }
+            const slotChoice = document.getElementById('verseSlots').value;
+            const slots = slotChoice === 'all' ? ['morning','midday','afternoon','evening'] : slotChoice.split(',');
+            showLoading();
+            try {
+                await setDoc(doc(db, 'verseSchedule', date), {
+                    date: date,
+                    title: document.getElementById('verseTitle').value.trim(),
+                    reference: reference,
+                    text: text,
+                    translation: document.getElementById('verseTranslation').value.trim() || 'KJV',
+                    slots: slots,
+                    special: true,
+                    createdAt: serverTimestamp(),
+                    createdBy: adminUser?.email || 'admin'
+                }, { merge: true });
+                toast('Special verse scheduled for ' + date + ' ✅');
+                await logAdminActivity('verse_scheduled', { date, reference });
+                closeModal('modalVerse');
+                document.getElementById('verseDate').value = '';
+                document.getElementById('verseTitle').value = '';
+                document.getElementById('verseRef').value = '';
+                document.getElementById('verseText').value = '';
+                document.getElementById('verseTranslation').value = 'KJV';
+                document.getElementById('verseSlots').value = 'all';
+                loadVerseSchedule();
+            } catch(e) { toast('Error: ' + e.message, 'error'); }
+            finally { hideLoading(); }
+        };
+
+        window.editVerseSchedule = async function(id) {
+            try {
+                const snap = await getDoc(doc(db, 'verseSchedule', id));
+                if(!snap.exists()) return toast('Scheduled verse not found', 'error');
+                const v = snap.data();
+                document.getElementById('verseDate').value = v.date || id;
+                document.getElementById('verseTitle').value = v.title || '';
+                document.getElementById('verseRef').value = v.reference || '';
+                document.getElementById('verseText').value = v.text || '';
+                document.getElementById('verseTranslation').value = v.translation || 'KJV';
+                const slots = Array.isArray(v.slots) ? v.slots : [];
+                document.getElementById('verseSlots').value = (!slots.length || slots.length === 4) ? 'all' : slots.join(',');
+                openModal('modalVerse');
+            } catch(e) { toast('Error: ' + e.message, 'error'); }
+        };
+
+        window.deleteVerseSchedule = function(id) {
+            if(!confirm('Remove this special verse? Members will get the normal rotation on that day.')) return;
+            deleteDoc(doc(db, 'verseSchedule', id)).then(() => { toast('Special verse removed'); loadVerseSchedule(); }).catch(e => toast(e.message, 'error'));
+        };
+
+        // ==================== AI VIDEO STUDIO (admin) ====================
+        const AIV_CATEGORY_LABELS = { sermon: 'Sermon', 'bible-story': 'Bible Story', devotional: 'Devotional', inspiration: 'Inspirational', promo: 'Promotional' };
+
+        window.loadAiVideos = function() {
+            const tbody = document.getElementById('listAiVideos');
+            if(!tbody) return;
+            getDocs(query(collection(db, 'aiVideos'), orderBy('createdAt', 'desc'), limit(60))).then(snap => {
+                if(snap.empty){ tbody.innerHTML = '<tr><td colspan="6">No AI videos published yet. Use the Scripture Studio or paste a finished video URL.</td></tr>'; return; }
+                tbody.innerHTML = snap.docs.map(d => {
+                    const v = d.data();
+                    const when = v.createdAt?.toDate ? moment(v.createdAt.toDate()).format('MMM D, YYYY') : '—';
+                    const status = v.published === false
+                        ? '<span class="badge badge-warning">Hidden</span>'
+                        : '<span class="badge badge-success">Published</span>';
+                    const badge = v.aiAssisted !== false ? ' <span class="badge badge-info"><i class="fas fa-robot"></i> AI</span>' : '';
+                    return `<tr>
+                        <td>${when}</td>
+                        <td><strong>${escapeHTML(v.title || 'Untitled')}</strong>${badge}<br><span style="font-size:.7rem;color:var(--text-sub);">${escapeHTML(v.scripture || '')}</span></td>
+                        <td>${escapeHTML(AIV_CATEGORY_LABELS[v.category] || v.category || '—')}</td>
+                        <td style="font-size:.76rem;">${escapeHTML(v.provider || '—')}</td>
+                        <td>${status}</td>
+                        <td>
+                            ${v.url ? `<a class="btn btn-sm btn-outline" href="${escapeHTML(v.url)}" target="_blank" rel="noopener"><i class="fas fa-play"></i></a>` : ''}
+                            <button class="btn btn-sm btn-outline" onclick="toggleAiVideo('${d.id}', ${v.published === false})"><i class="fas fa-eye${v.published === false ? '' : '-slash'}"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteAiVideo('${d.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            }).catch(e => { console.error(e); tbody.innerHTML = '<tr><td colspan="6">Error loading AI videos</td></tr>'; });
+        };
+
+        window.saveAiVideo = async function() {
+            const title = document.getElementById('aivTitle').value.trim();
+            const url = document.getElementById('aivUrl').value.trim();
+            if(!title || !url){ toast('Title and video URL are required.', 'error'); return; }
+            if(/^blob:/i.test(url)){ toast('That is a temporary device link. Upload the video to cloud storage first.', 'error'); return; }
+            if(!/^https:\/\//i.test(url)){ toast('The video URL must start with https://', 'error'); return; }
+            showLoading();
+            try {
+                await addDoc(collection(db, 'aiVideos'), {
+                    title: title,
+                    category: document.getElementById('aivCategory').value,
+                    provider: document.getElementById('aivProvider').value.trim() || 'Prayer Dome Studio',
+                    url: url,
+                    thumb: document.getElementById('aivThumb').value.trim() || '',
+                    desc: document.getElementById('aivDesc').value.trim(),
+                    scripture: document.getElementById('aivScripture').value.trim(),
+                    aiAssisted: document.getElementById('aivDisclosure').checked,
+                    published: true,
+                    views: 0,
+                    createdAt: serverTimestamp(),
+                    createdBy: adminUser?.email || 'admin'
+                });
+                toast('AI video published ✅');
+                await logAdminActivity('ai_video_published', { title });
+                closeModal('modalAiVideo');
+                ['aivTitle','aivUrl','aivThumb','aivDesc','aivScripture'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
+                loadAiVideos();
+            } catch(e) { toast('Error: ' + e.message, 'error'); }
+            finally { hideLoading(); }
+        };
+
+        window.toggleAiVideo = function(id, makePublished) {
+            updateDoc(doc(db, 'aiVideos', id), { published: !!makePublished })
+                .then(() => { toast(makePublished ? 'Video published' : 'Video hidden from members'); loadAiVideos(); })
+                .catch(e => toast(e.message, 'error'));
+        };
+
+        window.deleteAiVideo = function(id) {
+            if(!confirm('Delete this AI video from the library? This cannot be undone.')) return;
+            deleteDoc(doc(db, 'aiVideos', id)).then(() => { toast('AI video deleted'); loadAiVideos(); }).catch(e => toast(e.message, 'error'));
         };
 
         window.uploadNewsImage = function() {
@@ -2732,11 +3035,31 @@
             }
         };
 
-        /* ==================== DEVICE BROADCAST (in-app Go Live) ==================== */
+        /* ==================== DEVICE BROADCAST (in-app Go Live) ====================
+           The broadcast is recorded straight into Prayer Dome cloud storage in
+           rolling parts (see /assets/pd-cloud-video.js). Nothing is written to
+           the broadcaster's device and no blob: replay links are ever stored —
+           members watch the recording from the cloud inside the app.          */
         let deviceStream = {
-            active: false, stream: null, recorder: null, chunks: [], timer: null, seconds: 0,
+            active: false, stream: null, recorder: null, timer: null, seconds: 0,
             facing: 'user', videoEl: null, status: null, recordId: null
         };
+
+        function cloudRecordUI(state, detail) {
+            const box = document.getElementById('cloudRecordBox');
+            const label = document.getElementById('cloudRecordState');
+            const bar = document.getElementById('cloudRecordBar');
+            if (!box) return;
+            box.style.display = state === 'hidden' ? 'none' : 'block';
+            if (label && detail && detail.text) label.textContent = detail.text;
+            if (bar && detail && typeof detail.percent === 'number') {
+                bar.style.width = Math.max(0, Math.min(100, detail.percent)) + '%';
+            }
+        }
+
+        function formatMB(bytes) {
+            return ((bytes || 0) / 1024 / 1024).toFixed(1) + ' MB';
+        }
 
         window.adminDeviceGoLive = async function () {
             if (!adminUser) return toast('Not authenticated', 'error');
@@ -2756,12 +3079,35 @@
                 if (wrap) wrap.style.display = 'block';
                 if (preview) { preview.srcObject = deviceStream.stream; deviceStream.videoEl = preview; }
 
-                // 2. Record with MediaRecorder so a replay can be saved.
-                const mime = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'].find(m => MediaRecorder.isTypeSupported(m)) || '';
-                deviceStream.recorder = new MediaRecorder(deviceStream.stream, mime ? { mimeType: mime } : undefined);
-                deviceStream.chunks = [];
-                deviceStream.recorder.ondataavailable = e => { if (e.data && e.data.size) deviceStream.chunks.push(e.data); };
-                deviceStream.recorder.start(2000);
+                // 2. Record straight to Prayer Dome cloud storage — rolling parts
+                //    are uploaded while the service is still running, so nothing
+                //    is ever kept on this device.
+                if (window.PDCloudVideo) {
+                    deviceStream.recorder = PDCloudVideo.createRecorder(deviceStream.stream, {
+                        title: title,
+                        onProgress: snap => {
+                            const total = Math.max(snap.recordedBytes, 1);
+                            const percent = Math.round((snap.uploadedBytes / total) * 100);
+                            const label = snap.state === 'finishing'
+                                ? 'Finishing upload…'
+                                : (snap.pending ? 'Uploading part ' + (snap.parts.length + 1) + '…' : 'Saved to cloud');
+                            cloudRecordUI('show', {
+                                percent: percent,
+                                text: label + ' · ' + snap.parts.length + ' part(s) · ' + formatMB(snap.uploadedBytes)
+                            });
+                        },
+                        onPart: part => {
+                            console.log('Cloud recording part stored:', part.url);
+                        },
+                        onRetry: attempt => toast('Network hiccup — retrying cloud upload (' + attempt + ')', 'info'),
+                        onError: err => toast('Cloud upload problem: ' + (err.message || err), 'error')
+                    });
+                    deviceStream.recorder.start();
+                    cloudRecordUI('show', { percent: 0, text: 'Recording to cloud…' });
+                } else {
+                    deviceStream.recorder = null;
+                    toast('Cloud recorder unavailable — broadcasting without a replay', 'error');
+                }
 
                 // 3. Publish live status (localStorage + Firestore + BroadcastChannel).
                 const streamId = `device_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
@@ -2835,60 +3181,94 @@
                 }
                 deviceStream.stream = newStream;
                 if (deviceStream.videoEl) deviceStream.videoEl.srcObject = newStream;
-                // Rebuild recorder with the new stream.
-                deviceStream.recorder.stop();
-                const mime = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'].find(m => MediaRecorder.isTypeSupported(m)) || '';
-                deviceStream.recorder = new MediaRecorder(newStream, mime ? { mimeType: mime } : undefined);
-                deviceStream.chunks = [];
-                deviceStream.recorder.ondataavailable = e => { if (e.data && e.data.size) deviceStream.chunks.push(e.data); };
-                deviceStream.recorder.start(2000);
+                // Roll to a new cloud part with the new camera — the recording continues.
+                if (deviceStream.recorder && deviceStream.recorder.replaceStream) {
+                    deviceStream.recorder.replaceStream(newStream);
+                }
                 toast('Camera flipped');
             } catch (e) { toast('Could not flip camera: ' + e.message, 'error'); }
         };
 
         window.adminDeviceEndLive = async function () {
             if (!deviceStream.active) return;
-            if (!confirm('Stop the broadcast and save this replay?')) return;
+            if (!confirm('Stop the broadcast and finish saving the recording to Prayer Dome cloud storage?')) return;
             try {
                 deviceStream.active = false;
                 clearInterval(deviceStream.timer);
-                if (deviceStream.recorder && deviceStream.recorder.state !== 'inactive') deviceStream.recorder.stop();
+                document.getElementById('btnDeviceEndLive').disabled = true;
+                cloudRecordUI('show', { text: 'Finishing upload — please keep this page open…' });
+
+                // Finish the cloud recording FIRST so the last part is safely stored,
+                // then release the camera.
+                let cloud = null;
+                if (deviceStream.recorder) {
+                    try { cloud = await deviceStream.recorder.stop(); }
+                    catch (err) { console.error('Cloud recording finish failed', err); }
+                }
+
                 deviceStream.stream?.getTracks().forEach(t => t.stop());
                 if (deviceStream.videoEl) deviceStream.videoEl.srcObject = null;
                 document.getElementById('deviceCamWrap').style.display = 'none';
                 document.getElementById('btnDeviceGoLive').style.display = 'inline-flex';
                 document.getElementById('btnDeviceEndLive').style.display = 'none';
+                document.getElementById('btnDeviceEndLive').disabled = false;
                 document.getElementById('btnDeviceToggleCam').style.display = 'none';
                 document.getElementById('btnStartLive').style.display = 'inline-flex';
 
-                // Save replay (blob URL is session-scoped; Firestore copy stores metadata).
-                const blob = new Blob(deviceStream.chunks, { type: 'video/webm' });
-                const replayUrl = URL.createObjectURL(blob);
-                if (window.PDApp) {
+                const prev = deviceStream.status || {};
+                const parts = (cloud && cloud.parts) || [];
+                const playbackUrl = (cloud && cloud.playbackUrl) || null;
+
+                // Share the cloud replay with the app (cloud URLs only — never blob:).
+                if (window.PDApp && playbackUrl) {
                     PDApp.live.addReplay({
-                        title: deviceStream.status?.title || 'Live Service',
-                        description: deviceStream.status?.description || '',
-                        url: replayUrl, durationSeconds: deviceStream.seconds,
-                        date: new Date().toISOString(), source: 'device'
+                        title: prev.title || 'Live Service',
+                        description: prev.description || '',
+                        url: playbackUrl,
+                        parts: parts,
+                        thumbnail: (cloud && cloud.thumbnail) || null,
+                        durationSeconds: (cloud && cloud.durationSeconds) || deviceStream.seconds,
+                        date: new Date().toISOString(), source: 'device', storage: 'cloud'
                     });
                 }
-                // End status (keep last title for the replay row).
-                const prev = deviceStream.status || {};
+
                 deviceStream.status = { isLive: false, endedAt: new Date().toISOString(), title: prev.title, streamId: prev.streamId, viewers: 0 };
                 if (window.PDApp) PDApp.live.setStatus(deviceStream.status);
+
                 await addDoc(collection(db, 'liveRecordings'), {
-                    title: prev.title || 'Live Service', description: prev.description || '',
-                    streamId: prev.streamId || null, playbackUrl: replayUrl || null, source: 'device',
-                    startedBy: adminUser.email, createdAt: serverTimestamp()
+                    title: prev.title || 'Live Service',
+                    description: prev.description || '',
+                    streamId: prev.streamId || null,
+                    playbackUrl: playbackUrl,
+                    parts: parts,
+                    thumbnail: (cloud && cloud.thumbnail) || null,
+                    durationSeconds: (cloud && cloud.durationSeconds) || deviceStream.seconds,
+                    totalBytes: (cloud && cloud.totalBytes) || 0,
+                    storage: 'cloudinary',
+                    storedOnDevice: false,
+                    uploadError: (cloud && cloud.error) || null,
+                    source: 'device',
+                    startedBy: adminUser.email,
+                    createdAt: serverTimestamp()
                 }).catch(() => {});
+
                 await addDoc(collection(db, 'liveChat'), {
                     userId: 'system', name: 'System',
-                    message: '🔴 The live stream has ended. The replay is available in Live → Previous Streams.',
+                    message: '🔴 The live stream has ended. The recording is now in the app under Live → Sermon Archive.',
                     timestamp: serverTimestamp(), isSystem: true
                 }).catch(() => {});
-                await logAdminActivity('live_ended_device', { title: prev.title });
+                await logAdminActivity('live_ended_device', { title: prev.title, parts: parts.length });
                 applyAdminLiveUI({ isLive: false, viewers: 0 });
-                toast('Broadcast ended — replay saved ✅');
+
+                if (playbackUrl) {
+                    cloudRecordUI('show', { percent: 100, text: 'Saved to cloud · ' + parts.length + ' part(s)' });
+                    toast('Broadcast ended — recording saved to cloud storage ☁️');
+                    setTimeout(() => cloudRecordUI('hidden'), 6000);
+                } else {
+                    cloudRecordUI('show', { percent: 0, text: 'Upload failed — check the Cloudinary preset "live_recordings"' });
+                    toast('Broadcast ended, but the cloud upload did not complete', 'error');
+                }
+                deviceStream.recorder = null;
                 loadLiveRecordings();
             } catch (e) {
                 console.error(e);
@@ -2910,12 +3290,16 @@
                     const r = d.data();
                     const when = r.createdAt ? moment(r.createdAt.toDate()).format('MMM D, YYYY h:mm A') : '—';
                     const play = r.playbackUrl || r.hlsUrl || (r.streamId ? `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/hls/${r.streamId}.m3u8` : '');
+                    const partCount = Array.isArray(r.parts) ? r.parts.length : 0;
+                    const cloudBadge = /^blob:/i.test(String(play))
+                        ? '<span class="badge badge-warning">Local only</span>'
+                        : (play ? `<span class="badge badge-info"><i class="fas fa-cloud"></i> Cloud${partCount ? ' · ' + partCount + ' part' + (partCount > 1 ? 's' : '') : ''}</span>` : '');
                     return `<tr>
                         <td style="white-space:nowrap;">${when}</td>
-                        <td><strong>${escapeHTML(r.title || 'Live Service')}</strong></td>
+                        <td><strong>${escapeHTML(r.title || 'Live Service')}</strong><br>${cloudBadge}</td>
                         <td style="font-family:monospace;font-size:.75rem;color:var(--accent-gold);">${escapeHTML(r.streamId || '—')}</td>
                         <td>${escapeHTML(r.startedBy || '—')}</td>
-                        <td>${play ? `<a class="btn btn-sm btn-outline" href="${play}" target="_blank"><i class="fas fa-play"></i> HLS</a>` : '—'}
+                        <td>${play && !/^blob:/i.test(String(play)) ? `<a class="btn btn-sm btn-outline" href="${play}" target="_blank"><i class="fas fa-play"></i> Play</a>` : '—'}
                             <button class="btn btn-sm btn-danger" onclick="deleteRecord('liveRecordings','${d.id}')"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>`;
@@ -2974,6 +3358,8 @@
                 else if(viewId === 'sermons') await loadAdminSermons();
                 else if(viewId === 'translations') await loadTranslationReview();
                 else if(viewId === 'devotionals') await loadAdminDevotionals();
+                else if(viewId === 'verses') await loadVerseSchedule();
+                else if(viewId === 'aivideo') await loadAiVideos();
                 else if(viewId === 'banners') await loadAdminBanners();
                 else if(viewId === 'languages') await loadAdminLanguages();
                 else if(viewId === 'media') { await loadAdminPodcasts(); loadAdminRadio(); }

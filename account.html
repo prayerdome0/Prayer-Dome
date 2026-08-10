@@ -572,6 +572,8 @@
     <script src="/assets/pd-motion.js" defer></script>
     <script src="/assets/pd-content-data.js" defer></script>
     <script src="/translation-data.js"></script>
+<script src="/assets/pd-verse-data.js" defer></script>
+<script src="/assets/pd-verse-alerts.js" defer></script>
 <script src="/assets/pd-app.js" defer></script>
     <script src="/assets/pd-certificate.js" defer></script>
 </head>
@@ -629,7 +631,7 @@
             <p style="text-align: center; color: var(--text-sub); margin-bottom: 25px;">Create your account to access all features</p>
             
             <div style="text-align: center; margin-bottom: 20px;">
-                <div class="avatar-frame"><img id="regPreview" src="https://via.placeholder.com/150"></div>
+                <div class="avatar-frame"><img id="regPreview" src="/assets/avatar-default.svg"></div>
                 <button type="button" onclick="uploadPhoto('register')" class="btn btn-outline" style="width: auto; padding: 8px 20px; margin-top: 10px;"><i class="fas fa-camera"></i> Upload Photo</button>
                 <input type="hidden" id="uploadedPhoto">
             </div>
@@ -674,7 +676,7 @@
             <div id="profileView">
                 <div class="profile-hero">
                     <div class="avatar-frame" onclick="changeProfilePhoto()">
-                        <img id="pPhoto" src="https://via.placeholder.com/150">
+                        <img id="pPhoto" src="/assets/avatar-default.svg">
                         <div class="camera-overlay"><i class="fas fa-camera"></i></div>
                     </div>
                     <h2 id="pNameDisplay" style="font-family: 'Playfair Display', serif;">User Name</h2>
@@ -717,6 +719,23 @@
                     </div>
                 </div>
 
+                <!-- NOTIFICATION & DAILY VERSE SETTINGS -->
+                <div class="settings-block" style="background: var(--bg-primary); border-radius: 20px; padding: 20px; margin: 15px 0; border: 1px solid rgba(10,77,155,.2);">
+                    <h3 style="margin: 0 0 4px; font-family: 'Playfair Display', serif; color: var(--accent-green);"><i class="fas fa-sliders"></i> Notification Settings</h3>
+                    <p style="font-size: .78rem; color: var(--text-sub); margin: 0 0 16px;">Choose what Prayer Dome sends to your device. You are always in control.</p>
+
+                    <div id="notifPermissionRow" style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; background: var(--bg-card); border:1px solid var(--border-color); border-radius:14px; padding:12px 14px; margin-bottom:14px;">
+                        <div style="min-width:0;">
+                            <strong style="font-size:.88rem;">Device notifications</strong><br>
+                            <small id="notifPermissionState" style="font-size:.72rem; color: var(--text-sub);">Checking…</small>
+                        </div>
+                        <button class="btn btn-outline" style="width:auto;" id="notifPermissionBtn" onclick="requestAppNotifications()"><i class="fas fa-bell"></i> Allow Notifications</button>
+                    </div>
+
+                    <!-- Daily Bible verse scheduler renders here -->
+                    <div data-pd-verse-settings></div>
+                </div>
+
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                     <button onclick="toggleEdit(true)" class="btn btn-primary" style="flex: 2;">Edit Profile</button>
                     <button onclick="handleLogout()" class="btn btn-outline" style="flex: 1; color: #ef4444;">Logout</button>
@@ -742,7 +761,7 @@
                 <div class="form-group">
                     <label>Profile Photo</label>
                     <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-                        <img id="editPhotoPreview" src="https://via.placeholder.com/80" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+                        <img id="editPhotoPreview" src="/assets/avatar-default.svg" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
                         <button type="button" onclick="changeProfilePhoto()" class="btn btn-outline" style="width: auto;">Change Photo</button>
                     </div>
                 </div>
@@ -898,7 +917,7 @@
         const defaultProfile = (user) => ({
             fullName: user.displayName || user.email?.split('@')[0] || 'Prayer Dome Member',
             email: user.email || '',
-            photoURL: user.photoURL || 'https://via.placeholder.com/150',
+            photoURL: user.photoURL || '/assets/avatar-default.svg',
             emailVerified: Boolean(user.emailVerified),
             prayerCount: 0,
             walletBalance: 0,
@@ -1130,7 +1149,7 @@
             const countryCode = document.getElementById('rCountryCode').value;
             const phoneNum = document.getElementById('rPhone').value.trim();
             const fullPhone = `${countryCode}${phoneNum}`;
-            const photoUrl = document.getElementById('uploadedPhoto').value || "https://via.placeholder.com/150";
+            const photoUrl = document.getElementById('uploadedPhoto').value || "/assets/avatar-default.svg";
             
             if (!name || !isValidEmail(email)) {
                 showToast('Enter your full name and a valid email address.', 'error');
@@ -1245,7 +1264,7 @@
             if (userSnap.exists()) {
                 currentUserData = userSnap.data();
                 const data = currentUserData;
-                const photoUrl = data.photoURL || user.photoURL || "https://via.placeholder.com/150";
+                const photoUrl = data.photoURL || user.photoURL || "/assets/avatar-default.svg";
                 currentPhotoUrl = photoUrl;
 
                 // Show Admin / Finance dashboard access for leadership roles.
@@ -1558,6 +1577,44 @@
         };
         
         window.handleLogout = () => signOut(auth);
+
+        /* ---------------- notification permission control ---------------- */
+        function refreshNotifPermissionUI() {
+            const state = document.getElementById('notifPermissionState');
+            const btn = document.getElementById('notifPermissionBtn');
+            if (!state || !btn) return;
+            const perm = (typeof Notification !== 'undefined') ? Notification.permission : 'unsupported';
+            if (perm === 'granted') {
+                state.textContent = 'On — verses, live alerts and prayer updates reach your device.';
+                btn.innerHTML = '<i class="fas fa-check"></i> Allowed';
+                btn.disabled = true;
+                btn.style.opacity = '.7';
+            } else if (perm === 'denied') {
+                state.textContent = 'Blocked. Open your browser or phone settings for Prayer Dome to turn notifications back on.';
+                btn.innerHTML = '<i class="fas fa-triangle-exclamation"></i> Blocked';
+                btn.disabled = true;
+                btn.style.opacity = '.7';
+            } else if (perm === 'unsupported') {
+                state.textContent = 'This device does not support notifications.';
+                btn.style.display = 'none';
+            } else {
+                state.textContent = 'Off — turn on to receive daily verses and live service alerts.';
+                btn.innerHTML = '<i class="fas fa-bell"></i> Allow Notifications';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+        }
+
+        window.requestAppNotifications = async () => {
+            const perm = window.PDApp && PDApp.notifications
+                ? await PDApp.notifications.requestPermission()
+                : await Notification.requestPermission();
+            refreshNotifPermissionUI();
+            if (perm === 'granted' && window.PDApp) PDApp.toast('Notifications are on 🙏', 'success');
+        };
+
+        refreshNotifPermissionUI();
+        document.addEventListener('DOMContentLoaded', refreshNotifPermissionUI);
         window.toggleDarkMode = () => document.body.classList.toggle('dark-mode');
         
         window.checkAge = (val) => {

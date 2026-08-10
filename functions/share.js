@@ -8,20 +8,79 @@ const SITE_ORIGIN = 'https://prayerdome.net';
 const PROJECT_ID = 'prayer-dome';
 const API_KEY = process.env.FIREBASE_WEB_API_KEY || 'AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo';
 
-const FALLBACKS = {
+/**
+ * Every shareable content type. `collection` is the Firestore collection the
+ * document lives in, `target` is the in-app page a human is forwarded to, and
+ * `image` is the branded fallback used when an item has no featured image.
+ */
+const TYPES = {
   news: {
+    collection: 'news',
     title: 'News | Prayer Dome',
     description: 'Read the latest Prayer Dome ministry news and stories.',
     image: '/assets/hero-worship.jpg',
-    target: '/news.html'
+    page: '/news.html',
+    param: 'story',
+    ogType: 'article'
   },
   testimony: {
+    collection: 'testimonies',
     title: 'Testimony | Prayer Dome',
     description: 'Read this Prayer Dome testimony and be encouraged.',
     image: '/assets/testimonies/hero-praise.jpg',
-    target: '/testimony.html'
+    page: '/testimony.html',
+    param: 'story',
+    ogType: 'article'
+  },
+  sermon: {
+    collection: 'sermons',
+    title: 'Sermon | Prayer Dome',
+    description: 'Listen to this Prayer Dome sermon and let the Word settle in your heart.',
+    image: '/assets/sermons/sermon-prayer.jpg',
+    page: '/sermons.html',
+    param: 's',
+    ogType: 'article'
+  },
+  devotional: {
+    collection: 'devotionals',
+    title: 'Daily Devotional | Prayer Dome',
+    description: 'A short daily devotional from Prayer Dome — scripture, a thought and a prayer.',
+    image: '/assets/hero-worship.jpg',
+    page: '/index.html',
+    param: 'devotional',
+    ogType: 'article'
+  },
+  prayer: {
+    collection: 'prayers',
+    title: 'Prayer Request | Prayer Dome',
+    description: 'Stand in agreement with this prayer request on the Prayer Dome global prayer wall.',
+    image: '/assets/og-image.png',
+    page: '/prayer.html',
+    param: 'request',
+    ogType: 'article'
+  },
+  event: {
+    collection: 'events',
+    title: 'Church Event | Prayer Dome',
+    description: 'Join this Prayer Dome gathering — everyone is welcome.',
+    image: '/assets/og-image.png',
+    page: '/event.html',
+    param: 'id',
+    ogType: 'article'
+  },
+  video: {
+    collection: 'aiVideos',
+    title: 'Video | Prayer Dome',
+    description: 'Watch this Prayer Dome video — sermons, Bible stories and daily encouragement.',
+    image: '/assets/og-image.png',
+    page: '/video.html',
+    param: 'v',
+    ogType: 'video.other'
   }
 };
+
+// Retained for older call sites and tests.
+const FALLBACKS = TYPES;
 
 function htmlEscape(value) {
   return String(value == null ? '' : value)
@@ -125,35 +184,153 @@ function getSeededNews(id) {
   }
 }
 
+/**
+ * Sermons and Bible stories that ship with the app (sermons-data.js) are
+ * shareable too — they have no Firestore document, so read them from the
+ * bundled data file.
+ */
+let seededSermons;
+function getSeededSermon(id) {
+  if (!id) return null;
+  try {
+    if (!seededSermons) {
+      seededSermons = [];
+      try {
+        const file = path.join(process.cwd(), 'sermons-data.js');
+        const src = fs.readFileSync(file, 'utf8');
+        const sandbox = { module: { exports: {} }, window: {} };
+        sandbox.exports = sandbox.module.exports;
+        vm.runInNewContext(src, sandbox, { filename: 'sermons-data.js', timeout: 1000 });
+        seededSermons = (sandbox.module.exports && sandbox.module.exports.PD_SERMONS) || [];
+      } catch (_readError) {
+        seededSermons = [];
+      }
+    }
+    return seededSermons.find((s) => s && s.id === id) || null;
+  } catch (_e) {
+    return null;
+  }
+}
+
+/** First non-empty featured-image field an editor may have filled in. */
+function pickImage(data) {
+  if (!data) return null;
+  return data.socialImage || data.featuredImage || data.image || data.imageUrl ||
+    data.thumb || data.thumbnail || data.coverImage || data.photoUrl || data.banner || null;
+}
+
+/** First non-empty description-ish field. */
+function pickDescription(data, keys) {
+  if (!data) return '';
+  for (const key of keys) {
+    const value = data[key];
+    if (typeof value === 'string' && value.trim()) return value;
+    if (Array.isArray(value) && value.length && typeof value[0] === 'string') return value.join(' ');
+  }
+  return '';
+}
+
+function brandTitle(title) {
+  const clean = text(title, 110);
+  return /prayer dome/i.test(clean) ? clean : `${clean} | Prayer Dome`;
+}
+
 function normalizeItem(type, id, data) {
-  const fallback = FALLBACKS[type] || FALLBACKS.news;
+  const spec = TYPES[type] || TYPES.news;
+  const encodedId = encodeURIComponent(id || '');
+  const shareUrl = `${SITE_ORIGIN}/share/${type}/${encodedId}`;
+  const target = id
+    ? `${SITE_ORIGIN}${spec.page}?${spec.param}=${encodedId}`
+    : `${SITE_ORIGIN}${spec.page}`;
+  const image = absoluteUrl(pickImage(data), spec.image);
+
   if (type === 'testimony') {
-    const image = data && (data.socialImage || data.featuredImage || data.imageUrl || data.image || data.photoUrl);
     const author = text((data && data.author) || 'Anonymous', 80);
     const category = text((data && data.category) || 'Testimony', 80);
-    const body = text((data && data.content) || fallback.description, 220);
     return {
-      title: `${category} by ${author} | Prayer Dome`,
-      description: body,
-      image: absoluteUrl(image, fallback.image),
-      target: `${SITE_ORIGIN}/testimony.html?story=${encodeURIComponent(id || '')}`,
-      shareUrl: `${SITE_ORIGIN}/testimony/${encodeURIComponent(id || '')}`,
-      type: 'article'
+      title: brandTitle(`${category} by ${author}`),
+      description: text(pickDescription(data, ['content', 'summary', 'body']) || spec.description, 220),
+      image, target, shareUrl, type: spec.ogType,
+      label: 'Testimony'
     };
   }
 
-  const image = data && (data.socialImage || data.featuredImage || data.image || data.imageUrl || data.photoUrl);
-  const title = text((data && data.title) || fallback.title, 120);
-  const description = text((data && (data.summary || data.body || data.description)) || fallback.description, 220);
+  if (type === 'sermon') {
+    const speaker = text((data && (data.speaker || data.author)) || 'Prayer Dome Ministry Team', 80);
+    const scripture = text((data && (data.scripture || data.keyVerse)) || '', 70);
+    const summary = text(pickDescription(data, ['summary', 'description', 'story', 'body']) || spec.description, 200);
+    return {
+      title: brandTitle((data && (data.title || data.subtitle)) || spec.title),
+      description: [scripture, summary].filter(Boolean).join(' · ') + ` — ${speaker}`,
+      image, target, shareUrl, type: spec.ogType,
+      label: 'Sermon'
+    };
+  }
+
+  if (type === 'devotional') {
+    const scripture = text((data && (data.scriptureRef || data.scripture)) || '', 70);
+    const body = text(pickDescription(data, ['thought', 'scriptureText', 'summary', 'body']) || spec.description, 200);
+    return {
+      title: brandTitle((data && data.title) || spec.title),
+      description: [scripture, body].filter(Boolean).join(' · '),
+      image, target, shareUrl, type: spec.ogType,
+      label: 'Daily Devotional'
+    };
+  }
+
+  if (type === 'prayer') {
+    const author = text((data && (data.name || data.author)) || 'A member', 60);
+    const category = text((data && data.category) || 'Prayer request', 60);
+    return {
+      title: brandTitle(`${category} — please pray`),
+      description: text(pickDescription(data, ['request', 'content', 'body', 'text']) || spec.description, 220) +
+        ` (shared by ${author})`,
+      image, target, shareUrl, type: spec.ogType,
+      label: 'Prayer Wall'
+    };
+  }
+
+  if (type === 'event') {
+    const when = text((data && (data.dateLabel || data.date || data.startDate)) || '', 60);
+    const place = text((data && (data.venue || data.location)) || '', 70);
+    return {
+      title: brandTitle((data && data.title) || spec.title),
+      description: [when, place, text(pickDescription(data, ['description', 'summary', 'body']), 160)]
+        .filter(Boolean).join(' · ') || spec.description,
+      image, target, shareUrl, type: spec.ogType,
+      label: 'Church Event'
+    };
+  }
+
+  if (type === 'video') {
+    const scripture = text((data && data.scripture) || '', 70);
+    return {
+      title: brandTitle((data && data.title) || spec.title),
+      description: [scripture, text(pickDescription(data, ['desc', 'description', 'summary']) || spec.description, 200)]
+        .filter(Boolean).join(' · '),
+      image, target, shareUrl, type: spec.ogType,
+      label: 'Prayer Dome Video',
+      videoUrl: (data && typeof data.url === 'string' && /^https:\/\//i.test(data.url)) ? data.url : null
+    };
+  }
+
   return {
-    title: `${title}${/Prayer Dome/i.test(title) ? '' : ' | Prayer Dome'}`,
-    description,
-    image: absoluteUrl(image, fallback.image),
-    target: `${SITE_ORIGIN}/news.html?story=${encodeURIComponent(id || '')}`,
-    shareUrl: `${SITE_ORIGIN}/news/${encodeURIComponent(id || '')}`,
-    type: 'article'
+    title: brandTitle((data && data.title) || spec.title),
+    description: text(pickDescription(data, ['summary', 'body', 'description', 'content']) || spec.description, 220),
+    image, target, shareUrl, type: spec.ogType,
+    label: 'Ministry News'
   };
 }
+
+const TYPE_ALIASES = {
+  stories: 'news', story: 'news', article: 'news', articles: 'news',
+  testimonies: 'testimony',
+  sermons: 'sermon', message: 'sermon', messages: 'sermon',
+  devotionals: 'devotional', daily: 'devotional',
+  prayers: 'prayer', 'prayer-wall': 'prayer', request: 'prayer', 'prayer-request': 'prayer',
+  events: 'event',
+  videos: 'video', aivideo: 'video', 'ai-video': 'video', watch: 'video'
+};
 
 function parseParams(req) {
   const query = req.query || {};
@@ -164,18 +341,18 @@ function parseParams(req) {
   const parts = pathOnly.split('/').filter(Boolean);
 
   if ((!type || !id) && parts.length >= 2) {
-    if (parts[0] === 'news' || parts[0] === 'testimony') {
-      type = parts[0];
-      id = decodeURIComponent(parts[1] || '');
-    } else if (parts[0] === 'share') {
+    const head = String(parts[0] || '').toLowerCase();
+    if (head === 'share') {
       type = String(parts[1] || '').toLowerCase();
       id = decodeURIComponent(parts[2] || '');
+    } else if (TYPES[head] || TYPE_ALIASES[head]) {
+      type = head;
+      id = decodeURIComponent(parts[1] || '');
     }
   }
 
-  if (type === 'stories' || type === 'story') type = 'news';
-  if (type === 'testimonies') type = 'testimony';
-  if (type !== 'news' && type !== 'testimony') type = 'news';
+  type = TYPE_ALIASES[type] || type;
+  if (!TYPES[type]) type = 'news';
   return { type, id };
 }
 
@@ -186,6 +363,13 @@ function render(meta) {
   const url = htmlEscape(meta.shareUrl);
   const target = htmlEscape(meta.target);
   const type = htmlEscape(meta.type || 'article');
+  const label = htmlEscape(meta.label || 'Prayer Dome');
+  const videoTags = meta.videoUrl
+    ? `\n  <meta property="og:video" content="${htmlEscape(meta.videoUrl)}">` +
+      `\n  <meta property="og:video:secure_url" content="${htmlEscape(meta.videoUrl)}">` +
+      `\n  <meta property="og:video:type" content="video/mp4">` +
+      `\n  <meta name="twitter:player" content="${htmlEscape(meta.videoUrl)}">`
+    : '';
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -204,10 +388,16 @@ function render(meta) {
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="${title}">
+  <meta property="og:locale" content="en_US">${videoTags}
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@prayerdome">
   <meta name="twitter:title" content="${title}">
   <meta name="twitter:description" content="${desc}">
   <meta name="twitter:image" content="${image}">
+  <meta name="twitter:image:alt" content="${title}">
+  <meta name="theme-color" content="#0A4D9B">
+  <link rel="icon" type="image/png" href="${SITE_ORIGIN}/assets/logo.png">
+  <link rel="apple-touch-icon" href="${SITE_ORIGIN}/assets/logo.png">
   <script type="application/ld+json">${JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -215,16 +405,38 @@ function render(meta) {
     description: meta.description,
     image: [meta.image],
     mainEntityOfPage: meta.shareUrl,
-    publisher: { '@type': 'Organization', name: 'Prayer Dome' }
+    publisher: {
+      '@type': 'Organization',
+      name: 'Prayer Dome',
+      logo: { '@type': 'ImageObject', url: `${SITE_ORIGIN}/assets/logo.png` }
+    }
   }).replace(/</g, '\\u003c')}</script>
   <meta http-equiv="refresh" content="0;url=${target}">
-  <style>body{font-family:Montserrat,Arial,sans-serif;background:#f8fafc;color:#0f172a;display:grid;min-height:100vh;place-items:center;text-align:center;padding:24px}a{color:#0A4D9B;font-weight:700}</style>
+  <style>
+    *{box-sizing:border-box}
+    body{font-family:Montserrat,Arial,sans-serif;background:linear-gradient(180deg,#f6f9ff,#eef3fb);color:#0f172a;
+      display:grid;min-height:100vh;place-items:center;text-align:center;padding:24px;margin:0}
+    .card{max-width:520px;background:#fff;border-radius:22px;padding:30px 24px;box-shadow:0 18px 46px rgba(10,77,155,.14)}
+    .logo{width:76px;height:76px;object-fit:contain;margin:0 auto 6px;display:block}
+    .brand{font-weight:800;letter-spacing:.24em;font-size:.68rem;color:#0A4D9B;text-transform:uppercase}
+    .kind{display:inline-block;margin:12px 0 4px;font-size:.66rem;font-weight:800;letter-spacing:.12em;
+      text-transform:uppercase;color:#8a6414;background:rgba(212,175,55,.16);padding:5px 12px;border-radius:999px}
+    h1{font-size:1.22rem;line-height:1.35;margin:10px 0 8px}
+    p{color:#475569;font-size:.9rem;line-height:1.6;margin:0 0 18px}
+    .cover{width:100%;border-radius:14px;margin:14px 0 4px;display:block;aspect-ratio:1200/630;object-fit:cover;background:#0A4D9B}
+    a.go{display:inline-block;background:#0A4D9B;color:#fff;text-decoration:none;font-weight:800;
+      padding:13px 26px;border-radius:999px;font-size:.85rem}
+  </style>
 </head>
 <body>
-  <main>
+  <main class="card">
+    <img class="logo" src="${SITE_ORIGIN}/assets/logo.png" alt="Prayer Dome">
+    <span class="brand">Prayer Dome</span>
+    <span class="kind">${label}</span>
     <h1>${title}</h1>
+    <img class="cover" src="${image}" alt="${title}">
     <p>${desc}</p>
-    <p><a href="${target}">Open in Prayer Dome</a></p>
+    <p><a class="go" href="${target}">Open in Prayer Dome</a></p>
   </main>
   <script>window.location.replace(${JSON.stringify(meta.target)});</script>
 </body>
@@ -233,9 +445,15 @@ function render(meta) {
 
 async function handler(req, res) {
   const { type, id } = parseParams(req);
-  const collection = type === 'testimony' ? 'testimonies' : 'news';
-  const remote = await getFirestoreDocument(collection, id);
-  const seed = type === 'news' ? getSeededNews(id) : null;
+  const spec = TYPES[type] || TYPES.news;
+  const remote = await getFirestoreDocument(spec.collection, id);
+
+  // Bundled content (news seeds, sermons) has no Firestore document.
+  let seed = null;
+  if (!remote) {
+    if (type === 'news') seed = getSeededNews(id);
+    else if (type === 'sermon') seed = getSeededSermon(id);
+  }
   const meta = normalizeItem(type, id, remote || seed || null);
 
   if (res.setHeader) {

@@ -14,7 +14,7 @@
   },
   "functions": {
     "api/*.js": {
-      "includeFiles": "{assets/pd-academy-data.js,assets/pd-content-data.js,functions/share.js}",
+      "includeFiles": "{assets/pd-academy-data.js,assets/pd-content-data.js,functions/share.js,sermons-data.js}",
       "maxDuration": 10
     }
   },
@@ -52,6 +52,22 @@
       "destination": "/api/share?type=testimony&id=:id"
     },
     {
+      "source": "/sermon/:id",
+      "destination": "/api/share?type=sermon&id=:id"
+    },
+    {
+      "source": "/devotional/:id",
+      "destination": "/api/share?type=devotional&id=:id"
+    },
+    {
+      "source": "/prayer-request/:id",
+      "destination": "/api/share?type=prayer&id=:id"
+    },
+    {
+      "source": "/watch/:id",
+      "destination": "/api/share?type=video&id=:id"
+    },
+    {
       "source": "/share/:type/:id",
       "destination": "/api/share?type=:type&id=:id"
     },
@@ -82,6 +98,14 @@
     {
       "source": "/video",
       "destination": "/video.html"
+    },
+    {
+      "source": "/ai-video",
+      "destination": "/ai-video.html"
+    },
+    {
+      "source": "/scripture-studio",
+      "destination": "/ai-video.html"
     },
     {
       "source": "/chat",

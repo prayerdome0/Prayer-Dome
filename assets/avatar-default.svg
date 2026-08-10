@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Prayer Dome member">
+  <!--
+    Prayer Dome default member avatar.
+    Replaces the grey third-party placeholder images that used to load from
+    via.placeholder.com. It ships with the app, so it works offline, inside the
+    Android package, and never leaks a member's page view to another host.
+  -->
+  <defs>
+    <linearGradient id="pdAvatarBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0A4D9B"/>
+      <stop offset="0.55" stop-color="#0b3f7f"/>
+      <stop offset="1" stop-color="#082c5c"/>
+    </linearGradient>
+    <linearGradient id="pdAvatarGold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f2d98b"/>
+      <stop offset="1" stop-color="#d4af37"/>
+    </linearGradient>
+    <clipPath id="pdAvatarClip"><circle cx="100" cy="100" r="100"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#pdAvatarClip)">
+    <rect width="200" height="200" fill="url(#pdAvatarBg)"/>
+    <!-- soft dome arch behind the figure -->
+    <path d="M28 176V104a72 72 0 0 1 144 0v72z" fill="rgba(255,255,255,0.05)"/>
+    <!-- shoulders -->
+    <path d="M100 112c-34 0-62 22-68 52-1.6 8-2.4 16-2.4 24h140.8c0-8-.8-16-2.4-24-6-30-34-52-68-52z" fill="url(#pdAvatarGold)" opacity="0.92"/>
+    <!-- head -->
+    <circle cx="100" cy="76" r="30" fill="url(#pdAvatarGold)"/>
+  </g>
+  <circle cx="100" cy="100" r="97" fill="none" stroke="#d4af37" stroke-width="5" opacity="0.85"/>
+</svg>

@@ -91,6 +91,22 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Daily Bible Verse schedule (special verses for holidays, programmes,
+    // fasting seasons and events). Document id is the date, e.g. 2026-04-03.
+    // Every device — signed in or not — must be able to read the verse of the
+    // day so the lock-screen notification can be raised offline/in background.
+    match /verseSchedule/{date} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // AI-assisted video library (sermons, Bible stories, devotionals,
+    // inspirational messages, promotional clips).
+    match /aiVideos/{id} {
+      allow read: if resource.data.published != false || isAdmin();
+      allow write: if isAdmin();
+    }
+
     // Community Stats
     match /communityStats/{id} {
       allow read: if true;

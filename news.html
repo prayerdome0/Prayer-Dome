@@ -220,6 +220,8 @@
     <script src="/assets/pd-motion.js" defer></script>
     <script src="/assets/pd-content-data.js" defer></script>
     <script src="/translation-data.js"></script>
+<script src="/assets/pd-verse-data.js" defer></script>
+<script src="/assets/pd-verse-alerts.js" defer></script>
 <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
@@ -503,14 +505,25 @@
         document.getElementById('newsModalTitle').textContent = n.title;
         document.getElementById('newsModalMeta').innerHTML = `<span><i class="far fa-clock"></i> ${formatDate(n.date)}</span><span><i class="fas fa-user"></i> ${esc(n.author || 'Prayer Dome')}</span>`;
         document.getElementById('newsModalBody').textContent = n.body || n.summary || '';
+        // One branded share row across the whole app — the link resolves to
+        // /share/news/<id>, which serves the featured image, title, summary
+        // and Prayer Dome branding to WhatsApp, Facebook, X and Telegram.
         const rawShareUrl = storyShareUrl(n.id);
-        const shareUrl = encodeURIComponent(rawShareUrl);
-        const shareText = encodeURIComponent(n.title);
-        document.getElementById('newsShareRow').innerHTML = `
+        const shareRow = document.getElementById('newsShareRow');
+        if (window.PDApp && PDApp.share) {
+            PDApp.share.buttons(shareRow, {
+                type: 'news', id: n.id, title: n.title,
+                description: n.summary || n.body || ''
+            });
+        } else {
+            const shareUrl = encodeURIComponent(rawShareUrl);
+            const shareText = encodeURIComponent(n.title);
+            shareRow.innerHTML = `
             <button class="btn-share-wa" onclick="window.open('https://wa.me/?text=${shareText}%20${shareUrl}','_blank')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
             <button class="btn-share-fb" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=${shareUrl}','_blank')"><i class="fab fa-facebook-f"></i> Facebook</button>
             <button class="btn-share-x" onclick="window.open('https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}','_blank')"><i class="fab fa-x-twitter"></i> X</button>
             <button class="btn-share-copy" onclick="navigator.clipboard.writeText('${rawShareUrl}'); PDApp.toast('Story link copied — it will share with this story image');"><i class="fas fa-link"></i> Copy Story Link</button>`;
+        }
         updateArticleMeta(n);
         if (options.pushState !== false && history.pushState) history.pushState({ newsId: n.id }, '', `/news/${encodeURIComponent(n.id)}`);
         document.getElementById('newsModalOverlay').classList.add('open');

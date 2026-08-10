@@ -501,6 +501,8 @@
     <script src="/assets/pd-motion.js" defer></script>
     <script src="/assets/pd-content-data.js" defer></script>
     <script src="/translation-data.js"></script>
+<script src="/assets/pd-verse-data.js" defer></script>
+<script src="/assets/pd-verse-alerts.js" defer></script>
 <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
@@ -659,7 +661,9 @@
     <!-- Founder Card with Larger Photo -->
     <div class="founder-card glass-card pd-reveal">
         <div class="founder-img-wrapper">
-            <img src="https://i.ibb.co/RTbNh1hB/founder-2.jpg" alt="Pastor Seedwell K. Masuku">
+            <img src="https://i.ibb.co/RTbNh1hB/founder-2.jpg" alt="Pastor Seedwell K. Masuku"
+                 loading="lazy" decoding="async"
+                 onerror="this.onerror=null;this.src='/assets/logo.png';this.style.objectFit='contain';this.style.padding='18px';this.style.background='#fff';">
         </div>
         <div class="founder-info">
             <h3 class="founder-name">Pastor Seedwell K. Masuku</h3>

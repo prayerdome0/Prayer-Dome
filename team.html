@@ -665,6 +665,8 @@
     <script src="/assets/pd-motion.js" defer></script>
     <script src="/assets/pd-content-data.js" defer></script>
     <script src="/translation-data.js"></script>
+<script src="/assets/pd-verse-data.js" defer></script>
+<script src="/assets/pd-verse-alerts.js" defer></script>
 <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
@@ -699,7 +701,9 @@
         <!-- Founder Featured Card -->
         <div class="founder-featured">
             <div class="founder-image">
-                <img src="https://i.ibb.co/RTbNh1hB/founder-2.jpg" alt="Founder Seedwell Khayalethu Masuku">
+                <img src="https://i.ibb.co/RTbNh1hB/founder-2.jpg" alt="Founder Seedwell Khayalethu Masuku"
+                     loading="lazy" decoding="async"
+                     onerror="this.onerror=null;this.src='/assets/logo.png';this.style.objectFit='contain';this.style.padding='16px';this.style.background='#fff';">
             </div>
             <h1>Seedwell Khayalethu Masuku</h1>
             <h3><i class="fas fa-crown"></i> Founder & Senior Pastor</h3>
@@ -786,7 +790,7 @@
             container.innerHTML = filtered.map((member, index) => `
                 <div class="team-card" style="animation-delay: ${index * 0.05}s">
                     <div class="team-image">
-                        <img src="${member.image}" alt="${member.name}" onerror="this.src='https://i.ibb.co/RTbNh1hB/founder-2.jpg'">
+                        <img src="${member.image}" alt="${member.name}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/logo.png';this.style.objectFit='contain';this.style.padding='18px';this.style.background='#fff';">
                         <div class="team-overlay">
                             <p>${member.description}</p>
                         </div>

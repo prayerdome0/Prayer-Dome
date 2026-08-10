@@ -466,6 +466,9 @@
     <script src="/assets/pd-motion.js" defer></script>
     <script src="/assets/pd-content-data.js" defer></script>
     <script src="/translation-data.js"></script>
+<script src="/assets/pd-cloud-video.js"></script>
+<script src="/assets/pd-verse-data.js" defer></script>
+<script src="/assets/pd-verse-alerts.js" defer></script>
 <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
@@ -588,6 +591,8 @@
         <i class="fas fa-play-circle"></i> START STREAMING
     </button>
     
+    <div id="cloudRecordStatus" style="display:none; margin-top:12px; font-size:0.78rem; color:var(--accent-gold); background:rgba(0,0,0,.25); border-radius:10px; padding:8px 12px;"></div>
+
     <div id="previewArea" class="preview-area">
         <video id="localVideo" autoplay muted playsinline></video>
         <p style="text-align: center; font-size: 0.7rem; margin-top: 8px;">🔴 You are LIVE! Share this screen</p>
@@ -597,6 +602,14 @@
 <!-- Past Recordings -->
 <div class="section-title"><i class="fas fa-history"></i> Past Recordings</div>
 <div class="video-grid" id="pastVideosGrid">
+    <div style="text-align: center; padding: 20px;">Loading...</div>
+</div>
+
+<!-- AI-assisted video library: sermons, Bible stories, devotionals,
+     inspirational messages and promotional clips published by the ministry. -->
+<div class="section-title" id="aiVideoHeading"><i class="fas fa-wand-magic-sparkles"></i> Prayer Dome Video Library</div>
+<div id="aiVideoFilters" style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px;"></div>
+<div class="video-grid" id="aiVideosGrid">
     <div style="text-align: center; padding: 20px;">Loading...</div>
 </div>
 
@@ -629,6 +642,7 @@
     let permissionsGranted = false;
     let isStreaming = false;
     let hlsPlayer = null;
+    let cloudRecorder = null;
 
     const CLOUD_NAME = 'prayerdome';
 
@@ -664,7 +678,8 @@
         }
         checkLiveStatus();
         loadPastVideos();
-        
+        loadAiVideoLibrary();
+
         const liveStatusRef = doc(db, "liveStatus", "current");
         onSnapshot(liveStatusRef, (doc) => {
             if (doc.exists()) updateUIFromStatus(doc.data());
@@ -727,6 +742,30 @@
                 mobileStream: true
             });
             
+            // Record the broadcast straight into Prayer Dome cloud storage.
+            // Nothing is kept on this phone — parts upload while you stream.
+            if (window.PDCloudVideo) {
+                try {
+                    cloudRecorder = PDCloudVideo.createRecorder(mediaStream, {
+                        title: title,
+                        onProgress: snap => {
+                            const el = document.getElementById('cloudRecordStatus');
+                            if (!el) return;
+                            el.style.display = 'block';
+                            el.textContent = snap.state === 'finishing'
+                                ? '☁️ Finishing upload…'
+                                : '☁️ Saving to cloud — ' + snap.parts.length + ' part(s), ' +
+                                  ((snap.uploadedBytes / 1048576).toFixed(1)) + ' MB uploaded';
+                        },
+                        onError: err => showToast('Cloud upload issue: ' + (err.message || err), 'error')
+                    });
+                    cloudRecorder.start();
+                } catch (recErr) {
+                    console.error('Cloud recorder failed to start', recErr);
+                    cloudRecorder = null;
+                }
+            }
+
             isStreaming = true;
             showToast("🔴 LIVE! Share the RTMP info with your streaming app", "success");
             confetti({ particleCount: 100, spread: 70 });
@@ -749,10 +788,19 @@
 
     // END STREAM
     window.stopLiveStream = async () => {
-        if (!confirm("End this live stream?")) return;
-        
-        showToast("Ending stream...", "info");
-        
+        if (!confirm("End this live stream? The recording will finish uploading to cloud storage.")) return;
+
+        showToast("Ending stream — saving the recording to the cloud…", "info");
+
+        // Finish the cloud recording before releasing the camera so the last
+        // part is safely stored. Nothing is written to this device.
+        let cloud = null;
+        if (cloudRecorder) {
+            try { cloud = await cloudRecorder.stop(); }
+            catch (err) { console.error('Cloud recording finish failed', err); }
+            cloudRecorder = null;
+        }
+
         if (mediaStream) {
             mediaStream.getTracks().forEach(track => track.stop());
             mediaStream = null;
@@ -763,16 +811,28 @@
             endedAt: serverTimestamp()
         }, { merge: true });
         
-        // Save recording reference
+        // Save recording reference (cloud URLs only)
         if (currentStreamId) {
             await addDoc(collection(db, "liveRecordings"), {
                 title: document.getElementById('broadcastTitle').value || 'Live Service',
                 description: document.getElementById('broadcastDesc').value || '',
                 streamId: currentStreamId,
+                playbackUrl: (cloud && cloud.playbackUrl) || null,
+                parts: (cloud && cloud.parts) || [],
+                thumbnail: (cloud && cloud.thumbnail) || null,
+                durationSeconds: (cloud && cloud.durationSeconds) || 0,
+                storage: 'cloudinary',
+                storedOnDevice: false,
                 startedBy: currentUser?.email,
                 startTime: serverTimestamp(),
                 createdAt: serverTimestamp()
             });
+        }
+        const statusEl = document.getElementById('cloudRecordStatus');
+        if (statusEl) {
+            statusEl.textContent = (cloud && cloud.playbackUrl)
+                ? '☁️ Recording saved to cloud storage — members can watch it in the app.'
+                : '⚠️ The cloud upload did not complete.';
         }
         
         await addDoc(collection(db, "liveChat"), {
@@ -970,11 +1030,13 @@
                 grid.innerHTML = '<div style="text-align: center; padding: 20px;">No recordings yet</div>';
                 return;
             }
+            window.__pdRecordings = {};
+            snapshot.docs.forEach(d => { window.__pdRecordings[d.id] = d.data(); });
             grid.innerHTML = snapshot.docs.map(doc => {
                 const rec = doc.data();
                 return `
-                    <div class="video-card" onclick="alert('Recording playback coming soon')">
-                        <div class="thumb"><div style="background:#1a1a2e; height:100%; display:flex; align-items:center; justify-content:center;"><i class="fas fa-video" style="color:var(--accent-gold);"></i></div></div>
+                    <div class="video-card" onclick="playRecording('${doc.id}')">
+                        <div class="thumb">${rec.thumbnail ? `<img src="${escapeHtml(rec.thumbnail)}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;">` : '<div style="background:#1a1a2e; height:100%; display:flex; align-items:center; justify-content:center;"><i class="fas fa-video" style="color:var(--accent-gold);"></i></div>'}</div>
                         <div class="card-body">
                             <h4>${escapeHtml(rec.title || 'Recording')}</h4>
                             <p>${moment(rec.createdAt?.toDate()).format('MMM D')}</p>
@@ -984,6 +1046,145 @@
             }).join('');
         } catch(e) { console.error(e); }
     }
+
+    /* ======================================================================
+     * Prayer Dome video library (AI-assisted content)
+     * ----------------------------------------------------------------------
+     * Sermons, Bible stories, devotionals, inspirational messages and
+     * promotional clips published from the Admin panel or the Scripture
+     * Studio. Every entry streams from Prayer Dome cloud storage — never from
+     * a file on this device — and downloads are disabled on the player.
+     * ==================================================================== */
+    const AI_CATEGORIES = [
+        { key: 'all', label: 'All' },
+        { key: 'sermon', label: 'Sermons' },
+        { key: 'bible-story', label: 'Bible Stories' },
+        { key: 'devotional', label: 'Devotionals' },
+        { key: 'inspiration', label: 'Inspiration' },
+        { key: 'promo', label: 'Promos' }
+    ];
+    let aiVideoCache = [];
+    let aiVideoFilter = 'all';
+
+    async function loadAiVideoLibrary() {
+        const grid = document.getElementById('aiVideosGrid');
+        if (!grid) return;
+        try {
+            const snapshot = await getDocs(query(collection(db, "aiVideos"), orderBy("createdAt", "desc")));
+            aiVideoCache = snapshot.docs
+                .map(d => Object.assign({ id: d.id }, d.data()))
+                .filter(v => v.published !== false && v.url && !/^blob:/i.test(v.url));
+            renderAiFilters();
+            renderAiVideos();
+        } catch (e) {
+            console.error(e);
+            grid.innerHTML = '<div style="text-align:center;padding:20px;">Video library unavailable right now.</div>';
+        }
+    }
+
+    function renderAiFilters() {
+        const host = document.getElementById('aiVideoFilters');
+        if (!host) return;
+        const present = new Set(aiVideoCache.map(v => v.category));
+        host.innerHTML = AI_CATEGORIES
+            .filter(c => c.key === 'all' || present.has(c.key))
+            .map(c => `<button type="button" class="ai-filter" data-cat="${c.key}" style="border:1.5px solid rgba(212,175,55,.45);background:${c.key === aiVideoFilter ? 'var(--accent-gold,#d4af37)' : 'transparent'};color:${c.key === aiVideoFilter ? '#20180a' : 'inherit'};border-radius:999px;padding:7px 14px;font:700 .72rem/1 inherit;cursor:pointer;">${c.label}</button>`)
+            .join('');
+        host.querySelectorAll('.ai-filter').forEach(btn => {
+            btn.addEventListener('click', () => {
+                aiVideoFilter = btn.dataset.cat;
+                renderAiFilters();
+                renderAiVideos();
+            });
+        });
+    }
+
+    function renderAiVideos() {
+        const grid = document.getElementById('aiVideosGrid');
+        if (!grid) return;
+        const items = aiVideoFilter === 'all'
+            ? aiVideoCache
+            : aiVideoCache.filter(v => v.category === aiVideoFilter);
+        if (!items.length) {
+            grid.innerHTML = '<div style="text-align:center;padding:20px;">Nothing published here yet — check back soon.</div>';
+            return;
+        }
+        grid.innerHTML = items.map(v => {
+            const badge = v.aiAssisted === false ? '' :
+                '<span style="position:absolute;top:8px;left:8px;background:rgba(10,77,155,.92);color:#fff;font:800 .58rem/1 inherit;letter-spacing:.06em;padding:5px 9px;border-radius:999px;">AI-ASSISTED</span>';
+            const thumb = v.thumb
+                ? `<img src="${escapeHtml(v.thumb)}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.src='/assets/og-image.png';">`
+                : '<div style="background:#0A4D9B;height:100%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-wand-magic-sparkles" style="color:var(--accent-gold);font-size:1.5rem;"></i></div>';
+            return `
+                <div class="video-card" onclick="playAiVideo('${v.id}')">
+                    <div class="thumb" style="position:relative;">${thumb}${badge}</div>
+                    <div class="card-body">
+                        <h4>${escapeHtml(v.title || 'Prayer Dome video')}</h4>
+                        <p>${escapeHtml(v.scripture || v.desc || 'Prayer Dome')}</p>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    window.playAiVideo = (id) => {
+        const v = aiVideoCache.find(x => x.id === id);
+        if (!v || !v.url || /^blob:/i.test(v.url)) { showToast('This video is not available yet', 'error'); return; }
+        document.getElementById('currentVideoTitle').innerText = v.title || 'Prayer Dome video';
+        document.getElementById('currentVideoDesc').innerText = v.desc || v.scripture || 'From the Prayer Dome video library';
+
+        const container = document.getElementById('playerContainer');
+        container.innerHTML = '';
+        const video = document.createElement('video');
+        video.controls = true;
+        video.playsInline = true;
+        video.setAttribute('controlsList', 'nodownload noremoteplayback');
+        video.setAttribute('disablepictureinpicture', '');
+        video.oncontextmenu = (e) => { e.preventDefault(); return false; };
+        video.style.width = '100%';
+        video.style.maxHeight = '50vh';
+        container.appendChild(video);
+
+        if (window.PDCloudVideo) {
+            PDCloudVideo.attachPlayer(video, { playbackUrl: v.url }, { autoplay: true });
+        } else {
+            video.src = v.url;
+            video.play().catch(() => {});
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Play a cloud recording in the main player (multi-part replays play back-to-back).
+    window.playRecording = (id) => {
+        const rec = (window.__pdRecordings || {})[id];
+        if (!rec) return;
+        const parts = Array.isArray(rec.parts) ? rec.parts.filter(p => p && p.url) : [];
+        const url = rec.playbackUrl || (parts[0] && parts[0].url) || rec.hlsUrl ||
+            (rec.streamId ? `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/hls/${rec.streamId}.m3u8` : null);
+        if (!url || /^blob:/i.test(url)) { showToast('This recording is not available yet', 'error'); return; }
+
+        document.getElementById('currentVideoTitle').innerText = rec.title || 'Recording';
+        document.getElementById('currentVideoDesc').innerText = rec.description || 'From the Prayer Dome cloud archive';
+
+        const container = document.getElementById('playerContainer');
+        container.innerHTML = '';
+        const video = document.createElement('video');
+        video.controls = true;
+        video.playsInline = true;
+        video.setAttribute('controlsList', 'nodownload noremoteplayback');
+        video.style.width = '100%';
+        video.style.maxHeight = '50vh';
+        container.appendChild(video);
+
+        if (/\.m3u8(\?|$)/i.test(url)) {
+            playHLSStream(url);
+        } else if (window.PDCloudVideo) {
+            PDCloudVideo.attachPlayer(video, { parts, playbackUrl: url }, { autoplay: true });
+        } else {
+            video.src = url;
+            video.play().catch(() => {});
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     function escapeHtml(text) { if (!text) return ''; return text.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
     function showToast(msg, type = 'success') { const t = document.createElement('div'); t.className = `toast ${type === 'error' ? 'error' : ''}`; t.innerHTML = msg; document.getElementById('toastContainer').appendChild(t); setTimeout(() => t.remove(), 3000); }

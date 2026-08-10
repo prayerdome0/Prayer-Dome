@@ -1,0 +1,1009 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scripture Studio — AI Video | Prayer Dome</title>
+<meta name="description" content="Prayer Dome Scripture Studio: turn a script into a narrated, branded video for sermons, Bible stories, devotionals, inspirational messages and promotions. Rendered in the browser and saved straight to Prayer Dome cloud storage.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0A4D9B">
+<link rel="icon" type="image/png" href="/assets/logo.png">
+<link rel="apple-touch-icon" href="/assets/logo.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Prayer Dome">
+<meta property="og:title" content="Scripture Studio | Prayer Dome">
+<meta property="og:description" content="Create narrated, branded Prayer Dome videos in the browser and publish them to the app library.">
+<meta property="og:image" content="/assets/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="/assets/pd-brand.css">
+<link rel="manifest" href="/manifest.json">
+<script src="/assets/pd-cloud-video.js"></script>
+<script src="/assets/pd-verse-data.js" defer></script>
+<script src="/assets/pd-verse-alerts.js" defer></script>
+<script src="/assets/pd-app.js" defer></script>
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{overflow-x:hidden;max-width:100%;}
+  body{
+    margin:0; font-family:'Montserrat',system-ui,sans-serif; color:#0f172a;
+    background:linear-gradient(180deg,#f6f9ff 0%,#eef3fb 100%); min-height:100vh;
+  }
+  body.dark-mode{background:#0b1220;color:#e8eefc;}
+  a{color:#0A4D9B;}
+  .std-top{
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    padding:14px 18px; background:linear-gradient(120deg,#0A4D9B,#08356c);
+    color:#fff; position:sticky; top:0; z-index:40; box-shadow:0 6px 24px rgba(8,53,108,.25);
+  }
+  .std-top img{width:40px;height:40px;object-fit:contain;background:#fff;border-radius:12px;padding:4px;flex:none;}
+  .std-top h1{font-family:'Playfair Display',serif;font-size:1.05rem;margin:0;line-height:1.2;}
+  .std-top small{display:block;font-weight:500;opacity:.82;font-size:.7rem;letter-spacing:.04em;text-transform:uppercase;}
+  .std-top .spacer{flex:1 1 auto;}
+  .std-back{
+    color:#fff; text-decoration:none; font-size:.78rem; font-weight:700;
+    border:1px solid rgba(255,255,255,.4); padding:8px 14px; border-radius:999px; white-space:nowrap;
+  }
+  .std-wrap{max-width:1180px;margin:0 auto;padding:18px 16px 80px;}
+  .std-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:18px;align-items:start;}
+  @media (max-width:980px){ .std-grid{grid-template-columns:minmax(0,1fr);} }
+  .card{
+    background:#fff;border:1px solid rgba(10,77,155,.12);border-radius:18px;padding:18px;
+    box-shadow:0 10px 30px rgba(15,23,42,.06); margin-bottom:16px; min-width:0;
+  }
+  body.dark-mode .card{background:#111a2e;border-color:rgba(212,175,55,.18);}
+  .card h2{font-family:'Playfair Display',serif;font-size:1.05rem;margin:0 0 4px;display:flex;align-items:center;gap:9px;}
+  .card h2 .num{
+    width:26px;height:26px;flex:none;border-radius:50%;background:#0A4D9B;color:#fff;
+    font-family:'Montserrat',sans-serif;font-size:.78rem;font-weight:800;display:grid;place-items:center;
+  }
+  .hint{font-size:.76rem;color:#64748b;margin:0 0 14px;line-height:1.55;}
+  body.dark-mode .hint{color:#94a3b8;}
+  label.fl{display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#475569;margin:12px 0 6px;}
+  body.dark-mode label.fl{color:#9fb3d4;}
+  input[type=text],input[type=url],select,textarea{
+    width:100%;max-width:100%;padding:11px 13px;border:1.5px solid rgba(10,77,155,.2);border-radius:12px;
+    font-family:inherit;font-size:.85rem;background:#fff;color:inherit;
+  }
+  body.dark-mode input,body.dark-mode select,body.dark-mode textarea{background:#0d1526;border-color:rgba(212,175,55,.25);color:#e8eefc;}
+  textarea{resize:vertical;line-height:1.65;}
+  .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:12px;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{
+    border:1.5px solid rgba(10,77,155,.25);background:#fff;color:#0A4D9B;border-radius:999px;
+    padding:8px 14px;font-size:.75rem;font-weight:700;cursor:pointer;font-family:inherit;
+  }
+  .chip.on{background:#0A4D9B;color:#fff;border-color:#0A4D9B;}
+  body.dark-mode .chip{background:#0d1526;color:#cfe0ff;}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;
+    font-family:inherit;font-weight:800;font-size:.82rem;padding:12px 20px;border-radius:12px;
+    background:#0A4D9B;color:#fff;text-decoration:none;
+  }
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  .btn.gold{background:linear-gradient(120deg,#d4af37,#b8941f);color:#20180a;}
+  .btn.ghost{background:transparent;color:#0A4D9B;border:1.5px solid rgba(10,77,155,.3);}
+  body.dark-mode .btn.ghost{color:#cfe0ff;border-color:rgba(212,175,55,.35);}
+  .btn.danger{background:#b91c1c;}
+  .btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;}
+  .stage{
+    position:relative;background:#000;border-radius:16px;overflow:hidden;
+    border:1px solid rgba(212,175,55,.35);
+  }
+  .stage canvas,.stage video{display:block;width:100%;height:auto;background:#000;}
+  .stage-badge{
+    position:absolute;top:10px;left:10px;background:rgba(185,28,28,.92);color:#fff;font-size:.66rem;
+    font-weight:800;letter-spacing:.08em;padding:5px 11px;border-radius:999px;display:none;
+  }
+  .stage-badge.on{display:block;animation:pdblink 1.4s infinite;}
+  @keyframes pdblink{50%{opacity:.45;}}
+  .meter{height:8px;border-radius:99px;background:rgba(10,77,155,.14);overflow:hidden;margin-top:10px;}
+  .meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,#0A4D9B,#d4af37);transition:width .3s;}
+  .status{font-size:.78rem;color:#475569;margin-top:8px;min-height:1.2em;line-height:1.5;}
+  body.dark-mode .status{color:#9fb3d4;}
+  .note{
+    border-left:3px solid #d4af37;background:rgba(212,175,55,.09);padding:10px 12px;border-radius:0 10px 10px 0;
+    font-size:.74rem;line-height:1.6;color:#57534e;margin-top:12px;
+  }
+  body.dark-mode .note{color:#d8cba8;}
+  .scene-list{display:grid;gap:8px;margin-top:10px;max-height:230px;overflow:auto;}
+  .scene-row{
+    display:flex;gap:10px;align-items:flex-start;font-size:.76rem;background:rgba(10,77,155,.05);
+    border-radius:10px;padding:9px 11px;line-height:1.5;
+  }
+  .scene-row b{flex:none;color:#0A4D9B;}
+  body.dark-mode .scene-row{background:rgba(212,175,55,.07);}
+  .out{display:none;}
+  .out.on{display:block;}
+  .out-url{
+    font-family:ui-monospace,Menlo,monospace;font-size:.7rem;word-break:break-all;background:rgba(10,77,155,.07);
+    padding:10px;border-radius:10px;margin-top:8px;
+  }
+  .switch{display:flex;align-items:center;gap:10px;font-size:.8rem;margin-top:10px;cursor:pointer;}
+  .lib{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:12px;margin-top:12px;}
+  .lib-item{border:1px solid rgba(10,77,155,.14);border-radius:14px;overflow:hidden;background:#fff;min-width:0;}
+  body.dark-mode .lib-item{background:#0d1526;border-color:rgba(212,175,55,.18);}
+  .lib-item img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#0A4D9B;display:block;}
+  .lib-item div{padding:10px;font-size:.78rem;font-weight:700;line-height:1.4;}
+  .lib-item span{display:block;font-weight:500;font-size:.68rem;color:#64748b;margin-top:3px;}
+</style>
+</head>
+<body>
+
+<header class="std-top">
+  <img src="/assets/logo.png" alt="Prayer Dome">
+  <div>
+    <small>Prayer Dome</small>
+    <h1>Scripture Studio — AI Video</h1>
+  </div>
+  <span class="spacer"></span>
+  <a class="std-back" href="/admin.html"><i class="fas fa-arrow-left"></i> Admin</a>
+</header>
+
+<div class="std-wrap">
+
+  <div class="card" style="border-left:4px solid #d4af37;">
+    <h2><i class="fas fa-wand-magic-sparkles" style="color:#d4af37"></i> Write it once — Prayer Dome renders the video</h2>
+    <p class="hint" style="margin-bottom:0;">
+      Type or generate a script, choose the look and the narration, then press <strong>Render</strong>. The video is
+      drawn frame by frame in this browser and uploaded straight to <strong>Prayer Dome cloud storage</strong> — nothing is
+      saved to your phone or computer. When it finishes you can publish it into the app library for members to watch.
+    </p>
+  </div>
+
+  <div class="std-grid">
+    <!-- ─────────── LEFT: the builder ─────────── -->
+    <div>
+
+      <div class="card">
+        <h2><span class="num">1</span> What are we making?</h2>
+        <p class="hint">Pick a format to load a starting script — every word stays editable.</p>
+        <div class="chips" id="templateChips"></div>
+
+        <label class="fl" for="vTitle">Video title</label>
+        <input type="text" id="vTitle" maxlength="90" placeholder="e.g. The Prodigal Son — a Bible story">
+
+        <div class="row">
+          <div>
+            <label class="fl" for="vScripture">Scripture reference (shown on screen)</label>
+            <input type="text" id="vScripture" maxlength="60" placeholder="e.g. Luke 15:11-32">
+          </div>
+          <div>
+            <label class="fl" for="vAspect">Shape</label>
+            <select id="vAspect">
+              <option value="16:9">Landscape 16:9 — app &amp; YouTube</option>
+              <option value="9:16">Portrait 9:16 — reels &amp; status</option>
+              <option value="1:1">Square 1:1 — feed posts</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="num">2</span> The script</h2>
+        <p class="hint">One thought per paragraph. Leave a blank line between paragraphs — each becomes a scene on screen.</p>
+        <textarea id="vScript" rows="12" placeholder="Leave a blank line between paragraphs…"></textarea>
+        <div class="btn-row">
+          <button class="btn ghost" type="button" id="btnOutline"><i class="fas fa-list-ul"></i> Build an outline for me</button>
+          <button class="btn ghost" type="button" id="btnVerse"><i class="fas fa-book-bible"></i> Insert today's verse</button>
+        </div>
+        <div class="scene-list" id="sceneList"></div>
+        <div class="status" id="scriptStatus"></div>
+      </div>
+
+      <div class="card">
+        <h2><span class="num">3</span> The look</h2>
+        <div class="row">
+          <div>
+            <label class="fl" for="vTheme">Theme</label>
+            <select id="vTheme">
+              <option value="royal">Royal Blue — sermons &amp; teaching</option>
+              <option value="dawn">Gold Dawn — devotionals &amp; encouragement</option>
+              <option value="night">Night Prayer — intercession &amp; watch</option>
+              <option value="parchment">Scripture Parchment — Bible stories</option>
+            </select>
+          </div>
+          <div>
+            <label class="fl" for="vPace">Reading pace</label>
+            <select id="vPace">
+              <option value="0.85">Unhurried</option>
+              <option value="1" selected>Natural</option>
+              <option value="1.2">Brisk</option>
+            </select>
+          </div>
+        </div>
+        <label class="fl" for="vBackdrops">Backdrop image URLs (optional, one per line — they rotate between scenes)</label>
+        <textarea id="vBackdrops" rows="3" placeholder="https://res.cloudinary.com/prayerdome/image/upload/…"></textarea>
+        <label class="switch"><input type="checkbox" id="vWatermark" checked> Show the Prayer Dome logo &amp; name on every frame</label>
+        <label class="switch"><input type="checkbox" id="vDisclose" checked> Add an “AI-assisted” badge to the closing frame</label>
+      </div>
+
+      <div class="card">
+        <h2><span class="num">4</span> The voice</h2>
+        <p class="hint">Choose how the video speaks. Prayer Dome never uploads your narration anywhere except its own cloud storage.</p>
+        <div class="chips" id="voiceChips"></div>
+
+        <div id="voicePanelSpeech">
+          <label class="fl" for="vVoice">Device narration voice</label>
+          <select id="vVoice"></select>
+          <div class="note">
+            <strong>How this works:</strong> the browser speaks the script aloud while the video renders. Browsers do not let a
+            page grab that audio silently, so when you press Render, Chrome/Edge will ask you to share <em>this tab</em> —
+            tick <strong>“Also share tab audio”</strong> and the narration is captured into the video. If you decline, the video
+            still renders beautifully, just silent.
+          </div>
+        </div>
+
+        <div id="voicePanelFile" style="display:none;">
+          <label class="fl" for="vAudioUrl">Narration audio URL (MP3 / WAV / M4A)</label>
+          <input type="url" id="vAudioUrl" placeholder="https://…/narration.mp3">
+          <div class="note">Made a voice-over with an AI voice provider? Paste the finished audio link here. Scene timings are
+            spread evenly across the narration so the words on screen follow the voice.</div>
+        </div>
+
+        <div id="voicePanelMic" style="display:none;">
+          <div class="note">Your microphone is captured live while the scenes play, so you can preach or read over the visuals.
+            Find a quiet room and watch the scene counter to keep pace.</div>
+        </div>
+
+        <div id="voicePanelSilent" style="display:none;">
+          <div class="note">A silent video with on-screen text — perfect for social feeds that autoplay muted. You can add a
+            music bed later in the app library.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────── RIGHT: stage, render, publish ─────────── -->
+    <div>
+      <div class="card">
+        <h2><span class="num">5</span> Preview &amp; render</h2>
+        <div class="stage">
+          <span class="stage-badge" id="recBadge">● RECORDING</span>
+          <canvas id="stage" width="1280" height="720"></canvas>
+        </div>
+        <div class="meter"><i id="renderBar"></i></div>
+        <div class="status" id="renderStatus">Ready when you are.</div>
+        <div class="btn-row">
+          <button class="btn ghost" type="button" id="btnPreview"><i class="fas fa-eye"></i> Preview</button>
+          <button class="btn gold" type="button" id="btnRender"><i class="fas fa-clapperboard"></i> Render &amp; save to cloud</button>
+          <button class="btn danger" type="button" id="btnStop" style="display:none;"><i class="fas fa-stop"></i> Stop</button>
+        </div>
+      </div>
+
+      <div class="card out" id="outCard">
+        <h2><i class="fas fa-cloud-arrow-up" style="color:#16a34a"></i> Saved to Prayer Dome cloud</h2>
+        <div class="stage"><video id="outVideo" controls controlsList="nodownload noremoteplayback" disablepictureinpicture playsinline></video></div>
+        <div class="out-url" id="outUrl"></div>
+        <label class="fl" for="outDesc">Description shown in the app and in social previews</label>
+        <textarea id="outDesc" rows="3" maxlength="400" placeholder="A short description…"></textarea>
+        <div class="btn-row">
+          <button class="btn" type="button" id="btnPublish"><i class="fas fa-paper-plane"></i> Publish to the app library</button>
+          <button class="btn ghost" type="button" id="btnCopy"><i class="fas fa-copy"></i> Copy link</button>
+        </div>
+        <div class="status" id="publishStatus"></div>
+      </div>
+
+      <div class="card">
+        <h2><i class="fas fa-film" style="color:#0A4D9B"></i> Published AI videos</h2>
+        <p class="hint" style="margin-bottom:0;">Everything the ministry has published into the app library.</p>
+        <div class="lib" id="libGrid"></div>
+        <div class="status" id="libStatus">Loading…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo",
+  authDomain: "prayer-dome.firebaseapp.com",
+  projectId: "prayer-dome",
+  storageBucket: "prayer-dome.firebasestorage.app",
+  messagingSenderId: "198295153196",
+  appId: "1:198295153196:web:8de1b988bdb1d5c53a30bb"
+};
+
+let db = null, auth = null, currentUser = null;
+try {
+  const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+  db = getFirestore(app);
+  auth = getAuth(app);
+  onAuthStateChanged(auth, (u) => { currentUser = u || null; });
+} catch (e) { console.warn('Firebase unavailable', e); }
+
+window.PDStudioCloud = {
+  async publish(record) {
+    if (!db) throw new Error('Cloud database is not available right now.');
+    await addDoc(collection(db, 'aiVideos'), Object.assign({
+      published: true, views: 0, createdAt: serverTimestamp(),
+      createdBy: (currentUser && currentUser.email) || 'studio'
+    }, record));
+  },
+  async list() {
+    if (!db) return [];
+    const snap = await getDocs(query(collection(db, 'aiVideos'), orderBy('createdAt', 'desc'), limit(24)));
+    return snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+  }
+};
+window.dispatchEvent(new Event('pd-studio-cloud-ready'));
+</script>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ══════════════════════════════════════════ templates */
+  var TEMPLATES = {
+    sermon: {
+      label: '🎤 Sermon',
+      title: 'A House of Prayer for All Nations',
+      scripture: 'Isaiah 56:7',
+      theme: 'royal',
+      script: [
+        'My house shall be called a house of prayer for all nations.',
+        'Long before the church had buildings, God had a people who called on His name. Prayer was never a programme. It was the doorway.',
+        'When Jesus walked into the temple, He was not offended by the singing. He was grieved that the place of prayer had become a place of business.',
+        'Beloved, do not let the noise of life crowd out the quiet place. What God calls a house of prayer, let us not turn into a house of hurry.',
+        'So today, take your seat in the house. Bring the thing you have carried alone. Pray until the burden becomes worship.'
+      ].join('\n\n')
+    },
+    story: {
+      label: '📖 Bible Story',
+      title: 'The Prodigal Son',
+      scripture: 'Luke 15:11-32',
+      theme: 'parchment',
+      script: [
+        'A certain man had two sons. And the younger of them said to his father: Father, give me the portion of goods that falleth to me.',
+        'He gathered all together, and took his journey into a far country, and there wasted his substance with riotous living.',
+        'When he had spent all, a mighty famine arose in that land, and he began to be in want. He fed pigs, and no man gave unto him.',
+        'And when he came to himself, he said: How many hired servants of my father have bread enough and to spare, and I perish with hunger.',
+        'I will arise and go to my father, and will say unto him: Father, I have sinned against heaven, and before thee.',
+        'But when he was yet a great way off, his father saw him, and had compassion, and ran, and fell on his neck, and kissed him.',
+        'This my son was dead, and is alive again. He was lost, and is found. Whoever you are — the Father is still running.'
+      ].join('\n\n')
+    },
+    devotional: {
+      label: '🌅 Devotional',
+      title: 'New Every Morning',
+      scripture: 'Lamentations 3:22-23',
+      theme: 'dawn',
+      script: [
+        'It is of the Lord\u2019s mercies that we are not consumed, because his compassions fail not.',
+        'They are new every morning: great is thy faithfulness.',
+        'Yesterday may have ended in failure. This morning does not begin there. Mercy arrived before you woke.',
+        'Take one minute now. Name one mercy you can see. Thank God for it out loud.',
+        'Father, thank You for a fresh supply of grace today. Let me walk in it, and let someone else feel it through me. Amen.'
+      ].join('\n\n')
+    },
+    inspiration: {
+      label: '✨ Inspirational',
+      title: 'You Are Not Forgotten',
+      scripture: 'Isaiah 49:16',
+      theme: 'night',
+      script: [
+        'Behold, I have graven thee upon the palms of my hands.',
+        'You have been praying in a season where nothing seems to answer back. Heaven is not silent. Heaven is at work.',
+        'The same God who counted the stars also counted your tears. Nothing about your life is too small for His attention.',
+        'Hold on. What God begins, God finishes. Keep praying — your name is written on His hands.'
+      ].join('\n\n')
+    },
+    promo: {
+      label: '📣 Promotional',
+      title: 'Join Prayer Dome Live',
+      scripture: 'Matthew 18:20',
+      theme: 'royal',
+      script: [
+        'Where two or three are gathered together in my name, there am I in the midst of them.',
+        'Prayer Dome is a house of prayer for all nations — online and in person.',
+        'Daily devotionals. A global prayer wall. Live services. Bible study in your own language.',
+        'Download the Prayer Dome app, or visit prayerdome.net, and pray with us today.'
+      ].join('\n\n')
+    }
+  };
+
+  var THEMES = {
+    royal:     { bg: ['#08356c', '#0A4D9B', '#0b2a52'], text: '#ffffff', accent: '#d4af37', scrim: 0.42 },
+    dawn:      { bg: ['#3b2708', '#8a6414', '#d4af37'], text: '#fffdf5', accent: '#ffe9a8', scrim: 0.40 },
+    night:     { bg: ['#050b18', '#0d1b3a', '#101c33'], text: '#e8eefc', accent: '#d4af37', scrim: 0.30 },
+    parchment: { bg: ['#3a2c17', '#6b5228', '#a8874a'], text: '#fffaf0', accent: '#ffe1a8', scrim: 0.44 }
+  };
+
+  var ASPECTS = { '16:9': [1280, 720], '9:16': [720, 1280], '1:1': [1000, 1000] };
+
+  /* ══════════════════════════════════════════ helpers */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+  function scenes() {
+    return $('vScript').value.split(/\n\s*\n/).map(function (s) { return s.replace(/\s+/g, ' ').trim(); })
+      .filter(Boolean);
+  }
+  function wordCount(t) { return (t.match(/\S+/g) || []).length; }
+  function sceneSeconds(text) {
+    var pace = parseFloat($('vPace').value) || 1;
+    return Math.max(3.2, Math.min(18, (wordCount(text) / (2.5 * pace)) + 1.4));
+  }
+  function totalSeconds() {
+    return scenes().reduce(function (sum, s) { return sum + sceneSeconds(s); }, 0) + 4.5; // + closing frame
+  }
+  function fmt(sec) {
+    sec = Math.round(sec);
+    return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+  }
+
+  /* ══════════════════════════════════════════ logo for the watermark */
+  var logoImg = new Image();
+  logoImg.crossOrigin = 'anonymous';
+  var logoReady = false;
+  logoImg.onload = function () { logoReady = true; };
+  logoImg.onerror = function () { logoReady = false; };
+  logoImg.src = '/assets/logo.png';
+
+  var backdropCache = {};
+  function backdrop(url) {
+    if (!url) return null;
+    if (backdropCache[url] !== undefined) return backdropCache[url];
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onerror = function () { backdropCache[url] = null; };
+    img.src = url;
+    backdropCache[url] = img;
+    return img;
+  }
+  function backdropList() {
+    return $('vBackdrops').value.split(/\n+/).map(function (s) { return s.trim(); }).filter(Boolean);
+  }
+
+  /* ══════════════════════════════════════════ frame painter */
+  function wrapText(ctx, text, maxWidth) {
+    var words = text.split(' ');
+    var lines = [];
+    var line = '';
+    for (var i = 0; i < words.length; i++) {
+      var test = line ? line + ' ' + words[i] : words[i];
+      if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = words[i]; }
+      else line = test;
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function paintFrame(ctx, W, H, opts) {
+    var theme = THEMES[opts.theme] || THEMES.royal;
+    var t = opts.progress;                 // 0..1 within this scene
+    var fade = Math.min(1, t / 0.10) * Math.min(1, (1 - t) / 0.10 + 0.35);
+    fade = Math.max(0, Math.min(1, fade));
+
+    // gradient base
+    var g = ctx.createLinearGradient(0, 0, W, H);
+    g.addColorStop(0, theme.bg[0]); g.addColorStop(0.55, theme.bg[1]); g.addColorStop(1, theme.bg[2]);
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+    // backdrop with a slow Ken Burns push
+    if (opts.image && opts.image.complete && opts.image.naturalWidth) {
+      var zoom = 1.06 + 0.07 * t;
+      var iw = opts.image.naturalWidth, ih = opts.image.naturalHeight;
+      var scale = Math.max(W / iw, H / ih) * zoom;
+      var dw = iw * scale, dh = ih * scale;
+      ctx.save(); ctx.globalAlpha = 0.9;
+      ctx.drawImage(opts.image, (W - dw) / 2, (H - dh) / 2, dw, dh);
+      ctx.restore();
+      ctx.fillStyle = 'rgba(4,10,22,' + theme.scrim + ')'; ctx.fillRect(0, 0, W, H);
+    } else {
+      // soft moving light so a plain gradient still feels alive
+      var rg = ctx.createRadialGradient(W * (0.3 + 0.4 * t), H * 0.25, 10, W / 2, H / 2, Math.max(W, H) * 0.75);
+      rg.addColorStop(0, 'rgba(255,255,255,0.16)'); rg.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = rg; ctx.fillRect(0, 0, W, H);
+    }
+
+    // gold rule top + bottom
+    ctx.fillStyle = theme.accent;
+    ctx.fillRect(0, 0, W, Math.max(3, H * 0.006));
+    ctx.fillRect(0, H - Math.max(3, H * 0.006), W, Math.max(3, H * 0.006));
+
+    var pad = W * 0.10;
+    var maxW = W - pad * 2;
+
+    ctx.save();
+    ctx.globalAlpha = fade;
+    ctx.textAlign = 'center';
+
+    if (opts.kind === 'closing') {
+      if (logoReady) {
+        var ls = Math.min(W, H) * 0.22;
+        ctx.drawImage(logoImg, (W - ls) / 2, H * 0.24, ls, ls);
+      }
+      ctx.fillStyle = theme.text;
+      ctx.font = '800 ' + (W * 0.055) + 'px Montserrat, sans-serif';
+      ctx.fillText('PRAYER DOME', W / 2, H * 0.58);
+      ctx.fillStyle = theme.accent;
+      ctx.font = '600 ' + (W * 0.028) + 'px Montserrat, sans-serif';
+      ctx.fillText('A House of Prayer for All Nations', W / 2, H * 0.645);
+      ctx.fillStyle = 'rgba(255,255,255,.82)';
+      ctx.font = '500 ' + (W * 0.024) + 'px Montserrat, sans-serif';
+      ctx.fillText('prayerdome.net', W / 2, H * 0.71);
+      if (opts.disclose) {
+        ctx.fillStyle = 'rgba(255,255,255,.62)';
+        ctx.font = '500 ' + (W * 0.018) + 'px Montserrat, sans-serif';
+        ctx.fillText('Visuals produced with AI assistance · Scripture unchanged', W / 2, H * 0.80);
+      }
+      ctx.restore();
+      return;
+    }
+
+    if (opts.kind === 'title') {
+      ctx.fillStyle = theme.accent;
+      ctx.font = '700 ' + (W * 0.022) + 'px Montserrat, sans-serif';
+      ctx.fillText((opts.scripture || 'PRAYER DOME').toUpperCase(), W / 2, H * 0.34);
+      ctx.fillStyle = theme.text;
+      ctx.font = '700 ' + (W * 0.062) + 'px "Playfair Display", Georgia, serif';
+      var tl = wrapText(ctx, opts.title || 'Prayer Dome', maxW);
+      tl.slice(0, 3).forEach(function (l, i) { ctx.fillText(l, W / 2, H * 0.45 + i * W * 0.076); });
+      ctx.restore();
+      drawWatermark(ctx, W, H, opts);
+      return;
+    }
+
+    // body scene
+    var size = W * (H > W ? 0.048 : 0.042);
+    ctx.font = '400 ' + size + 'px Lora, Georgia, serif';
+    var lines = wrapText(ctx, opts.text || '', maxW);
+    var lh = size * 1.5;
+    var startY = H / 2 - ((lines.length - 1) * lh) / 2;
+    ctx.fillStyle = 'rgba(0,0,0,.35)';
+    ctx.shadowColor = 'rgba(0,0,0,.55)'; ctx.shadowBlur = W * 0.012;
+    ctx.fillStyle = theme.text;
+    lines.forEach(function (l, i) { ctx.fillText(l, W / 2, startY + i * lh); });
+    ctx.shadowBlur = 0;
+
+    if (opts.scripture) {
+      ctx.fillStyle = theme.accent;
+      ctx.font = '700 ' + (W * 0.021) + 'px Montserrat, sans-serif';
+      ctx.fillText(opts.scripture.toUpperCase(), W / 2, H - H * 0.085);
+    }
+    ctx.restore();
+    drawWatermark(ctx, W, H, opts);
+  }
+
+  function drawWatermark(ctx, W, H, opts) {
+    if (!opts.watermark) return;
+    ctx.save();
+    ctx.globalAlpha = 0.92;
+    var s = Math.min(W, H) * 0.075;
+    var x = W - s - W * 0.035, y = H * 0.035;
+    if (logoReady) ctx.drawImage(logoImg, x, y, s, s);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(255,255,255,.88)';
+    ctx.font = '700 ' + (W * 0.016) + 'px Montserrat, sans-serif';
+    ctx.fillText('PRAYER DOME', x + s, y + s + W * 0.026);
+    ctx.restore();
+  }
+
+  /* ══════════════════════════════════════════ timeline */
+  function buildTimeline() {
+    var body = scenes();
+    var backs = backdropList();
+    var list = [];
+    list.push({ kind: 'title', text: '', seconds: 3.2, image: backdrop(backs[0]) });
+    body.forEach(function (text, i) {
+      list.push({
+        kind: 'body', text: text, seconds: sceneSeconds(text),
+        image: backdrop(backs.length ? backs[i % backs.length] : null)
+      });
+    });
+    list.push({ kind: 'closing', text: '', seconds: 4.0, image: null });
+    return list;
+  }
+
+  /* ══════════════════════════════════════════ player / renderer */
+  var running = false, stopRequested = false;
+
+  function paintIdle() {
+    var canvas = $('stage');
+    var ctx = canvas.getContext('2d');
+    var dim = ASPECTS[$('vAspect').value] || ASPECTS['16:9'];
+    canvas.width = dim[0]; canvas.height = dim[1];
+    paintFrame(ctx, dim[0], dim[1], {
+      kind: 'title', theme: $('vTheme').value, progress: 0.5,
+      title: $('vTitle').value || 'Prayer Dome',
+      scripture: $('vScripture').value,
+      watermark: $('vWatermark').checked, image: backdrop(backdropList()[0])
+    });
+  }
+
+  /**
+   * Runs the timeline against the canvas.
+   * `hooks.onScene(i,total)` / `hooks.onTick(progress)` report progress.
+   */
+  function playTimeline(timeline, hooks) {
+    hooks = hooks || {};
+    var canvas = $('stage');
+    var ctx = canvas.getContext('2d');
+    var dim = ASPECTS[$('vAspect').value] || ASPECTS['16:9'];
+    canvas.width = dim[0]; canvas.height = dim[1];
+
+    var theme = $('vTheme').value;
+    var title = $('vTitle').value || 'Prayer Dome';
+    var scripture = $('vScripture').value;
+    var watermark = $('vWatermark').checked;
+    var disclose = $('vDisclose').checked;
+    var total = timeline.reduce(function (s, x) { return s + x.seconds; }, 0);
+
+    return new Promise(function (resolve) {
+      var index = 0, sceneStart = performance.now(), begun = performance.now();
+      if (hooks.onScene) hooks.onScene(1, timeline.length);
+
+      function frame(now) {
+        if (stopRequested) { resolve('stopped'); return; }
+        var scene = timeline[index];
+        var elapsed = (now - sceneStart) / 1000;
+        var p = Math.max(0, Math.min(1, elapsed / scene.seconds));
+
+        paintFrame(ctx, dim[0], dim[1], {
+          kind: scene.kind, text: scene.text, theme: theme, title: title,
+          scripture: scripture, watermark: watermark, disclose: disclose,
+          image: scene.image, progress: p
+        });
+
+        if (hooks.onTick) hooks.onTick(Math.min(1, (now - begun) / 1000 / total));
+
+        if (elapsed >= scene.seconds) {
+          index += 1;
+          if (index >= timeline.length) { resolve('done'); return; }
+          sceneStart = now;
+          if (hooks.onScene) hooks.onScene(index + 1, timeline.length);
+          if (hooks.onSceneStart) hooks.onSceneStart(timeline[index]);
+        }
+        requestAnimationFrame(frame);
+      }
+      if (hooks.onSceneStart) hooks.onSceneStart(timeline[0]);
+      requestAnimationFrame(frame);
+    });
+  }
+
+  /* ══════════════════════════════════════════ narration voices */
+  var voiceMode = 'speech';
+  function loadVoices() {
+    var sel = $('vVoice');
+    if (!sel || !('speechSynthesis' in window)) return;
+    var list = window.speechSynthesis.getVoices().filter(function (v) { return /^en/i.test(v.lang); });
+    if (!list.length) list = window.speechSynthesis.getVoices();
+    sel.innerHTML = list.map(function (v, i) {
+      return '<option value="' + i + '">' + esc(v.name) + ' — ' + esc(v.lang) + '</option>';
+    }).join('') || '<option value="">No device voices available</option>';
+    sel._list = list;
+  }
+  if ('speechSynthesis' in window) {
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }
+
+  function speak(text) {
+    if (!('speechSynthesis' in window) || !text) return;
+    var u = new SpeechSynthesisUtterance(text);
+    var sel = $('vVoice');
+    var v = sel && sel._list && sel._list[parseInt(sel.value, 10)];
+    if (v) { u.voice = v; u.lang = v.lang; }
+    u.rate = 0.94 * (parseFloat($('vPace').value) || 1);
+    u.pitch = 1;
+    window.speechSynthesis.speak(u);
+  }
+
+  /* ══════════════════════════════════════════ audio wiring for the recording */
+  async function buildAudioTrack(audioCtx, dest) {
+    // returns a cleanup function
+    if (voiceMode === 'mic') {
+      var mic = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      audioCtx.createMediaStreamSource(mic).connect(dest);
+      return function () { mic.getTracks().forEach(function (t) { t.stop(); }); };
+    }
+    if (voiceMode === 'file') {
+      var url = $('vAudioUrl').value.trim();
+      if (!url) throw new Error('Paste the narration audio URL first.');
+      var res = await fetch(url, { mode: 'cors' });
+      if (!res.ok) throw new Error('That narration audio could not be loaded (' + res.status + ').');
+      var buf = await audioCtx.decodeAudioData(await res.arrayBuffer());
+      var src = audioCtx.createBufferSource();
+      src.buffer = buf; src.connect(dest); src.start();
+      return function () { try { src.stop(); } catch (e) { /* already ended */ } };
+    }
+    if (voiceMode === 'speech') {
+      // Tab audio capture is the only way a page may record its own speech synthesis.
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) return null;
+      var tab = await navigator.mediaDevices.getDisplayMedia({
+        video: true, audio: true, preferCurrentTab: true, selfBrowserSurface: 'include'
+      });
+      var audioTracks = tab.getAudioTracks();
+      tab.getVideoTracks().forEach(function (t) { t.stop(); });
+      if (!audioTracks.length) { audioTracks.forEach(function (t) { t.stop(); }); return null; }
+      audioCtx.createMediaStreamSource(new MediaStream(audioTracks)).connect(dest);
+      return function () { audioTracks.forEach(function (t) { t.stop(); }); };
+    }
+    return null;
+  }
+
+  /* ══════════════════════════════════════════ preview */
+  $('btnPreview').addEventListener('click', async function () {
+    if (running) return;
+    var timeline = buildTimeline();
+    if (timeline.length <= 2) { $('renderStatus').textContent = 'Write a script first — at least one paragraph.'; return; }
+    running = true; stopRequested = false;
+    $('btnStop').style.display = 'inline-flex';
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    await playTimeline(timeline, {
+      onScene: function (i, n) { $('renderStatus').textContent = 'Preview — scene ' + i + ' of ' + n; },
+      onTick: function (p) { $('renderBar').style.width = (p * 100).toFixed(1) + '%'; },
+      onSceneStart: function (scene) { if (voiceMode === 'speech' && scene.kind === 'body') speak(scene.text); }
+    });
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    running = false; stopRequested = false;
+    $('btnStop').style.display = 'none';
+    $('renderStatus').textContent = 'Preview finished. Happy with it? Render it to the cloud.';
+    paintIdle();
+  });
+
+  $('btnStop').addEventListener('click', function () { stopRequested = true; });
+
+  /* ══════════════════════════════════════════ render + upload */
+  $('btnRender').addEventListener('click', async function () {
+    if (running) return;
+    var timeline = buildTimeline();
+    if (timeline.length <= 2) { $('renderStatus').textContent = 'Write a script first — at least one paragraph.'; return; }
+    if (!$('vTitle').value.trim()) { $('renderStatus').textContent = 'Give the video a title first.'; $('vTitle').focus(); return; }
+    if (typeof MediaRecorder === 'undefined' || !$('stage').captureStream) {
+      $('renderStatus').textContent = 'This browser cannot render video. Please use Chrome, Edge or Firefox on a computer.';
+      return;
+    }
+
+    running = true; stopRequested = false;
+    $('btnRender').disabled = true;
+    $('btnStop').style.display = 'inline-flex';
+    $('outCard').classList.remove('on');
+    $('renderStatus').textContent = 'Preparing…';
+
+    var audioCtx = null, dest = null, cleanupAudio = null, recorder = null;
+    var chunks = [];
+    try {
+      var canvas = $('stage');
+      var dim = ASPECTS[$('vAspect').value] || ASPECTS['16:9'];
+      canvas.width = dim[0]; canvas.height = dim[1];
+      var stream = canvas.captureStream(30);
+
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        dest = audioCtx.createMediaStreamDestination();
+        cleanupAudio = await buildAudioTrack(audioCtx, dest);
+        if (cleanupAudio || voiceMode === 'file' || voiceMode === 'mic') {
+          dest.stream.getAudioTracks().forEach(function (t) { stream.addTrack(t); });
+        }
+      } catch (audioError) {
+        $('renderStatus').textContent = 'Narration unavailable (' + audioError.message + ') — rendering a silent video.';
+      }
+
+      var mime = (window.PDCloudVideo && PDCloudVideo.pickMimeType && PDCloudVideo.pickMimeType()) || '';
+      recorder = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 3500000 } : {});
+      recorder.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+      var finished = new Promise(function (res) { recorder.onstop = res; });
+      recorder.start(1000);
+      $('recBadge').classList.add('on');
+
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      await playTimeline(timeline, {
+        onScene: function (i, n) { $('renderStatus').textContent = 'Recording — scene ' + i + ' of ' + n; },
+        onTick: function (p) { $('renderBar').style.width = (p * 70).toFixed(1) + '%'; },
+        onSceneStart: function (scene) { if (voiceMode === 'speech' && scene.kind === 'body') speak(scene.text); }
+      });
+
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      recorder.stop();
+      await finished;
+      $('recBadge').classList.remove('on');
+      stream.getTracks().forEach(function (t) { t.stop(); });
+      if (cleanupAudio) cleanupAudio();
+      if (audioCtx) audioCtx.close();
+
+      var blob = new Blob(chunks, { type: chunks.length && chunks[0].type ? chunks[0].type : 'video/webm' });
+      chunks.length = 0;
+      if (!blob.size) throw new Error('Nothing was recorded.');
+
+      $('renderStatus').textContent = 'Uploading to Prayer Dome cloud storage… 0%';
+      var result = await PDCloudVideo.uploadWithRetry(blob, {
+        title: $('vTitle').value.trim(),
+        folder: 'ai_videos',
+        presets: ['ai_videos', 'live_recordings', 'live_streams', 'gallery_uploads'],
+        tags: ['prayer-dome', 'ai-video', $('vTheme').value],
+        onProgress: function (done, total) {
+          var pct = total ? Math.round((done / total) * 100) : 0;
+          $('renderBar').style.width = (70 + pct * 0.3).toFixed(1) + '%';
+          $('renderStatus').textContent = 'Uploading to Prayer Dome cloud storage… ' + pct + '%';
+        },
+        onRetry: function (n) { $('renderStatus').textContent = 'Connection hiccup — retrying upload (attempt ' + n + ')…'; }
+      });
+
+      // The finished video is played back from the cloud, never from a device blob.
+      window.PD_STUDIO_RESULT = result;
+      $('outVideo').src = result.url;
+      $('outUrl').textContent = result.url;
+      $('outCard').classList.add('on');
+      $('renderBar').style.width = '100%';
+      $('renderStatus').textContent = 'Saved to Prayer Dome cloud storage. Nothing was written to this device.';
+      $('outCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (error) {
+      console.error(error);
+      $('recBadge').classList.remove('on');
+      if (cleanupAudio) { try { cleanupAudio(); } catch (e) { /* ignore */ } }
+      if (audioCtx) { try { audioCtx.close(); } catch (e) { /* ignore */ } }
+      $('renderStatus').textContent = 'Could not finish: ' + (error.message || error);
+    } finally {
+      running = false; stopRequested = false;
+      $('btnRender').disabled = false;
+      $('btnStop').style.display = 'none';
+    }
+  });
+
+  /* ══════════════════════════════════════════ publish */
+  $('btnPublish').addEventListener('click', async function () {
+    var result = window.PD_STUDIO_RESULT;
+    if (!result || !result.url) { $('publishStatus').textContent = 'Render a video first.'; return; }
+    if (!window.PDStudioCloud) { $('publishStatus').textContent = 'Cloud database still loading — try again in a moment.'; return; }
+    $('btnPublish').disabled = true;
+    $('publishStatus').textContent = 'Publishing…';
+    try {
+      var tplKey = document.querySelector('#templateChips .chip.on');
+      var categoryMap = { sermon: 'sermon', story: 'bible-story', devotional: 'devotional', inspiration: 'inspiration', promo: 'promo' };
+      await window.PDStudioCloud.publish({
+        title: $('vTitle').value.trim() || 'Prayer Dome video',
+        category: categoryMap[tplKey && tplKey.dataset.key] || 'inspiration',
+        provider: 'Prayer Dome Scripture Studio',
+        url: result.url,
+        thumb: result.thumbnail || '',
+        desc: $('outDesc').value.trim() || scenes()[0] || '',
+        scripture: $('vScripture').value.trim(),
+        aiAssisted: $('vDisclose').checked,
+        durationSeconds: Math.round(totalSeconds()),
+        aspect: $('vAspect').value,
+        storedOnDevice: false,
+        storage: 'cloudinary'
+      });
+      $('publishStatus').textContent = 'Published. Members can watch it in the app library.';
+      loadLibrary();
+    } catch (e) {
+      $('publishStatus').textContent = 'Could not publish: ' + (e.message || e) + ' — you can still copy the link and add it from the Admin panel.';
+    } finally {
+      $('btnPublish').disabled = false;
+    }
+  });
+
+  $('btnCopy').addEventListener('click', function () {
+    var url = $('outUrl').textContent.trim();
+    if (!url) return;
+    if (navigator.clipboard) navigator.clipboard.writeText(url);
+    $('publishStatus').textContent = 'Link copied.';
+  });
+
+  /* ══════════════════════════════════════════ library */
+  function loadLibrary() {
+    if (!window.PDStudioCloud) return;
+    window.PDStudioCloud.list().then(function (items) {
+      if (!items.length) { $('libStatus').textContent = 'Nothing published yet.'; $('libGrid').innerHTML = ''; return; }
+      $('libStatus').textContent = '';
+      $('libGrid').innerHTML = items.map(function (v) {
+        var thumb = v.thumb || '/assets/og-image.png';
+        return '<a class="lib-item" href="' + esc(v.url || '#') + '" target="_blank" rel="noopener">' +
+          '<img src="' + esc(thumb) + '" alt="" onerror="this.src=\'/assets/og-image.png\'">' +
+          '<div>' + esc(v.title || 'Untitled') + '<span>' + esc(v.category || '') +
+          (v.aiAssisted === false ? '' : ' · AI-assisted') + '</span></div></a>';
+      }).join('');
+    }).catch(function () { $('libStatus').textContent = 'Could not load the library.'; });
+  }
+  window.addEventListener('pd-studio-cloud-ready', loadLibrary);
+  if (window.PDStudioCloud) loadLibrary();
+
+  /* ══════════════════════════════════════════ UI wiring */
+  var chips = $('templateChips');
+  chips.innerHTML = Object.keys(TEMPLATES).map(function (k, i) {
+    return '<button type="button" class="chip' + (i === 0 ? ' on' : '') + '" data-key="' + k + '">' +
+      esc(TEMPLATES[k].label) + '</button>';
+  }).join('');
+  chips.addEventListener('click', function (e) {
+    var chip = e.target.closest('.chip');
+    if (!chip) return;
+    chips.querySelectorAll('.chip').forEach(function (c) { c.classList.remove('on'); });
+    chip.classList.add('on');
+    applyTemplate(chip.dataset.key);
+  });
+
+  var VOICES = [
+    { key: 'speech', label: '🔊 Prayer Dome voice (device)' },
+    { key: 'file', label: '🎧 AI voice-over file' },
+    { key: 'mic', label: '🎙️ My microphone' },
+    { key: 'silent', label: '🤫 Silent (text only)' }
+  ];
+  var vchips = $('voiceChips');
+  vchips.innerHTML = VOICES.map(function (v, i) {
+    return '<button type="button" class="chip' + (i === 0 ? ' on' : '') + '" data-voice="' + v.key + '">' + v.label + '</button>';
+  }).join('');
+  vchips.addEventListener('click', function (e) {
+    var chip = e.target.closest('.chip');
+    if (!chip) return;
+    vchips.querySelectorAll('.chip').forEach(function (c) { c.classList.remove('on'); });
+    chip.classList.add('on');
+    voiceMode = chip.dataset.voice;
+    $('voicePanelSpeech').style.display = voiceMode === 'speech' ? '' : 'none';
+    $('voicePanelFile').style.display = voiceMode === 'file' ? '' : 'none';
+    $('voicePanelMic').style.display = voiceMode === 'mic' ? '' : 'none';
+    $('voicePanelSilent').style.display = voiceMode === 'silent' ? '' : 'none';
+  });
+
+  function applyTemplate(key) {
+    var tpl = TEMPLATES[key];
+    if (!tpl) return;
+    $('vTitle').value = tpl.title;
+    $('vScripture').value = tpl.scripture;
+    $('vTheme').value = tpl.theme;
+    $('vScript').value = tpl.script;
+    refreshScenes();
+    paintIdle();
+  }
+
+  function refreshScenes() {
+    var list = scenes();
+    $('sceneList').innerHTML = list.map(function (s, i) {
+      return '<div class="scene-row"><b>' + (i + 1) + '.</b><span>' + esc(s.slice(0, 150)) +
+        (s.length > 150 ? '…' : '') + ' <em style="opacity:.6">(' + fmt(sceneSeconds(s)) + ')</em></span></div>';
+    }).join('');
+    $('scriptStatus').textContent = list.length
+      ? list.length + ' scene' + (list.length === 1 ? '' : 's') + ' · about ' + fmt(totalSeconds()) + ' long'
+      : 'Add at least one paragraph.';
+  }
+
+  ['vScript', 'vPace', 'vTheme', 'vAspect', 'vTitle', 'vScripture', 'vBackdrops'].forEach(function (id) {
+    $(id).addEventListener('input', function () { refreshScenes(); paintIdle(); });
+    $(id).addEventListener('change', function () { refreshScenes(); paintIdle(); });
+  });
+  $('vWatermark').addEventListener('change', paintIdle);
+
+  $('btnOutline').addEventListener('click', function () {
+    var topic = ($('vTitle').value || 'God\u2019s faithfulness').trim();
+    var ref = ($('vScripture').value || 'Psalm 46:1').trim();
+    $('vScript').value = [
+      '"' + ref + '" — let the Word settle before we say anything about it.',
+      'Here is the truth in one sentence: ' + topic + ' is not an idea to admire, it is a promise to stand on.',
+      'Think about where this meets your week. The place you feel weakest is exactly where this verse was written to stand.',
+      'Scripture does not ask you to pretend the struggle away. It asks you to bring the struggle to a God who has never lost a battle.',
+      'So here is the invitation: pray one honest sentence today. Then obey one small thing. That is how faith grows.',
+      'Father, thank You for Your Word. Make it real in us this week, and let it overflow to someone who needs it. Amen.'
+    ].join('\n\n');
+    refreshScenes(); paintIdle();
+  });
+
+  $('btnVerse').addEventListener('click', function () {
+    var verse = null;
+    try {
+      if (window.PD_VERSES && typeof window.PD_VERSES.verseFor === 'function') {
+        verse = window.PD_VERSES.verseFor((window.PD_VERSES.currentSlot && window.PD_VERSES.currentSlot()) || 'morning');
+      }
+    } catch (e) { verse = null; }
+    if (!verse) verse = { text: 'God is our refuge and strength, a very present help in trouble.', reference: 'Psalm 46:1' };
+    $('vScripture').value = verse.reference || $('vScripture').value;
+    $('vScript').value = (verse.text || '') + '\n\n' + $('vScript').value;
+    refreshScenes(); paintIdle();
+  });
+
+  // First paint
+  applyTemplate('sermon');
+  if (logoImg.complete) { logoReady = logoImg.naturalWidth > 0; paintIdle(); }
+  logoImg.addEventListener('load', paintIdle);
+})();
+</script>
+</body>
+</html>
