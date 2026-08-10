@@ -99,7 +99,7 @@
       '<div class="pd-acad-hero-actions">' +
         '<button class="pd-acad-btn pd-acad-btn-primary" id="markReadBtn"><i class="fas fa-check"></i> Mark Lesson Complete</button>' +
         (q ? '<button class="pd-acad-btn pd-acad-btn-secondary" id="startQuizBtn"><i class="fas fa-star"></i> Take Linked Quiz</button>' : '') +
-        (canNext && l.nextLessonId ? '<a class="pd-acad-btn pd-acad-btn-ghost" href="#lesson/' + esc(l.nextLessonId) + '">Next lesson <i class="fas fa-arrow-right"></i></a>' : '') +
+        ((canNext || state.completedLessons.indexOf(l.id) >= 0) && l.nextLessonId ? '<a class="pd-acad-btn pd-acad-btn-ghost" href="#lesson/' + esc(l.nextLessonId) + '">Next lesson <i class="fas fa-arrow-right"></i></a>' : '') +
       '</div>' +
       (q ? renderQuiz(q, passed, sample) : '');
     if (state.completedLessons.indexOf(l.id) < 0) {
@@ -177,6 +177,8 @@
             dlBtn.style.display = 'none';
           }
         }
+        // Re-render the lesson to show the next button now that it's completed
+        renderLesson(lesson.id);
         updateOverview(); renderLessonList($('#lessonList'), lesson.id);
       } else {
         result.innerHTML = '<div class="pd-acad-callout"><strong>Almost there.</strong> You scored ' + percent + '%. Review the lesson and try again — 80% is required to earn your certificate. The questions change on each attempt.</div>' +

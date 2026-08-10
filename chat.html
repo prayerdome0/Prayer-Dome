@@ -721,7 +721,8 @@
         .suggestion-chip:hover { transform: translateY(-2px) scale(1.04); background: var(--accent-gold); color: #fff; box-shadow: 0 6px 14px -3px rgba(212,175,55,.5); }
 
         .chat-input-area {
-            padding: 14px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+            padding: 14px 16px calc(20px + env(safe-area-inset-bottom, 20px));
+            margin-top: auto;
             background: var(--bg-card);
             background: color-mix(in srgb, var(--bg-card) 97%, transparent);
             backdrop-filter: blur(16px);
@@ -734,6 +735,7 @@
             transition: box-shadow 0.3s, background 0.3s, transform 0.3s;
             position: relative;
             z-index: 200;
+            margin-top: auto;
         }
         .chat-input-area::before {
             content: '';
@@ -2817,7 +2819,7 @@
             const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
             await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `📍 Location: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`, timestamp: serverTimestamp(), delivered:false, read:false, type:'location', location:{latitude, longitude, url} });
             showToast('Location shared 📍');
-          }, err=> showToast('Location error: '+err.message,'error'), {enableHighAccuracy:false, timeout:8000});
+          }, err=> showToast('Location error: '+err.message,'error'), {enableHighAccuracy:true, timeout:15000});
         };
         window.createPoll = async ()=>{
           const q=prompt('📊 Poll question:');
