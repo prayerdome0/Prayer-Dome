@@ -306,7 +306,7 @@ body.dark-mode .draft-pill { color:#fcd34d; }
 .parallel .cell { background:var(--bg-card); padding:17px 18px; }
 .parallel .cell .lang-pill { margin-bottom:9px; display:inline-block; }
 .parallel .cell p { font-family:'Lora',serif; font-size:.96rem; line-height:1.82; }
-@media (min-width:820px) { .parallel { grid-template-columns:repeat(3,1fr); } }
+@media (min-width:820px) { .parallel { grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); } } @media (min-width:1100px) { .parallel { grid-template-columns:repeat(5,1fr); } }
 
 .topic-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px; }
 .topic-chip {
@@ -365,10 +365,10 @@ body.dark-mode .nav-link.active { color:#5eead4; }
 </header>
 
 <section class="hero">
-  <div class="hero-badge pd-reveal"><i class="fas fa-language"></i> Three Languages</div>
-  <h1 class="pd-reveal" data-pd-delay="70">Scripture in <span class="pd-gradient-text">your own tongue</span></h1>
+  <div class="hero-badge pd-reveal"><i class="fas fa-language"></i> Five Languages</div>
+  <h1 class="pd-reveal" data-pd-delay="70">Scripture in <span class="pd-gradient-text">your own tongue</span> — five languages</h1>
   <p class="pd-reveal" data-pd-delay="140" id="heroCopy">
-    English, Chitumbuka and siSwati side by side. Search a verse, switch language in one tap,
+    English, Chitumbuka, siSwati, Bemba and Nyanja side by side. Search a verse, switch language in one tap,
     and have it read aloud.
   </p>
 </section>
@@ -379,10 +379,9 @@ body.dark-mode .nav-link.active { color:#5eead4; }
     <i class="fas fa-circle-info"></i>
     <div>
       <strong>About these translations — please read</strong>
-      The English is the King James Version and is exact. The Chitumbuka and siSwati renderings are
+      The English is the King James Version and is exact. The Chitumbuka, siSwati, Bemba and Nyanja renderings are
       <b>Prayer Dome community drafts</b>, prepared as a starting point and marked
-      <em>awaiting review</em> until a fluent speaker has checked each one. They are not the published
-      <em>Buku Lakupatulika</em> or siSwati Bible and should not be quoted as an official translation.
+      <em>awaiting review</em> until a fluent speaker has checked each one. They are not the published <em>Buku Lakupatulika</em>, siSwati, Bemba or Nyanja Bibles and should not be quoted as an official translation.
       If you speak either language and can help us correct them,
       <a href="/contact.html" style="font-weight:800;color:#b45309">please get in touch</a> — it would be a real gift to the church.
     </div>
@@ -393,7 +392,7 @@ body.dark-mode .nav-link.active { color:#5eead4; }
 
   <div class="mode-row">
     <button class="mode-btn active" id="modeSingle" onclick="setMode('single')"><i class="fas fa-align-left"></i> One language</button>
-    <button class="mode-btn" id="modeParallel" onclick="setMode('parallel')"><i class="fas fa-table-columns"></i> All three side by side</button>
+    <button class="mode-btn" id="modeParallel" onclick="setMode('parallel')"><i class="fas fa-table-columns"></i> All five side by side</button>
     <button class="mode-btn" id="stopAllBtn" onclick="stopSpeech()" style="margin-left:auto"><i class="fas fa-stop"></i> Stop audio</button>
   </div>
 
@@ -402,7 +401,7 @@ body.dark-mode .nav-link.active { color:#5eead4; }
   <div class="search-wrap">
     <i class="fas fa-magnifying-glass"></i>
     <label for="verseSearch" class="pd-sr-only">Search scripture</label>
-    <input id="verseSearch" type="search" placeholder="Search a verse in any of the three languages…" autocomplete="off">
+    <input id="verseSearch" type="search" placeholder="Search a verse in any of the five languages…" autocomplete="off">
   </div>
 
   <div class="topic-row" id="topicRow"></div>

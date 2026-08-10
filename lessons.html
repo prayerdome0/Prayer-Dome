@@ -139,7 +139,8 @@
   <script src="/assets/pd-motion.js" defer></script>
   <script src="/assets/pd-content-data.js" defer></script>
   <script src="/assets/pd-academy-data.js" defer></script>
-  <script src="/assets/pd-app.js" defer></script>
+  <script src="/translation-data.js"></script>
+<script src="/assets/pd-app.js" defer></script>
   <script src="/assets/pd-certificate.js" defer></script>
   <script src="/assets/pd-academy.js" defer></script>
 </head>
@@ -158,16 +159,29 @@
     <a class="pd-drawer-link" href="/account"><i class="fas fa-user-circle"></i> Account</a>
   </nav>
 </aside>
-<header class="pd-topbar" style="position:sticky;top:0;z-index:50">
+<header class="pd-topbar">
   <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="fas fa-bars"></i></button>
-  <a href="/" class="pd-topbar-center"><span class="pd-topbar-word">PRAYER DOME</span></a>
-  <div class="pd-topbar-right"><a class="theme-toggle-btn" href="/resources"><i class="fas fa-folder-open"></i></a><a class="theme-toggle-btn" href="/quiz"><i class="fas fa-star"></i></a></div>
+  <a href="/" class="pd-topbar-center">
+    <div class="pd-topbar-logo"><img src="/assets/logo.png" alt="PD Logo"></div>
+    <div class="pd-topbar-word">PRAYER DOME</div>
+  </a>
+  <div class="pd-topbar-right">
+    <select class="pd-lang-select" aria-label="Language">
+      <option value="en">🇬🇧 English</option>
+      <option value="tum">🇲🇼 Tumbuka</option>
+      <option value="ssw">🇸🇿 siSwati</option>
+      <option value="bem">🇿🇲 Bemba</option>
+      <option value="nya">🇲🇼 Nyanja</option>
+    </select>
+    <button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="fas fa-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>
+    <button class="theme-toggle-btn" onclick="toggleDarkMode && toggleDarkMode()"><i class="fas fa-moon"></i></button>
+  </div>
 </header>
 
 <main class="pd-acad-wrap" data-page="lessons">
   <section class="pd-acad-hero">
     <span class="pd-acad-eyebrow"><i class="fas fa-graduation-cap"></i> Prayer Dome Academy</span>
-    <h1>Lessons that help members grow, serve and walk in faith.</h1>
+    <h1 data-pd-t="academy.title">Lessons that help members grow, serve and walk in faith.</h1>
     <p>Study clear biblical pathways, reflect on practical questions, mark your progress, take linked quizzes, and earn certificates as you build confidence in God’s Word.</p>
     <div class="pd-acad-hero-actions">
       <a class="pd-acad-btn pd-acad-btn-primary" href="#lessonList"><i class="fas fa-book-open"></i> Start Learning</a>
@@ -184,12 +198,12 @@
   </section>
 
   <div class="pd-acad-section-head">
-    <div><h2>Choose a growth track</h2><p>Each track combines teaching, reflection, action steps and a short knowledge check.</p></div>
+    <div><h2 data-pd-t="label.lessons">Choose a growth track</h2><p>Each track combines teaching, reflection, action steps and a short knowledge check.</p></div>
   </div>
   <section class="pd-acad-grid pd-acad-grid-3" id="trackGrid"></section>
 
   <div class="pd-acad-section-head">
-    <div><h2>Lesson library</h2><p>Open any lesson, complete the reading, and use the quiz to confirm your understanding.</p></div>
+    <div><h2 data-pd-t="label.lessons">Lesson library</h2><p>Open any lesson, complete the reading, and use the quiz to confirm your understanding.</p></div>
   </div>
   <section class="pd-acad-lesson-layout">
     <div class="pd-acad-list" id="lessonList" aria-label="Lesson list"></div>

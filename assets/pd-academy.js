@@ -34,13 +34,32 @@
     return Math.round((quizState().completedLessons.length / total) * 100);
   }
   function iconFor(trackId) { var t = DATA.tracks.filter(function (x) { return x.id === trackId; })[0]; return t ? t.icon : 'fa-book'; }
+  function tr(key, fallback) {
+    try {
+      if (window.pdT) {
+        var lang = (window.PDApp && window.PDApp.i18n && window.PDApp.i18n.current) ? window.PDApp.i18n.current() : (localStorage.getItem('pd_lang')||'en');
+        var v = window.pdT(key, lang);
+        if (v && v !== key) return v;
+      }
+      if (window.PDApp && window.PDApp.i18n) {
+        var vv = window.PDApp.i18n.t(key);
+        if (vv && vv !== key) return vv;
+      }
+    } catch(e){}
+    return fallback;
+  }
+  function trackTitle(t) {
+    var key = 'academy.track.' + t.id;
+    return tr(key, t.title);
+  }
+
   function renderTrackCards(root) {
     if (!root) return;
     root.innerHTML = DATA.tracks.map(function (t) {
       var count = DATA.lessons.filter(function (l) { return l.trackId === t.id; }).length;
       return '<a class="pd-acad-card pd-lift" href="/lessons?track=' + encodeURIComponent(t.id) + '">' +
         '<div class="pd-acad-icon ' + (t.color === 'gold' ? 'gold' : '') + '"><i class="fas ' + esc(t.icon) + '"></i></div>' +
-        '<h3>' + esc(t.title) + '</h3><p>' + esc(t.summary) + '</p>' +
+        '<h3>' + esc(trackTitle(t)) + '</h3><p>' + esc(t.summary) + '</p>' +
         '<div class="pd-acad-meta"><span class="pd-acad-chip ' + (t.color === 'gold' ? 'gold' : '') + '">' + count + ' lessons</span></div></a>';
     }).join('');
   }
@@ -51,7 +70,7 @@
       var done = state.completedLessons.indexOf(l.id) >= 0;
       var passed = state.passedQuizzes[l.quizId];
       return '<button class="pd-acad-lesson-link ' + (activeId === l.id ? 'is-active' : '') + '" data-lesson="' + esc(l.id) + '">' +
-        '<small><i class="fas ' + esc(l.icon) + '"></i> ' + esc(l.track) + '</small>' +
+        '<small><i class="fas ' + esc(l.icon) + '"></i> ' + esc(tr('academy.track.'+l.trackId, l.track)) + '</small>' +
         '<strong>' + esc(l.order + '. ' + l.title) + '</strong>' +
         '<span>' + esc(l.minutes + ' min · ' + l.level + (done ? ' · ✓ Read' : '') + (passed ? ' · Certificate earned' : '')) + '</span></button>';
     }).join('');
@@ -230,6 +249,37 @@
       return '<article class="pd-acad-card pd-lift pd-acad-resource"><div class="pd-acad-icon gold"><i class="fas ' + esc(r.icon) + '"></i></div><div style="flex:1"><h3>' + esc(r.title) + '</h3><p>' + esc(r.description) + '</p><div class="pd-acad-meta"><span class="pd-acad-chip">' + esc(r.category) + '</span><span class="pd-acad-chip gold">' + esc(r.format) + '</span><span class="pd-acad-chip">' + esc(r.version) + '</span></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="pd-acad-btn pd-acad-btn-secondary" href="' + esc(r.url) + '"><i class="fas fa-eye"></i> Read</a><a class="pd-acad-btn pd-acad-btn-primary" href="' + esc(r.downloadUrl || r.url) + '" download><i class="fas fa-download"></i> Download</a></div></article>';
     }).join('');
   }
+
+  document.addEventListener('pd:lang', function() {
+    try {
+      renderTrackCards(document.getElementById('trackGrid'));
+      var list = document.getElementById('lessonList');
+      if (list) {
+        var active = (location.hash || '').indexOf('#lesson/')===0 ? location.hash.split('/')[1] : (DATA.lessons[0]&&DATA.lessons[0].id);
+        renderLessonList(list, active);
+        // re-render lesson reader if open
+        if (active) renderLesson(active);
+      }
+      // re-render resources grid headings if present
+      var rg = document.getElementById('resourceGrid');
+      if (rg) {
+        // re-trigger resource render via initResourcesPage logic: simple reload
+        if (window.PD_ACADEMY && rg) {
+          // rebuild resource grid with same function but we can just call initResourcesPage indirectly by re-creating
+          var grid = document.getElementById('resourceGrid');
+          if (grid && DATA.resources) {
+            grid.innerHTML = DATA.resources.map(function (r) {
+              return '<article class="pd-acad-card pd-lift pd-acad-resource"><div class="pd-acad-icon gold"><i class="fas ' + esc(r.icon) + '"></i></div><div style="flex:1"><h3>' + esc(r.title) + '</h3><p>' + esc(r.description) + '</p><div class="pd-acad-meta"><span class="pd-acad-chip">' + esc(r.category) + '</span><span class="pd-acad-chip gold">' + esc(r.format) + '</span><span class="pd-acad-chip">' + esc(r.version) + '</span></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="pd-acad-btn pd-acad-btn-secondary" href="' + esc(r.url) + '"><i class="fas fa-eye"></i> ' + tr('action.read','Read') + '</a><a class="pd-acad-btn pd-acad-btn-primary" href="' + esc(r.downloadUrl || r.url) + '" download><i class="fas fa-download"></i> ' + tr('action.download','Download') + '</a></div></article>';
+            }).join('');
+          }
+        }
+      }
+      // translate static hero texts via data-pd-t already handled by pd-app, but also translate known hard-coded strings
+      var heroTitle = document.querySelector('.pd-acad-hero h1[data-pd-t]');
+      // pd-app will handle data-pd-t automatically, no need here
+    } catch(e){}
+  });
+
   document.addEventListener('DOMContentLoaded', function () { initLessonsPage(); initStoriesPage(); initResourcesPage(); updateOverview(); });
   window.PD_ACADEMY_APP = { DATA: DATA, pct: pct, state: quizState, memberName: memberName };
 })();
