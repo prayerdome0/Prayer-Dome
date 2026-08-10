@@ -1639,8 +1639,24 @@
                 document.getElementById('fullMemberStatus').value=member.status||'pending'; 
                 document.getElementById('fullMemberWallet').value=walletDoc.exists()?`E${walletDoc.data().balance.toFixed(2)}`:'E0.00'; 
                 document.getElementById('fullMemberJoined').value=member.createdAt?moment(member.createdAt.toDate()).format('MMMM D, YYYY'):'N/A'; 
-                document.getElementById('fullMemberGifts').value=(member.spiritualGifts||[]).join(', '); 
-                document.getElementById('fullMemberMinistries').value=(member.ministries||[]).join(', '); 
+                // Robust spiritualGifts / ministries display — handles legacy booleans, strings & arrays without crashing
+                const giftsDisplay = (function(v, gNames){
+                    if (Array.isArray(v)) return v.join(', ');
+                    if (typeof v === 'string') return v;
+                    if (v === true) {
+                        if (typeof gNames === 'string') return gNames;
+                        if (Array.isArray(gNames)) return gNames.join(', ');
+                        return '';
+                    }
+                    if (gNames) {
+                        if (Array.isArray(gNames)) return gNames.join(', ');
+                        if (typeof gNames === 'string') return gNames;
+                    }
+                    return '';
+                })(member.spiritualGifts, member.giftNames);
+                document.getElementById('fullMemberGifts').value=giftsDisplay; 
+                const ministriesDisplay = Array.isArray(member.ministries) ? member.ministries.join(', ') : (typeof member.ministries === 'string' ? member.ministries : '');
+                document.getElementById('fullMemberMinistries').value=ministriesDisplay; 
                 document.getElementById('fullMemberBio').value=member.bio||''; 
                 document.getElementById('fullMemberAdminNotes').value=member.adminNotes||''; 
                 document.getElementById('fullMemberPhoto').src=member.photoUrl||'https://via.placeholder.com/100'; 
@@ -1661,7 +1677,8 @@
             if(!uid) return; 
             const gifts=document.getElementById('fullMemberGifts').value.split(',').map(g=>g.trim()).filter(g=>g); 
             const ministries=document.getElementById('fullMemberMinistries').value.split(',').map(m=>m.trim()).filter(m=>m); 
-            const data={ membershipId:document.getElementById('fullMemberId').value.trim(), fullName:document.getElementById('fullMemberName').value, phone:document.getElementById('fullMemberPhone').value, idNumber:document.getElementById('fullMemberIdNumber').value, dateOfBirth:document.getElementById('fullMemberDob').value, gender:document.getElementById('fullMemberGender').value, maritalStatus:document.getElementById('fullMemberMarital').value, branch:document.getElementById('fullMemberBranch').value, role:document.getElementById('fullMemberRole').value, badge:document.getElementById('fullMemberBadge').value, status:document.getElementById('fullMemberStatus').value, bio:document.getElementById('fullMemberBio').value, spiritualGifts:gifts, ministries:ministries, adminNotes:document.getElementById('fullMemberAdminNotes').value, updatedAt:serverTimestamp(), updatedBy:adminUser?.email || adminUser?.uid }; 
+            // Keep both fields in sync for legacy membership page (boolean + giftNames) and new admin array shape
+            const data={ membershipId:document.getElementById('fullMemberId').value.trim(), fullName:document.getElementById('fullMemberName').value, phone:document.getElementById('fullMemberPhone').value, idNumber:document.getElementById('fullMemberIdNumber').value, dateOfBirth:document.getElementById('fullMemberDob').value, gender:document.getElementById('fullMemberGender').value, maritalStatus:document.getElementById('fullMemberMarital').value, branch:document.getElementById('fullMemberBranch').value, role:document.getElementById('fullMemberRole').value, badge:document.getElementById('fullMemberBadge').value, status:document.getElementById('fullMemberStatus').value, bio:document.getElementById('fullMemberBio').value, spiritualGifts:gifts, giftNames:gifts.join(', '), ministries:ministries, adminNotes:document.getElementById('fullMemberAdminNotes').value, updatedAt:serverTimestamp(), updatedBy:adminUser?.email || adminUser?.uid }; 
             showLoading(); 
             try{ 
                 await updateDoc(doc(db,"memberships",uid),data); 

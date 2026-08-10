@@ -1494,8 +1494,10 @@
         document.getElementById('editBaptDate').value = data.baptismDate || '';
         document.getElementById('editHolySpirit').checked = !!data.holySpiritBaptism;
         document.getElementById('editTongues').checked = !!data.speaksTongues;
-        document.getElementById('editGifts').checked = !!data.spiritualGifts;
-        document.getElementById('editGiftNames').value = (Array.isArray(data.giftNames) ? data.giftNames.join(', ') : (data.giftNames || ''));
+        // Robust: handle boolean (legacy) or array (admin) without crashing
+        document.getElementById('editGifts').checked = Array.isArray(data.spiritualGifts) ? data.spiritualGifts.length > 0 : !!data.spiritualGifts;
+        const giftNamesFallback = Array.isArray(data.spiritualGifts) ? data.spiritualGifts.join(', ') : (typeof data.spiritualGifts === 'string' ? data.spiritualGifts : '');
+        document.getElementById('editGiftNames').value = (Array.isArray(data.giftNames) ? data.giftNames.join(', ') : (data.giftNames || giftNamesFallback));
         document.getElementById('editBio').value = data.bio || '';
 
         const mins = Array.isArray(data.ministries) ? data.ministries : [];
