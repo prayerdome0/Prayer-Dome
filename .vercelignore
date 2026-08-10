@@ -27,6 +27,10 @@
 functions/*
 !functions/share.js
 
-# Only the public-bundle builder is needed during the Vercel build.
+# Only the public-bundle builder and the postinstall hook are needed during
+# the Vercel build. Vercel still runs `npm install` for the deployment even
+# with "installCommand" overridden, so the postinstall script referenced by
+# package.json must survive the upload filter (it no-ops when VERCEL is set).
 scripts/*
 !scripts/build-vercel.mjs
+!scripts/install-functions.mjs
