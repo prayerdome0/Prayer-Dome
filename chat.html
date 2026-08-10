@@ -130,6 +130,8 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <!-- PeerJS uses the free public signalling server for one-to-one calls. Media stays peer-to-peer. -->
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1290,7 +1292,7 @@
                         <h2 id="currentRoomName">🌍 General Fellowship</h2>
                         <p id="currentRoomDesc">Welcome all believers - share encouragement and prayer</p>
                     </div>
-                    <div class="chat-actions" id="chatActions"></div>
+                    <div class="chat-actions" id="chatActions"><button class="header-btn" title="Voice call" onclick="startCall(false)"><i class="fas fa-phone"></i></button><button class="header-btn" title="Video call" onclick="startCall(true)"><i class="fas fa-video"></i></button></div>
                 </div>
                 
                 <div class="messages-area" id="messagesArea">
@@ -1501,6 +1503,23 @@
         </div>
     </div>
     
+    <!-- Lightweight one-to-one call surface (PeerJS WebRTC; no paid API key required). -->
+    <div id="callModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content" style="max-width:680px;">
+            <h3 id="callTitle" style="color:var(--accent-green);"><i class="fas fa-phone"></i> Prayer Dome call</h3>
+            <p id="callStatus" style="color:var(--text-sub);">Connecting securely…</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#071b35;padding:10px;border-radius:14px;">
+                <video id="localCallVideo" autoplay muted playsinline style="width:100%;border-radius:10px;background:#000;min-height:150px;"></video>
+                <video id="remoteCallVideo" autoplay playsinline style="width:100%;border-radius:10px;background:#000;min-height:150px;"></video>
+            </div>
+            <div style="display:flex;justify-content:center;gap:10px;margin-top:15px;">
+                <button class="header-btn" onclick="toggleCallMic()" title="Mute microphone"><i class="fas fa-microphone" id="callMicIcon"></i></button>
+                <button class="header-btn" onclick="toggleCallCamera()" title="Camera on/off"><i class="fas fa-video" id="callCameraIcon"></i></button>
+                <button class="header-btn" style="background:#dc2626;color:white;" onclick="endCall()"><i class="fas fa-phone-slash"></i> End call</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, updateDoc, getDoc, setDoc, deleteDoc, where, getDocs, increment, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -1533,6 +1552,42 @@
         let isAdmin = false;
         let typingTimeout = null;
         let currentStatusId = null;
+        let callPeer = null, activeCall = null, callStream = null;
+
+        function initCallPeer() {
+            if (!window.Peer || !currentUser || callPeer) return;
+            // PeerJS's free cloud broker only exchanges connection metadata; audio/video is P2P.
+            callPeer = new Peer('prayerdome-' + currentUser.uid, { debug: 0 });
+            callPeer.on('call', async call => {
+                if (!confirm(`${call.metadata?.name || 'A member'} is calling you. Answer?`)) return;
+                await openCallMedia(call.metadata?.video !== false);
+                call.answer(callStream); activeCall = call; bindCall(call);
+            });
+            callPeer.on('error', e => console.warn('Call signalling:', e.type));
+        }
+        async function openCallMedia(video) {
+            callStream = await navigator.mediaDevices.getUserMedia({ audio:true, video:!!video });
+            document.getElementById('localCallVideo').srcObject = callStream;
+            document.getElementById('callModal').style.display = 'flex';
+        }
+        function bindCall(call) {
+            call.on('stream', stream => { document.getElementById('remoteCallVideo').srcObject = stream; document.getElementById('callStatus').textContent = 'Connected'; });
+            call.on('close', endCall); call.on('error', endCall);
+        }
+        window.startCall = async function(video) {
+            const chat = privateChats.find(c => c.id === currentRoom);
+            const target = chat?.participants?.find(id => id !== currentUser?.uid);
+            if (!target || currentChatType !== 'private') return showToast('Open a private chat before calling.', 'info');
+            try {
+                initCallPeer(); await openCallMedia(video);
+                const call = callPeer.call('prayerdome-' + target, callStream, { metadata:{ name: currentUser.displayName || 'A member', video } });
+                activeCall = call; bindCall(call); document.getElementById('callStatus').textContent = 'Calling…';
+            } catch(e) { showToast('Camera or microphone permission is required.', 'error'); endCall(); }
+        };
+        window.toggleCallMic = () => { const t=callStream?.getAudioTracks()[0]; if(t) t.enabled=!t.enabled; document.getElementById('callMicIcon').className=t?.enabled?'fas fa-microphone':'fas fa-microphone-slash'; };
+        window.toggleCallCamera = () => { const t=callStream?.getVideoTracks()[0]; if(t) t.enabled=!t.enabled; document.getElementById('callCameraIcon').className=t?.enabled?'fas fa-video':'fas fa-video-slash'; };
+        window.endCall = () => { activeCall?.close(); callStream?.getTracks().forEach(t=>t.stop()); activeCall=null; callStream=null; document.getElementById('remoteCallVideo').srcObject=null; document.getElementById('localCallVideo').srcObject=null; document.getElementById('callModal').style.display='none'; };
+
         
         // Rooms configuration
         const groupRooms = {
@@ -1552,6 +1607,7 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
+                initCallPeer();
                 await checkAdminStatus();
                 await loadUserProfile();
                 await loadPrivateChats();
@@ -1576,7 +1632,7 @@
                 if (isAdmin) {
                     const actionsDiv = document.getElementById('chatActions');
                     if (actionsDiv) {
-                        actionsDiv.innerHTML = '<button class="header-btn" onclick="showAdminPanel()" style="background: var(--accent-gold); color: black;"><i class="fas fa-shield-alt"></i> Admin</button>';
+                        actionsDiv.insertAdjacentHTML('beforeend', '<button class="header-btn" onclick="showAdminPanel()" style="background: var(--accent-gold); color: black;"><i class="fas fa-shield-alt"></i> Admin</button>');
                     }
                 }
             } catch(e) { console.error(e); }
@@ -1635,6 +1691,7 @@
                         chat.otherName = userSnap.exists() ? userSnap.data().displayName : 'User';
                         chat.otherPhoto = userSnap.exists() ? userSnap.data().photoURL : null;
                         chat.otherOnline = userSnap.exists() ? userSnap.data().online : false;
+                        chat.otherLastSeen = userSnap.exists() ? userSnap.data().lastSeen : null;
                     }
                     privateChats.push(chat);
                 }
@@ -1650,11 +1707,12 @@
         
         window.searchUsers = async () => {
             const search = document.getElementById('searchUser').value.toLowerCase().trim();
-            if (search.length < 2) return;
-            
             const usersRef = collection(db, "users");
-            const q = query(usersRef, where("displayName", ">=", search), where("displayName", "<=", search + '\uf8ff'));
-            const snapshot = await getDocs(q);
+            // Opening New Private Chat immediately shows the member directory;
+            // typing narrows it with a Firestore prefix query.
+            const snapshot = search.length < 2
+                ? await getDocs(usersRef)
+                : await getDocs(query(usersRef, where("displayName", ">=", search), where("displayName", "<=", search + '\uf8ff')));
             
             const resultsDiv = document.getElementById('userSearchResults');
             let html = '';
@@ -1729,7 +1787,7 @@
                             ${escapeHtml(room.name)}
                             ${isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
                         </div>
-                        <div class="room-preview">${room.type === 'group' ? 'Tap to join conversation' : 'Private chat'}</div>
+                        <div class="room-preview">${room.type === 'group' ? 'Tap to join conversation' : (room.online ? 'online' : 'last seen recently')}</div>
                     </div>
                     ${room.unread > 0 ? `<div class="room-badge">${room.unread}</div>` : ''}
                 </div>
@@ -1746,7 +1804,7 @@
                     <div class="room-avatar">${room.type === 'group' ? room.icon : '👤'}</div>
                     <div class="room-info">
                         <div class="room-name">${escapeHtml(room.name)}</div>
-                        <div class="room-preview">${room.type === 'group' ? 'Tap to join conversation' : 'Private chat'}</div>
+                        <div class="room-preview">${room.type === 'group' ? 'Tap to join conversation' : (room.online ? 'online' : 'last seen recently')}</div>
                     </div>
                 </div>
             `).join('');
@@ -1957,19 +2015,23 @@
         };
 
         // Media upload functions
+        // Keep one pending attachment so every media button (photo, file, voice)
+        // uses the same send pipeline.
         let pendingMedia1 = null;
+        function setPendingMedia(media) { pendingMedia = media; pendingMedia1 = media; }
         
         window.uploadPhoto = () => {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
+            // Mobile browsers expose Gallery, Photos and Camera from this native picker.
             input.onchange = async (e) => {
                 const file = e.target.files[0];
                 if (file) {
                     showToast("Uploading image...", "info");
                     const url = await uploadToCloudinary(file);
                     if (url) {
-                        pendingMedia1 = { url: url, type: 'image', name: file.name };
+                        setPendingMedia({ url: url, type: 'image', name: file.name });
                         const msgInput = document.getElementById('messageInput');
                         if (msgInput) {
                             msgInput.placeholder = 'Add a caption (optional)...';
@@ -1992,7 +2054,7 @@
                     showToast("Uploading video...", "info");
                     const url = await uploadToCloudinary(file);
                     if (url) {
-                        pendingMedia1 = { url: url, type: 'video', name: file.name };
+                        setPendingMedia({ url: url, type: 'video', name: file.name });
                         showToast("Video ready! Send your message.", "success");
                     }
                 }
@@ -2003,14 +2065,14 @@
         window.uploadDocument = () => {
             const input = document.createElement('input');
             input.type = 'file';
-            input.accept = '.pdf,.doc,.docx,.txt';
+            input.accept = '.pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx,.zip,application/*,text/*';
             input.onchange = async (e) => {
                 const file = e.target.files[0];
                 if (file) {
                     showToast("Uploading document...", "info");
                     const url = await uploadToCloudinary(file);
                     if (url) {
-                        pendingMedia1 = { url: url, type: 'document', name: file.name };
+                        setPendingMedia({ url: url, type: 'document', name: file.name });
                         showToast("Document ready! Send your message.", "success");
                     }
                 }
@@ -2084,7 +2146,7 @@
             showToast("Uploading voice message...", "info");
             const url = await uploadToCloudinary(recordedBlob);
             if (url) {
-                pendingMedia1 = { url: url, type: 'audio', name: 'Voice message' };
+                setPendingMedia({ url: url, type: 'audio', name: 'Voice message' });
                 await sendMessage();
                 closeVoiceModal();
             }

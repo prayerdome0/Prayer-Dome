@@ -47,3 +47,14 @@ The complete **[Prayer Dome Website User Guide](https://prayerdome.net/Prayer-Do
 ## Help
 
 Use the **[Contact page](https://prayerdome.net/contact.html)** for prayer support, account help, document requests or accessibility feedback. When reporting a website problem, include the page name, what you selected and what appeared. Never send your password.
+
+## Free service configuration
+
+The community features use services with free tiers and browser APIs:
+
+- **Firebase Authentication + Firestore** — sign-in, member profiles, presence, chat, receipts, typing, live chat and reactions.
+- **Cloudinary unsigned upload** — photos, documents and voice notes upload directly in the background using the existing `cloudName` and upload-preset names. The browser never opens a Cloudinary page. Keep API secrets server-side.
+- **HLS.js** — free open-source HLS playback for live broadcasts. Admins can publish with OBS, Larix or PRISM using the RTMP details in Admin → Live.
+- **PeerJS WebRTC** — one-to-one voice and video calling through the free public signalling broker; the media connection is peer-to-peer and needs no paid API key.
+
+Free tiers have quotas and are not a guarantee of production-scale capacity. Configure Firebase rules and Cloudinary upload presets before launch, and never put a Cloudinary API secret in browser code.

@@ -1029,7 +1029,7 @@
                         <div class="form-group"><label>Full Name</label><input type="text" id="fullMemberName" class="form-control"></div>
                         <div class="form-group"><label>Email</label><input type="email" id="fullMemberEmail" class="form-control" readonly></div>
                         <div class="form-group"><label>Phone</label><input type="tel" id="fullMemberPhone" class="form-control"></div>
-                        <div class="form-group"><label>Membership ID</label><input type="text" id="fullMemberId" class="form-control" readonly></div>
+                        <div class="form-group"><label>Membership ID</label><input type="text" id="fullMemberId" class="form-control" placeholder="Membership ID"></div>
                         <div class="form-group"><label>ID Number</label><input type="text" id="fullMemberIdNumber" class="form-control"></div>
                         <div class="form-group"><label>Date of Birth</label><input type="date" id="fullMemberDob" class="form-control"></div>
                         <div class="form-group"><label>Gender</label><select id="fullMemberGender" class="form-control"><option>Male</option><option>Female</option></select></div>
@@ -1050,7 +1050,7 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer"><button class="btn btn-danger" id="suspendFullBtn">Suspend</button><button class="btn btn-outline" onclick="closeModal('modalFullMemberDetails')">Cancel</button><button class="btn btn-primary" onclick="saveFullMemberDetails()">Save Changes</button></div>
+            <div class="modal-footer"><button class="btn btn-danger" id="suspendFullBtn">Suspend</button><button class="btn btn-warning" type="button" onclick="resetMemberAccount()"><i class="fas fa-rotate-left"></i> Reset Account</button><button class="btn btn-outline" onclick="closeModal('modalFullMemberDetails')">Cancel</button><button class="btn btn-primary" onclick="saveFullMemberDetails()">Save Changes</button></div>
         </div>
     </div>
 
@@ -1661,7 +1661,7 @@
             if(!uid) return; 
             const gifts=document.getElementById('fullMemberGifts').value.split(',').map(g=>g.trim()).filter(g=>g); 
             const ministries=document.getElementById('fullMemberMinistries').value.split(',').map(m=>m.trim()).filter(m=>m); 
-            const data={ fullName:document.getElementById('fullMemberName').value, phone:document.getElementById('fullMemberPhone').value, idNumber:document.getElementById('fullMemberIdNumber').value, dateOfBirth:document.getElementById('fullMemberDob').value, gender:document.getElementById('fullMemberGender').value, maritalStatus:document.getElementById('fullMemberMarital').value, branch:document.getElementById('fullMemberBranch').value, role:document.getElementById('fullMemberRole').value, badge:document.getElementById('fullMemberBadge').value, status:document.getElementById('fullMemberStatus').value, bio:document.getElementById('fullMemberBio').value, spiritualGifts:gifts, ministries:ministries, adminNotes:document.getElementById('fullMemberAdminNotes').value, updatedAt:serverTimestamp(), updatedBy:adminUser?.email || adminUser?.uid }; 
+            const data={ membershipId:document.getElementById('fullMemberId').value.trim(), fullName:document.getElementById('fullMemberName').value, phone:document.getElementById('fullMemberPhone').value, idNumber:document.getElementById('fullMemberIdNumber').value, dateOfBirth:document.getElementById('fullMemberDob').value, gender:document.getElementById('fullMemberGender').value, maritalStatus:document.getElementById('fullMemberMarital').value, branch:document.getElementById('fullMemberBranch').value, role:document.getElementById('fullMemberRole').value, badge:document.getElementById('fullMemberBadge').value, status:document.getElementById('fullMemberStatus').value, bio:document.getElementById('fullMemberBio').value, spiritualGifts:gifts, ministries:ministries, adminNotes:document.getElementById('fullMemberAdminNotes').value, updatedAt:serverTimestamp(), updatedBy:adminUser?.email || adminUser?.uid }; 
             showLoading(); 
             try{ 
                 await updateDoc(doc(db,"memberships",uid),data); 
@@ -1674,6 +1674,26 @@
             finally { hideLoading(); } 
         };
         
+        // Reset only member-facing profile/session data; never delete the membership record.
+        // This gives admins a safe recovery action without touching authentication credentials.
+        window.resetMemberAccount = async function() {
+            const uid = document.getElementById('editMemberId').value;
+            if (!uid || !confirm('Reset this member profile? Their membership record and ID will be kept.')) return;
+            showLoading();
+            try {
+                await setDoc(doc(db, 'users', uid), {
+                    displayName: '', photoURL: null, coverPhotoURL: null,
+                    bio: '', settings: { notifications: true, sound: true, readReceipts: true, showOnline: true },
+                    profileResetAt: serverTimestamp(), profileResetBy: adminUser?.email || adminUser?.uid
+                }, { merge: true });
+                await updateDoc(doc(db, 'memberships', uid), { profileResetAt: serverTimestamp(), profileResetBy: adminUser?.email || adminUser?.uid });
+                await logAdminActivity('member_profile_reset', { memberId: uid });
+                toast('Member profile reset. Sign-in credentials were not changed.');
+                closeModal('modalFullMemberDetails');
+            } catch (e) { toast('Could not reset profile: ' + e.message, 'error'); }
+            finally { hideLoading(); }
+        };
+
         window.suspendMemberFull = async function(uid) { 
             if(!confirm("Suspend this member?")) return; 
             showLoading(); 
