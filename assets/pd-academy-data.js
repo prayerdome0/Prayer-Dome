@@ -716,47 +716,63 @@
       foundations: [
         ['What does salvation come through?', 'Good works only', 'Grace through faith in Christ', 'Family tradition', 'Wealth', 1],
         ['Which passage says Scripture is God-breathed?', 'Psalm 23', '2 Timothy 3:16-17', 'Proverbs 3:5', 'Ruth 1:16', 1],
-        ['Faith without works is described as what?', 'Powerful', 'Private', 'Dead', 'Enough', 2]
+        ['Faith without works is described as what?', 'Powerful', 'Private', 'Dead', 'Enough', 2],
+        ['Repentance means what?', 'Doing more good works', 'Turning away from sin and back to God', 'Feeling guilty forever', 'Perfect behaviour', 1],
+        ['What helps us grow closer to God day by day?', 'Reading His Word and praying', 'Church attendance only', 'Following trends', 'Nothing at all', 0],
+        ['According to Hebrews 11, faith is confidence in what?', 'What we can see', 'What we hope for', 'What others say', 'Our own feelings', 1]
       ],
       prayer: [
         ['What did the disciples ask Jesus to teach them?', 'How to fast', 'How to pray', 'How to lead', 'How to give', 1],
         ['Where did Jesus pray before choosing the twelve?', 'In the temple', 'On a mountain all night', 'By the sea at noon', 'In a cave', 1],
-        ['Biblical fasting should be done with what motive?', 'To be seen by people', 'To draw near to God', 'To force God', 'To replace love', 1]
+        ['Biblical fasting should be done with what motive?', 'To be seen by people', 'To draw near to God', 'To force God', 'To replace love', 1],
+        ['Jesus taught His disciples to pray for what daily?', 'Daily bread', 'Wealth', 'Fame', 'Safety only', 0],
+        ['Where does Jesus encourage private prayer?', 'In the marketplace', 'In your room', 'On the street corner', 'Only in church', 1],
+        ['Praying in the Spirit is guided by whom?', 'Our own effort', 'The Holy Spirit', 'Angels only', 'Emotions alone', 1]
       ],
       word: [
         ['What is the first step in the study method taught here?', 'Application only', 'Observation', 'Debate', 'Memory only', 1],
         ['Scripture is described as a what to our path?', 'Lamp', 'Wall', 'Shadow', 'Noise', 0],
-        ['A testimony should mainly point to whom?', 'Ourselves', 'Jesus', 'A pastor only', 'Luck', 1]
+        ['A testimony should mainly point to whom?', 'Ourselves', 'Jesus', 'A pastor only', 'Luck', 1],
+        ['The Bible is inspired by whom?', 'Church leaders', 'God through the Holy Spirit', 'Poets only', 'Kings', 1],
+        ['Meditating on Scripture means doing what?', 'Forgetting it quickly', 'Chewing it over in the heart', 'Reading it once', 'Criticizing it', 1],
+        ['A disciple lets God’s Word do what?', 'Remain unused', 'Transform their life', 'Stay theoretical', 'Bring pride', 1]
       ],
       spirit: [
         ['Jesus called the Holy Spirit another what?', 'Lawgiver', 'Helper', 'Servant', 'Accuser', 1],
         ['Which list includes love, joy and peace?', 'Gifts of the Spirit', 'Fruit of the Spirit', 'Ten Commandments', 'Beatitudes only', 1],
-        ['Spiritual gifts are given to do what?', 'Compete with others', 'Edify the church', 'Make people proud', 'Replace love', 1]
+        ['Spiritual gifts are given to do what?', 'Compete with others', 'Edify the church', 'Make people proud', 'Replace love', 1],
+        ['Who baptizes believers in the Holy Spirit?', 'A pastor only', 'Jesus', 'The believer', 'An angel', 1],
+        ['What does the Spirit of truth do?', 'Guides us into all truth', 'Hides the truth', 'Confuses us', 'Speaks only to prophets', 0],
+        ['How is the fruit of the Spirit produced?', 'By self-effort', 'By abiding in Christ', 'By imitation only', 'Instantly', 1]
       ],
       character: [
         ['What should replace anxiety according to Philippians 4?', 'Silence only', 'Prayer and thanksgiving', 'Worry planning only', 'Isolation', 1],
         ['Faithfulness in little things leads to what?', 'Nothing important', 'Greater responsibility', 'Pride always', 'Secret sin', 1],
-        ['How should believers treat one another according to Colossians 3?', 'Compete', 'Forgive', 'Avoid forever', 'Judge only', 1]
+        ['How should believers treat one another according to Colossians 3?', 'Compete', 'Forgive', 'Avoid forever', 'Judge only', 1],
+        ['The greatest virtue, according to 1 Corinthians 13, is what?', 'Faith', 'Love', 'Knowledge', 'Talent', 1],
+        ['Humility means what?', 'Thinking less of yourself', 'Depending on God and esteeming others', 'Weakness', 'Silence always', 1],
+        ['Growing in character involves doing what?', 'Reaching instant perfection', 'Yielding daily to the Spirit', 'Isolating from others', 'Never failing', 1]
       ],
       mission: [
         ['The Great Commission tells believers to make what?', 'Money', 'Disciples', 'Buildings only', 'Rules only', 1],
         ['The church is described as one what with many members?', 'Army only', 'Body', 'Mountain', 'Business', 1],
-        ['God loves what kind of giver?', 'Reluctant', 'Cheerful', 'Forced', 'Anonymous only', 1]
+        ['God loves what kind of giver?', 'Reluctant', 'Cheerful', 'Forced', 'Anonymous only', 1],
+        ['Sharing the gospel with others is often called what?', 'Evangelism', 'Entertainment', 'Business', 'Politics', 0],
+        ['Serving others is modelled on whom?', 'Famous leaders', 'Jesus, who came to serve', 'Only the clergy', 'Our own gain', 1],
+        ['A good steward uses their gifts to do what?', 'Serve God and others', 'Build their own fame', 'Hide them', 'Compare with others', 1]
       ]
     };
-    var base = banks[lesson.trackId][idx % 3];
-    if (idx === 3) {
-      return ['What should you do after studying this lesson?', 'Forget it quickly', 'Apply one action step', 'Compare yourself proudly', 'Keep it secret forever', 1];
-    }
-    if (idx === 4) {
-      return ['What score is required to earn a lesson certificate?', '50% or higher', '60% or higher', '80% or higher', 'No score required', 2];
-    }
-    return base;
+    return banks[lesson.trackId][idx];
   }
 
   var quizzes = lessons.map(function (lesson) {
     var questions = [];
+    // 6 subject questions drawn from the expanded bank (see questionForLesson).
     for (var i = 0; i < 6; i++) questions.push(questionForLesson(lesson, i));
+    // 2 shared reflection questions. The full pool is kept so that every
+    // attempt can present a different random set of questions.
+    questions.push(['What should you do after studying this lesson?', 'Forget it quickly', 'Apply one action step', 'Compare yourself proudly', 'Keep it secret forever', 1]);
+    questions.push(['What score is required to earn a lesson certificate?', '50% or higher', '60% or higher', '80% or higher', 'No score required', 2]);
     return {
       id: 'quiz-' + lesson.id,
       lessonId: lesson.id,

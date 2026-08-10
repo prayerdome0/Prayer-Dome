@@ -260,7 +260,7 @@ t('admin dashboard no longer contains legacy overview statistic cards',
    'statPendingClaims', 'statActivePrayers'].every(id => !adminHtml.includes(id)));
 t('admin certificates tracker exists and is wired in',
   ['view-certificates', 'loadCertificates', 'exportCertificatesCSV',
-   'certTotalDownloads', 'switchView(\'certificates\''].every(s => adminHtml.includes(s)));
+   'certificateCompletionChart', 'renderCertificateCompletionChart', 'switchView(\'certificates\''].every(s => adminHtml.includes(s)));
 
 // Account page: personal certificate library.
 const accountHtml = fs.readFileSync(path.join(ROOT, 'account.html'), 'utf8');

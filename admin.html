@@ -924,11 +924,18 @@
             <!-- CERTIFICATES TRACKER VIEW -->
             <div id="view-certificates" class="section-view">
                 <div class="page-title"><span><i class="fas fa-award"></i> Certificates Tracker</span><button class="btn btn-primary" onclick="loadCertificates()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
-                <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 20px;">
-                    <div class="kpi-card" style="cursor: default;"><div class="kpi-icon blue"><i class="fas fa-certificate"></i></div><div class="kpi-details"><h3 id="certTotalIssued">0</h3><p>Certificates Issued</p></div></div>
-                    <div class="kpi-card" style="cursor: default;"><div class="kpi-icon gold"><i class="fas fa-calendar-week"></i></div><div class="kpi-details"><h3 id="certThisMonth">0</h3><p>Issued This Month</p></div></div>
-                    <div class="kpi-card" style="cursor: default;"><div class="kpi-icon green"><i class="fas fa-download"></i></div><div class="kpi-details"><h3 id="certTotalDownloads">0</h3><p>Total Downloads</p></div></div>
-                </div>
+                <section class="performance-card" aria-labelledby="certCompletionTitle" style="margin-bottom: 20px;">
+                    <div class="performance-header">
+                        <div>
+                            <h3 id="certCompletionTitle"><i class="fas fa-chart-column"></i> Lesson completion &amp; certificates</h3>
+                            <p>Members who completed each lesson and earned its certificate.</p>
+                        </div>
+                    </div>
+                    <div id="certificateCompletionChart" class="performance-chart" role="img" aria-label="Certificate completion by lesson chart">
+                        <span class="performance-loading"><i class="fas fa-circle-notch fa-spin"></i> Loading completion chart…</span>
+                    </div>
+                    <div id="certificateCompletionLegend" class="performance-legend" aria-label="Chart legend"></div>
+                </section>
                 <div class="panel-card">
                     <div class="panel-header">
                         <h3><i class="fas fa-list"></i> Issued Certificates <span style="font-weight:400; font-size:.7rem; color:var(--text-sub);">— every Academy certificate earned by members, tracked live (score, ID, download count)</span></h3>
@@ -1322,14 +1329,7 @@
                 (c.course || c.title || '').toLowerCase().includes(q) ||
                 (c.id || '').toLowerCase().includes(q));
 
-            document.getElementById('certTotalIssued').innerText = allCertificatesCache.length;
-            const now = new Date();
-            const monthCount = allCertificatesCache.filter(c => {
-                const d = c.date ? new Date(c.date) : null;
-                return d && !isNaN(d) && d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-            }).length;
-            document.getElementById('certThisMonth').innerText = monthCount;
-            document.getElementById('certTotalDownloads').innerText = allCertificatesCache.reduce((s, c) => s + (Number(c.downloads) || 0), 0);
+            renderCertificateCompletionChart();
 
             if (!rows.length) {
                 tbody.innerHTML = '<tr><td colspan="7">No certificates yet. When members pass Academy quizzes at 80% or higher, their certificates appear here automatically.</td></tr>';
@@ -1351,6 +1351,41 @@
         };
 
         window.filterCertificates = function () { renderCertificates(); };
+
+        function renderCertificateCompletionChart() {
+            const root = document.getElementById('certificateCompletionChart');
+            const legend = document.getElementById('certificateCompletionLegend');
+            if (!root) return;
+            if (!allCertificatesCache.length) {
+                root.innerHTML = '<p>No certificates yet. When members pass Academy quizzes at 80% or higher, their certificates appear here automatically.</p>';
+                if (legend) legend.innerHTML = '';
+                return;
+            }
+            const counts = {};
+            allCertificatesCache.forEach(c => {
+                const course = String(c.course || c.title || 'Prayer Dome Academy').trim();
+                counts[course] = (counts[course] || 0) + 1;
+            });
+            const rows = Object.keys(counts)
+                .map(course => ({ course, count: counts[course] }))
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 15);
+            const maxCount = Math.max(1, ...rows.map(r => r.count));
+            const barH = 26, gap = 14, padL = 230, padR = 40, padTop = 16, padBottom = 24;
+            const chartW = 760;
+            const chartH = padTop + rows.length * (barH + gap) + padBottom;
+            let svg = `<svg viewBox="0 0 ${chartW} ${chartH}" role="img" aria-label="Certificate completion by lesson"><title id="certSvgTitle">Certificate completion by lesson</title>`;
+            rows.forEach((row, i) => {
+                const y = padTop + i * (barH + gap);
+                const barW = Math.max(3, (row.count / maxCount) * (chartW - padL - padR));
+                svg += `<text x="${padL - 12}" y="${y + barH / 2 + 4}" text-anchor="end" fill="var(--text-sub)" font-size="11">${escapeHTML(row.course)}</text>`;
+                svg += `<rect x="${padL}" y="${y}" width="${barW.toFixed(1)}" height="${barH}" rx="6" fill="#10b981"><title>${escapeHTML(row.course)}: ${row.count} certificate${row.count === 1 ? '' : 's'}</title></rect>`;
+                svg += `<text x="${padL + barW + 8}" y="${y + barH / 2 + 4}" fill="var(--ink, #111)" font-size="11" font-weight="600">${row.count}</text>`;
+            });
+            svg += '</svg>';
+            root.innerHTML = svg;
+            if (legend) legend.innerHTML = '<span><i style="background:#10b981"></i>Certificates earned per lesson (people who completed the lesson and earned its certificate)</span>';
+        }
 
         window.deleteCertificate = async function (docId) {
             if (!docId || !confirm('Delete this certificate record? The member will still keep their own copy on their account.')) return;

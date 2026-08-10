@@ -1222,6 +1222,12 @@
 
         window.addEventListener('beforeunload', () => saveProgress());
 
+        let currentAcademyQuestions = [];
+        function sampleAcademyQuestions(q, count){
+            const pool=q.questions.map((raw,i)=>({raw,id:i}));
+            const picked=shuffleArray(pool).slice(0,Math.min(count,pool.length));
+            return picked.map(p=>({ id:p.id, raw:p.raw }));
+        }
         function academyProgress(){ try{ return JSON.parse(localStorage.getItem('pd_academy_progress'))||{completedLessons:[],passedQuizzes:{},certificates:[]}; }catch(e){ return {completedLessons:[],passedQuizzes:{},certificates:[]}; } }
         function saveAcademyProgress(p){ localStorage.setItem('pd_academy_progress', JSON.stringify(p)); renderAcademyQuizzes(); }
         function escapeAcademyHtml(v){ const d=document.createElement('div'); d.textContent=v==null?'':String(v); return d.innerHTML; }
@@ -1233,7 +1239,7 @@
                 const lesson=PD_ACADEMY.getLesson(q.lessonId); const passed=progress.passedQuizzes && progress.passedQuizzes[q.id];
                 return `<button class="pd-acad-card pd-lift" onclick="openAcademyQuiz('${q.id}')" style="text-align:left;cursor:pointer">
                     <div class="pd-acad-icon gold"><i class="fas ${passed?'fa-certificate':'fa-star'}"></i></div>
-                    <h3>${q.title}</h3><p>${q.track} · ${q.questions.length} questions · Pass 80%</p>
+                    <h3>${q.title}</h3><p>${q.track} · 5 questions each attempt · Pass 80%</p>
                     <div class="pd-acad-meta"><span class="pd-acad-chip ${passed?'gold':''}">${passed?'Certificate earned':'Ready to take'}</span>${lesson?`<span class="pd-acad-chip">${lesson.minutes} min lesson</span>`:''}</div>
                 </button>`;
             }).join('');
@@ -1244,9 +1250,12 @@
             document.getElementById('academyModalTitle').textContent=q.title;
             document.getElementById('academyModalDesc').textContent=q.description;
             document.getElementById('academyModalResult').innerHTML='';
-            document.getElementById('academyModalQuestions').innerHTML=q.questions.map((raw,i)=>{
+            // Random set each time so a retake never repeats the same questions.
+            currentAcademyQuestions = sampleAcademyQuestions(q, 5);
+            document.getElementById('academyModalQuestions').innerHTML=currentAcademyQuestions.map((qz,i)=>{
+                const raw=qz.raw;
                 const opts=shuffleArray([{t:raw[1],c:raw[5]===0},{t:raw[2],c:raw[5]===1},{t:raw[3],c:raw[5]===2},{t:raw[4],c:raw[5]===3}]);
-                return `<div class="pd-acad-quiz-q"><p>${i+1}. ${raw[0]}</p>${opts.map(o=>`<label class="pd-acad-option"><input type="radio" name="aq-${id}-${i}" value="${o.c?1:0}"><span>${o.t}</span></label>`).join('')}</div>`;
+                return `<div class="pd-acad-quiz-q"><p>${i+1}. ${raw[0]}</p>${opts.map(o=>`<label class="pd-acad-option"><input type="radio" name="aq-${id}-${qz.id}" value="${o.c?1:0}"><span>${o.t}</span></label>`).join('')}</div>`;
             }).join('');
             document.getElementById('academyQuizModal').style.display='flex';
         };
@@ -1254,9 +1263,9 @@
         window.submitAcademyModalQuiz=function(){
             const title=document.getElementById('academyModalTitle').textContent;
             const q=PD_ACADEMY.DATA.quizzes.find(x=>x.title===title); if(!q) return;
-            let score=0; const total=q.questions.length;
-            q.questions.forEach((raw,i)=>{
-                const selected=document.querySelector(`input[name="aq-${q.id}-${i}"]:checked`);
+            let score=0; const total=currentAcademyQuestions.length;
+            currentAcademyQuestions.forEach((qz)=>{
+                const selected=document.querySelector(`input[name="aq-${q.id}-${qz.id}"]:checked`);
                 if(selected && selected.value === '1') score++;
             });
             const percent=Math.round(score/total*100); const result=document.getElementById('academyModalResult');
@@ -1284,7 +1293,8 @@
                         createdAt: serverTimestamp()
                     }, { merge: true }).catch(() => {});
                 }
-                result.innerHTML=`<div class="pd-acad-cert"><img class="pd-acad-cert-logo" src="/assets/logo.png" alt="Prayer Dome logo"><span class="pd-acad-cert-brand">Prayer Dome Academy</span><h3>Certificate of Completion</h3><p>This certifies that</p><div class="name">${escapeAcademyHtml(academyName())}</div><p>has completed</p><h3 class="cert-course">${q.title}</h3><p class="cert-meta">Score: ${percent}% · Certificate ID: ${certId}</p><p class="pd-acad-cert-verse">“He does everything blamelessly.” — Mark 7:37</p><div class="pd-acad-cert-foot"><div class="pd-acad-cert-sign"><span class="sig">Prayer Dome</span><em>Ministry Team</em></div><div class="pd-acad-cert-seal"><i class="fas fa-award"></i></div></div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn-modern no-print" id="academyModalDownloadCert" style="background:linear-gradient(135deg,var(--accent-green),var(--accent-gold));color:#fff"><i class="fas fa-download"></i> Download Certificate</button><button class="btn-modern no-print" onclick="window.print()" style="background:var(--accent-gold);color:#1f2937"><i class="fas fa-print"></i> Print / Save</button></div></div>`;
+                const nextLesson = lesson && lesson.nextLessonId ? PD_ACADEMY.getLesson(lesson.nextLessonId) : null;
+                result.innerHTML=`<div class="pd-acad-cert"><img class="pd-acad-cert-logo" src="/assets/logo.png" alt="Prayer Dome logo"><span class="pd-acad-cert-brand">Prayer Dome Academy</span><h3>Certificate of Completion</h3><p>This certifies that</p><div class="name">${escapeAcademyHtml(academyName())}</div><p>has completed</p><h3 class="cert-course">${q.title}</h3><p class="cert-meta">Score: ${percent}% · Certificate ID: ${certId}</p><p class="pd-acad-cert-verse">“He does everything blamelessly.” — Mark 7:37</p><div class="pd-acad-cert-foot"><div class="pd-acad-cert-sign"><span class="sig">Prayer Dome</span><em>Ministry Team</em></div><div class="pd-acad-cert-seal"><i class="fas fa-award"></i></div></div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn-modern no-print" id="academyModalDownloadCert" style="background:linear-gradient(135deg,var(--accent-green),var(--accent-gold));color:#fff"><i class="fas fa-download"></i> Download Certificate</button><button class="btn-modern no-print" onclick="window.print()" style="background:var(--accent-gold);color:#1f2937"><i class="fas fa-print"></i> Print / Save</button>${nextLesson?`<a class="btn-modern no-print" href="/lessons#lesson/${encodeURIComponent(nextLesson.id)}" style="background:var(--accent-blue);color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:8px"><i class="fas fa-arrow-right"></i> Next lesson: ${escapeAcademyHtml(nextLesson.title)}</a>`:''}</div></div>`;
                 const pdCertDl=document.getElementById('academyModalDownloadCert');
                 if(pdCertDl){
                     if(window.PDCertificate){
@@ -1299,7 +1309,7 @@
                     } else { pdCertDl.style.display='none'; }
                 }
             } else {
-                result.innerHTML=`<div class="pd-acad-callout"><strong>Try again.</strong> You scored ${percent}%. Review the linked lesson and aim for 80% or higher.</div>`;
+                result.innerHTML=`<div class="pd-acad-callout"><strong>Try again.</strong> You scored ${percent}%. Review the linked lesson and aim for 80% or higher. The questions change each time you retake.</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px"><button class="btn-modern" onclick="openAcademyQuiz('${q.id}')" style="background:var(--accent-blue);color:#fff"><i class="fas fa-redo"></i> Retake Quiz</button></div>`;
             }
         };
         document.addEventListener('DOMContentLoaded', renderAcademyQuizzes);
