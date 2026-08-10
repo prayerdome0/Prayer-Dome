@@ -14,7 +14,7 @@
     "mobile:run": "npm run mobile:sync && npx cap run android",
     "mobile:build:debug": "npm run mobile:sync && cd android && ./gradlew assembleDebug",
     "mobile:build:release": "npm run mobile:sync && cd android && ./gradlew bundleRelease assembleRelease",
-    "test": "node tests/assistant.test.js && node tests/content.test.js && node tests/academy.test.js && node tests/admin.test.js && node tests/certificate.test.js && node tests/pages.test.js && node tests/premium.test.js && node tests/challenge.test.js && node tests/certificates.test.js && node tests/devotional.test.js",
+    "test": "node tests/assistant.test.js && node tests/content.test.js && node tests/academy.test.js && node tests/admin.test.js && node tests/certificate.test.js && node tests/pages.test.js && node tests/premium.test.js && node tests/challenge.test.js && node tests/certificates.test.js && node tests/devotional.test.js && node tests/geo.test.js",
     "lint": "node scripts/validate-production.mjs && python3 seo/apply-seo.py --check",
     "functions:verify": "npm --prefix functions install --no-audit --no-fund && npm --prefix functions run verify",
     "verify:all": "npm run lint && npm test && npm run functions:verify"

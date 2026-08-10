@@ -956,28 +956,90 @@
         countdownInterval = setInterval(updateTimer, 1000);
     }
     
-    async function getUserTimezone() {
+    let resolvedTimezone = null;
+
+    function localTimeIn(tz) {
         try {
-            const response = await fetch('https://ipapi.co/json/');
-            const data = await response.json();
-            const timezoneSpan = document.getElementById('timezoneInfo');
-            if (timezoneSpan && data.timezone) {
-                timezoneSpan.innerHTML = `<i class="fas fa-globe"></i> Your timezone: ${data.timezone} | ${data.city || ''}, ${data.country_name || ''}`;
-            }
-            return data.timezone;
-        } catch (error) {
-            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            const timezoneSpan = document.getElementById('timezoneInfo');
-            if (timezoneSpan) timezoneSpan.innerHTML = `<i class="fas fa-globe"></i> Your timezone: ${timezone}`;
-            return timezone;
+            return new Intl.DateTimeFormat([], { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
+        } catch (e) { return ''; }
+    }
+
+    function flagEmoji(countryCode) {
+        if (!countryCode || typeof countryCode !== 'string') return '';
+        return countryCode.toUpperCase().replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt(0)));
+    }
+
+    // Real IP-geolocation lookup (free, keyless, HTTPS): ipwho.is first
+    // (flag, region, timezone, local time, ISP), ipapi.co as fallback.
+    // Prefers the shared geo layer from pd-app.js (cached 24h).
+    async function getIpLocation() {
+        if (window.PDApp && PDApp.geo && typeof PDApp.geo.lookupIP === 'function') {
+            const viaShared = await PDApp.geo.lookupIP();
+            if (viaShared) return viaShared;
+            return null; // the shared layer already tried the network
         }
+        const endpoints = ['https://ipwho.is/', 'https://ipapi.co/json/'];
+        for (const url of endpoints) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) continue;
+                const data = await response.json();
+                const tz = data.timezone && typeof data.timezone === 'object' ? (data.timezone.id || null) : (data.timezone || null);
+                if (!tz) continue;
+                let flag = '';
+                if (data.flag && typeof data.flag === 'object') flag = data.flag.emoji || '';
+                else if (data.flag && typeof data.flag === 'string') flag = data.flag;
+                if (!flag) flag = flagEmoji(data.country_code || data.countryCode);
+                return {
+                    timezone: tz,
+                    city: data.city || null,
+                    region: data.region || data.regionName || null,
+                    country: data.country_name || data.country || null,
+                    flag: flag || null,
+                    lat: data.latitude != null ? Number(data.latitude) : null,
+                    lon: data.longitude != null ? Number(data.longitude) : null,
+                    isp: data.isp || (data.connection && (data.connection.isp || data.connection.org)) || null
+                };
+            } catch (e) { /* try next endpoint */ }
+        }
+        return null;
+    }
+
+    function renderTimezoneInfo(info, fallbackTz) {
+        const span = document.getElementById('timezoneInfo');
+        if (!span) return;
+        const tz = (info && info.timezone) || fallbackTz || '';
+        const place = [info && info.city, info && info.region, info && info.country].filter(Boolean).join(', ');
+        const flag = (info && info.flag) || '';
+        const clock = tz ? localTimeIn(tz) : '';
+        let text = 'Your timezone: ' + (tz || 'Local time');
+        if (place) text += ' | ' + (flag ? flag + ' ' : '') + place;
+        if (clock) text += ' · ' + clock;
+        span.innerHTML = '<i class="fas fa-globe"></i> ' + text;
+        resolvedTimezone = tz || null;
+    }
+
+    function updateTimezoneClock() {
+        const span = document.getElementById('timezoneInfo');
+        if (!span || !resolvedTimezone) return;
+        const clock = localTimeIn(resolvedTimezone);
+        if (!clock) return;
+        span.innerHTML = span.innerHTML.replace(/(\s*·\s*\d{1,2}:\d{2}\s*$)/, '') + ' · ' + clock;
+    }
+
+    async function getUserTimezone() {
+        let info = null;
+        try { info = await getIpLocation(); } catch (e) { info = null; }
+        const fallbackTz = Intl.DateTimeFormat().resolvedOptions().timeZone || null;
+        renderTimezoneInfo(info, fallbackTz);
+        return resolvedTimezone;
     }
     
     function initDevotionalSystem() {
         getUserTimezone();
         updateDevotionalUI();
         
-        // Check for period changes every minute
+        // Check for period changes every minute and tick the local clock
         setInterval(() => {
             const now = new Date();
             const lastPeriod = localStorage.getItem('lastDevotionalPeriod');
@@ -989,6 +1051,7 @@
                 localStorage.setItem('lastDevotionalPeriod', currentDevotional.period);
                 localStorage.setItem('lastDevotionalDate', now.toDateString());
             }
+            updateTimezoneClock();
         }, 60000);
         
         startCountdownTimer();

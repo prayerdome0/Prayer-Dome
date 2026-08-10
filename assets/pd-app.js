@@ -385,6 +385,84 @@
     }
   };
 
+  /* ------------------------------------------------------------------ geo */
+  // Real IP-geolocation via free, keyless HTTPS APIs — ipwho.is (rich:
+  // flag, region, timezone, local time, ISP) with ipapi.co as fallback.
+  // Results are cached for 24h so repeat visits are instant and the free
+  // quotas are never stressed.
+  var GEO_CACHE_KEY = 'pd_ip_geo';
+  var GEO_CACHE_TTL = 24 * 60 * 60 * 1000;
+  var geo = {
+    // Two-letter ISO country code -> flag emoji (regional indicators).
+    flagEmoji: function (code) {
+      if (!code || typeof code !== 'string') return '';
+      return code.toUpperCase().replace(/./g, function (ch) {
+        return String.fromCodePoint(127397 + ch.charCodeAt(0));
+      });
+    },
+    formatLocalTime: function (tz, date) {
+      try {
+        return new Intl.DateTimeFormat([], {
+          timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false
+        }).format(date || new Date());
+      } catch (e) { return ''; }
+    },
+    // Accepts either the ipwho.is shape or the ipapi.co shape.
+    normalize: function (raw, source) {
+      if (!raw || raw.success === false) return null;
+      var tz = raw.timezone;
+      if (tz && typeof tz === 'object') tz = tz.id || null;
+      if (!tz) return null;
+      var flag = '';
+      if (raw.flag && typeof raw.flag === 'object') flag = raw.flag.emoji || '';
+      else if (raw.flag && typeof raw.flag === 'string') flag = raw.flag;
+      var conn = raw.connection && typeof raw.connection === 'object'
+        ? (raw.connection.isp || raw.connection.org || '') : (raw.isp || '');
+      var info = {
+        source: source,
+        timezone: tz,
+        city: raw.city || null,
+        region: raw.region || raw.regionName || null,
+        country: raw.country_name || raw.country || null,
+        countryCode: raw.countryCode || raw.country_code || null,
+        flag: flag || null,
+        lat: raw.latitude != null ? Number(raw.latitude) : null,
+        lon: raw.longitude != null ? Number(raw.longitude) : null,
+        isp: conn || null,
+        localTime: geo.formatLocalTime(tz)
+      };
+      if (!info.flag && info.countryCode) info.flag = geo.flagEmoji(info.countryCode);
+      return info;
+    },
+    lookupIP: function (force) {
+      // 1) Fresh cache wins — instant render, no quota use.
+      if (!force) {
+        var cached = lsGet(GEO_CACHE_KEY, null);
+        if (cached && cached.data && cached.ts && (Date.now() - cached.ts) < GEO_CACHE_TTL) {
+          return Promise.resolve(cached.data);
+        }
+      }
+      if (typeof fetch !== 'function') return Promise.resolve(null);
+      var endpoints = [
+        { url: 'https://ipwho.is/', name: 'ipwho.is' },
+        { url: 'https://ipapi.co/json/', name: 'ipapi.co' }
+      ];
+      var attempt = function (i) {
+        if (i >= endpoints.length) return Promise.resolve(null);
+        return fetch(endpoints[i].url)
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (d) { return geo.normalize(d, endpoints[i].name); })
+          .then(function (info) {
+            if (!info) return attempt(i + 1);
+            lsSet(GEO_CACHE_KEY, { ts: Date.now(), data: info });
+            return info;
+          })
+          .catch(function () { return attempt(i + 1); });
+      };
+      return attempt(0);
+    }
+  };
+
   /* -------------------------------------------------------------- location */
   var location = {
     state: null,
@@ -436,6 +514,14 @@
             finish(base);
           })
           .catch(function () { finish(base); });
+        // Enrich the sub-line with local time + ISP from the IP API.
+        geo.lookupIP().then(function (d) {
+          if (!d || !subEl) return;
+          var extra = [];
+          if (d.localTime) extra.push(d.localTime);
+          if (d.isp) extra.push(d.isp);
+          if (extra.length) subEl.textContent = base.coords + ' · ' + extra.join(' · ');
+        }).catch(function () { /* enrichment is optional */ });
       }, function () {
         location.ipFallback(finish);
       }, { timeout: 8000, maximumAge: 300000 });
@@ -449,19 +535,22 @@
       });
     },
     ipFallback: function (finish) {
-      if (typeof fetch !== 'function') {
-        finish({ name: 'Global Network', coords: 'Online — connecting Zambia, Eswatini & Ireland' });
-        return;
-      }
-      fetch('https://ipapi.co/json/').then(function (r) { return r.json(); }).then(function (d) {
+      var offline = { name: 'Global Network', coords: 'Online — connecting Zambia, Eswatini & Ireland' };
+      if (typeof fetch !== 'function') { finish(offline); return; }
+      geo.lookupIP().then(function (d) {
+        if (!d || !d.country) { finish(offline); return; }
+        var name = [d.city, d.region, d.country].filter(Boolean).join(', ') || 'Global Network';
+        if (d.flag) name = d.flag + ' ' + name;
+        var sub = [];
+        if (d.lat != null && d.lon != null) sub.push(Number(d.lat).toFixed(2) + '°, ' + Number(d.lon).toFixed(2) + '°');
+        if (d.localTime) sub.push(d.localTime);
+        if (d.isp) sub.push(d.isp);
         finish({
-          name: [d.city, d.country_name].filter(Boolean).join(', ') || 'Global Network',
-          coords: d.latitude ? Number(d.latitude).toFixed(2) + '°, ' + Number(d.longitude).toFixed(2) + '°' : 'Online',
-          lat: d.latitude, lng: d.longitude
+          name: name,
+          coords: sub.join(' · ') || 'Online',
+          lat: d.lat, lng: d.lon
         });
-      }).catch(function () {
-        finish({ name: 'Global Network', coords: 'Online — connecting Zambia, Eswatini & Ireland' });
-      });
+      }).catch(function () { finish(offline); });
     }
   };
 
@@ -1094,6 +1183,7 @@
     store: store,
     ui: ui,
     i18n: i18n,
+    geo: geo,
     location: location,
     announcements: announcements,
     notifications: notifications,
