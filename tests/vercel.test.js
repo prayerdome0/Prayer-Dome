@@ -127,6 +127,9 @@ function invoke(modulePath, method = 'GET') {
   test('.vercelignore excludes the repository by default and allows required sources',
     ignore.includes('\n/*\n') && ignore.includes('!api/') &&
     ignore.includes('!scripts/build-vercel.mjs') && ignore.includes('!functions/share.js'));
+  test('.vercelignore keeps the postinstall hook that `npm install` runs on Vercel',
+    ignore.includes('!scripts/install-functions.mjs'),
+    'package.json "postinstall" must survive the upload filter');
 
   console.log(`\n${passed} passed, ${failed} failed`);
   process.exit(failed ? 1 : 0);
