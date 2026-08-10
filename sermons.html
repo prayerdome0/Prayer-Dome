@@ -554,6 +554,8 @@ body.dark-mode .nav-link.active { color:#fcd34d; }
       <ol id="readerReflect"></ol>
     </div>
 
+    <div class="pd-share-row" id="readerShareRow" aria-label="Share this message"></div>
+
     <div class="reader-actions">
       <button class="act" onclick="shareSermon()"><i class="fas fa-share-nodes"></i> Share</button>
       <button class="act" onclick="copySermon()"><i class="fas fa-copy"></i> Copy text</button>
@@ -580,6 +582,8 @@ body.dark-mode .nav-link.active { color:#fcd34d; }
 <script src="/assets/pd-motion.js" defer></script>
     <script src="/assets/pd-content-data.js" defer></script>
     <script src="/translation-data.js"></script>
+<script src="/assets/pd-verse-data.js" defer></script>
+<script src="/assets/pd-verse-alerts.js" defer></script>
 <script src="/assets/pd-app.js" defer></script>
 <script>
 /* =====================================================================
@@ -950,6 +954,18 @@ function openReader(id) {
   syncSaveBtn();
   showVoiceWarning();
 
+  // Branded social row — every link previews with the sermon image and title.
+  try {
+    if (window.PDApp && PDApp.share) {
+      PDApp.share.buttons('#readerShareRow', {
+        type: 'sermon',
+        id: s.id,
+        title: s.title,
+        description: [s.scripture, s.summary].filter(Boolean).join(' · ')
+      });
+    }
+  } catch (e) { /* sharing is a bonus, never a blocker */ }
+
   document.getElementById('reader').classList.add('open');
   document.body.style.overflow = 'hidden';
   document.getElementById('reader').scrollTop = 0;
@@ -1011,12 +1027,20 @@ function sermonPlainText() {
          '\n\nprayerdome.net/sermons?s=' + current.id;
 }
 
+/* Share a sermon through the branded /share/sermon/<id> link so WhatsApp,
+   Facebook and X show the sermon image, title, scripture and Prayer Dome. */
 function shareSermon() {
   if (!current) return;
-  const url = location.origin + '/sermons?s=' + encodeURIComponent(current.id);
+  const payload = {
+    type: 'sermon',
+    id: current.id,
+    title: current.title,
+    description: [current.scripture, current.summary].filter(Boolean).join(' · ')
+  };
+  if (window.PDApp && PDApp.share) { PDApp.share.open(payload); return; }
+  const url = 'https://prayerdome.net/share/sermon/' + encodeURIComponent(current.id);
   if (navigator.share) {
-    navigator.share({ title: current.title, text: current.summary, url: url })
-      .catch(function () {});
+    navigator.share({ title: current.title, text: current.summary, url: url }).catch(function () {});
   } else if (navigator.clipboard) {
     navigator.clipboard.writeText(url).then(function () { toast('Link copied'); });
   }

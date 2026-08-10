@@ -152,11 +152,56 @@
   };
 
   /* ----------------------------------------------------------- theme ui --- */
+  /* ------------------------------------------------------------- branding
+   * Prayer Dome ships its own artwork. Nothing in the app may fall back to a
+   * third-party placeholder service, a stock-photo host or a stand-in logo.
+   * DEFAULT_AVATAR is the branded member silhouette; BRAND_LOGO is the one
+   * official mark used for icons, splash screens and every fallback.
+   * ---------------------------------------------------------------------- */
+  var DEFAULT_AVATAR = '/assets/avatar-default.svg';
+  var PLACEHOLDER_HOSTS = /(^|\/\/)(www\.)?(via\.placeholder\.com|placehold\.it|placehold\.co|placekitten\.com|dummyimage\.com|loremflickr\.com)/i;
+
+  /** Resolve any avatar URL to something Prayer Dome actually owns. */
+  function avatarUrl(url) {
+    if (!url || typeof url !== 'string') return DEFAULT_AVATAR;
+    var clean = url.trim();
+    if (!clean || PLACEHOLDER_HOSTS.test(clean)) return DEFAULT_AVATAR;
+    return clean;
+  }
+
+  /**
+   * Sweep the page for any image still pointing at a placeholder service —
+   * including ones rendered later from stored member records — and swap in
+   * the official Prayer Dome avatar. Runs once now, then watches for new
+   * nodes so historical data never shows a grey stand-in again.
+   */
+  function enforceBranding(root) {
+    var scope = root && root.querySelectorAll ? root : document;
+    var images = scope.querySelectorAll ? scope.querySelectorAll('img[src]') : [];
+    for (var i = 0; i < images.length; i++) {
+      var src = images[i].getAttribute('src') || '';
+      if (PLACEHOLDER_HOSTS.test(src)) images[i].setAttribute('src', DEFAULT_AVATAR);
+    }
+  }
+
+  function watchBranding() {
+    enforceBranding(document);
+    if (typeof MutationObserver === 'undefined') return;
+    var pending = false;
+    var observer = new MutationObserver(function () {
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(function () { pending = false; enforceBranding(document); });
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  }
+
   var ui = {
     init: function () {
       ui.drawer();
       ui.splash();
       ui.syncTheme();
+      try { watchBranding(); } catch (e) { /* branding sweep is best-effort */ }
       // Auto-show the friendly "Allow notifications?" pop-up once per
       // device, ~6s after the app loads, so members get the OS push
       // experience they expect without hunting for a bell.
@@ -220,7 +265,12 @@
       var open = typeof forceOpen === 'boolean' ? forceOpen : !panel.classList.contains('open');
       panel.classList.toggle('open', open);
       if (open) notifications.syncBadge();
-    }
+    },
+    /* Branded member photo — falls back to the Prayer Dome avatar, never to a
+       third-party placeholder image. */
+    avatar: avatarUrl,
+    defaultAvatar: DEFAULT_AVATAR,
+    brandLogo: BRAND_LOGO
   };
 
   /* --------------------------------------------------------- translations */
@@ -580,7 +630,58 @@
     }
   };
 
-  /* ---------------------------------------------------------- notifications */
+  /* ---------------------------------------------------------- notifications
+     Three problems this module solves:
+       1. The permission prompt must read professionally — we show our own
+          "Allow Notifications" sheet first, and on the native Android build we
+          ask through Capacitor so the browser origin is never displayed.
+       2. Notifications must reach the *device* (notification shade / lock
+          screen), not just the in-app bell — so we hand them to the service
+          worker, which is what Android and installed iOS PWAs require.
+       3. Once an item is read it must never come back as new — read state is
+          stored per notification id and applied to the Firestore mirror too. */
+  var READ_KEY = 'pd_notif_read_ids';
+  var READ_SIG_KEY = 'pd_notif_read_sigs';
+  var SHOWN_KEY = 'pd_notif_shown_ids';
+
+  /* Web-push identity. The VAPID public key is the Web Push certificate from
+     the Prayer Dome Firebase project — it is a public value, safe to ship. */
+  var VAPID_PUBLIC_KEY = 'BFo6TSo4Urth0PXWZETz6cuPgRlemsFx7LDn8yDlFqCrIELU16X12O4ObOOlnbP2h7PvKqbC0N6a-_vrSsksrnM';
+  var FCM_CONFIG = {
+    apiKey: 'AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo',
+    authDomain: 'prayer-dome.firebaseapp.com',
+    projectId: 'prayer-dome',
+    storageBucket: 'prayer-dome.firebasestorage.app',
+    messagingSenderId: '198295153196',
+    appId: '1:198295153196:web:1222b31948d7974ba3bf89'
+  };
+
+  function idList(key) { var v = lsGet(key, []); return Array.isArray(v) ? v : []; }
+  function rememberId(key, id, cap) {
+    if (!id) return;
+    var list = idList(key);
+    if (list.indexOf(id) > -1) return;
+    list.unshift(id);
+    lsSet(key, list.slice(0, cap || 300));
+  }
+  function signature(n) {
+    return [n.type || 'general', (n.title || '').trim(), (n.message || '').trim()].join('|');
+  }
+  /* Once a member marks something read it must never come back as new — not
+     even if the same announcement later arrives under a different id (a local
+     push adopted by Firestore, a re-sent broadcast, a second device). So we
+     remember both the id and a content signature. */
+  function isRead(n) {
+    if (!n) return false;
+    if (n.id && idList(READ_KEY).indexOf(n.id) > -1) return true;
+    return idList(READ_SIG_KEY).indexOf(signature(n)) > -1;
+  }
+  function rememberRead(n) {
+    if (!n) return;
+    rememberId(READ_KEY, n.id, 300);
+    rememberId(READ_SIG_KEY, signature(n), 300);
+  }
+
   var notifications = {
     items: lsGet('pd_notifications', []),
     badgeEl: null,
@@ -590,8 +691,14 @@
       notifications.badgeEl = $('#pdNotifBadge') || $('.pd-bell-badge') || $('#notifBadge');
       notifications.listEl = $('#pdNotifList');
       notifications.panelEl = $('#pdNotifPanel');
+      // Apply stored read state on boot so nothing reappears as "new".
+      notifications.items = notifications.items.map(function (n) {
+        if (isRead(n)) n.read = true;
+        return n;
+      });
       if (notifications.listEl) notifications.render();
       notifications.syncBadge();
+
       // Bell opens the in-app notification center — and if the browser
       // permission is still "default", it pops the friendly enable dialog
       // (instead of leaving the user wondering why nothing pings).
@@ -617,6 +724,18 @@
       on('notification', function (e) {
         if (e && e.detail) notifications.push(e.detail, { silent: true });
       });
+      // If the member already allowed notifications, make sure this device is
+      // registered for push so admin announcements actually arrive.
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        setTimeout(function () { notifications.registerDevice(); }, 2500);
+      }
+      // A dismissed system notification counts as seen.
+      if (navigator.serviceWorker) {
+        navigator.serviceWorker.addEventListener('message', function (event) {
+          var msg = event.data || {};
+          if (msg.type === 'pd-notification-dismissed' && msg.id) notifications.markRead(msg.id);
+        });
+      }
       // Firestore live mirror (liveStatus style): watch notifications in real time.
       if (fb && fb.db && fb.collection && fb.query && fb.orderBy && fb.limit && fb.getDocs) {
         var q = fb.query(fb.collection(fb.db, 'notifications'), fb.orderBy('createdAt', 'desc'), fb.limit(20));
@@ -628,70 +747,238 @@
               id: d.id, type: x.type || 'general', title: x.title || 'Update',
               message: x.message || '', link: x.link || null,
               time: x.createdAt ? (x.createdAt.toDate ? x.createdAt.toDate().toISOString() : new Date(x.createdAt).toISOString()) : new Date().toISOString(),
-              read: lsGet('pd_notif_read_' + d.id, false)
+              read: false
             });
           });
-          if (remote.length && notifications.listEl) {
-            // Merge: remote first (newest), then local-only items.
-            var localIds = notifications.items.map(function (n) { return n.id; });
-            var merged = remote.concat(notifications.items.filter(function (n) { return localIds.indexOf(n.id) === -1 && remote.indexOf(n.id) === -1; }));
-            notifications.items = merged.slice(0, 40);
-            notifications.render();
-            notifications.syncBadge();
-          }
+          if (remote.length) notifications.merge(remote);
         }).catch(function () {});
       }
     },
+
+    /* Merge remote items without duplicating what is already local and without
+       resurrecting anything the member already read. */
+    merge: function (remote) {
+      var seenIds = {};
+      var seenSignatures = {};
+      var merged = [];
+
+      remote.concat(notifications.items).forEach(function (n) {
+        if (!n || !n.id) return;
+        var sig = signature(n);
+        if (seenIds[n.id] || seenSignatures[sig]) return;
+        seenIds[n.id] = true;
+        seenSignatures[sig] = true;
+        if (isRead(n)) n.read = true;
+        merged.push(n);
+      });
+
+      merged.sort(function (a, b) { return new Date(b.time) - new Date(a.time); });
+      notifications.items = merged.slice(0, 40);
+      lsSet('pd_notifications', notifications.items);
+      notifications.render();
+      notifications.syncBadge();
+
+      // Surface genuinely fresh remote items on the device (last 10 minutes).
+      var cutoff = Date.now() - 10 * 60 * 1000;
+      notifications.items.forEach(function (n) {
+        if (!n.read && new Date(n.time).getTime() > cutoff) notifications.notifyDevice(n);
+      });
+    },
+
     canPrompt: function () {
       return typeof Notification !== 'undefined' && Notification.permission === 'default';
     },
-    /* Friendly in-app "Allow notifications?" modal. We show it once per device
-       (and on every bell click until the user grants or dismisses) so members
-       actually get the OS push experience they expect. */
+
+    /* Our own "Allow Notifications" sheet. Browsers always add their own
+       origin line to the *system* prompt (that text cannot be changed by a
+       website), so we make the request feel professional by asking first, in
+       Prayer Dome's own words, and by using the native permission dialog on the
+       installed Android app where no website name is shown at all. */
     showEnablePop: function () {
       if (document.getElementById('pdNotifPop')) return;
       var overlay = document.createElement('div');
       overlay.id = 'pdNotifPop';
       overlay.className = 'pd-notif-pop-overlay';
       overlay.innerHTML =
-        '<div class="pd-notif-pop" role="dialog" aria-modal="true" aria-label="Enable notifications">' +
-          '<div class="pd-notif-pop-icon"><i class="fas fa-bell"></i></div>' +
-          '<h3>Stay connected to Prayer Dome</h3>' +
-          '<p>Get instant alerts when a service goes live, a prayer request needs you, or new gospel content is published. You can turn this off anytime.</p>' +
+        '<div class="pd-notif-pop" role="dialog" aria-modal="true" aria-labelledby="pdNotifPopTitle">' +
+          '<div class="pd-notif-pop-icon"><img src="' + BRAND_LOGO + '" alt="Prayer Dome" width="44" height="44"></div>' +
+          '<h3 id="pdNotifPopTitle">Allow Notifications</h3>' +
+          '<p>Prayer Dome would like to send you daily Bible verses, live service alerts and prayer updates. You can turn this off at any time in Settings.</p>' +
           '<div class="pd-notif-pop-actions">' +
-            '<button class="pd-notif-pop-btn pd-notif-pop-btn--ghost" data-action="dismiss">Maybe later</button>' +
-            '<button class="pd-notif-pop-btn pd-notif-pop-btn--primary" data-action="enable"><i class="fas fa-bell"></i> Allow notifications</button>' +
+            '<button class="pd-notif-pop-btn pd-notif-pop-btn--ghost" data-action="dismiss">Not now</button>' +
+            '<button class="pd-notif-pop-btn pd-notif-pop-btn--primary" data-action="enable"><i class="fas fa-bell"></i> Allow</button>' +
           '</div>' +
-          '<small class="pd-notif-pop-hint">Works on iOS, Android and desktop. We never spam.</small>' +
+          '<small class="pd-notif-pop-hint">Prayer Dome · A House of Prayer for All Nations</small>' +
         '</div>';
       document.body.appendChild(overlay);
-      // Animate in
       requestAnimationFrame(function () { overlay.classList.add('pd-notif-pop-open'); });
       overlay.addEventListener('click', function (e) {
-        var act = e.target && e.target.getAttribute && e.target.getAttribute('data-action');
-        if (!act && e.target !== overlay) return;
-        if (act === 'enable') {
+        var action = e.target && e.target.closest && e.target.closest('[data-action]')
+          ? e.target.closest('[data-action]').getAttribute('data-action')
+          : (e.target === overlay ? 'dismiss' : null);
+        if (!action) return;
+        if (action === 'enable') {
           notifications.requestPermission().then(function (perm) {
-            if (perm === 'granted') toast('Notifications enabled — you will hear from us', 'success');
-            else if (perm === 'denied') toast('Notifications blocked — enable them in your browser settings', 'error');
+            if (perm === 'granted') toast('Notifications are on — you will hear from us', 'success');
+            else if (perm === 'denied') toast('Notifications are blocked. You can allow them in your device settings.', 'error');
             closePop();
           });
         } else {
-          // dismiss = "Maybe later" or backdrop tap
           closePop();
           localStorage.setItem('pd_notif_pop_dismissed', new Date().toISOString());
         }
         function closePop() { overlay.classList.remove('pd-notif-pop-open'); setTimeout(function () { overlay.remove(); }, 250); }
       });
     },
+
+    /** Native permission on the packaged app, browser permission on the web. */
     requestPermission: function () {
+      var native = window.Capacitor && window.Capacitor.Plugins &&
+        (window.Capacitor.Plugins.PushNotifications || window.Capacitor.Plugins.LocalNotifications);
+      if (native && native.requestPermissions) {
+        return native.requestPermissions()
+          .then(function (res) {
+            var granted = res && (res.receive === 'granted' || res.display === 'granted');
+            if (granted && window.Capacitor.Plugins.PushNotifications) {
+              try { window.Capacitor.Plugins.PushNotifications.register(); } catch (e) {}
+            }
+            if (granted) notifications.registerDevice();
+            return granted ? 'granted' : 'denied';
+          })
+          .catch(function () { return 'denied'; });
+      }
       if (typeof Notification === 'undefined') return Promise.resolve('unsupported');
-      try { return Notification.requestPermission(); }
-      catch (e) {
+      try {
+        return Promise.resolve(Notification.requestPermission()).then(function (perm) {
+          if (perm === 'granted') notifications.registerDevice();
+          return perm;
+        });
+      } catch (e) {
         // Some browsers throw if not from a user gesture — fall back to in-app only.
         return Promise.resolve(Notification.permission || 'default');
       }
     },
+
+    /**
+     * Register this device with Firebase Cloud Messaging so an announcement
+     * published from the Admin Dashboard actually pops on the phone — even
+     * with the app closed.
+     *
+     * Without this the `userTokens` collection stays empty and "Send to all"
+     * has nobody to send to. The token is written once per device and only
+     * rewritten when Google issues a new one, so this is cheap on every load.
+     *
+     * On the packaged Android app Capacitor supplies the token instead, so we
+     * simply listen for it.
+     */
+    registerDevice: function (uid) {
+      if (notifications._registering) return notifications._registering;
+      if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return Promise.resolve(null);
+
+      var member = uid || (fb && fb.auth && fb.auth.currentUser && fb.auth.currentUser.uid) || window.PD_UID || null;
+
+      // Packaged Android app: Capacitor hands us the FCM token.
+      var push = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications;
+      if (push && push.addListener) {
+        if (!notifications._nativeBound) {
+          notifications._nativeBound = true;
+          try {
+            push.addListener('registration', function (t) {
+              notifications.saveToken(t && t.value, member, 'android');
+            });
+            push.register();
+          } catch (e) { /* the plugin is unavailable on this build */ }
+        }
+        return Promise.resolve(null);
+      }
+
+      if (!navigator.serviceWorker || !window.indexedDB) return Promise.resolve(null);
+
+      notifications._registering = (async function () {
+        try {
+          var reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
+          var appMod = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js');
+          var msgMod = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js');
+          if (!(await msgMod.isSupported())) return null;
+          var app = appMod.getApps().length ? appMod.getApps()[0] : appMod.initializeApp(FCM_CONFIG);
+          var messaging = msgMod.getMessaging(app);
+          var token = await msgMod.getToken(messaging, { vapidKey: VAPID_PUBLIC_KEY, serviceWorkerRegistration: reg });
+          if (!token) return null;
+
+          // Foreground pushes still raise a real device notification, using the
+          // same stable tag so nothing is ever shown twice.
+          msgMod.onMessage(messaging, function (payload) {
+            var note = (payload && payload.notification) || {};
+            var data = (payload && payload.data) || {};
+            notifications.push({
+              id: data.id || note.title,
+              type: data.kind || data.type || 'general',
+              title: note.title || data.title || 'Prayer Dome',
+              message: note.body || data.body || data.message || '',
+              link: data.url || data.link || null
+            });
+          });
+
+          notifications.saveToken(token, member, 'web');
+          return token;
+        } catch (e) {
+          return null;   // push is a bonus; the in-app centre still works
+        } finally {
+          notifications._registering = null;
+        }
+      })();
+      return notifications._registering;
+    },
+
+    /** Persist a device token so the Admin Dashboard can reach this device. */
+    saveToken: function (token, uid, platform) {
+      if (!token) return;
+      var member = uid || (fb && fb.auth && fb.auth.currentUser && fb.auth.currentUser.uid) || window.PD_UID || null;
+      if (localStorage.getItem('pd_push_token') === token &&
+          localStorage.getItem('pd_push_uid') === String(member)) return;
+      localStorage.setItem('pd_push_token', token);
+      localStorage.setItem('pd_push_uid', String(member));
+      // The security rules require a signed-in owner, so anonymous visitors
+      // keep the token locally until they sign in.
+      if (!member || !fb || !fb.db || !fb.setDoc || !fb.doc) return;
+      fsSet(fb.doc(fb.db, 'userTokens', member), {
+        token: token,
+        userId: member,
+        platform: platform || 'web',
+        active: true,
+        updatedAt: fb.serverTimestamp ? fb.serverTimestamp() : new Date().toISOString()
+      });
+    },
+
+    /* Show the notification on the device itself. Android and installed iOS
+       PWAs only display notifications raised by the service worker, so that is
+       the preferred path; the page-level API is the desktop fallback. */
+    notifyDevice: function (n) {
+      if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+      if (idList(SHOWN_KEY).indexOf(n.id) > -1) return;
+      rememberId(SHOWN_KEY, n.id, 200);
+
+      var options = {
+        body: n.message || '',
+        icon: BRAND_LOGO,
+        badge: '/assets/logo-192.png',
+        tag: n.id,                 // one entry per item — never a duplicate
+        renotify: false,
+        requireInteraction: false, // informative, not intrusive
+        timestamp: new Date(n.time).getTime() || Date.now(),
+        data: { url: n.link || '/index.html', id: n.id, kind: n.type || 'general' }
+      };
+      if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+        navigator.serviceWorker.ready
+          .then(function (reg) { return reg.showNotification(n.title, options); })
+          .catch(function () {
+            try { new Notification(n.title, options); } catch (e) {}
+          });
+      } else {
+        try { new Notification(n.title, options); } catch (e) {}
+      }
+    },
+
     push: function (item, opts) {
       opts = opts || {};
       var now = new Date().toISOString();
@@ -704,32 +991,44 @@
         time: item.time || now,
         read: false
       };
+      n.read = isRead(n);
+      // Never store the same announcement twice (e.g. local push + Firestore mirror).
+      var sig = signature(n);
+      var duplicate = notifications.items.filter(function (existing) {
+        return existing.id === n.id || signature(existing) === sig;
+      })[0];
+      if (duplicate) return duplicate;
+
       notifications.items = [n].concat(notifications.items).slice(0, 40);
       lsSet('pd_notifications', notifications.items);
       if (notifications.listEl) notifications.render();
       notifications.syncBadge();
+
       if (!opts.silent) {
         // Let every other open tab render it instantly (they re-push silently,
         // so this does not loop).
         broadcast('notification', n);
         toast(n.title + (n.message ? ' — ' + n.message : ''), 'success');
-        if ('Notification' in window && Notification.permission === 'granted') {
-          try { new Notification(n.title, { body: n.message, icon: '/assets/og-image.png' }); } catch (e) {}
-        }
-        if (n.link && window.location.pathname !== n.link) {
-          // Surface a tappable toast-style CTA inside the panel header.
-        }
+        notifications.notifyDevice(n);
       }
       // Persist to Firestore once (as a broadcast record, without FCM tokens).
-      if (fb && fb.db && fb.collection && fb.addDoc && fb.serverTimestamp && !n._persisted) {
+      if (!opts.localOnly && fb && fb.db && fb.collection && fb.addDoc && fb.serverTimestamp && !n._persisted) {
         n._persisted = true;
         fb.addDoc(fb.collection(fb.db, 'notifications'), {
           type: n.type, title: n.title, message: n.message, link: n.link || null,
           createdAt: fb.serverTimestamp()
+        }).then(function (ref) {
+          // Adopt the server id so the mirror does not re-add this as new.
+          if (!ref || !ref.id) return;
+          var wasRead = n.read;
+          n.id = ref.id;
+          if (wasRead) rememberRead(n);
+          lsSet('pd_notifications', notifications.items);
         }).catch(function () {});
       }
       return n;
     },
+
     render: function () {
       var list = notifications.listEl;
       if (!list) return;
@@ -761,39 +1060,69 @@
         });
       });
     },
+
     markRead: function (id) {
+      rememberId(READ_KEY, id, 300);
       notifications.items = notifications.items.map(function (n) {
-        if (n.id === id) n.read = true;
+        if (n.id === id) { n.read = true; rememberRead(n); }
         return n;
       });
       lsSet('pd_notifications', notifications.items);
+      // Clear it from the device shade too, so it cannot be tapped again later.
+      if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+        navigator.serviceWorker.ready.then(function (reg) {
+          if (reg.active) reg.active.postMessage({ type: 'pd-clear-notification', tag: id });
+        }).catch(function () {});
+      }
       notifications.render();
       notifications.syncBadge();
     },
+
     markAllRead: function () {
-      notifications.items.forEach(function (n) { n.read = true; });
+      notifications.items.forEach(function (n) {
+        n.read = true;
+        rememberRead(n);
+      });
       lsSet('pd_notifications', notifications.items);
+      if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+        navigator.serviceWorker.ready.then(function (reg) {
+          return reg.getNotifications ? reg.getNotifications() : [];
+        }).then(function (list) {
+          (list || []).forEach(function (note) { note.close(); });
+        }).catch(function () {});
+      }
       notifications.render();
       notifications.syncBadge();
     },
+
     clear: function () {
+      // Remember what was cleared so the Firestore mirror cannot resurrect it.
+      notifications.items.forEach(function (n) { rememberRead(n); });
       notifications.items = [];
       lsSet('pd_notifications', []);
       notifications.render();
       notifications.syncBadge();
     },
+
     unread: function () {
       return notifications.items.filter(function (n) { return !n.read; }).length;
     },
+
     syncBadge: function () {
       var n = notifications.unread();
       var legacy = 0;
       var legacyBadge = $('#notifBadge');
-      if (legacyBadge && legacyBadge.style.display !== 'none' && legacyBadge.textContent) {
+      if (legacyBadge && legacyBadge !== notifications.badgeEl &&
+          legacyBadge.style.display !== 'none' && legacyBadge.textContent) {
         legacy = parseInt(legacyBadge.textContent, 10) || 0;
       }
       var total = n + legacy;
       var badge = notifications.badgeEl;
+      // Keep the app icon badge (installed PWA) in step with the bell.
+      if (navigator.setAppBadge) {
+        if (total > 0) navigator.setAppBadge(total).catch(function () {});
+        else if (navigator.clearAppBadge) navigator.clearAppBadge().catch(function () {});
+      }
       if (!badge) return;
       if (total > 0) {
         badge.style.display = 'flex';
@@ -1027,10 +1356,33 @@
       broadcast('live:schedule', list);
       return list;
     },
-    replays: function () { return lsGet('pd_live_replays', []); },
+    /* Replays are cloud recordings only. Any legacy `blob:` entry (a replay
+       that lived in the browser's memory on one device) is dropped so members
+       never see a broken "Play" that only worked for the person who recorded
+       it — every recording now streams from Prayer Dome cloud storage. */
+    isCloudUrl: function (url) {
+      return typeof url === 'string' && /^https?:\/\//i.test(url) && !/^blob:/i.test(url);
+    },
+    replays: function () {
+      var list = lsGet('pd_live_replays', []);
+      var cloudOnly = list.filter(function (r) {
+        return r && (live.isCloudUrl(r.url) || live.isCloudUrl(r.playbackUrl) ||
+          (Array.isArray(r.parts) && r.parts.length && live.isCloudUrl(r.parts[0] && r.parts[0].url)));
+      });
+      if (cloudOnly.length !== list.length) lsSet('pd_live_replays', cloudOnly);
+      return cloudOnly;
+    },
     addReplay: function (item) {
+      item = item || {};
+      var url = item.url || item.playbackUrl ||
+        (Array.isArray(item.parts) && item.parts[0] ? item.parts[0].url : null);
+      if (!live.isCloudUrl(url)) {
+        // Refuse device-local recordings — they must be uploaded to the cloud.
+        console.warn('[PDApp] Ignoring a non-cloud replay URL; recordings must live in cloud storage.');
+        return live.replays();
+      }
       var list = live.replays();
-      list.unshift(Object.assign({ id: uid('rec') }, item));
+      list.unshift(Object.assign({ id: uid('rec'), storage: 'cloud' }, item, { url: url }));
       lsSet('pd_live_replays', list.slice(0, 30));
       broadcast('live:replay', list);
       return list;
@@ -1176,6 +1528,103 @@
     }
   };
 
+  /* ----------------------------------------------------------------- share
+   * Social sharing that always carries the featured image, the content title,
+   * a short description and Prayer Dome branding.
+   *
+   * Every shared link points at /share/<type>/<id>, which is answered by the
+   * share function (functions/share.js). That endpoint renders real Open Graph
+   * tags — og:image, og:title, og:description, og:site_name — then forwards a
+   * human straight to the page. WhatsApp, Facebook, X, Telegram and iMessage
+   * all read those tags, so the preview card is correct everywhere.
+   * ---------------------------------------------------------------------- */
+  var SHARE_ORIGIN = 'https://prayerdome.net';
+  var SHARE_TYPES = {
+    news: 'news', story: 'news', article: 'news',
+    testimony: 'testimony', testimonies: 'testimony',
+    sermon: 'sermon', sermons: 'sermon',
+    devotional: 'devotional', devotionals: 'devotional',
+    prayer: 'prayer', prayers: 'prayer',
+    event: 'event', events: 'event',
+    video: 'video', aivideo: 'video'
+  };
+
+  var share = {
+    /** Canonical, preview-friendly link for a piece of content. */
+    url: function (type, id) {
+      var kind = SHARE_TYPES[String(type || '').toLowerCase()] || 'news';
+      if (!id) return SHARE_ORIGIN + '/';
+      return SHARE_ORIGIN + '/share/' + kind + '/' + encodeURIComponent(String(id));
+    },
+
+    /** A short branded blurb to accompany the link. */
+    text: function (opts) {
+      opts = opts || {};
+      var title = String(opts.title || 'Prayer Dome').trim();
+      var desc = String(opts.description || '').replace(/\s+/g, ' ').trim();
+      if (desc.length > 160) desc = desc.slice(0, 159).trim() + '…';
+      return desc ? (title + '\n\n' + desc + '\n\n— Prayer Dome') : (title + '\n\n— Prayer Dome');
+    },
+
+    /**
+     * Share a piece of content. Uses the device share sheet when available
+     * (Android/iOS/Chrome), otherwise falls back to copying the link.
+     */
+    open: function (opts) {
+      opts = opts || {};
+      var link = opts.url || share.url(opts.type, opts.id);
+      var body = share.text(opts);
+      if (navigator.share) {
+        return navigator.share({ title: opts.title || 'Prayer Dome', text: body, url: link })
+          .catch(function () { /* the member dismissed the sheet */ });
+      }
+      return share.copy(link);
+    },
+
+    /** Copy a link to the clipboard and confirm it quietly. */
+    copy: function (link) {
+      var done = function () { toast('Link copied — it will preview with the image and title.'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(link).then(done).catch(function () { window.prompt('Copy this link', link); });
+      }
+      window.prompt('Copy this link', link);
+      return Promise.resolve();
+    },
+
+    /** Per-network share links, for pages that render their own buttons. */
+    links: function (opts) {
+      opts = opts || {};
+      var link = opts.url || share.url(opts.type, opts.id);
+      var body = share.text(opts);
+      var u = encodeURIComponent(link);
+      var t = encodeURIComponent(body);
+      return {
+        url: link,
+        whatsapp: 'https://wa.me/?text=' + encodeURIComponent(body + '\n' + link),
+        facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + u,
+        x: 'https://twitter.com/intent/tweet?text=' + t + '&url=' + u,
+        telegram: 'https://t.me/share/url?url=' + u + '&text=' + t,
+        email: 'mailto:?subject=' + encodeURIComponent(opts.title || 'Prayer Dome') + '&body=' + encodeURIComponent(body + '\n\n' + link)
+      };
+    },
+
+    /** Render a consistent row of share buttons into a container. */
+    buttons: function (container, opts) {
+      var host = (typeof container === 'string') ? $(container) : container;
+      if (!host) return;
+      var l = share.links(opts);
+      host.classList.add('pd-share-row');
+      host.innerHTML =
+        '<a class="pd-share-btn pd-share-wa" target="_blank" rel="noopener" href="' + l.whatsapp + '"><i class="fab fa-whatsapp"></i> WhatsApp</a>' +
+        '<a class="pd-share-btn pd-share-fb" target="_blank" rel="noopener" href="' + l.facebook + '"><i class="fab fa-facebook-f"></i> Facebook</a>' +
+        '<a class="pd-share-btn pd-share-x" target="_blank" rel="noopener" href="' + l.x + '"><i class="fab fa-x-twitter"></i> X</a>' +
+        '<a class="pd-share-btn pd-share-tg" target="_blank" rel="noopener" href="' + l.telegram + '"><i class="fab fa-telegram"></i> Telegram</a>' +
+        '<button type="button" class="pd-share-btn pd-share-copy"><i class="fas fa-link"></i> Copy link</button>';
+      var copyBtn = host.querySelector('.pd-share-copy');
+      if (copyBtn) copyBtn.addEventListener('click', function () { share.copy(l.url); });
+    }
+  };
+
   /* ---------------------------------------------------------------- public */
   window.PDApp = {
     version: VERSION,
@@ -1194,6 +1643,7 @@
     academyNav: academyNav,
     scripture: scripture,
     radio: radio,
+    share: share,
     toast: toast,
     broadcast: broadcast,
     on: on,

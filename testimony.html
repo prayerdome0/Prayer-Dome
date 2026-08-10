@@ -433,7 +433,7 @@
     /* Testimonies Grid */
     .testimonies-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
       gap: 25px;
       margin-top: 20px;
     }
@@ -774,6 +774,8 @@
     <script src="/assets/pd-motion.js" defer></script>
     <script src="/assets/pd-content-data.js" defer></script>
     <script src="/translation-data.js"></script>
+<script src="/assets/pd-verse-data.js" defer></script>
+<script src="/assets/pd-verse-alerts.js" defer></script>
 <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
@@ -1361,15 +1363,25 @@
         renderTestimonies();
     }
 
+    /* Share a testimony through the branded /share/testimony/<id> link, so the
+       preview card carries the testimony image, title, a short excerpt and the
+       Prayer Dome name instead of a bare block of text. */
     function shareTestimony(id) {
         const testimony = allTestimonies.find(t => t.id === id);
         if (!testimony) return;
-        const shareText = `✨ PRAYER DOME TESTIMONY ✨\n\n"${testimony.content.substring(0, 200)}${testimony.content.length > 200 ? '...' : ''}"\n\n- ${testimony.author}\n\nJoin us at Prayer Dome!`;
+        const excerpt = `${testimony.content.substring(0, 200)}${testimony.content.length > 200 ? '…' : ''}`;
+        const title = `${testimony.category || 'Testimony'} by ${testimony.author || 'Anonymous'}`;
+        if (window.PDApp && PDApp.share) {
+            PDApp.share.open({ type: 'testimony', id, title, description: excerpt });
+            return;
+        }
+        const url = `https://prayerdome.net/share/testimony/${encodeURIComponent(id)}`;
+        const shareText = `✨ PRAYER DOME TESTIMONY ✨\n\n"${excerpt}"\n\n- ${testimony.author}\n\n${url}`;
         if (navigator.share) {
-            navigator.share({ title: 'Prayer Dome Testimony', text: shareText });
+            navigator.share({ title: 'Prayer Dome Testimony', text: shareText, url });
         } else {
             navigator.clipboard.writeText(shareText);
-            showToast('📋 Testimony copied to clipboard!', 'success');
+            showToast('📋 Testimony link copied!', 'success');
         }
     }
 

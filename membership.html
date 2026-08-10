@@ -536,6 +536,8 @@
     <script src="/assets/pd-motion.js" defer></script>
     <script src="/assets/pd-content-data.js" defer></script>
     <script src="/translation-data.js"></script>
+<script src="/assets/pd-verse-data.js" defer></script>
+<script src="/assets/pd-verse-alerts.js" defer></script>
 <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
@@ -581,7 +583,7 @@
         <div style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px 24px; margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
             <div style="display: flex; align-items: center; gap: 18px;">
                 <div style="position: relative;">
-                    <img id="editPhotoPreview" src="https://via.placeholder.com/80" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-gold); cursor: pointer;" onclick="triggerEditPhotoFileInput()">
+                    <img id="editPhotoPreview" src="/assets/avatar-default.svg" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-gold); cursor: pointer;" onclick="triggerEditPhotoFileInput()">
                     <div style="position: absolute; bottom: 0; right: 0; background: var(--accent-gold); color: #000; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer;" onclick="triggerEditPhotoFileInput()"><i class="fas fa-camera"></i></div>
                 </div>
                 <div>
@@ -762,7 +764,7 @@
             
             <div id="retrievedMemberInfo" style="margin-top: 30px; display: none; background: var(--bg-primary); border-radius: 24px; padding: 25px; border: 2px solid var(--accent-gold);">
                 <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
-                    <img id="retrievedPhoto" src="https://via.placeholder.com/80" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-gold);">
+                    <img id="retrievedPhoto" src="/assets/avatar-default.svg" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-gold);">
                     <div style="flex: 1;">
                         <h4 id="retrievedName" style="color: var(--accent-green); font-family: 'Playfair Display', serif; font-size: 1.2rem;">-</h4>
                         <p id="retrievedId" style="font-family: monospace; color: var(--accent-gold); font-size: 1rem;">-</p>
@@ -840,7 +842,7 @@
         
         <div class="photo-upload-area">
             <div class="photo-preview" onclick="triggerRegPhotoFileInput()">
-                <img id="photoPreview" src="https://via.placeholder.com/150" alt="Profile Photo">
+                <img id="photoPreview" src="/assets/avatar-default.svg" alt="Profile Photo">
                 <div class="photo-overlay"><i class="fas fa-camera"></i> Change Photo</div>
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
@@ -997,7 +999,7 @@
                 </div>
 
                 <div class="card-photo-circle">
-                    <img id="idPhoto" src="https://via.placeholder.com/150" alt="Member Photo">
+                    <img id="idPhoto" src="/assets/avatar-default.svg" alt="Member Photo">
                 </div>
 
                 <div class="card-name" id="idName">MEMBER NAME</div>
@@ -1521,7 +1523,7 @@
 
         uploadedEditPhotoUrl = data.photoUrl || data.photoURL || null;
         const p1 = document.getElementById('editPhotoPreview');
-        if (p1) p1.src = uploadedEditPhotoUrl || 'https://via.placeholder.com/80';
+        if (p1) p1.src = uploadedEditPhotoUrl || '/assets/avatar-default.svg';
 
         const sigPrev = document.getElementById('existingSigPreview');
         if (sigPrev) {
@@ -1582,7 +1584,7 @@
                 giftNames: giftNamesVal,
                 ministries: ministriesVal,
                 bio: document.getElementById('editBio').value.trim(),
-                photoUrl: uploadedEditPhotoUrl || currentMemberData?.photoUrl || "https://via.placeholder.com/150",
+                photoUrl: uploadedEditPhotoUrl || currentMemberData?.photoUrl || "/assets/avatar-default.svg",
                 signature: signatureData,
                 supportingDocs: uploadedEditDocs,
                 updatedAt: serverTimestamp()
@@ -1719,7 +1721,7 @@
             
             const newMemberId = `${prefix}${String(maxNum + 1).padStart(4, '0')}`;
             const signatureData = canvas.toDataURL();
-            const photoUrl = uploadedPhotoUrl || "https://via.placeholder.com/150";
+            const photoUrl = uploadedPhotoUrl || "/assets/avatar-default.svg";
             
             // IMPORTANT: For someone else registration, use a DIFFERENT UID
             // Generate a temporary unique ID for the new member
@@ -1803,7 +1805,7 @@
                 document.getElementById('email').value = '';
                 document.getElementById('job').value = '';
                 uploadedPhotoUrl = null;
-                document.getElementById('photoPreview').src = 'https://via.placeholder.com/150';
+                document.getElementById('photoPreview').src = '/assets/avatar-default.svg';
                 document.getElementById('uploadedPhotoUrl').value = '';
                 clearSig();
                 // Go back to step 1 to register another person
@@ -1849,7 +1851,7 @@
             
             retrievedMembershipData = { id: memberDoc.id, ...memberData };
             
-            document.getElementById('retrievedPhoto').src = memberData.photoUrl || "https://via.placeholder.com/80";
+            document.getElementById('retrievedPhoto').src = memberData.photoUrl || "/assets/avatar-default.svg";
             document.getElementById('retrievedName').innerText = memberData.fullName;
             document.getElementById('retrievedId').innerText = memberData.membershipId;
             document.getElementById('retrievedBranch').innerHTML = `<i class="fas fa-church"></i> ${memberData.branch || "Global"}`;
@@ -1928,7 +1930,7 @@
     
     function renderCard(data) {
         const idPhoto = document.getElementById('idPhoto');
-        if (idPhoto) idPhoto.src = data.photoUrl || "https://via.placeholder.com/150";
+        if (idPhoto) idPhoto.src = data.photoUrl || "/assets/avatar-default.svg";
         const idName = document.getElementById('idName');
         if (idName) idName.innerText = data.fullName || "MEMBER NAME";
         

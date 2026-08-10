@@ -334,6 +334,9 @@
     <script src="/assets/pd-motion.js" defer></script>
     <script src="/assets/pd-content-data.js" defer></script>
     <script src="/translation-data.js"></script>
+<script src="/assets/pd-cloud-video.js" defer></script>
+<script src="/assets/pd-verse-data.js" defer></script>
+<script src="/assets/pd-verse-alerts.js" defer></script>
 <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
@@ -374,7 +377,8 @@
         <div>
             <div class="player-shell">
                 <span class="live-tag" id="liveTag">LIVE</span>
-                <video id="livePlayer" playsinline controls preload="none" style="display:none;"></video>
+                <video id="livePlayer" playsinline controls preload="none" controlsList="nodownload noremoteplayback" disablepictureinpicture oncontextmenu="return false;" style="display:none;"></video>
+                <div id="partIndicator" style="display:none; position:absolute; bottom:14px; left:14px; background:rgba(0,0,0,.62); color:#fff; font-size:.68rem; font-weight:800; padding:5px 11px; border-radius:9px; letter-spacing:.4px;"></div>
 
                 <div class="offline-state" id="offlineState">
                     <i class="fas fa-tower-broadcast"></i>
@@ -776,7 +780,17 @@
             const deviceReplays = (window.PDApp ? PDApp.live.replays() : []).map(r => ({
                 id: r.id || 'dev-' + Date.now(),
                 title: r.title || 'Live Service',
-                data: { title: r.title || 'Live Service', playbackUrl: r.url || null, createdAt: r.date || new Date().toISOString(), source: 'device', durationSeconds: r.durationSeconds }
+                data: {
+                    title: r.title || 'Live Service',
+                    description: r.description || '',
+                    playbackUrl: r.url || null,
+                    parts: Array.isArray(r.parts) ? r.parts : [],
+                    thumbnail: r.thumbnail || null,
+                    createdAt: r.date || new Date().toISOString(),
+                    source: 'device',
+                    storage: 'cloud',
+                    durationSeconds: r.durationSeconds
+                }
             }));
             if (snap.empty && !deviceReplays.length) {
                 grid.innerHTML =
@@ -791,13 +805,14 @@
             deviceReplays.forEach(r => {
                 const rec = r.data;
                 cards.push('<div class="archive-card" onclick="watchRecording(\'' + esc(r.id) + '\')">' +
-                  '<div class="archive-thumb"><i class="fas fa-play-circle"></i>' +
+                  '<div class="archive-thumb">' +
+                  (rec.thumbnail ? '<img src="' + esc(rec.thumbnail) + '" alt="" loading="lazy">' : '<i class="fas fa-play-circle"></i>') +
                   (rec.durationSeconds ? '<span style="position:absolute; bottom:6px; right:8px; background:rgba(0,0,0,.6); color:#fff; font-size:.62rem; font-weight:800; padding:3px 8px; border-radius:8px; font-family:monospace;">' +
                     String(Math.floor(rec.durationSeconds/60)).padStart(2,'0') + ':' + String(rec.durationSeconds%60).padStart(2,'0') + '</span>' : '') +
                   '</div>' +
                   '<div class="archive-info">' +
                     '<strong>' + esc(rec.title) + '</strong>' +
-                    '<small><i class="fas fa-clock"></i> ' + esc(timeAgo(rec.createdAt)) + ' · from device</small>' +
+                    '<small><i class="fas fa-clock"></i> ' + esc(timeAgo(rec.createdAt)) + ' · cloud recording</small>' +
                   '</div>' +
                 '</div>');
             });
@@ -911,28 +926,48 @@
     window.watchRecording = function (id) {
         const rec = (window.__pdArchive || {})[id];
         if (!rec) return;
-        const url = rec.playbackUrl || rec.hlsUrl ||
+        const parts = Array.isArray(rec.parts) ? rec.parts.filter(p => p && p.url) : [];
+        const url = rec.playbackUrl || rec.hlsUrl || (parts[0] && parts[0].url) ||
             (rec.streamId ? 'https://res.cloudinary.com/prayerdome/video/upload/' + rec.streamId + '.m3u8' : null);
-        if (!url) { toast('This recording is not available yet', 'error'); return; }
+        if (!url || /^blob:/i.test(url)) {
+            toast('This recording is not available yet', 'error');
+            return;
+        }
 
         const v = $('livePlayer');
+        const indicator = $('partIndicator');
         $('offlineState').style.display = 'none';
         $('playOverlay').style.display = 'none';
         $('liveTag').classList.remove('show');
         v.style.display = 'block';
         stopPlayback();
 
-        if (v.canPlayType('application/vnd.apple.mpegurl')) {
+        const isHls = /\.m3u8(\?|$)/i.test(url);
+        if (!isHls && window.PDCloudVideo) {
+            // Cloud recording — parts stream back-to-back as one replay.
+            PDCloudVideo.attachPlayer(v, { parts: parts, playbackUrl: url }, {
+                autoplay: true,
+                onPart: (n, total) => {
+                    if (!indicator) return;
+                    indicator.style.display = total > 1 ? 'block' : 'none';
+                    indicator.textContent = 'Part ' + n + ' of ' + total;
+                }
+            });
+        } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
             v.src = url;
+            v.play().catch(() => {});
         } else if (window.Hls && Hls.isSupported()) {
             hls = new Hls();
             hls.loadSource(url);
             hls.attachMedia(v);
+            v.play().catch(() => {});
+        } else {
+            v.src = url;
+            v.play().catch(() => {});
         }
-        v.play().catch(() => {});
 
         $('npTitle').textContent = rec.title || 'Past Service';
-        $('npDesc').textContent = rec.description || 'From the Prayer Dome sermon archive.';
+        $('npDesc').textContent = rec.description || 'From the Prayer Dome sermon archive — streamed from Prayer Dome cloud storage.';
         document.querySelector('.player-shell').scrollIntoView({ behavior: 'smooth', block: 'center' });
     };
 

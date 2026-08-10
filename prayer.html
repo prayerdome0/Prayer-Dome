@@ -252,7 +252,7 @@
         /* Prayer Grid */
         .prayer-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
             gap: 25px;
             align-items: start;
         }
@@ -526,6 +526,8 @@
     <script src="/assets/pd-motion.js" defer></script>
     <script src="/assets/pd-content-data.js" defer></script>
     <script src="/translation-data.js"></script>
+<script src="/assets/pd-verse-data.js" defer></script>
+<script src="/assets/pd-verse-alerts.js" defer></script>
 <script src="/assets/pd-app.js" defer></script>
 </head>
 <body>
