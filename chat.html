@@ -721,7 +721,8 @@
         .suggestion-chip:hover { transform: translateY(-2px) scale(1.04); background: var(--accent-gold); color: #fff; box-shadow: 0 6px 14px -3px rgba(212,175,55,.5); }
 
         .chat-input-area {
-            padding: 14px 16px calc(20px + env(safe-area-inset-bottom, 20px));
+            /* Lift the composer slightly above the bottom edge for easier reach and visibility. */
+            padding: 14px 16px calc(28px + env(safe-area-inset-bottom, 20px));
             margin-top: auto;
             background: var(--bg-card);
             background: color-mix(in srgb, var(--bg-card) 97%, transparent);
