@@ -19,7 +19,7 @@ t('academy data has at least 18 lessons', data.lessons.length >= 18, data.lesson
 t('academy data has at least 10 stories', data.stories.length >= 10, data.stories.length);
 t('academy data has at least six resources', data.resources.length >= 6, data.resources.length);
 t('every lesson has a linked quiz', data.lessons.every(l => data.quizzes.some(q => q.id === l.quizId)));
-t('every quiz has six questions and 80% pass mark', data.quizzes.every(q => q.questions.length === 6 && q.passingScore === 80));
+t('every quiz keeps an 8-question pool and 80% pass mark', data.quizzes.every(q => q.questions.length >= 8 && q.passingScore === 80));
 t('every lesson contains detailed teaching sections', data.lessons.every(l => Array.isArray(l.sections) && l.sections.length >= 5 && l.reflection.length >= 4));
 t('every resource file exists on disk', data.resources.every(r => fs.existsSync(path.join(ROOT, (r.downloadUrl || r.url).replace(/^\//, '')))));
 t('every story links to a valid lesson', data.stories.every(s => data.lessons.some(l => l.id === s.lessonId)));

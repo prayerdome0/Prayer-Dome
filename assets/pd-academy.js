@@ -82,6 +82,10 @@
     var q = DATA.quizzes.filter(function (x) { return x.id === l.quizId; })[0];
     var state = quizState();
     var passed = state.passedQuizzes[l.quizId];
+    // Pick a fresh random set of questions for this attempt so a retake never
+    // shows the exact same quiz twice.
+    var sample = q ? sampleQuizQuestions(q, 5) : null;
+    var canNext = !q || !!passed;
     reader.innerHTML =
       '<div class="pd-acad-meta"><span class="pd-acad-chip"><i class="fas ' + esc(l.icon) + '"></i> ' + esc(l.track) + '</span>' +
       '<span class="pd-acad-chip gold"><i class="fas fa-clock"></i> ' + l.minutes + ' min</span>' +
@@ -95,9 +99,9 @@
       '<div class="pd-acad-hero-actions">' +
         '<button class="pd-acad-btn pd-acad-btn-primary" id="markReadBtn"><i class="fas fa-check"></i> Mark Lesson Complete</button>' +
         (q ? '<button class="pd-acad-btn pd-acad-btn-secondary" id="startQuizBtn"><i class="fas fa-star"></i> Take Linked Quiz</button>' : '') +
-        (l.nextLessonId ? '<a class="pd-acad-btn pd-acad-btn-ghost" href="#lesson/' + esc(l.nextLessonId) + '">Next lesson <i class="fas fa-arrow-right"></i></a>' : '') +
+        (canNext && l.nextLessonId ? '<a class="pd-acad-btn pd-acad-btn-ghost" href="#lesson/' + esc(l.nextLessonId) + '">Next lesson <i class="fas fa-arrow-right"></i></a>' : '') +
       '</div>' +
-      (q ? renderQuiz(q, passed) : '');
+      (q ? renderQuiz(q, passed, sample) : '');
     if (state.completedLessons.indexOf(l.id) < 0) {
       $('#markReadBtn').addEventListener('click', function () {
         state = quizState(); if (state.completedLessons.indexOf(l.id) < 0) state.completedLessons.push(l.id); saveState(state);
@@ -106,29 +110,35 @@
       });
     } else { b($('#markReadBtn'), '✓ Completed'); }
     var sq = $('#startQuizBtn'); if (sq) sq.addEventListener('click', function () { var qz = $('#academyQuiz'); qz.style.display = 'block'; qz.scrollIntoView({ behavior: 'smooth' }); });
-    wireQuiz(q, l);
+    wireQuiz(q, l, sample);
+  }
+  function sampleQuizQuestions(q, count) {
+    var pool = q.questions.map(function (raw, i) { return { raw: raw, id: i }; });
+    pool = shuffle(pool).slice(0, Math.min(count, pool.length));
+    return pool.map(function (p) {
+      return { id: p.id, text: p.raw[0], options: shuffle([{ t: p.raw[1], correct: p.raw[5] === 0 }, { t: p.raw[2], correct: p.raw[5] === 1 }, { t: p.raw[3], correct: p.raw[5] === 2 }, { t: p.raw[4], correct: p.raw[5] === 3 }]) };
+    });
   }
   function b(el, txt) { if (el) el.innerHTML = '<i class="fas fa-check"></i> ' + esc(txt); el.disabled = true; }
-  function renderQuiz(q, passed) {
-    var questions = q.questions.map(function (raw, i) {
-      return { id: i, text: raw[0], options: shuffle([{ t: raw[1], correct: raw[5] === 0 }, { t: raw[2], correct: raw[5] === 1 }, { t: raw[3], correct: raw[5] === 2 }, { t: raw[4], correct: raw[5] === 3 }]) };
-    });
-        return '<div class="pd-acad-quiz" id="academyQuiz" style="display:' + (passed ? 'block' : 'none') + '"><h3><i class="fas fa-certificate"></i> Knowledge Check</h3>' +
+  function renderQuiz(q, passed, questions) {
+    questions = questions || sampleQuizQuestions(q, 5);
+    return '<div class="pd-acad-quiz" id="academyQuiz" style="display:' + (passed ? 'block' : 'none') + '"><h3><i class="fas fa-certificate"></i> Knowledge Check</h3>' +
       '<p>' + esc(q.description) + '</p>' +
-      questions.map(function (qz) {
-        return '<div class="pd-acad-quiz-q"><p>' + (qz.id + 1) + '. ' + esc(qz.text) + '</p>' + qz.options.map(function (op) {
+      questions.map(function (qz, i) {
+        return '<div class="pd-acad-quiz-q"><p>' + (i + 1) + '. ' + esc(qz.text) + '</p>' + qz.options.map(function (op) {
           return '<label class="pd-acad-option"><input type="radio" name="q' + q.id + '-' + qz.id + '" value="' + (op.correct ? '1' : '0') + '"><span>' + esc(op.t) + '</span></label>';
         }).join('') + '</div>';
       }).join('') +
       '<button class="pd-acad-btn pd-acad-btn-primary" id="submitAcademyQuiz"><i class="fas fa-paper-plane"></i> Submit Quiz</button>' +
       '<div id="academyQuizResult"></div></div>';
   }
-  function wireQuiz(q, lesson) {
+  function wireQuiz(q, lesson, questions) {
     var btn = $('#submitAcademyQuiz'); if (!btn) return;
+    questions = questions || sampleQuizQuestions(q, 5);
     btn.addEventListener('click', function () {
-      var score = 0; var total = q.questions.length;
-      q.questions.forEach(function (raw, i) {
-        var selected = $('input[name="q' + q.id + '-' + i + '"]:checked');
+      var score = 0; var total = questions.length;
+      questions.forEach(function (qz) {
+        var selected = $('input[name="q' + q.id + '-' + qz.id + '"]:checked');
         if (selected && selected.value === '1') score++;
       });
       var percent = Math.round((score / total) * 100);
@@ -157,6 +167,7 @@
           '<div class="pd-acad-cert-actions no-print">' +
           '<button class="pd-acad-btn pd-acad-btn-primary" id="downloadCertBtn"><i class="fas fa-download"></i> Download Certificate</button> ' +
           '<button class="pd-acad-btn pd-acad-btn-secondary" onclick="window.print()"><i class="fas fa-print"></i> Print / Save</button>' +
+          (lesson.nextLessonId ? ' <a class="pd-acad-btn pd-acad-btn-ghost" href="#lesson/' + esc(lesson.nextLessonId) + '">Next lesson <i class="fas fa-arrow-right"></i></a>' : '') +
           '</div></div>';
         var dlBtn = $('#downloadCertBtn');
         if (dlBtn) {
@@ -168,7 +179,10 @@
         }
         updateOverview(); renderLessonList($('#lessonList'), lesson.id);
       } else {
-        result.innerHTML = '<div class="pd-acad-callout"><strong>Almost there.</strong> You scored ' + percent + '%. Review the lesson and try again—80% is required to earn your certificate.</div>';
+        result.innerHTML = '<div class="pd-acad-callout"><strong>Almost there.</strong> You scored ' + percent + '%. Review the lesson and try again — 80% is required to earn your certificate. The questions change on each attempt.</div>' +
+          '<div class="pd-acad-hero-actions" style="margin-top:14px"><button class="pd-acad-btn pd-acad-btn-primary" id="retakeAcademyQuizBtn"><i class="fas fa-redo"></i> Retake Quiz</button></div>';
+        var rt = $('#retakeAcademyQuizBtn');
+        if (rt) rt.addEventListener('click', function () { renderLesson(lesson.id); var qz = $('#academyQuiz'); if (qz) { qz.style.display = 'block'; qz.scrollIntoView({ behavior: 'smooth' }); } });
       }
       result.scrollIntoView({ behavior: 'smooth' });
     });

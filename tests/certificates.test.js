@@ -120,6 +120,7 @@ function sliceBalanced(code, marker) {
   const aEnd = code.indexOf('window.exportCertificatesCSV', aStart);
   const adminCertCode = sliceBalanced(code, 'window.loadCertificates = async function () {') +
     '\n' + code.slice(code.indexOf('window.renderCertificates = function () {'), code.indexOf('window.filterCertificates')) +
+    '\n' + sliceBalanced(code, 'function renderCertificateCompletionChart() {') + '\n' +
     '\n' + code.slice(aEnd, code.indexOf('\n        };\n', aEnd) + 12);
 
   const html = fs.readFileSync(path.join(ROOT, 'admin.html'), 'utf8');
@@ -154,11 +155,12 @@ function sliceBalanced(code, marker) {
       const d = w.document;
       t('admin: certificates table renders all records',
         d.querySelectorAll('#certificatesList tr').length === 3, d.querySelectorAll('#certificatesList tr').length + ' rows');
-      t('admin: KPI totals computed',
-        String(d.getElementById('certTotalIssued').innerText) === '3' &&
-        String(d.getElementById('certTotalDownloads').innerText) === '4');
-      t('admin: month KPI counts only current month',
-        String(d.getElementById('certThisMonth').innerText) === '1', String(d.getElementById('certThisMonth').innerText));
+      t('admin: completion chart renders one bar per course',
+        d.querySelectorAll('#certificateCompletionChart rect').length === 3, d.querySelectorAll('#certificateCompletionChart rect').length + ' bars');
+      t('admin: chart lists each completed course',
+        d.getElementById('certificateCompletionChart').textContent.includes('Foundations of Prayer') &&
+        d.getElementById('certificateCompletionChart').textContent.includes('Intercession 101'));
+      t('admin: chart has a legend', d.getElementById('certificateCompletionLegend').textContent.includes('Certificates earned per lesson'));
       t('admin: unlinked cert flagged', d.getElementById('certificatesList').textContent.includes('Unlinked'));
       // search filter
       d.getElementById('certSearchInput').value = 'john';
