@@ -644,7 +644,7 @@
       category: 'Doctrine',
       format: 'PDF',
       icon: 'fa-cross',
-      size: '57 KB',
+      size: '167 KB',
       version: '2026 edition',
       url: '/documents/statement-of-faith.pdf',
       downloadUrl: '/documents/statement-of-faith.pdf'
@@ -656,7 +656,7 @@
       category: 'Discipleship',
       format: 'PDF',
       icon: 'fa-seedling',
-      size: '57 KB',
+      size: '167 KB',
       version: '2026 edition',
       url: '/documents/new-believers-guide.pdf',
       downloadUrl: '/documents/new-believers-guide.pdf'
@@ -668,7 +668,7 @@
       category: 'Prayer',
       format: 'PDF',
       icon: 'fa-moon',
-      size: '56 KB',
+      size: '165 KB',
       version: '2026 edition',
       url: '/documents/prayer-watch-guide.pdf',
       downloadUrl: '/documents/prayer-watch-guide.pdf'
@@ -680,7 +680,7 @@
       category: 'Ministry',
       format: 'PDF',
       icon: 'fa-people-group',
-      size: '56 KB',
+      size: '168 KB',
       version: '2026 edition',
       url: '/documents/serving-teams-handbook.pdf',
       downloadUrl: '/documents/serving-teams-handbook.pdf'
@@ -692,7 +692,7 @@
       category: 'Groups',
       format: 'PDF',
       icon: 'fa-comments',
-      size: '56 KB',
+      size: '168 KB',
       version: '2026 edition',
       url: '/documents/small-group-guide.pdf',
       downloadUrl: '/documents/small-group-guide.pdf'
@@ -704,7 +704,7 @@
       category: 'App Guide',
       format: 'PDF',
       icon: 'fa-mobile-screen',
-      size: '64 KB',
+      size: '172 KB',
       version: '2026 edition',
       url: '/Prayer-Dome-User-Guide.pdf',
       downloadUrl: '/Prayer-Dome-User-Guide.pdf'

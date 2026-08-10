@@ -251,6 +251,13 @@ t('admin notification composer supports all content types',
     adminHtml.includes('value="' + tp + '"')));
 t('admin live view offers in-app device broadcast',
   adminHtml.includes('OPEN CAMERA & GO LIVE'));
+t('admin dashboard replaces statistic cards with performance charts',
+  !adminHtml.includes('data-pd-stat') &&
+  ['activityPerformanceChart', 'workflowPerformanceChart', 'loadDashboardPerformance',
+   'renderDashboardPerformance'].every(id => adminHtml.includes(id)));
+t('admin dashboard no longer contains legacy overview statistic cards',
+  ['statTotalMembers', 'statPendingMembers', 'statGalleryItems',
+   'statPendingClaims', 'statActivePrayers'].every(id => !adminHtml.includes(id)));
 t('admin certificates tracker exists and is wired in',
   ['view-certificates', 'loadCertificates', 'exportCertificatesCSV',
    'certTotalDownloads', 'switchView(\'certificates\''].every(s => adminHtml.includes(s)));

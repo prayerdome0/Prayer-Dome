@@ -62,5 +62,19 @@ t('academy runtime offers certificate downloads', academyJs.includes('PDCertific
 const indexHtml = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 t('home links teaching, stories and resources', ['/lessons.html', '/stories.html', '/resources.html'].every(u => indexHtml.includes(u)));
 
+const publicDocs = [
+  fs.readFileSync(path.join(ROOT, 'README.md'), 'utf8'),
+  ...fs.readdirSync(path.join(ROOT, 'scripts', 'documents-src'))
+    .filter(name => name.endsWith('.md'))
+    .map(name => fs.readFileSync(path.join(ROOT, 'scripts', 'documents-src', name), 'utf8'))
+].join('\n').toLowerCase();
+t('public documentation describes website use rather than implementation',
+  publicDocs.includes('how to use prayer dome') &&
+  !['firebase', 'firestore', 'vercel', 'github actions', 'android studio', 'deployment'].some(term => publicDocs.includes(term)));
+const pdfBuilder = fs.readFileSync(path.join(ROOT, 'scripts', 'build-guide-pdfs.py'), 'utf8');
+t('all generated guides, including the user guide, use the official logo',
+  pdfBuilder.includes("LOGO = ROOT / 'assets' / 'logo.png'") &&
+  pdfBuilder.includes("'output': ROOT / 'Prayer-Dome-User-Guide.pdf'"));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
