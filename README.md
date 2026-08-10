@@ -45,3 +45,18 @@ passwords must never be committed.
 ```bash
 npm test
 ```
+
+## Deployment (Vercel)
+
+The site is a static bundle served from the repository root plus the
+dependency-free serverless handlers in `api/`. Deploys need **no build step**,
+so `package.json` deliberately has no `build` script (Vercel auto-runs any
+script named `build`, and heavy CI-style checks there break deployments).
+
+- The full verification gate is `npm run verify:all` (JS validation + SEO
+  drift check + unit/DOM tests + Firebase Functions verify). Run it locally
+  and in CI before pushing.
+- `node scripts/validate-production.mjs` alone is a fast, pure-Node syntax
+  check of all first-party JS and inline scripts.
+- The `postinstall` hook installs `functions/` dependencies for local
+  development and is skipped automatically on Vercel (`VERCEL=1`).
