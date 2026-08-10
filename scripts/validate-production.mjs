@@ -6,6 +6,12 @@
  * JSON-LD script tags are deliberately excluded because they are data, not
  * JavaScript source. This catches a syntax failure before static hosting or a
  * Capacitor packaging build ships it to users.
+ *
+ * All files are parsed as ES modules: `node --check` on a plain .js file only
+ * exercises the CommonJS parser, which silently tolerates module-only files
+ * (e.g. `export` in sloppy mode) — so a broken `devotional-data.js` would
+ * otherwise ship to users. Every first-party .js/.mjs file must parse as an
+ * ES module; the inline scripts below are checked the same way.
  */
 import { execFileSync } from 'node:child_process';
 import { readdirSync, readFileSync, statSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
@@ -29,10 +35,13 @@ function walk(directory) {
 function check(file, code = null) {
   let temporaryDirectory = null;
   try {
-    if (code !== null) {
+    if (code !== null || extname(file) === '.js') {
+      // Parse .js files and inline scripts as ES modules — the mode browsers
+      // use when they are `import`ed. A plain `node --check` on a .js file
+      // only runs the CommonJS parser and misses module syntax errors.
       temporaryDirectory = mkdtempSync(join(tmpdir(), 'prayer-dome-validate-'));
       const temporary = join(temporaryDirectory, 'inline-script.mjs');
-      writeFileSync(temporary, code, 'utf8');
+      writeFileSync(temporary, code !== null ? code : readFileSync(file, 'utf8'), 'utf8');
       execFileSync(process.execPath, ['--check', temporary], { stdio: 'pipe' });
     } else {
       execFileSync(process.execPath, ['--check', file], { stdio: 'pipe' });

@@ -215,7 +215,8 @@ export const devotionalsDB = {
             prayer: "Father, I reject the terror of the night. I declare that I will not fear, because You are with me. Let Your angels encamp around my home tonight. Protect me from every harm, visible and invisible. I walk in Your peace. Amen.",
             branchZambia: true
         }
-    ];
+    ]
+};
 
 // Seasonal/Holiday Specials
 export const seasonalDevotionals = {
