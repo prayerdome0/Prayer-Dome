@@ -721,8 +721,8 @@
         .suggestion-chip:hover { transform: translateY(-2px) scale(1.04); background: var(--accent-gold); color: #fff; box-shadow: 0 6px 14px -3px rgba(212,175,55,.5); }
 
         .chat-input-area {
-            /* Lift the composer slightly above the bottom edge for easier reach and visibility. */
-            padding: 14px 16px calc(28px + env(safe-area-inset-bottom, 20px));
+            /* Lifted 100px above the bottom (+ safe-area) for easier reach. */
+            padding: 14px 16px calc(100px + env(safe-area-inset-bottom, 20px));
             margin-top: auto;
             background: var(--bg-card);
             background: color-mix(in srgb, var(--bg-card) 97%, transparent);
@@ -1728,6 +1728,30 @@
                 <button class="header-btn" style="flex:1;background:var(--grad-main);color:#fff;border:none;" onclick="sendContact()"><i class="fas fa-share"></i> Share Contact</button>
                 <button class="header-btn" style="flex:1;" onclick="closeModal('contactModal')">Cancel</button>
             </div>
+        </div>
+    </div>
+    <!-- Location Share Modal — choice: Current once vs Live (10s updates, auto-stop) -->
+    <div id="locationModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="color:var(--accent-green);"><i class="fas fa-map-marker-alt"></i> Share Location</h3>
+            <p style="font-size:.78rem;color:var(--text-sub);margin:4px 0 12px;">Choose how to share your location. Live sharing uses your browser's real GPS permission and updates the same card.</p>
+            <button class="header-btn" style="width:100%;background:var(--grad-main);color:#fff;border:none;margin-bottom:10px;" onclick="shareCurrentLocationOnce()"><i class="fas fa-crosshairs"></i> 📍 Current location — once</button>
+            <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:14px;padding:12px;">
+                <strong style="font-size:.82rem;display:flex;align-items:center;gap:6px;"><i class="fas fa-satellite-dish" style="color:#ef4444;"></i> Live location</strong>
+                <p style="font-size:.70rem;color:var(--text-sub);margin:6px 0;">Share live updates for a selected duration (max 60 min). Updates the same chat card ~every 10s with accuracy. Stops automatically.</p>
+                <label style="font-size:.75rem;font-weight:700;">Duration</label>
+                <select id="liveDurationSelect" class="chat-input" style="width:100%;margin:6px 0 10px;">
+                    <option value="15">15 minutes</option>
+                    <option value="30">30 minutes</option>
+                    <option value="60" selected>60 minutes (max)</option>
+                    <option value="5">5 minutes (test)</option>
+                    <option value="1">1 minute (test)</option>
+                </select>
+                <button class="header-btn" style="width:100%;background:linear-gradient(135deg,#ef4444,#f59e0b);color:#fff;border:none;" onclick="startLiveLocationFromModal()"><i class="fas fa-broadcast-tower"></i> Start live sharing</button>
+                <p id="liveLocationStatus" style="font-size:.68rem;color:var(--text-sub);margin-top:8px;display:none;"></p>
+                <button id="stopLiveBtn" class="header-btn" style="width:100%;margin-top:8px;background:rgba(239,68,68,.12);color:#ef4444;border-color:rgba(239,68,68,.3);display:none;" onclick="stopLiveLocation()"><i class="fas fa-stop-circle"></i> Stop live sharing</button>
+            </div>
+            <button class="header-btn" style="margin-top:14px;width:100%;" onclick="closeModal('locationModal')">Cancel</button>
         </div>
     </div>
     <!-- Blocked Users Modal -->
@@ -2811,17 +2835,144 @@
           await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `👤 Contact: ${name} — ${phone}${email? ' — '+email:''}`, timestamp: serverTimestamp(), delivered:false, read:false, type:'contact', contact:{name, phone, email} });
           closeModal('contactModal'); document.getElementById('contactName').value=''; document.getElementById('contactPhone').value=''; document.getElementById('contactEmail').value=''; showToast('Contact shared 👤');
         };
-        window.shareLocation = async ()=>{
+        // === Location: Current once OR Live (browser GPS, 10s updates, auto-stop) ===
+        let liveWatchId = null, liveInterval = null, liveTimeout = null, liveMessageId = null, liveStartTime = null, liveDurationMs = 0, liveUpdateCount = 0;
+
+        function updateLiveModalStatus(){
+          const s=document.getElementById('liveLocationStatus');
+          const btn=document.getElementById('stopLiveBtn');
+          if(!s) return;
+          if(liveMessageId){
+            const elapsed = Date.now() - (liveStartTime||Date.now());
+            const remain = Math.max(0, liveDurationMs - elapsed);
+            const mins = Math.floor(remain/60000);
+            const secs = Math.floor((remain%60000)/1000);
+            s.style.display='block';
+            s.innerHTML = `<i class="fas fa-circle" style="color:#ef4444;animation:onlinePulse 1.2s infinite;font-size:.6rem;"></i> Live sharing active — ${liveUpdateCount} updates • ends in ${mins}m ${secs}s • accuracy shown on card`;
+            if(btn) btn.style.display='inline-flex';
+          } else {
+            s.style.display='none';
+            s.textContent='';
+            if(btn) btn.style.display='none';
+          }
+        }
+        setInterval(updateLiveModalStatus, 1000);
+
+        window.shareLocation = ()=>{
+          // Open choice modal: Current once vs Live
+          document.getElementById('locationModal').style.display='flex';
+          updateLiveModalStatus();
+        };
+        window.shareCurrentLocationOnce = async ()=>{
           if(!navigator.geolocation) return showToast('Location not supported','error');
-          showToast('Getting your location...','info');
+          closeModal('locationModal');
+          showToast('Getting your location…','info');
           navigator.geolocation.getCurrentPosition(async pos=>{
-            const {latitude, longitude}=pos.coords;
+            const {latitude, longitude, accuracy}=pos.coords;
             const url=`https://www.google.com/maps?q=${latitude},${longitude}`;
             const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
-            await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `📍 Location: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`, timestamp: serverTimestamp(), delivered:false, read:false, type:'location', location:{latitude, longitude, url} });
-            showToast('Location shared 📍');
-          }, err=> showToast('Location error: '+err.message,'error'), {enableHighAccuracy:true, timeout:15000});
+            await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `📍 Location: ${latitude.toFixed(5)}, ${longitude.toFixed(5)} ±${Math.round(accuracy)}m`, timestamp: serverTimestamp(), delivered:false, read:false, type:'location', location:{latitude, longitude, url, accuracy: Math.round(accuracy)} });
+            showToast('Location shared 📍 ±'+Math.round(accuracy)+'m');
+          }, err=> showToast('Location error: '+err.message,'error'), {enableHighAccuracy:true, timeout:15000, maximumAge:0});
         };
+        window.startLiveLocationFromModal = async ()=>{
+          const sel=document.getElementById('liveDurationSelect');
+          const mins = Math.min(60, Math.max(1, parseInt(sel?.value||'60',10)));
+          closeModal('locationModal');
+          await startLiveLocation(mins);
+        };
+        async function startLiveLocation(durationMinutes){
+          if(!navigator.geolocation) return showToast('Location not supported','error');
+          if(liveMessageId) return showToast('Live sharing already active — stop it first','info');
+          if(!currentUser) return showToast('Sign in to share live location','error');
+          durationMinutes = Math.min(60, Math.max(1, durationMinutes));
+          liveDurationMs = durationMinutes * 60 * 1000;
+          showToast(`Starting live location for ${durationMinutes} min… grant GPS permission`,'info');
+          // Request real GPS permission via getCurrentPosition first
+          try{
+            const pos = await new Promise((res, rej)=> navigator.geolocation.getCurrentPosition(res, rej, {enableHighAccuracy:true, timeout:15000, maximumAge:0}));
+            const {latitude, longitude, accuracy}=pos.coords;
+            const url=`https://www.google.com/maps?q=${latitude},${longitude}`;
+            const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
+            const expiresAt = new Date(Date.now() + liveDurationMs);
+            const docRef = await addDoc(collection(db, path, currentRoom,'messages'),{
+              userId: currentUser.uid,
+              userName: currentUser.displayName||'Anonymous',
+              text: `📍 Live location — sharing for ${durationMinutes} min`,
+              timestamp: serverTimestamp(),
+              updatedAt: serverTimestamp(),
+              delivered:false, read:false,
+              type:'liveLocation',
+              live: true,
+              durationMinutes,
+              expiresAt,
+              location:{latitude, longitude, url, accuracy: Math.round(accuracy), updatedAt: new Date().toISOString()},
+              accuracy: Math.round(accuracy)
+            });
+            liveMessageId = docRef.id;
+            liveStartTime = Date.now();
+            liveUpdateCount = 1;
+            showToast(`Live location sharing for ${durationMinutes} min — updates every ~10s`,'info');
+            updateLiveModalStatus();
+
+            // Use both watchPosition and 10s polling for reliable 10s cadence; updates SAME card via updateDoc
+            const collectionPath = path;
+            const roomId = currentRoom;
+            const msgRef = doc(db, collectionPath, roomId, 'messages', liveMessageId);
+
+            const pushUpdate = async (position)=>{
+              try{
+                const {latitude: lat, longitude: lng, accuracy: acc}=position.coords;
+                const u=`https://www.google.com/maps?q=${lat},${lng}`;
+                liveUpdateCount++;
+                await updateDoc(msgRef, {
+                  text: `📍 Live location — update ${liveUpdateCount} • ±${Math.round(acc)}m`,
+                  updatedAt: serverTimestamp(),
+                  'location.latitude': lat,
+                  'location.longitude': lng,
+                  'location.url': u,
+                  'location.accuracy': Math.round(acc),
+                  'location.updatedAt': new Date().toISOString(),
+                  accuracy: Math.round(acc)
+                });
+              }catch(e){ console.warn('live update failed', e); }
+            };
+
+            // High-accuracy watch (system may throttle) + 10s explicit poll ensures ~10s updates
+            try{
+              liveWatchId = navigator.geolocation.watchPosition(pushUpdate, err=> console.warn('watch error',err.message), {enableHighAccuracy:true, maximumAge:0, timeout:15000});
+            }catch(e){}
+
+            liveInterval = setInterval(()=>{
+              navigator.geolocation.getCurrentPosition(pushUpdate, err=> console.warn('live poll error',err.message), {enableHighAccuracy:true, timeout:12000, maximumAge:0});
+            }, 10000);
+
+            liveTimeout = setTimeout(async ()=>{
+              await stopLiveLocation(true);
+            }, liveDurationMs);
+
+          }catch(err){
+            showToast('Location error: '+err.message,'error');
+          }
+        }
+        window.stopLiveLocation = async (isAuto=false)=>{
+          if(liveWatchId!==null) try{ navigator.geolocation.clearWatch(liveWatchId);}catch(e){}
+          if(liveInterval) clearInterval(liveInterval);
+          if(liveTimeout) clearTimeout(liveTimeout);
+          liveWatchId=null; liveInterval=null; liveTimeout=null;
+          if(liveMessageId){
+            try{
+              const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
+              const ref=doc(db, path, currentRoom,'messages', liveMessageId);
+              await updateDoc(ref, { live:false, endedAt: serverTimestamp(), text: `📍 Live location — ended after ${Math.round((Date.now()- (liveStartTime||Date.now()))/60000)} min • ${liveUpdateCount} updates` });
+            }catch(e){}
+            showToast(isAuto ? 'Live location ended automatically' : 'Live location stopped','info');
+          }
+          liveMessageId=null; liveStartTime=null; liveDurationMs=0;
+          updateLiveModalStatus();
+        };
+        // Clean up live sharing if user switches room / logs out
+        window.addEventListener('beforeunload', ()=>{ if(liveWatchId!==null) try{ navigator.geolocation.clearWatch(liveWatchId);}catch(e){} });
         window.createPoll = async ()=>{
           const q=prompt('📊 Poll question:');
           if(!q||!q.trim()) return;
@@ -3107,8 +3258,20 @@
             if(msg.type==='contact' && msg.contact){
               const c=msg.contact;
               body=`<div class="contact-card"><strong><i class="fas fa-user"></i> ${escapeHtml(c.name)}</strong><span><i class="fas fa-phone"></i> ${escapeHtml(c.phone)}</span>${c.email? `<span><i class="fas fa-envelope"></i> ${escapeHtml(c.email)}</span>`:''}<button class="header-btn" style="margin-top:6px;font-size:.7rem;" onclick="alert('Saved ${escapeHtml(c.name)}')"><i class="fas fa-user-plus"></i> Add to contacts</button></div>`;
-            } else if(msg.type==='location' && msg.location){
-              body=`<div class="location-card"><strong><i class="fas fa-map-marker-alt"></i> Shared location</strong><span style="font-size:.75rem;">${msg.location.latitude?.toFixed(5)}, ${msg.location.longitude?.toFixed(5)}</span><a href="${msg.location.url}" target="_blank" class="header-btn" style="margin-top:6px;display:inline-flex;"><i class="fas fa-external-link-alt"></i> Open in Maps</a></div>`;
+            } else if((msg.type==='location' || msg.type==='liveLocation') && msg.location){
+              const isLive = msg.type==='liveLocation' || msg.live===true || msg.live===false;
+              const acc = msg.location.accuracy ?? msg.accuracy;
+              const isEnded = isLive && msg.live===false;
+              let remainText='';
+              if(isLive && !isEnded && msg.expiresAt?.toDate){
+                const remainMs = msg.expiresAt.toDate().getTime() - Date.now();
+                if(remainMs>0){ const rm=Math.ceil(remainMs/60000); remainText = ` • ends in ~${rm} min`; } else remainText=' • ending…';
+              } else if(isLive && !isEnded && msg.durationMinutes){ remainText = ` • live for ${msg.durationMinutes} min`; }
+              const liveBadge = isLive ? (isEnded ? `<span style="background:#64748b;color:#fff;font-size:.6rem;padding:2px 6px;border-radius:20px;margin-left:6px;">Ended</span>` : `<span style="background:#ef4444;color:#fff;font-size:.6rem;padding:2px 6px;border-radius:20px;margin-left:6px;animation:onlinePulse 1.2s infinite;">● LIVE</span>`) : '';
+              const accText = acc!=null ? ` • ±${Math.round(acc)}m accuracy` : '';
+              const updateInfo = msg.location.updatedAt ? `<span style="font-size:.65rem;color:var(--text-sub);">Updated ${moment(msg.location.updatedAt).fromNow()} • every ~10s${remainText}</span>` : (isLive && !isEnded ? `<span style="font-size:.65rem;color:var(--text-sub);">Live • updates every ~10s${remainText}</span>` : (accText ? `<span style="font-size:.65rem;color:var(--text-sub);">Accuracy ${accText.trim()}</span>` : ''));
+              const stopBtn = (isLive && !isEnded && currentUser && msg.userId===currentUser.uid) ? `<button class="header-btn" style="margin-top:6px;font-size:.68rem;background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.3);" onclick="stopLiveLocation()"><i class="fas fa-stop-circle"></i> Stop sharing</button>` : '';
+              body=`<div class="location-card"><strong><i class="fas fa-map-marker-alt"></i> ${isLive ? 'Live location' : 'Shared location'}${liveBadge}</strong><span style="font-size:.75rem;">${msg.location.latitude?.toFixed(5)}, ${msg.location.longitude?.toFixed(5)}${accText}</span>${updateInfo}<a href="${msg.location.url}" target="_blank" class="header-btn" style="margin-top:6px;display:inline-flex;"><i class="fas fa-external-link-alt"></i> Open in Maps</a>${stopBtn}</div>`;
             } else if(msg.type==='bibleVerse'){
               body=`<div class="bible-card"><strong style="color:var(--accent-gold);"><i class="fas fa-book-bible"></i> ${escapeHtml(msg.verseRef||'Bible Verse')}</strong><p style="font-style:italic;line-height:1.5;">“${escapeHtml(msg.verseText||msg.text)}</p></div>`;
             } else if(msg.type==='prayerRequest'){
