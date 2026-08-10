@@ -902,7 +902,7 @@
     // Hand the Firestore bindings to the shared premium layer (pd-app.js)
     // so live status, notifications, banners, news and stats sync in real time.
     if (window.PDApp) {
-        PDApp.setFirestore({ db, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, orderBy, limit, getDocs, serverTimestamp, Timestamp });
+        PDApp.setFirestore({ db, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, orderBy, limit, getDocs, serverTimestamp, Timestamp, auth });
     }
 
     let currentUser = null;
@@ -1610,6 +1610,10 @@
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
         if (user) {
+            // Register this device for push so ministry announcements reach
+            // the phone even when Prayer Dome is closed.
+            window.PD_UID = user.uid;
+            if (window.PDApp) PDApp.notifications.registerDevice(user.uid);
             await checkAndShowAdminTab(user);
             await loadNotifications();
             if (window.PDChallenge && PDChallenge.weekKey) PDChallenge.syncFromCloud();

@@ -644,6 +644,18 @@
   var READ_SIG_KEY = 'pd_notif_read_sigs';
   var SHOWN_KEY = 'pd_notif_shown_ids';
 
+  /* Web-push identity. The VAPID public key is the Web Push certificate from
+     the Prayer Dome Firebase project — it is a public value, safe to ship. */
+  var VAPID_PUBLIC_KEY = 'BFo6TSo4Urth0PXWZETz6cuPgRlemsFx7LDn8yDlFqCrIELU16X12O4ObOOlnbP2h7PvKqbC0N6a-_vrSsksrnM';
+  var FCM_CONFIG = {
+    apiKey: 'AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo',
+    authDomain: 'prayer-dome.firebaseapp.com',
+    projectId: 'prayer-dome',
+    storageBucket: 'prayer-dome.firebasestorage.app',
+    messagingSenderId: '198295153196',
+    appId: '1:198295153196:web:1222b31948d7974ba3bf89'
+  };
+
   function idList(key) { var v = lsGet(key, []); return Array.isArray(v) ? v : []; }
   function rememberId(key, id, cap) {
     if (!id) return;
@@ -712,6 +724,11 @@
       on('notification', function (e) {
         if (e && e.detail) notifications.push(e.detail, { silent: true });
       });
+      // If the member already allowed notifications, make sure this device is
+      // registered for push so admin announcements actually arrive.
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        setTimeout(function () { notifications.registerDevice(); }, 2500);
+      }
       // A dismissed system notification counts as seen.
       if (navigator.serviceWorker) {
         navigator.serviceWorker.addEventListener('message', function (event) {
@@ -825,16 +842,112 @@
             if (granted && window.Capacitor.Plugins.PushNotifications) {
               try { window.Capacitor.Plugins.PushNotifications.register(); } catch (e) {}
             }
+            if (granted) notifications.registerDevice();
             return granted ? 'granted' : 'denied';
           })
           .catch(function () { return 'denied'; });
       }
       if (typeof Notification === 'undefined') return Promise.resolve('unsupported');
-      try { return Promise.resolve(Notification.requestPermission()); }
-      catch (e) {
+      try {
+        return Promise.resolve(Notification.requestPermission()).then(function (perm) {
+          if (perm === 'granted') notifications.registerDevice();
+          return perm;
+        });
+      } catch (e) {
         // Some browsers throw if not from a user gesture — fall back to in-app only.
         return Promise.resolve(Notification.permission || 'default');
       }
+    },
+
+    /**
+     * Register this device with Firebase Cloud Messaging so an announcement
+     * published from the Admin Dashboard actually pops on the phone — even
+     * with the app closed.
+     *
+     * Without this the `userTokens` collection stays empty and "Send to all"
+     * has nobody to send to. The token is written once per device and only
+     * rewritten when Google issues a new one, so this is cheap on every load.
+     *
+     * On the packaged Android app Capacitor supplies the token instead, so we
+     * simply listen for it.
+     */
+    registerDevice: function (uid) {
+      if (notifications._registering) return notifications._registering;
+      if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return Promise.resolve(null);
+
+      var member = uid || (fb && fb.auth && fb.auth.currentUser && fb.auth.currentUser.uid) || window.PD_UID || null;
+
+      // Packaged Android app: Capacitor hands us the FCM token.
+      var push = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications;
+      if (push && push.addListener) {
+        if (!notifications._nativeBound) {
+          notifications._nativeBound = true;
+          try {
+            push.addListener('registration', function (t) {
+              notifications.saveToken(t && t.value, member, 'android');
+            });
+            push.register();
+          } catch (e) { /* the plugin is unavailable on this build */ }
+        }
+        return Promise.resolve(null);
+      }
+
+      if (!navigator.serviceWorker || !window.indexedDB) return Promise.resolve(null);
+
+      notifications._registering = (async function () {
+        try {
+          var reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
+          var appMod = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js');
+          var msgMod = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js');
+          if (!(await msgMod.isSupported())) return null;
+          var app = appMod.getApps().length ? appMod.getApps()[0] : appMod.initializeApp(FCM_CONFIG);
+          var messaging = msgMod.getMessaging(app);
+          var token = await msgMod.getToken(messaging, { vapidKey: VAPID_PUBLIC_KEY, serviceWorkerRegistration: reg });
+          if (!token) return null;
+
+          // Foreground pushes still raise a real device notification, using the
+          // same stable tag so nothing is ever shown twice.
+          msgMod.onMessage(messaging, function (payload) {
+            var note = (payload && payload.notification) || {};
+            var data = (payload && payload.data) || {};
+            notifications.push({
+              id: data.id || note.title,
+              type: data.kind || data.type || 'general',
+              title: note.title || data.title || 'Prayer Dome',
+              message: note.body || data.body || data.message || '',
+              link: data.url || data.link || null
+            });
+          });
+
+          notifications.saveToken(token, member, 'web');
+          return token;
+        } catch (e) {
+          return null;   // push is a bonus; the in-app centre still works
+        } finally {
+          notifications._registering = null;
+        }
+      })();
+      return notifications._registering;
+    },
+
+    /** Persist a device token so the Admin Dashboard can reach this device. */
+    saveToken: function (token, uid, platform) {
+      if (!token) return;
+      var member = uid || (fb && fb.auth && fb.auth.currentUser && fb.auth.currentUser.uid) || window.PD_UID || null;
+      if (localStorage.getItem('pd_push_token') === token &&
+          localStorage.getItem('pd_push_uid') === String(member)) return;
+      localStorage.setItem('pd_push_token', token);
+      localStorage.setItem('pd_push_uid', String(member));
+      // The security rules require a signed-in owner, so anonymous visitors
+      // keep the token locally until they sign in.
+      if (!member || !fb || !fb.db || !fb.setDoc || !fb.doc) return;
+      fsSet(fb.doc(fb.db, 'userTokens', member), {
+        token: token,
+        userId: member,
+        platform: platform || 'web',
+        active: true,
+        updatedAt: fb.serverTimestamp ? fb.serverTimestamp() : new Date().toISOString()
+      });
     },
 
     /* Show the notification on the device itself. Android and installed iOS

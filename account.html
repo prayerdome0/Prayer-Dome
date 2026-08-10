@@ -1541,6 +1541,14 @@
         
         onAuthStateChanged(auth, async (user) => {
             if (user) {
+                // Let the shared app layer write this device's push token, so
+                // ministry announcements pop on the phone even when the app is
+                // closed. It is a no-op until notifications are allowed.
+                window.PD_UID = user.uid;
+                if (window.PDApp) {
+                    PDApp.setFirestore({ db, doc, getDoc, setDoc, updateDoc, collection, query, orderBy, limit, getDocs, serverTimestamp, auth });
+                    PDApp.notifications.registerDevice(user.uid);
+                }
                 document.getElementById('authTabs').style.display = 'none';
                 document.getElementById('loginForm').style.display = 'none';
                 document.getElementById('registerForm').style.display = 'none';

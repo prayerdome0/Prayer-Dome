@@ -628,6 +628,20 @@
                         </div>
 
                         <p style="font-size:.72rem; opacity:.75; margin-top:10px;"><i class="fas fa-circle-info"></i> Broadcasts from this device are recorded <strong>directly into Prayer Dome cloud storage</strong> in rolling parts, so members can watch the replay in the app from any device. Nothing is stored locally. For large audiences, use the RTMP path above with OBS/Larix.</p>
+
+                        <details style="margin-top:10px; font-size:.72rem; opacity:.85;">
+                            <summary style="cursor:pointer; font-weight:700;"><i class="fas fa-screwdriver-wrench"></i> One-time cloud setup (optional)</summary>
+                            <p style="margin-top:8px; line-height:1.7;">
+                                Recording works today using the existing <code>live_streams</code> upload preset. For tidier
+                                storage and longer services, create two <strong>unsigned</strong> upload presets in the
+                                Cloudinary console (cloud name <code>prayerdome</code>):
+                            </p>
+                            <ul style="margin:8px 0 0 18px; line-height:1.8;">
+                                <li><code>live_recordings</code> — resource type <em>video</em>, folder <code>live_recordings</code></li>
+                                <li><code>ai_videos</code> — resource type <em>video</em>, folder <code>ai_videos</code></li>
+                            </ul>
+                            <p style="margin-top:8px;">Prayer Dome tries these first and quietly falls back to the existing presets, so nothing breaks either way.</p>
+                        </details>
                     </div>
                 </div>
 
@@ -3373,6 +3387,13 @@
                     const snap = await getDoc(doc(db, "memberships", user.uid));
                     if (snap.exists() && snap.data().role === 'admin') {
                         adminUser = user;
+                        // Register this device for push so "Send test notification"
+                        // and "Send to all" have a token to reach.
+                        window.PD_UID = user.uid;
+                        if (window.PDApp) {
+                            PDApp.setFirestore({ db, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, orderBy, limit, getDocs, serverTimestamp, Timestamp, onSnapshot, auth });
+                            PDApp.notifications.registerDevice(user.uid);
+                        }
                         document.getElementById('topbarName').innerText = snap.data().fullName || 'Admin';
                         document.getElementById('topbarAvatar').innerText = (snap.data().fullName || 'A')[0];
                         document.getElementById('loginModal').style.display = 'none';
