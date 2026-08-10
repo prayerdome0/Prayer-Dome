@@ -1230,6 +1230,42 @@
             .messages-area { padding: 14px; }
         }
 
+        /* ===== WhatsApp-style extras ===== */
+        .attachment-menu{position:absolute;bottom:74px;left:16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:18px;box-shadow:var(--shadow-lg);padding:8px;display:none;grid-template-columns:repeat(4,1fr);gap:8px;z-index:400;width:300px;}
+        .attachment-menu.open{display:grid;animation:modalPop .25s var(--ease-spring);}
+        .attachment-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border-radius:14px;cursor:pointer;transition:.2s;background:var(--bg-primary);font-size:.7rem;font-weight:700;text-align:center;}
+        .attachment-item i{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.15rem;}
+        .attachment-item:hover{transform:translateY(-3px) scale(1.03);box-shadow:var(--shadow);}
+        .emoji-picker{position:absolute;bottom:74px;left:16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:18px;box-shadow:var(--shadow-lg);padding:12px;display:none;grid-template-columns:repeat(8,1fr);gap:4px;z-index:401;width:320px;max-height:220px;overflow-y:auto;}
+        .emoji-picker.open{display:grid;animation:modalPop .25s var(--ease-spring);}
+        .emoji-picker button{background:none;border:none;font-size:1.35rem;cursor:pointer;border-radius:8px;padding:6px;transition:.15s;}
+        .emoji-picker button:hover{background:rgba(59,130,246,.1);transform:scale(1.2);}
+        .reaction-bar{display:flex;gap:4px;padding:6px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:30px;box-shadow:var(--shadow);position:absolute;top:-38px;left:10px;z-index:5;animation:fadeInUp .2s ease;}
+        .reaction-bar button{background:none;border:none;font-size:1.1rem;cursor:pointer;width:32px;height:32px;border-radius:50%;transition:.15s;display:flex;align-items:center;justify-content:center;}
+        .reaction-bar button:hover{background:rgba(59,130,246,.1);transform:scale(1.25);}
+        .msg-reactions{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;}
+        .msg-reaction{background:var(--bg-primary);border:1px solid var(--border-color);border-radius:30px;padding:3px 7px;font-size:.68rem;display:inline-flex;align-items:center;gap:4px;}
+        .christian-bar{display:flex;gap:6px;padding:8px 12px;background:linear-gradient(135deg, rgba(10,77,155,.06), rgba(212,175,55,.08));border-top:1px solid var(--border-color);overflow-x:auto;flex-shrink:0;scrollbar-width:none;}
+        .christian-bar::-webkit-scrollbar{display:none;}
+        .christian-btn{white-space:nowrap;border:1px solid rgba(212,175,55,.35);background:var(--bg-card);color:var(--accent-green);border-radius:30px;padding:7px 12px;font-size:.72rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.2s;flex-shrink:0;}
+        .christian-btn:hover{background:var(--accent-green);color:#fff;transform:translateY(-1px);box-shadow:0 4px 12px rgba(10,77,155,.2);}
+        .christian-btn.gold{border-color:var(--accent-gold);color:var(--accent-gold);}
+        .christian-btn.gold:hover{background:var(--accent-gold);color:#000;}
+        .call-history-item{display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--border-color);transition:.2s;}
+        .call-history-item:hover{background:rgba(59,130,246,.05);}
+        .call-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.95rem;flex-shrink:0;}
+        .call-icon.missed{background:var(--accent-red);} .call-icon.outgoing{background:var(--accent-green);} .call-icon.incoming{background:var(--accent-blue);}
+        .contact-card,.location-card,.bible-card,.prayer-card,.devotional-card,.testimony-card{background:rgba(255,255,255,.9);border:1px solid var(--border-color);border-radius:16px;padding:12px;margin-top:8px;display:flex;flex-direction:column;gap:6px;}
+        body.dark-mode .contact-card, body.dark-mode .location-card, body.dark-mode .bible-card, body.dark-mode .prayer-card, body.dark-mode .devotional-card{ background:rgba(21,31,51,.9); }
+        .contact-card i,.location-card i{color:var(--accent-green);}
+        .message.sent .contact-card,.message.sent .location-card,.message.sent .bible-card,.message.sent .prayer-card{ background:rgba(255,255,255,.15); border-color:rgba(255,255,255,.3); }
+        .group-avatar-stack{display:flex;margin-left:6px;}
+        .group-avatar-stack span{width:22px;height:22px;border-radius:50%;border:2px solid var(--bg-card);display:flex;align-items:center;justify-content:center;font-size:.65rem;background:var(--grad-lux);color:#fff;margin-left:-6px;}
+        .last-seen{font-size:.62rem;color:var(--text-sub);font-style:italic;}
+        .privacy-item-desc{font-size:.68rem;color:var(--text-sub);margin-top:2px;}
+        .calls-tab-header{display:flex;gap:8px;padding:12px;border-bottom:1px solid var(--border-color);background:var(--bg-card);position:sticky;top:0;z-index:2;}
+        .calls-filter{flex:1;padding:8px 12px;border-radius:30px;border:1px solid var(--border-color);background:var(--bg-primary);font-size:.75rem;cursor:pointer;text-align:center;font-weight:700;}
+        .calls-filter.active{background:var(--grad-main);color:#fff;border-color:transparent;}
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -1267,8 +1303,9 @@
     
     <!-- Main Tabs -->
     <div class="main-tabs">
-        <button class="main-tab active" onclick="switchMainTab('chats')"><i class="fas fa-comments"></i><span> Chats</span></button>
-        <button class="main-tab" onclick="switchMainTab('status')"><i class="fas fa-circle"></i><span> Status</span></button>
+        <button class="main-tab active" onclick="switchMainTab('chats')"><i class="fas fa-comments"></i><span> Chats</span><span id="chatsBadge" class="room-badge" style="display:none;margin-left:6px;font-size:.6rem;">0</span></button>
+        <button class="main-tab" onclick="switchMainTab('status')"><i class="fas fa-circle-notch"></i><span> Status</span></button>
+        <button class="main-tab" onclick="switchMainTab('calls')"><i class="fas fa-phone"></i><span> Calls</span><span id="callsBadge" class="room-badge" style="display:none;margin-left:6px;font-size:.6rem;background:#ef4444;">•</span></button>
         <button class="main-tab" onclick="switchMainTab('settings')"><i class="fas fa-cog"></i><span> Settings</span></button>
     </div>
     
@@ -1278,7 +1315,14 @@
             <div class="rooms-sidebar" id="roomsSidebar">
                 <div class="rooms-header">
                     <h3><i class="fas fa-comment-dots"></i> Conversations</h3>
-                    <button class="header-btn" style="margin-top: 10px; width: 100%;" onclick="startPrivateChat()"><i class="fas fa-user-plus"></i> New Private Chat</button>
+                    <div style="display:flex;gap:8px;margin-top:10px;">
+                        <button class="header-btn" style="flex:1;" onclick="startPrivateChat()"><i class="fas fa-user-plus"></i> New Chat</button>
+                        <button class="header-btn" style="flex:1;background:var(--grad-lux);color:#fff;border:none;" onclick="openCreateGroupModal()"><i class="fas fa-users"></i> New Group</button>
+                    </div>
+                    <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+                        <button class="christian-btn" style="flex:1;justify-content:center;" onclick="joinPresetGroup('prayer')"><i class="fas fa-pray"></i> Prayer Requests</button>
+                        <button class="christian-btn" style="flex:1;justify-content:center;" onclick="joinPresetGroup('bible')"><i class="fas fa-book-bible"></i> Bible Study</button>
+                    </div>
                 </div>
                 <div class="room-search">
                     <input type="text" id="roomSearch" placeholder="🔍 Search rooms or people..." onkeyup="filterRooms()">
@@ -1287,12 +1331,16 @@
             </div>
             
             <div class="chat-area">
-                <div class="chat-area-header">
-                    <div class="chat-area-title">
-                        <h2 id="currentRoomName">🌍 General Fellowship</h2>
-                        <p id="currentRoomDesc">Welcome all believers - share encouragement and prayer</p>
+                <div class="chat-area-header" id="chatAreaHeader" onclick="openGroupInfo()" style="cursor:pointer;">
+                    <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
+                        <div class="room-avatar" id="headerAvatar" style="width:38px;height:38px;font-size:.95rem;">🌍</div>
+                        <div class="chat-area-title" style="flex:1;min-width:0;">
+                            <h2 id="currentRoomName" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">🌍 General Fellowship</h2>
+                            <p id="currentRoomDesc" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Welcome all believers - share encouragement and prayer</p>
+                            <p id="currentRoomOnline" class="last-seen" style="display:none;"></p>
+                        </div>
                     </div>
-                    <div class="chat-actions" id="chatActions"><button class="header-btn" title="Voice call" onclick="startCall(false)"><i class="fas fa-phone"></i></button><button class="header-btn" title="Video call" onclick="startCall(true)"><i class="fas fa-video"></i></button></div>
+                    <div class="chat-actions" id="chatActions" onclick="event.stopPropagation()"><button class="header-btn" title="Voice call" onclick="startCall(false)"><i class="fas fa-phone"></i></button><button class="header-btn" title="Video call" onclick="startCall(true)"><i class="fas fa-video"></i></button><button class="header-btn" title="Group info" onclick="openGroupInfo()"><i class="fas fa-ellipsis-v"></i></button></div>
                 </div>
                 
                 <div class="messages-area" id="messagesArea">
@@ -1306,21 +1354,42 @@
                     <span class="typing-dots"><span></span><span></span><span></span></span> Someone is typing...
                 </div>
                 
+                <div class="christian-bar" id="christianBar">
+                    <button class="christian-btn gold" onclick="sharePrayerRequest()"><i class="fas fa-praying-hands"></i> Prayer Request</button>
+                    <button class="christian-btn" onclick="shareBibleVerse()"><i class="fas fa-book-bible"></i> Bible Verse</button>
+                    <button class="christian-btn" onclick="shareTestimony()"><i class="fas fa-star"></i> Testimony</button>
+                    <button class="christian-btn gold" onclick="shareDevotional()"><i class="fas fa-book-open"></i> Devotional</button>
+                    <button class="christian-btn" onclick="shareContact()"><i class="fas fa-address-card"></i> Contact</button>
+                    <button class="christian-btn" onclick="shareLocation()"><i class="fas fa-map-marker-alt"></i> Location</button>
+                </div>
                 <div class="chat-suggestions" id="chatSuggestions">
                     <span class="suggestion-hint"><i class="fas fa-bolt"></i></span>
                     <button class="suggestion-chip" onclick="sendSuggestion('Amen, God is good! 🙌')">Amen 🙌</button>
                     <button class="suggestion-chip" onclick="sendSuggestion('God bless you and your family 🌿')">God bless you 🌿</button>
                     <button class="suggestion-chip" onclick="sendSuggestion('I am praying for you today 🙏')">Praying for you 🙏</button>
                     <button class="suggestion-chip" onclick="sendSuggestion('Welcome to the Prayer Dome family! 🕊️')">Welcome 🕊️</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion('🙏 Prayer answered — Glory to God!')">Answered 🙏</button>
                 </div>
-                <div class="chat-input-area">
+                <div class="chat-input-area" style="position:relative;">
+                    <div class="attachment-menu" id="attachmentMenu">
+                        <div class="attachment-item" onclick="uploadPhoto();toggleAttachmentMenu()"><i class="fas fa-image" style="background:#25D366;"></i> Gallery</div>
+                        <div class="attachment-item" onclick="uploadVideo();toggleAttachmentMenu()"><i class="fas fa-video" style="background:#3b82f6;"></i> Video</div>
+                        <div class="attachment-item" onclick="uploadDocument();toggleAttachmentMenu()"><i class="fas fa-file-pdf" style="background:#ef4444;"></i> Document</div>
+                        <div class="attachment-item" onclick="uploadAudioFile();toggleAttachmentMenu()"><i class="fas fa-music" style="background:#8b5cf6;"></i> Audio</div>
+                        <div class="attachment-item" onclick="shareContact();toggleAttachmentMenu()"><i class="fas fa-address-card" style="background:#0A4D9B;"></i> Contact</div>
+                        <div class="attachment-item" onclick="shareLocation();toggleAttachmentMenu()"><i class="fas fa-map-marker-alt" style="background:#f59e0b;"></i> Location</div>
+                        <div class="attachment-item" onclick="shareBibleVerse();toggleAttachmentMenu()"><i class="fas fa-book-bible" style="background:#d4af37;"></i> Bible</div>
+                        <div class="attachment-item" onclick="createPoll();toggleAttachmentMenu()"><i class="fas fa-poll" style="background:#10b981;"></i> Poll</div>
+                    </div>
+                    <div class="emoji-picker" id="emojiPicker">
+                        <button onclick="insertEmoji('😊')">😊</button><button onclick="insertEmoji('❤️')">❤️</button><button onclick="insertEmoji('🙏')">🙏</button><button onclick="insertEmoji('😇')">😇</button><button onclick="insertEmoji('✝️')">✝️</button><button onclick="insertEmoji('🕊️')">🕊️</button><button onclick="insertEmoji('🔥')">🔥</button><button onclick="insertEmoji('✨')">✨</button><button onclick="insertEmoji('🙌')">🙌</button><button onclick="insertEmoji('👋')">👋</button><button onclick="insertEmoji('😂')">😂</button><button onclick="insertEmoji('🥰')">🥰</button><button onclick="insertEmoji('😎')">😎</button><button onclick="insertEmoji('🤗')">🤗</button><button onclick="insertEmoji('💪')">💪</button><button onclick="insertEmoji('👍')">👍</button><button onclick="insertEmoji('🎉')">🎉</button><button onclick="insertEmoji('😢')">😢</button><button onclick="insertEmoji('🌿')">🌿</button><button onclick="insertEmoji('📖')">📖</button><button onclick="insertEmoji('⛪')">⛪</button><button onclick="insertEmoji('💒')">💒</button><button onclick="insertEmoji('🙇')">🙇</button><button onclick="insertEmoji('👏')">👏</button>
+                    </div>
                     <div class="media-buttons">
-                        <button class="media-btn" onclick="uploadPhoto()" title="Send Photo" aria-label="Send photo"><i class="fas fa-image"></i></button>
-                        <button class="media-btn" onclick="uploadVideo()" title="Send Video" aria-label="Send video"><i class="fas fa-video"></i></button>
-                        <button class="media-btn" onclick="uploadDocument()" title="Send Document" aria-label="Send document"><i class="fas fa-file-alt"></i></button>
+                        <button class="media-btn" onclick="toggleEmojiPicker()" title="Emoji" aria-label="Emoji"><i class="fas fa-smile"></i></button>
+                        <button class="media-btn" onclick="toggleAttachmentMenu()" title="Attach" aria-label="Attach"><i class="fas fa-paperclip"></i></button>
                         <button class="media-btn" onclick="startVoiceRecording()" title="Voice Message" aria-label="Voice message"><i class="fas fa-microphone"></i></button>
                     </div>
-                    <input type="text" id="messageInput" class="chat-input" placeholder="Type a message" autocomplete="off" maxlength="2000" onkeypress="if(event.key==='Enter') sendMessage()">
+                    <input type="text" id="messageInput" class="chat-input" placeholder="Type a message" autocomplete="off" maxlength="2000" onkeypress="if(event.key==='Enter') sendMessage()" oninput="onMessageInput()">
                     <button class="chat-send" id="chatSendBtn" onclick="sendMessage()" aria-label="Send message">
                         <i class="fas fa-paper-plane"></i>
                         <span class="send-label">Send</span>
@@ -1337,14 +1406,34 @@
                 <div class="my-status-avatar"><i class="fas fa-plus"></i></div>
                 <div>
                     <h3>My Status</h3>
-                    <p>Tap to add a photo or video that disappears in 24 hours</p>
+                    <p>Tap to add a photo, video or text that disappears in 24 hours</p>
                     <div class="status-stats" id="myStatusStats"></div>
                 </div>
+                <button class="header-btn" style="margin-left:auto;background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.3);" onclick="event.stopPropagation();addTextStatus()"><i class="fas fa-font"></i> Text</button>
             </div>
             
             <h3 style="margin: 20px 0 10px;"><i class="fas fa-users"></i> Friends' Status</h3>
             <div id="statusGrid" class="status-grid">
                 <div style="text-align: center; grid-column: 1/-1; padding: 40px;">Loading statuses...</div>
+            </div>
+            <p style="font-size:.68rem;color:var(--text-sub);margin-top:14px;text-align:center;"><i class="fas fa-lock"></i> Status updates disappear after 24 hours • Tap to view • Long-press to react • Swipe to reply</p>
+        </div>
+    </div>
+    <!-- CALLS TAB -->
+    <div id="tab-calls" class="tab-content">
+        <div class="settings-container" style="padding:0;max-width:640px;">
+            <div class="calls-tab-header">
+                <button class="calls-filter active" onclick="filterCalls('all')" id="filterAll">All</button>
+                <button class="calls-filter" onclick="filterCalls('missed')" id="filterMissed">Missed</button>
+                <button class="calls-filter" onclick="filterCalls('incoming')" id="filterIncoming">Incoming</button>
+                <button class="calls-filter" onclick="filterCalls('outgoing')" id="filterOutgoing">Outgoing</button>
+            </div>
+            <div style="padding:14px;display:flex;gap:10px;">
+                <button class="header-btn" style="flex:1;background:var(--grad-main);color:#fff;border:none;" onclick="startPrivateChat()"><i class="fas fa-phone"></i> New Call</button>
+                <button class="header-btn" style="flex:1;" onclick="clearCallHistory()"><i class="fas fa-trash"></i> Clear</button>
+            </div>
+            <div id="callsList" style="background:var(--bg-card);border-top:1px solid var(--border-color);min-height:300px;">
+                <div style="text-align:center;padding:40px;color:var(--text-sub);"><i class="fas fa-phone" style="font-size:2rem;opacity:.3;"></i><p>No calls yet — your voice & video call history will appear here</p></div>
             </div>
         </div>
     </div>
@@ -1400,7 +1489,7 @@
                 <div class="settings-item">
                     <div class="settings-item-left">
                         <div class="settings-icon"><i class="fas fa-eye"></i></div>
-                        <div><strong>Read Receipts</strong></div>
+                        <div><div><strong>Read Receipts</strong></div><div class="privacy-item-desc">If turned off, you won't send or receive read receipts</div></div>
                     </div>
                     <div class="toggle-switch" id="readReceiptToggle" onclick="toggleReadReceipts()">
                         <div class="toggle-slider"></div>
@@ -1409,16 +1498,56 @@
                 <div class="settings-item">
                     <div class="settings-item-left">
                         <div class="settings-icon"><i class="fas fa-user-secret"></i></div>
-                        <div><strong>Show Online Status</strong></div>
+                        <div><div><strong>Show Online Status</strong></div><div class="privacy-item-desc">Let others see when you're online</div></div>
                     </div>
                     <div class="toggle-switch" id="onlineToggle" onclick="toggleOnlineStatus()">
                         <div class="toggle-slider"></div>
                     </div>
                 </div>
+                <div class="settings-item">
+                    <div class="settings-item-left">
+                        <div class="settings-icon"><i class="fas fa-clock"></i></div>
+                        <div><div><strong>Last Seen</strong></div><div class="privacy-item-desc">Who can see your last seen</div></div>
+                    </div>
+                    <select id="lastSeenPrivacy" onchange="savePrivacySetting('lastSeen',this.value)" style="border:1px solid var(--border-color);border-radius:12px;padding:6px 10px;background:var(--bg-primary);font-size:.75rem;">
+                        <option value="everyone">Everyone</option>
+                        <option value="contacts">My contacts</option>
+                        <option value="nobody">Nobody</option>
+                    </select>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-item-left">
+                        <div class="settings-icon"><i class="fas fa-user-circle"></i></div>
+                        <div><div><strong>Profile Photo</strong></div><div class="privacy-item-desc">Who can see your photo</div></div>
+                    </div>
+                    <select id="photoPrivacy" onchange="savePrivacySetting('photo',this.value)" style="border:1px solid var(--border-color);border-radius:12px;padding:6px 10px;background:var(--bg-primary);font-size:.75rem;">
+                        <option value="everyone">Everyone</option>
+                        <option value="contacts">My contacts</option>
+                        <option value="nobody">Nobody</option>
+                    </select>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-item-left">
+                        <div class="settings-icon"><i class="fas fa-circle-notch"></i></div>
+                        <div><div><strong>Status Visibility</strong></div><div class="privacy-item-desc">Who can see your status</div></div>
+                    </div>
+                    <select id="statusPrivacy" onchange="savePrivacySetting('status',this.value)" style="border:1px solid var(--border-color);border-radius:12px;padding:6px 10px;background:var(--bg-primary);font-size:.75rem;">
+                        <option value="everyone">Everyone</option>
+                        <option value="contacts">My contacts</option>
+                        <option value="nobody">Nobody</option>
+                    </select>
+                </div>
                 <div class="settings-item" onclick="blockedUsers()">
                     <div class="settings-item-left">
                         <div class="settings-icon"><i class="fas fa-ban"></i></div>
-                        <div><strong>Blocked Users</strong></div>
+                        <div><div><strong>Blocked Users</strong></div><div class="privacy-item-desc" id="blockedCount">0 blocked</div></div>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+                <div class="settings-item" onclick="reportUser()">
+                    <div class="settings-item-left">
+                        <div class="settings-icon" style="background:rgba(239,68,68,.15);color:#ef4444;"><i class="fas fa-flag"></i></div>
+                        <div><div><strong>Report a User</strong></div><div class="privacy-item-desc">Report abuse or spam</div></div>
                     </div>
                     <i class="fas fa-chevron-right"></i>
                 </div>
@@ -1462,7 +1591,12 @@
             </div>
         </div>
         <div class="status-view-media" id="statusViewMedia"></div>
-        <div style="padding: 20px; text-align: center;">
+        <div style="padding: 16px; text-align: center; display:flex;gap:8px;justify-content:center;flex-wrap:wrap;align-items:center;">
+            <button onclick="reactToStatus('❤️')" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;">❤️</button>
+            <button onclick="reactToStatus('🙏')" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;">🙏</button>
+            <button onclick="reactToStatus('😇')" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;">😇</button>
+            <button onclick="reactToStatus('🔥')" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;">🔥</button>
+            <button onclick="reactToStatus('✨')" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;">✨</button>
             <button onclick="replyToStatus()" class="header-btn" style="background: var(--accent-green); color: white;"><i class="fas fa-reply"></i> Reply</button>
         </div>
     </div>
@@ -1503,6 +1637,104 @@
         </div>
     </div>
     
+    <!-- Create Group Modal -->
+    <div id="createGroupModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="color:var(--accent-green);"><i class="fas fa-users"></i> Create Group</h3>
+            <div class="form-group">
+                <label style="font-size:.75rem;font-weight:700;">Group Name *</label>
+                <input type="text" id="groupNameInput" class="chat-input" placeholder="e.g. Prayer Requests, Youth Fellowship" maxlength="40" style="width:100%;">
+            </div>
+            <div class="form-group">
+                <label style="font-size:.75rem;font-weight:700;">Description</label>
+                <input type="text" id="groupDescInput" class="chat-input" placeholder="What's this group for?" maxlength="80" style="width:100%;">
+            </div>
+            <div class="form-group">
+                <label style="font-size:.75rem;font-weight:700;">Group Type</label>
+                <select id="groupTypeInput" class="chat-input" style="width:100%;">
+                    <option value="general">💬 General</option>
+                    <option value="prayer">🙏 Prayer Requests</option>
+                    <option value="youth">🔥 Youth Fellowship</option>
+                    <option value="women">👩 Women's Ministry</option>
+                    <option value="men">👨 Men's Ministry</option>
+                    <option value="bible">📖 Bible Study</option>
+                    <option value="leadership">👑 Church Leadership</option>
+                    <option value="worship">🎵 Worship Team</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label style="font-size:.75rem;font-weight:700;">Group Icon</label>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button class="header-btn" onclick="pickGroupIcon('🙏')">🙏</button><button class="header-btn" onclick="pickGroupIcon('📖')">📖</button><button class="header-btn" onclick="pickGroupIcon('🔥')">🔥</button><button class="header-btn" onclick="pickGroupIcon('✝️')">✝️</button><button class="header-btn" onclick="pickGroupIcon('👩')">👩</button><button class="header-btn" onclick="pickGroupIcon('👨')">👨</button><button class="header-btn" onclick="pickGroupIcon('🎵')">🎵</button><button class="header-btn" onclick="pickGroupIcon('💒')">💒</button>
+                    <span id="selectedGroupIcon" style="margin-left:8px;font-size:1.4rem;line-height:32px;">🌍</span>
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+                <button class="header-btn" style="flex:1;background:var(--grad-main);color:#fff;border:none;" onclick="createGroup()"><i class="fas fa-check"></i> Create Group</button>
+                <button class="header-btn" style="flex:1;" onclick="closeModal('createGroupModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <!-- Group Info Modal -->
+    <div id="groupInfoModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="groupInfoTitle" style="color:var(--accent-green);"><i class="fas fa-info-circle"></i> Group Info</h3>
+            <div id="groupInfoBody" style="margin-top:12px;"></div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+                <button class="header-btn" style="flex:1;background:var(--accent-red);color:#fff;border:none;display:none;" id="leaveGroupBtn" onclick="leaveGroup()"><i class="fas fa-sign-out-alt"></i> Leave Group</button>
+                <button class="header-btn" style="flex:1;" onclick="closeModal('groupInfoModal')">Close</button>
+            </div>
+        </div>
+    </div>
+    <!-- Text Status Modal -->
+    <div id="textStatusModal" class="modal-overlay">
+        <div class="modal-content" style="background:linear-gradient(135deg,#0A4D9B,#d4af37);color:#fff;">
+            <h3 style="color:#fff;"><i class="fas fa-font"></i> Text Status</h3>
+            <textarea id="textStatusInput" placeholder="What's on your heart? Share a scripture or encouragement..." maxlength="200" style="width:100%;min-height:90px;border-radius:14px;padding:12px;border:none;font-family:inherit;margin-top:10px;color:#0f172a;"></textarea>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+                <button class="header-btn" style="background:#fff;color:#0A4D9B;" onclick="pickStatusBg('#0A4D9B')">Blue</button>
+                <button class="header-btn" style="background:#d4af37;color:#000;" onclick="pickStatusBg('#d4af37')">Gold</button>
+                <button class="header-btn" style="background:#10b981;color:#fff;" onclick="pickStatusBg('#10b981')">Green</button>
+                <button class="header-btn" style="background:#ef4444;color:#fff;" onclick="pickStatusBg('#ef4444')">Red</button>
+                <button class="header-btn" style="background:#8b5cf6;color:#fff;" onclick="pickStatusBg('#8b5cf6')">Purple</button>
+            </div>
+            <div id="textStatusPreview" style="margin-top:12px;padding:18px;border-radius:14px;background:#0A4D9B;text-align:center;font-weight:700;min-height:60px;display:flex;align-items:center;justify-content:center;">Preview</div>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+                <button class="header-btn" style="flex:1;background:#fff;color:#0A4D9B;border:none;" onclick="postTextStatus()"><i class="fas fa-paper-plane"></i> Post Status</button>
+                <button class="header-btn" style="flex:1;background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.3);" onclick="closeModal('textStatusModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <!-- Bible Verse Modal -->
+    <div id="bibleModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="color:var(--accent-green);"><i class="fas fa-book-bible"></i> Share Bible Verse</h3>
+            <input type="text" id="bibleSearch" class="chat-input" placeholder="Search verse (e.g. John 3:16, Psalm 23)" style="width:100%;margin:10px 0;" onkeyup="filterBibleVerses()">
+            <div id="bibleVersesList" style="max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
+            <button class="header-btn" style="margin-top:12px;width:100%;" onclick="closeModal('bibleModal')">Close</button>
+        </div>
+    </div>
+    <!-- Contact Share Modal -->
+    <div id="contactModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="color:var(--accent-green);"><i class="fas fa-address-card"></i> Share Contact</h3>
+            <div class="form-group"><label style="font-size:.75rem;font-weight:700;">Name</label><input type="text" id="contactName" class="chat-input" placeholder="Full name" style="width:100%;"></div>
+            <div class="form-group"><label style="font-size:.75rem;font-weight:700;">Phone</label><input type="tel" id="contactPhone" class="chat-input" placeholder="+268..." style="width:100%;"></div>
+            <div class="form-group"><label style="font-size:.75rem;font-weight:700;">Email (optional)</label><input type="email" id="contactEmail" class="chat-input" placeholder="email@example.com" style="width:100%;"></div>
+            <div style="display:flex;gap:10px;margin-top:12px;">
+                <button class="header-btn" style="flex:1;background:var(--grad-main);color:#fff;border:none;" onclick="sendContact()"><i class="fas fa-share"></i> Share Contact</button>
+                <button class="header-btn" style="flex:1;" onclick="closeModal('contactModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <!-- Blocked Users Modal -->
+    <div id="blockedModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="color:var(--accent-green);"><i class="fas fa-ban"></i> Blocked Users</h3>
+            <div id="blockedList" style="margin-top:12px;max-height:300px;overflow-y:auto;"></div>
+            <button class="header-btn" style="margin-top:12px;width:100%;" onclick="closeModal('blockedModal')">Close</button>
+        </div>
+    </div>
     <!-- Lightweight one-to-one call surface (PeerJS WebRTC; no paid API key required). -->
     <div id="callModal" class="modal-overlay" style="display:none;">
         <div class="modal-content" style="max-width:680px;">
@@ -2379,20 +2611,623 @@
         window.switchMainTab = (tab) => {
             document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            
+            document.getElementById('attachmentMenu')?.classList.remove('open');
+            document.getElementById('emojiPicker')?.classList.remove('open');
             if (tab === 'chats') {
-                document.querySelector('.main-tab:first-child').classList.add('active');
+                document.querySelectorAll('.main-tab')[0].classList.add('active');
                 document.getElementById('tab-chats').classList.add('active');
             } else if (tab === 'status') {
                 document.querySelectorAll('.main-tab')[1].classList.add('active');
                 document.getElementById('tab-status').classList.add('active');
                 loadStatuses();
-            } else if (tab === 'settings') {
+            } else if (tab === 'calls') {
                 document.querySelectorAll('.main-tab')[2].classList.add('active');
+                document.getElementById('tab-calls').classList.add('active');
+                loadCallHistory();
+                const b=document.getElementById('callsBadge'); if(b) b.style.display='none';
+            } else if (tab === 'settings') {
+                document.querySelectorAll('.main-tab')[3].classList.add('active');
                 document.getElementById('tab-settings').classList.add('active');
+                loadBlockedUsersCount();
             }
         };
         
+        // ===== WhatsApp-style: Groups, Christian features, Status text, Attachments, Calls, Privacy =====
+        let customGroups = [];
+        let selectedGroupIcon = '🌍';
+        let textStatusBg = '#0A4D9B';
+        let lastMessagesCache = {};
+        let unreadCounts = {};
+        let callHistoryFilter='all';
+        const BIBLE_VERSES = [
+          {ref:"John 3:16", text:"For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life."},
+          {ref:"Jeremiah 29:11", text:"For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, to give you hope and a future."},
+          {ref:"Psalm 23:1", text:"The Lord is my shepherd, I lack nothing."},
+          {ref:"Philippians 4:13", text:"I can do all this through him who gives me strength."},
+          {ref:"Romans 8:28", text:"And we know that in all things God works for the good of those who love him."},
+          {ref:"Isaiah 41:10", text:"So do not fear, for I am with you; do not be dismayed, for I am your God."},
+          {ref:"Proverbs 3:5-6", text:"Trust in the Lord with all your heart and lean not on your own understanding."},
+          {ref:"Matthew 11:28", text:"Come to me, all you who are weary and burdened, and I will give you rest."},
+          {ref:"2 Timothy 1:7", text:"For God has not given us a spirit of fear, but of power and of love and of a sound mind."},
+          {ref:"Psalm 46:1", text:"God is our refuge and strength, an ever-present help in trouble."},
+          {ref:"Mark 11:24", text:"Therefore I tell you, whatever you ask for in prayer, believe that you have received it, and it will be yours."},
+          {ref:"Ephesians 2:8", text:"For it is by grace you have been saved, through faith — and this is not from yourselves, it is the gift of God."},
+          {ref:"Psalm 91:11", text:"For he will command his angels concerning you to guard you in all your ways."},
+          {ref:"Hebrews 11:1", text:"Now faith is confidence in what we hope for and assurance about what we do not see."},
+          {ref:"Matthew 5:9", text:"Blessed are the peacemakers, for they will be called children of God."}
+        ];
+        const DEVOTIONALS = [
+          {title:"Morning Grace", text:"Start your day with prayer — God’s mercies are new every morning. Lamentations 3:23"},
+          {title:"Strength in Weakness", text:"When you feel weak, remember His strength is made perfect in weakness. 2 Cor 12:9"},
+          {title:"Walk by Faith", text:"Trust Him even when you cannot see the next step. Faith moves mountains."}
+        ];
+
+        window.pickGroupIcon = (icon)=>{ selectedGroupIcon=icon; const el=document.getElementById('selectedGroupIcon'); if(el) el.textContent=icon; };
+        window.openCreateGroupModal = ()=>{ document.getElementById('createGroupModal').style.display='flex'; document.getElementById('groupNameInput').value=''; document.getElementById('groupDescInput').value=''; selectedGroupIcon='🌍'; const e=document.getElementById('selectedGroupIcon'); if(e) e.textContent='🌍'; };
+        window.joinPresetGroup = (key)=>{ joinRoom(key,'group'); switchMainTab('chats'); };
+        window.createGroup = async ()=>{
+          const name=document.getElementById('groupNameInput').value.trim();
+          const desc=document.getElementById('groupDescInput').value.trim();
+          const type=document.getElementById('groupTypeInput').value;
+          if(!name) return showToast('Group name is required','error');
+          const id='custom_'+Date.now().toString(36);
+          const group={ name: selectedGroupIcon+' '+name, desc: desc|| 'Fellowship group', icon:selectedGroupIcon, type:'group', custom:true, groupType:type, adminIds:[currentUser.uid], members:[currentUser.uid], createdAt: serverTimestamp() };
+          try{
+            await setDoc(doc(db,'customGroups',id), group);
+            customGroups.push({id, ...group, name: selectedGroupIcon+' '+name});
+            buildRoomList(); closeModal('createGroupModal'); joinRoom(id,'group'); showToast('Group created: '+name);
+            // Add announcement message
+            await addDoc(collection(db, 'groupMessages_'+id, id, 'messages'), { userId:'system', userName:'System', text: `🙏 Welcome to ${name}! ${desc} — He does everything blamelessly. Mark 7:37`, timestamp: serverTimestamp(), delivered:true, read:false, system:true });
+            if(window.confetti) confetti({particleCount:80, spread:60});
+          }catch(e){ showToast(e.message,'error'); }
+        };
+        async function loadCustomGroups(){
+          try{
+            const snap=await getDocs(collection(db,'customGroups'));
+            customGroups=[];
+            snap.forEach(d=>{ const g=d.data(); customGroups.push({id:d.id, ...g}); // merge
+            });
+          }catch(e){ console.warn('customGroups load',e); }
+        }
+        window.openGroupInfo = async ()=>{
+          const gid=currentRoom;
+          const isCustom = customGroups.find(g=>g.id===gid);
+          const preset = groupRooms[gid];
+          const info=isCustom||preset;
+          if(!info){ // private chat -> show user info
+            const pc=privateChats.find(c=>c.id===gid);
+            if(pc){
+              const el=document.getElementById('groupInfoBody');
+              if(el) el.innerHTML=`<div style="text-align:center;"><div class="room-avatar" style="width:64px;height:64px;margin:0 auto;font-size:1.6rem;">${(pc.otherName||'U').charAt(0).toUpperCase()}</div><h3 style="margin-top:10px;">${escapeHtml(pc.otherName)}</h3><p style="color:var(--text-sub);font-size:.8rem;">${pc.otherOnline?'🟢 Online':'⚪ Offline'} • Last seen ${pc.otherLastSeen? moment(pc.otherLastSeen.toDate()).fromNow():'recently'}</p><p style="margin-top:12px;"><button class="header-btn" onclick="startCall(false)"> <i class="fas fa-phone"></i> Voice call</button> <button class="header-btn" onclick="startCall(true)"><i class="fas fa-video"></i> Video call</button></p><hr style="margin:16px 0;border:none;border-top:1px solid var(--border-color);"><button class="header-btn" style="width:100%;background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.3);" onclick="blockUser('${pc.otherId}')"><i class="fas fa-ban"></i> Block user</button> <button class="header-btn" style="width:100%;margin-top:8px;" onclick="reportUser('${pc.otherId}')"><i class="fas fa-flag"></i> Report</button></div>`;
+              document.getElementById('groupInfoModal').style.display='flex';
+              return;
+            }
+            return showToast('No info for this chat','info');
+          }
+          const membersCount = isCustom? (isCustom.members?.length||1) : '∞';
+          const admin = isCustom? isCustom.adminIds?.includes(currentUser.uid): false;
+          const el=document.getElementById('groupInfoBody');
+          if(el) el.innerHTML=`<div style="text-align:center;"><div class="room-avatar" style="width:64px;height:64px;margin:0 auto;font-size:1.8rem;">${info.icon||'💬'}</div><h3 style="margin-top:10px;">${escapeHtml(info.name)}</h3><p style="color:var(--text-sub);font-size:.82rem;">${escapeHtml(info.desc||'Fellowship group')}</p><p style="margin-top:8px;"><span class="admin-badge">${isCustom? 'CUSTOM GROUP':'OFFICIAL'}</span> <span style="font-size:.7rem;color:var(--text-sub);">${membersCount} members</span></p>${info.groupType? `<p style="font-size:.7rem;margin-top:6px;color:var(--text-sub);">Type: ${info.groupType}</p>`:''}<hr style="margin:16px 0;border:none;border-top:1px solid var(--border-color);"><div style="text-align:left;background:var(--bg-primary);border-radius:14px;padding:12px;"><strong style="font-size:.8rem;">📢 Group Announcement</strong><p style="font-size:.76rem;color:var(--text-sub);margin-top:6px;">${escapeHtml(info.announcement||'No announcement yet. Admins can post one.')}</p>${admin? `<button class="header-btn" style="margin-top:8px;width:100%;" onclick="editGroupAnnouncement('${gid}')"><i class="fas fa-bullhorn"></i> Edit announcement</button>`:''}</div><div style="margin-top:12px;display:flex;gap:8px;"><button class="header-btn" style="flex:1;" onclick="shareBibleVerse()"><i class="fas fa-book-bible"></i> Share Verse</button><button class="header-btn" style="flex:1;" onclick="sharePrayerRequest()"><i class="fas fa-pray"></i> Prayer</button></div></div>`;
+          const leaveBtn=document.getElementById('leaveGroupBtn');
+          if(leaveBtn) leaveBtn.style.display = isCustom? 'inline-flex':'none';
+          document.getElementById('groupInfoModal').style.display='flex';
+        };
+        window.editGroupAnnouncement = async (gid)=>{
+          const text=prompt('Group announcement (shown to all members):');
+          if(text===null) return;
+          try{ await updateDoc(doc(db,'customGroups',gid),{announcement:text}); showToast('Announcement updated'); const g=customGroups.find(x=>x.id===gid); if(g) g.announcement=text; openGroupInfo(); }catch(e){ showToast(e.message,'error'); }
+        };
+        window.leaveGroup = async ()=>{
+          if(!confirm('Leave this group?')) return;
+          try{ const g=customGroups.find(x=>x.id==currentRoom); if(g){ await updateDoc(doc(db,'customGroups',currentRoom),{ members: arrayRemove(currentUser.uid) }); customGroups=customGroups.filter(x=>x.id!==currentRoom); buildRoomList(); joinRoom('general'); closeModal('groupInfoModal'); showToast('Left group'); }}catch(e){ showToast(e.message,'error'); }
+        };
+
+        // Status text
+        window.pickStatusBg = (c)=>{ textStatusBg=c; const p=document.getElementById('textStatusPreview'); if(p) p.style.background=c; if(document.getElementById('textStatusInput')?.value) p.textContent=document.getElementById('textStatusInput').value||'Preview'; };
+        window.addTextStatus = ()=>{ document.getElementById('textStatusModal').style.display='flex'; document.getElementById('textStatusInput').value=''; document.getElementById('textStatusInput').oninput=(e)=>{ const pv=document.getElementById('textStatusPreview'); if(pv) pv.textContent=e.target.value||'Preview'; }; const pv=document.getElementById('textStatusPreview'); if(pv){ pv.style.background=textStatusBg; pv.textContent='Preview'; } };
+        window.postTextStatus = async ()=>{
+          const text=document.getElementById('textStatusInput').value.trim();
+          if(!text) return showToast('Write something first','error');
+          try{
+            await addDoc(collection(db,'statuses'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', mediaUrl:null, mediaType:'text', text:text, bg:textStatusBg, timestamp: serverTimestamp(), expiresAt: new Date(Date.now()+24*60*60*1000), viewers:[], reactions:{} });
+            closeModal('textStatusModal'); showToast('Text status posted!'); loadStatuses();
+          }catch(e){ showToast(e.message,'error'); }
+        };
+        window.reactToStatus = async (emoji)=>{
+          if(!currentStatusId) return;
+          try{
+            const ref=doc(db,'statuses',currentStatusId);
+            const snap=await getDoc(ref);
+            if(!snap.exists()) return;
+            const data=snap.data();
+            const reacts=data.reactions||{};
+            reacts[emoji]=reacts[emoji]||[];
+            if(!reacts[emoji].includes(currentUser.uid)) reacts[emoji].push(currentUser.uid);
+            await updateDoc(ref,{reactions:reacts});
+            showToast('Reacted '+emoji);
+            // also send chat reply
+            const roomId=currentRoom;
+            const path=currentChatType==='group'? `groupMessages_${roomId}`:`privateMessages_${roomId}`;
+            await addDoc(collection(db, path, roomId,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `${emoji} reacted to ${snap.data().userName}'s status`, timestamp: serverTimestamp(), delivered:false, read:false, system:false });
+          }catch(e){ showToast(e.message,'error'); }
+        };
+
+        // Christian features
+        window.sharePrayerRequest = async ()=>{
+          const text=prompt('🙏 Share your prayer request with this chat:');
+          if(!text||!text.trim()) return;
+          const collectionPath = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
+          await addDoc(collection(db, collectionPath, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `🙏 PRAYER REQUEST: ${text.trim()}`, timestamp: serverTimestamp(), delivered:false, read:false, type:'prayerRequest', prayerText:text.trim() });
+          // also to global prayers wall
+          try{ await addDoc(collection(db,'prayers'),{ name: currentUser.displayName||'Anonymous', text: text.trim(), timestamp: serverTimestamp(), status:'pending' }); }catch(e){}
+          showToast('Prayer request shared 🙏');
+        };
+        window.shareBibleVerse = ()=>{
+          const modal=document.getElementById('bibleModal');
+          const list=document.getElementById('bibleVersesList');
+          list.innerHTML = BIBLE_VERSES.map(v=>`<div class=\"bible-card\" style=\"cursor:pointer;border-radius:14px;\" onclick=\"sendBibleVerse('${v.ref.replace(/'/g, "\\'")}')\"><strong style=\"color:var(--accent-green);\">${escapeHtml(v.ref)}</strong><p style=\"font-size:.82rem;line-height:1.5;margin:4px 0 0;\">${escapeHtml(v.text)}</p><span style=\"font-size:.68rem;color:var(--accent-gold);margin-top:4px;display:inline-flex;align-items:center;gap:4px;\"><i class=\"fas fa-share\"></i> Tap to share</span></div>`).join('');
+          modal.style.display='flex';
+        };
+        window.sendBibleVerse = async (ref)=>{
+          const v=BIBLE_VERSES.find(x=>x.ref===ref); if(!v) return;
+          const text=`📖 ${v.ref} — “${v.text}”`;
+          const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
+          await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text, timestamp: serverTimestamp(), delivered:false, read:false, type:'bibleVerse', verseRef: v.ref, verseText: v.text });
+          closeModal('bibleModal'); showToast('Bible verse shared 📖');
+        };
+        window.filterBibleVerses = ()=>{
+          const q=document.getElementById('bibleSearch').value.toLowerCase();
+          const filtered=BIBLE_VERSES.filter(v=> (v.ref+' '+v.text).toLowerCase().includes(q));
+          const list=document.getElementById('bibleVersesList');
+          list.innerHTML = filtered.map(v=>`<div class=\"bible-card\" style=\"cursor:pointer;\" onclick=\"sendBibleVerse('${v.ref.replace(/'/g, "\\'")}')\"><strong style=\"color:var(--accent-green);\">${escapeHtml(v.ref)}</strong><p style=\"font-size:.82rem;line-height:1.5;margin:4px 0 0;\">${escapeHtml(v.text)}</p></div>`).join('') || '<p style="text-align:center;color:var(--text-sub);padding:20px;">No verses found</p>';
+        };
+        window.shareTestimony = async ()=>{
+          const t=prompt('✨ Share your testimony:');
+          if(!t||!t.trim()) return;
+          const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
+          await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `✨ TESTIMONY: ${t.trim()} — Glory to God!`, timestamp: serverTimestamp(), delivered:false, read:false, type:'testimony' });
+          try{ await addDoc(collection(db,'testimonies'),{ name: currentUser.displayName||'Anonymous', text: t.trim(), timestamp: serverTimestamp(), status:'pending' }); }catch(e){}
+          showToast('Testimony shared ✨');
+        };
+        window.shareDevotional = async ()=>{
+          const d=DEVOTIONALS[Math.floor(Math.random()*DEVOTIONALS.length)];
+          const chosen=prompt(`📖 Daily devotional to share:\n${d.title} — ${d.text}\n\nEdit before sharing:`, `${d.title}: ${d.text}`);
+          if(chosen===null) return;
+          const text=chosen.trim()|| `${d.title}: ${d.text}`;
+          const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
+          await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `📖 DEVOTIONAL: ${text}`, timestamp: serverTimestamp(), delivered:false, read:false, type:'devotional' });
+          showToast('Devotional shared 📖');
+        };
+        window.shareContact = ()=>{ document.getElementById('contactModal').style.display='flex'; };
+        window.sendContact = async ()=>{
+          const name=document.getElementById('contactName').value.trim();
+          const phone=document.getElementById('contactPhone').value.trim();
+          const email=document.getElementById('contactEmail').value.trim();
+          if(!name||!phone) return showToast('Name and phone required','error');
+          const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
+          await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `👤 Contact: ${name} — ${phone}${email? ' — '+email:''}`, timestamp: serverTimestamp(), delivered:false, read:false, type:'contact', contact:{name, phone, email} });
+          closeModal('contactModal'); document.getElementById('contactName').value=''; document.getElementById('contactPhone').value=''; document.getElementById('contactEmail').value=''; showToast('Contact shared 👤');
+        };
+        window.shareLocation = async ()=>{
+          if(!navigator.geolocation) return showToast('Location not supported','error');
+          showToast('Getting your location...','info');
+          navigator.geolocation.getCurrentPosition(async pos=>{
+            const {latitude, longitude}=pos.coords;
+            const url=`https://www.google.com/maps?q=${latitude},${longitude}`;
+            const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
+            await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `📍 Location: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`, timestamp: serverTimestamp(), delivered:false, read:false, type:'location', location:{latitude, longitude, url} });
+            showToast('Location shared 📍');
+          }, err=> showToast('Location error: '+err.message,'error'), {enableHighAccuracy:false, timeout:8000});
+        };
+        window.createPoll = async ()=>{
+          const q=prompt('📊 Poll question:');
+          if(!q||!q.trim()) return;
+          const opts=prompt('Options (comma separated, e.g. Yes, No, Maybe):');
+          if(!opts) return;
+          const options=opts.split(',').map(s=>s.trim()).filter(Boolean).slice(0,4);
+          if(options.length<2) return showToast('Need at least 2 options','error');
+          const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
+          await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `📊 Poll: ${q.trim()}`, timestamp: serverTimestamp(), delivered:false, read:false, type:'poll', poll:{question:q.trim(), options: options.map(o=>({text:o, votes:0, voters:[]} )) } });
+          showToast('Poll created 📊');
+        };
+        window.uploadAudioFile = ()=>{
+          const input=document.createElement('input'); input.type='file'; input.accept='audio/*';
+          input.onchange=async e=>{ const file=e.target.files[0]; if(!file) return; showToast('Uploading audio...','info'); const url=await uploadToCloudinary(file); if(url){ pendingMedia={url, type:'audio', name:file.name}; showToast('Audio ready — send your message','info'); } };
+          input.click();
+        };
+
+        // Emoji & attachment toggles
+        window.toggleEmojiPicker = ()=>{ document.getElementById('attachmentMenu')?.classList.remove('open'); document.getElementById('emojiPicker')?.classList.toggle('open'); };
+        window.toggleAttachmentMenu = ()=>{ document.getElementById('emojiPicker')?.classList.remove('open'); document.getElementById('attachmentMenu')?.classList.toggle('open'); };
+        window.insertEmoji = (emoji)=>{ const inp=document.getElementById('messageInput'); if(!inp) return; const start=inp.selectionStart||inp.value.length; inp.value = inp.value.slice(0,start)+emoji+inp.value.slice(start); inp.focus(); inp.selectionStart=inp.selectionEnd=start+emoji.length; };
+        window.onMessageInput = ()=>{
+          // auto-switch send button icon handled via existing typing indicator
+          const v=document.getElementById('messageInput').value.trim();
+          // optional: show/hide voice vs send could be added
+        };
+        window.addReaction = async (msgId, emoji)=>{
+          const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
+          const ref=doc(db, path, currentRoom,'messages', msgId);
+          const snap=await getDoc(ref); if(!snap.exists()) return;
+          const data=snap.data(); const reactions=data.reactions||{};
+          reactions[emoji]=reactions[emoji]||[]; 
+          const idx=reactions[emoji].indexOf(currentUser.uid);
+          if(idx>=0) reactions[emoji].splice(idx,1); else reactions[emoji].push(currentUser.uid);
+          // cleanup empty
+          Object.keys(reactions).forEach(k=>{ if(!reactions[k].length) delete reactions[k]; });
+          await updateDoc(ref,{reactions});
+        };
+
+        // Calls history
+        async function addCallToHistory(withUser, type, direction, status){
+          const entry={ userId: currentUser.uid, withUser, type: type?'video':'voice', direction, status, timestamp: serverTimestamp(), at: Date.now() };
+          try{ await addDoc(collection(db,'callHistory'), entry); }catch(e){}
+          // local mirror for instant UI
+          const local=JSON.parse(localStorage.getItem('pd_call_history')||'[]');
+          local.unshift({...entry, at: Date.now(), timestamp:{toDate:()=>new Date()} });
+          localStorage.setItem('pd_call_history', JSON.stringify(local.slice(0,50)));
+          const badge=document.getElementById('callsBadge'); if(badge && status==='missed') badge.style.display='inline-block';
+          // browser notification
+          if(status==='missed' && Notification && Notification.permission==='granted'){
+            new Notification('Missed call', {body: `Missed ${type?'video':'voice'} call from ${withUser||'a believer'}`, icon:'/assets/logo.png'});
+          }
+        }
+        window.loadCallHistory = async ()=>{
+          const c=document.getElementById('callsList');
+          if(!c) return;
+          let entries=[];
+          try{
+            const snap=await getDocs(query(collection(db,'callHistory'), where('userId','==', currentUser.uid), orderBy('timestamp','desc')));
+            // if orderBy needs index, fallback to local
+            snap.forEach(d=> entries.push({id:d.id, ...d.data()}));
+          }catch(e){
+            // fallback local
+            try{ entries=JSON.parse(localStorage.getItem('pd_call_history')||'[]'); }catch(_){}
+          }
+          if(!entries.length){
+            try{ const local=JSON.parse(localStorage.getItem('pd_call_history')||'[]'); if(local.length) entries=local; }catch(_){}
+          }
+          if(callHistoryFilter!=='all'){
+            entries=entries.filter(en=> en.status===callHistoryFilter || en.direction===callHistoryFilter);
+          }
+          if(!entries.length){
+            c.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-sub);"><i class="fas fa-phone" style="font-size:2rem;opacity:.3;"></i><p>No calls in this filter</p></div>'; return;
+          }
+          c.innerHTML=entries.slice(0,30).map(en=>{
+            const isMissed=en.status==='missed';
+            const icon=isMissed?'fa-phone-slash': (en.direction==='outgoing'?'fa-arrow-up': en.direction==='incoming'?'fa-arrow-down':'fa-phone');
+            const cls=isMissed?'missed': en.direction==='outgoing'?'outgoing':'incoming';
+            const when=en.timestamp?.toDate? moment(en.timestamp.toDate()).calendar(): moment(en.at||Date.now()).calendar();
+            const label=isMissed?'Missed': (en.direction==='outgoing'?'Outgoing':'Incoming');
+            return `<div class="call-history-item"><div class="call-icon ${cls}"><i class="fas ${icon}"></i></div><div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(en.withUser||'Believer')} <span style="font-weight:400;font-size:.7rem;color:var(--text-sub);">• ${en.type==='video'? 'Video':'Voice'}</span></div><div style="font-size:.7rem;color:${isMissed?'#ef4444':'var(--text-sub)'};">${isMissed?'': '<i class="fas fa-check"></i> '} ${label} • ${when}</div></div><button class="header-btn" onclick="callbackUser('${(en.withUser||'').replace(/'/g,"\\'")}')" title="Call back"><i class="fas fa-phone"></i></button><button class="header-btn" onclick="callbackVideo('${(en.withUser||'').replace(/'/g,"\\'")}')"><i class="fas fa-video"></i></button></div>`;
+          }).join('');
+        };
+        window.filterCalls = (f)=>{ callHistoryFilter=f; document.querySelectorAll('.calls-filter').forEach(b=>b.classList.remove('active')); const id='filter'+f.charAt(0).toUpperCase()+f.slice(1); const el=document.getElementById(id); if(el) el.classList.add('active'); loadCallHistory(); };
+        window.clearCallHistory = ()=>{ if(!confirm('Clear call history?')) return; localStorage.removeItem('pd_call_history'); const c=document.getElementById('callsList'); if(c) c.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-sub);">Call history cleared</div>'; try{ getDocs(query(collection(db,'callHistory'), where('userId','==',currentUser.uid))).then(s=> s.forEach(d=> deleteDoc(d.ref))); }catch(e){} showToast('Call history cleared'); };
+        window.callbackUser = (name)=>{ showToast('Opening private chat for call...','info'); startPrivateChat(); };
+        window.callbackVideo = (name)=>{ callbackUser(name); };
+
+        // Privacy
+        window.savePrivacySetting = (key,val)=>{
+          const st=JSON.parse(localStorage.getItem('chat_settings')||'{}');
+          st['privacy_'+key]=val; localStorage.setItem('chat_settings', JSON.stringify(st));
+          if(currentUser) setDoc(doc(db,'users',currentUser.uid),{ ['privacy_'+key]:val }, {merge:true});
+          showToast(key+' visibility: '+val);
+        };
+        window.blockUser = async (uid)=>{
+          if(!uid) { const u=prompt('Enter user id or email to block:'); if(!u) return; uid=u; }
+          if(!confirm('Block this user? They will not be able to message you.')) return;
+          try{
+            await setDoc(doc(db,'users',currentUser.uid),{ blocked: arrayUnion(uid) }, {merge:true});
+            const st=JSON.parse(localStorage.getItem('chat_settings')||'{}'); st.blocked=st.blocked||[]; if(!st.blocked.includes(uid)) st.blocked.push(uid); localStorage.setItem('chat_settings', JSON.stringify(st));
+            showToast('User blocked');
+            loadBlockedUsersCount();
+          }catch(e){ showToast(e.message,'error'); }
+        };
+        window.reportUser = async (uid)=>{
+          const reason=prompt('Report reason (spam, abuse, inappropriate content):'); if(reason===null) return;
+          if(!reason.trim()) return showToast('Reason required','error');
+          try{ await addDoc(collection(db,'reports'),{ reporter: currentUser.uid, reported: uid||'unknown', reason: reason.trim(), room: currentRoom, timestamp: serverTimestamp() }); showToast('Report sent — thank you 🙏'); }catch(e){ showToast(e.message,'error'); }
+        };
+        window.loadBlockedUsersCount = async ()=>{
+          const el=document.getElementById('blockedCount'); if(!el) return;
+          try{
+            const snap=await getDoc(doc(db,'users',currentUser.uid));
+            const blocked=snap.exists()? (snap.data().blocked||[]):[];
+            el.textContent=blocked.length? `${blocked.length} blocked`:'0 blocked';
+            const list=document.getElementById('blockedList');
+            if(list){
+              if(!blocked.length) list.innerHTML='<p style="text-align:center;color:var(--text-sub);padding:20px;">No blocked users</p>';
+              else list.innerHTML=blocked.map(uid=>`<div style="display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid var(--border-color);"><span style="flex:1;font-size:.82rem;">${escapeHtml(uid)}</span><button class="header-btn" onclick="unblockUser('${uid}')">Unblock</button></div>`).join('');
+            }
+          }catch(e){}
+        };
+        window.unblockUser = async (uid)=>{
+          try{ await updateDoc(doc(db,'users',currentUser.uid),{ blocked: arrayRemove(uid) }); const st=JSON.parse(localStorage.getItem('chat_settings')||'{}'); st.blocked=(st.blocked||[]).filter(x=>x!==uid); localStorage.setItem('chat_settings', JSON.stringify(st)); showToast('Unblocked'); loadBlockedUsersCount(); }catch(e){ showToast(e.message,'error'); }
+        };
+        const _origBlockedUsers = window.blockedUsers;
+        window.blockedUsers = ()=>{ document.getElementById('blockedModal').style.display='flex'; loadBlockedUsersCount(); };
+
+        // Request browser notifications permission on first interaction
+        function requestNotificationPermission(){
+          if('Notification' in window && Notification.permission==='default'){
+            Notification.requestPermission().then(p=>{ if(p==='granted') showToast('Notifications enabled 🔔'); });
+          }
+        }
+        document.addEventListener('click', function _once(){ requestNotificationPermission(); document.removeEventListener('click', _once); }, {once:true});
+
+        // Patch original functions for last message & unread & photo enhancements
+        const _origBuildRoomList = buildRoomList;
+        buildRoomList = function(){
+          _origBuildRoomList();
+          loadCustomGroups().then(()=>{
+            // inject custom groups into allRooms if not already
+            customGroups.forEach(g=>{
+              if(!allRooms.find(r=>r.id===g.id)) allRooms.push({id:g.id, name:g.name, icon:g.icon||'💬', type:'group', custom:true});
+            });
+            if(customGroups.length) renderRoomList();
+            refreshLastMessages();
+          });
+          refreshLastMessages();
+        };
+        async function refreshLastMessages(){
+          for(const room of allRooms){
+            const path = room.type==='group'? `groupMessages_${room.id}`:`privateMessages_${room.id}`;
+            try{
+              const q=query(collection(db, path, room.id,'messages'), orderBy('timestamp','desc'));
+              // we use onSnapshot per room for live would be heavy, so just fetch once + cache; real live will update via joinRoom
+              const snap=await getDocs(q);
+              let last=null; snap.forEach(d=>{ if(!last) last=d.data(); });
+              if(last){
+                lastMessagesCache[room.id]={text: last.text|| (last.mediaType? `[${last.mediaType}]`:'' ), time: last.timestamp, unread: 0};
+                // update preview asynchronously
+                updateRoomPreview(room.id);
+              }
+            }catch(e){}
+          }
+        }
+        function updateRoomPreview(roomId){
+          const cache=lastMessagesCache[roomId];
+          if(!cache) return;
+          // find DOM element
+          const container=document.getElementById('roomList');
+          if(!container) return;
+          // re-render whole list with last message (cheap)
+          const idx=allRooms.findIndex(r=>r.id===roomId);
+          if(idx>=0){
+            // trigger re-render if needed - debounce
+            clearTimeout(window._previewTimer);
+            window._previewTimer=setTimeout(()=> renderRoomList(), 300);
+          }
+        }
+        // Override renderRoomList to show last message, time, photo, unread
+        const _origRenderRoomList = renderRoomList;
+        renderRoomList = function(){
+          const container=document.getElementById('roomList');
+          if(!container) return;
+          container.innerHTML = allRooms.map(room=>{
+            const last=lastMessagesCache[room.id];
+            const isPrivate=room.type==='private';
+            const avatarContent = isPrivate? (room.otherPhoto? `<img src="${room.otherPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : '👤') : (room.icon||'💬');
+            const lastText = last? (last.text.length>28? last.text.slice(0,28)+'…': last.text) : (isPrivate? (room.online?'online':'last seen recently'):'Tap to join conversation');
+            const timeStr = last?.time? moment(last.time.toDate()).format('h:mm A') : '';
+            const unread = unreadCounts[room.id]||0;
+            return `<div class="room-item ${currentRoom===room.id?'active':''}" onclick="joinRoom('${room.id}','${room.type}')">
+              <div class="room-avatar" style="${isPrivate && room.otherPhoto? 'padding:0;overflow:hidden;':''}">${avatarContent}${room.online? '<span class="online-dot"></span>':''}</div>
+              <div class="room-info"><div class="room-name">${escapeHtml(room.name)}${isPrivate && room.online? ' • <span style="font-size:.58rem;color:#22c55e;">● online</span>':''}</div><div class="room-preview">${escapeHtml(lastText)}</div></div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
+                ${timeStr? `<span class="room-time">${timeStr}</span>`:''}
+                ${unread>0? `<span class="room-badge">${unread>99?'99+':unread}</span>`:''}
+              </div>
+            </div>`;
+          }).join('');
+          // update chats badge total unread
+          const total=Object.values(unreadCounts).reduce((a,b)=>a+b,0);
+          const badge=document.getElementById('chatsBadge');
+          if(badge){ if(total>0){ badge.textContent= total>99?'99+':total; badge.style.display='inline-block'; } else badge.style.display='none'; }
+        };
+        // wrap joinRoom to refresh header avatar & online
+        const _origJoinRoom = joinRoom;
+        joinRoom = async function(roomId, type='group'){
+          await _origJoinRoom(roomId, type);
+          // update header avatar/online after join
+          const headerAvatar=document.getElementById('headerAvatar');
+          const onlineEl=document.getElementById('currentRoomOnline');
+          const room = allRooms.find(r=>r.id===roomId) || groupRooms[roomId];
+          if(headerAvatar){
+            if(type==='private'){
+              const pc=privateChats.find(c=>c.id===roomId);
+              headerAvatar.textContent= pc?.otherName?.charAt(0).toUpperCase()||'👤';
+              if(pc?.otherPhoto) headerAvatar.innerHTML=`<img src="${pc.otherPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+              if(onlineEl){ onlineEl.style.display='block'; onlineEl.textContent= pc?.otherOnline? '🟢 online — tap for info':'⚪ last seen '+ (pc?.otherLastSeen? moment(pc.otherLastSeen.toDate()).fromNow():'recently'); }
+            } else {
+              headerAvatar.textContent= room?.icon||'🌍';
+              if(onlineEl) onlineEl.style.display='none';
+            }
+          }
+          // clear unread for this room
+          unreadCounts[roomId]=0; renderRoomList();
+        };
+        // enhance renderMessages to handle reactions, special cards, and update lastMessagesCache + notifications
+        const _origRenderMessages = renderMessages;
+        renderMessages = function(messages){
+          // update cache
+          if(messages.length){
+            const last=messages[messages.length-1];
+            lastMessagesCache[currentRoom]={text: last.text|| (last.mediaType? `[${last.mediaType}]`: last.poll? '📊 Poll': last.contact? '👤 Contact': last.location? '📍 Location': ''), time: last.timestamp, unread:0};
+            // unread for other rooms
+            messages.forEach(m=>{
+              if(m.userId!==currentUser.uid && !m.read){
+                // if not current room, increment? but we are in current room, so no
+              }
+            });
+            renderRoomList();
+            // desktop notification for new message not from me
+            const newest=messages[messages.length-1];
+            if(newest && newest.userId!==currentUser.uid && !newest._notified){
+              newest._notified=true;
+              if(Notification && Notification.permission==='granted' && document.hidden){
+                new Notification(newest.userName||'New message', {body: newest.text?.slice(0,80)||'New message in '+currentRoom, icon:'/assets/logo.png'});
+              }
+              // sound
+              const st=JSON.parse(localStorage.getItem('chat_settings')||'{}');
+              if(st.sound!==false){
+                try{ const a=new Audio('https://cdn.jsdelivr.net/gh/prayerdome0/assets@main/notification.mp3'); a.volume=0.5; a.play().catch(()=>{}); }catch(e){}
+              }
+            }
+          }
+          // call original with extended template then patch reactions display
+          const container=document.getElementById('messagesArea');
+          if(!container) return;
+          if(messages.length===0){ _origRenderMessages(messages); return; }
+          // Build enhanced HTML manually (override)
+          container.innerHTML = messages.map((msg,i)=>{
+            const isOwn=currentUser && msg.userId===currentUser.uid;
+            let statusIcon='';
+            let dateDivider='';
+            if(msg.timestamp && msg.timestamp.toDate){
+              const prev=i>0? messages[i-1]:null;
+              const prevDay=prev?.timestamp?.toDate? moment(prev.timestamp.toDate()).format('YYYY-MM-DD'):null;
+              const thisDay=moment(msg.timestamp.toDate()).format('YYYY-MM-DD');
+              if(prevDay!==thisDay){
+                const label=moment(msg.timestamp.toDate()).calendar(null,{sameDay:'[Today]', lastDay:'[Yesterday]', lastWeek:'dddd', sameElse:'MMMM D, YYYY'});
+                dateDivider=`<div class="message-date-divider"><span class="message-date-chip">${label}</span></div>`;
+              }
+            }
+            if(isOwn){
+              if(msg.read) statusIcon='<span class="delivery-status read"><i class="fas fa-check-double"></i></span>';
+              else if(msg.delivered) statusIcon='<span class="delivery-status delivered"><i class="fas fa-check-double"></i></span>';
+              else statusIcon='<span class="delivery-status"><i class="fas fa-check"></i></span>';
+            }
+            // message content by type
+            let body='';
+            if(msg.type==='contact' && msg.contact){
+              const c=msg.contact;
+              body=`<div class="contact-card"><strong><i class="fas fa-user"></i> ${escapeHtml(c.name)}</strong><span><i class="fas fa-phone"></i> ${escapeHtml(c.phone)}</span>${c.email? `<span><i class="fas fa-envelope"></i> ${escapeHtml(c.email)}</span>`:''}<button class="header-btn" style="margin-top:6px;font-size:.7rem;" onclick="alert('Saved ${escapeHtml(c.name)}')"><i class="fas fa-user-plus"></i> Add to contacts</button></div>`;
+            } else if(msg.type==='location' && msg.location){
+              body=`<div class="location-card"><strong><i class="fas fa-map-marker-alt"></i> Shared location</strong><span style="font-size:.75rem;">${msg.location.latitude?.toFixed(5)}, ${msg.location.longitude?.toFixed(5)}</span><a href="${msg.location.url}" target="_blank" class="header-btn" style="margin-top:6px;display:inline-flex;"><i class="fas fa-external-link-alt"></i> Open in Maps</a></div>`;
+            } else if(msg.type==='bibleVerse'){
+              body=`<div class="bible-card"><strong style="color:var(--accent-gold);"><i class="fas fa-book-bible"></i> ${escapeHtml(msg.verseRef||'Bible Verse')}</strong><p style="font-style:italic;line-height:1.5;">“${escapeHtml(msg.verseText||msg.text)}</p></div>`;
+            } else if(msg.type==='prayerRequest'){
+              body=`<div class="prayer-card" style="border-left:3px solid var(--accent-gold);"><strong style="color:var(--accent-green);"><i class="fas fa-praying-hands"></i> Prayer Request</strong><p>${escapeHtml(msg.prayerText||msg.text)}</p><button class="christian-btn" style="margin-top:6px;" onclick="sendSuggestion('I am praying for you 🙏 — ${escapeHtml((msg.userName||'friend').replace(/'/g,"\\'"))}')"><i class="fas fa-pray"></i> I will pray</button></div>`;
+            } else if(msg.type==='poll' && msg.poll){
+              const total=msg.poll.options.reduce((a,b)=>a+b.votes,0)||1;
+              body=`<div class="bible-card"><strong>📊 ${escapeHtml(msg.poll.question)}</strong>${msg.poll.options.map((o,idx)=>`<button onclick="votePoll('${msg.id}',${idx})" style="display:block;width:100%;text-align:left;margin:6px 0;padding:8px 12px;border-radius:12px;border:1px solid var(--border-color);background:var(--bg-primary);font-size:.78rem;">${escapeHtml(o.text)} <span style="float:right;color:var(--text-sub);">${o.votes} votes</span><div style="height:4px;background:rgba(212,175,55,.3);border-radius:10px;margin-top:4px;"><div style="width:${Math.round(o.votes/total*100)}%;height:100%;background:var(--accent-gold);border-radius:10px;"></div></div></button>`).join('')}<span style="font-size:.65rem;color:var(--text-sub);">${total} total votes • Tap to vote</span></div>`;
+            } else {
+              if(msg.text) body=`<div class="message-text">${escapeHtml(msg.text)}</div>`;
+              if(msg.mediaUrl){
+                if(msg.mediaType==='image') body+=`<img src="${msg.mediaUrl}" class="message-media" onclick="viewMedia('${msg.mediaUrl}')">`;
+                else if(msg.mediaType==='video') body+=`<video src="${msg.mediaUrl}" class="message-media" controls onclick="event.stopPropagation()"></video>`;
+                else if(msg.mediaType==='document') body+=`<a href="${msg.mediaUrl}" target="_blank" class="message-media" style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(0,0,0,0.05);border-radius:12px;text-decoration:none;color:var(--text-main);"><i class="fas fa-file-pdf"></i> ${escapeHtml(msg.mediaName||'Document')}</a>`;
+                else if(msg.mediaType==='audio') body+=`<audio src="${msg.mediaUrl}" controls style="margin-top:8px;width:100%;"></audio>`;
+              }
+            }
+            // reactions
+            const reacts=msg.reactions||{};
+            const reactsHtml=Object.keys(reacts).length? `<div class="msg-reactions">${Object.entries(reacts).map(([emoji,users])=>`<span class="msg-reaction">${emoji} ${users.length}</span>`).join('')}</div>`:'';
+            const reactBar=`<div style="position:absolute;top:-30px;right:8px;display:none;" class="reaction-bar" id="react-${msg.id}"><button onclick="addReaction('${msg.id}','❤️')">❤️</button><button onclick="addReaction('${msg.id}','🙏')">🙏</button><button onclick="addReaction('${msg.id}','😇')">😇</button><button onclick="addReaction('${msg.id}','🔥')">🔥</button><button onclick="addReaction('${msg.id}','✨')">✨</button><button onclick="addReaction('${msg.id}','👏')">👏</button></div>`;
+            return `${dateDivider}<div class="message ${isOwn?'sent':'received'}" onmouseenter="document.getElementById('react-${msg.id}')&&(document.getElementById('react-${msg.id}').style.display='flex')" onmouseleave="document.getElementById('react-${msg.id}')&&(document.getElementById('react-${msg.id}').style.display='none')" ontouchstart="document.getElementById('react-${msg.id}')&&(document.getElementById('react-${msg.id}').style.display='flex')" style="position:relative;">
+              <div class="message-avatar">${(msg.userName||'A').charAt(0).toUpperCase()}</div>
+              <div class="message-bubble">${reactBar}<div class="message-name">${escapeHtml(msg.userName||'Anonymous')}${isAdmin && !isOwn? `<span class="admin-badge" style="cursor:pointer;" onclick="deleteMessage('${msg.id}')">Delete</span>`:''} <span style="font-size:.6rem;cursor:pointer;color:var(--text-sub);" onclick="addReaction('${msg.id}','❤️')" title="React">♡</span></div>${body}${reactsHtml}<div class="message-time">${msg.timestamp? moment(msg.timestamp.toDate()).format('h:mm A'):'Just now'} ${statusIcon}</div></div></div>`;
+          }).join('');
+          container.scrollTop=container.scrollHeight;
+          // mark read
+          messages.forEach(async m=>{
+            if(m.userId!==currentUser.uid && !m.read){
+              const path=currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
+              try{ await updateDoc(doc(db, path, currentRoom,'messages', m.id), {read:true}); }catch(e){}
+            }
+          });
+        };
+        window.votePoll = async (msgId, idx)=>{
+          const path=currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
+          const ref=doc(db, path, currentRoom,'messages', msgId);
+          const snap=await getDoc(ref); if(!snap.exists()) return;
+          const poll=snap.data().poll; if(!poll) return;
+          // prevent double vote
+          if(poll.options.some(o=> (o.voters||[]).includes(currentUser.uid))) return showToast('You already voted','info');
+          poll.options[idx].votes=(poll.options[idx].votes||0)+1;
+          poll.options[idx].voters=poll.options[idx].voters||[]; poll.options[idx].voters.push(currentUser.uid);
+          await updateDoc(ref,{poll}); showToast('Vote recorded ✓');
+        };
+        // patch loadStatuses to handle text & reactions
+        const _origLoadStatuses = loadStatuses;
+        loadStatuses = async function(){
+          const container=document.getElementById('statusGrid'); if(!container) return;
+          const now=new Date();
+          let snap;
+          try{ snap=await getDocs(query(collection(db,'statuses'), where('expiresAt','>', now))); }catch(e){ container.innerHTML='<div style="text-align:center;grid-column:1/-1;padding:20px;">Status unavailable</div>'; return; }
+          const my=[]; const others=[];
+          snap.forEach(d=>{ const data={id:d.id, ...d.data()}; if(data.userId===currentUser?.uid) my.push(data); else others.push(data); });
+          const myStats=document.getElementById('myStatusStats');
+          if(myStats){
+            if(my.length) {
+              const views=my.reduce((s,x)=> s + (x.viewers?.length||0),0);
+              myStats.innerHTML=`<i class="fas fa-eye"></i> ${views} views • ${my.length} active`;
+            } else myStats.innerHTML='No active status';
+          }
+          // also show my statuses as deletable row above grid
+          if(others.length===0 && my.length===0){ container.innerHTML='<div style="text-align:center;grid-column:1/-1;padding:40px;">No status updates from friends<br><span style="font-size:.7rem;color:var(--text-sub);">Be the first to share a scripture or encouragement</span></div>'; return; }
+          container.innerHTML = others.map(st=>{
+            const isText=st.mediaType==='text';
+            const preview=isText? `<div style="width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:${escapeHtml(st.bg||'#0A4D9B')};color:#fff;padding:12px;text-align:center;font-weight:700;font-size:.78rem;overflow:hidden;">${escapeHtml((st.text||'').slice(0,80))}</div>` : (st.mediaType==='image'? `<img src="${st.mediaUrl}" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;">`:`<video src="${st.mediaUrl}" style="width:100%;aspect-ratio:1;object-fit:cover;"></video>`);
+            const reacts=st.reactions? Object.entries(st.reactions).map(([e,users])=> e+users.length).join(' '):'';
+            return `<div class="status-item" onclick="viewStatus('${st.id}','${(st.mediaUrl||'').replace(/'/g,"\\'")}','${st.mediaType}','${escapeHtml(st.userName)}','${st.timestamp?.toDate()}')" title="${reacts? 'Reactions: '+reacts:''}">
+              ${preview}
+              <div class="status-info"><div class="status-name">${escapeHtml(st.userName)}</div><div class="status-time">${st.timestamp? moment(st.timestamp.toDate()).fromNow():''}</div>${reacts? `<div class="viewers-count">${escapeHtml(reacts)}</div>`:''}</div>
+            </div>`;
+          }).join('');
+          // append my statuses as separate deletable items at top of grid if needed
+          if(my.length){
+            const myHtml=my.map(st=>{
+              const isText=st.mediaType==='text';
+              const preview=isText? `<div style="width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:${escapeHtml(st.bg||'#0A4D9B')};color:#fff;padding:12px;text-align:center;font-weight:700;font-size:.78rem;">${escapeHtml((st.text||'').slice(0,80))}</div>` : (st.mediaType==='image'? `<img src="${st.mediaUrl}" loading="lazy">`:`<video src="${st.mediaUrl}"></video>`);
+              return `<div class="status-item" style="border-color:#10b981;position:relative;" onclick="viewStatus('${st.id}','${(st.mediaUrl||'').replace(/'/g,"\\'")}','${st.mediaType}','${escapeHtml(st.userName)}','${st.timestamp?.toDate()}')">${preview}<div class="status-info"><div class="status-name">My Status • ${st.viewers?.length||0} views</div><div class="status-time">${st.timestamp? moment(st.timestamp.toDate()).fromNow():''}</div></div><button onclick="event.stopPropagation();deleteStatus('${st.id}')" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;"><i class="fas fa-trash" style="font-size:.7rem;"></i></button></div>`;
+            }).join('');
+            container.innerHTML = myHtml + container.innerHTML;
+          }
+        };
+        // sync window for inline handlers
+        window.buildRoomList = buildRoomList; window.renderRoomList = renderRoomList; window.joinRoom = joinRoom; window.renderMessages = renderMessages; window.loadStatuses = loadStatuses;
+        window.deleteStatus = async (id)=>{ if(!confirm('Delete this status?')) return; await deleteDoc(doc(db,'statuses',id)); showToast('Status deleted'); loadStatuses(); };
+        // call wrappers to track history
+        const _origStartCall = window.startCall;
+        window.startCall = async function(video){
+          const chat=privateChats.find(c=>c.id===currentRoom);
+          const target=chat?.participants?.find(id=> id!==currentUser?.uid);
+          const withUser=chat?.otherName||'Believer';
+          try{
+            await _origStartCall(video);
+            await addCallToHistory(withUser, video, 'outgoing', 'answered');
+          }catch(e){
+            await addCallToHistory(withUser, video, 'outgoing', 'missed');
+          }
+        };
+        // incoming call tracking via initCallPeer patch
+        const _origInitCallPeer = initCallPeer;
+        initCallPeer = function(){
+          _origInitCallPeer();
+          if(callPeer){
+            callPeer.off && callPeer.off('call');
+            callPeer.on('call', async call=>{
+              const withUser=call.metadata?.name||'Believer';
+              addCallToHistory(withUser, call.metadata?.video!==false, 'incoming', 'incoming');
+              if(!confirm(`${withUser} is calling you. Answer?`)){
+                addCallToHistory(withUser, call.metadata?.video!==false, 'incoming', 'missed');
+                return;
+              }
+              await openCallMedia(call.metadata?.video!==false);
+              call.answer(callStream); activeCall=call; bindCall(call);
+              addCallToHistory(withUser, call.metadata?.video!==false, 'incoming', 'answered');
+            });
+          }
+        };
+        // ensure custom groups loaded at startup
+        const _origOnAuth = onAuthStateChanged;
+        // hook after auth already set: just load custom groups now if user exists
+        if(currentUser) loadCustomGroups().then(buildRoomList);
+
+
         window.logout = async () => {
             await updateDoc(doc(db, "users", currentUser.uid), { online: false, lastSeen: serverTimestamp() });
             await signOut(auth);
