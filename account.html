@@ -1254,7 +1254,7 @@
                 const adminCard = document.getElementById('adminDashboardCard');
                 if (adminCard) adminCard.style.display = (role === 'admin' || role === 'finance') ? 'block' : 'none';
                 
-                document.getElementById('pNameDisplay').innerText = data.fullName;
+                document.getElementById('pNameDisplay').innerText = data.fullName || (data.email?.split('@')[0] || 'Member').charAt(0).toUpperCase();
                 document.getElementById('pRoleDisplay').innerText = data.ministry?.toUpperCase() || "MEMBER";
                 document.getElementById('pPhoto').src = photoUrl;
                 document.getElementById('pPrayers').innerText = data.prayerCount || 0;
