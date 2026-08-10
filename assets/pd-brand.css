@@ -855,74 +855,296 @@ body.dark-mode .pd-stat-item { background: var(--bg-card, #0f172a); }
 
 /* --- Weekly Prayer Challenge (home page) ---------------------------------- */
 .pd-challenge {
-  position: relative; overflow: hidden; margin: 16px 16px 0;
-  border-radius: 26px; padding: 22px 22px 18px;
-  background: linear-gradient(135deg, var(--pd-blue, #0A4D9B) 0%, var(--pd-blue-deep, #0a3d7a) 60%, var(--pd-navy, #07244d) 100%);
-  color: #fff; box-shadow: 0 18px 44px rgba(10,77,155,.28);
-  border: 1px solid rgba(212,175,55,.35);
+  position: relative; overflow: hidden; margin: 18px 16px 0;
+  border-radius: 30px; padding: 26px 26px 22px;
+  background: linear-gradient(135deg, var(--pd-blue, #0A4D9B) 0%, var(--pd-blue-deep, #0a3d7a) 55%, var(--pd-navy, #07244d) 100%);
+  color: #fff; 
+  box-shadow: 0 20px 50px rgba(10,77,155,.32);
+  border: 1px solid rgba(212,175,55,.4);
+  transition: transform 0.4s var(--pd-ease), box-shadow 0.4s;
+}
+.pd-challenge:hover { 
+  transform: translateY(-3px); 
+  box-shadow: 0 25px 60px rgba(10,77,155,.38);
 }
 .pd-challenge-glow {
-  position: absolute; top: -90px; right: -60px; width: 260px; height: 260px;
-  background: radial-gradient(circle, rgba(212,175,55,.35), transparent 70%);
-  border-radius: 50%; pointer-events: none;
+  position: absolute; top: -100px; right: -70px; width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(212,175,55,.4) 0%, transparent 75%);
+  border-radius: 50%; 
+  pointer-events: none;
+  animation: glowPulse 4s ease-in-out infinite;
 }
-.pd-challenge-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+.pd-challenge-head { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  gap: 12px; 
+  flex-wrap: wrap; 
+  margin-bottom: 16px;
+}
 .pd-challenge-ribbon {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(212,175,55,.18); border: 1px solid rgba(212,175,55,.55);
-  color: #f6df8a; font-size: .66rem; font-weight: 900; letter-spacing: 2.2px;
-  padding: 6px 14px; border-radius: 30px; text-transform: uppercase;
+  display: inline-flex; 
+  align-items: center; 
+  gap: 9px;
+  background: rgba(212,175,55,.2); 
+  border: 1px solid rgba(212,175,55,.65);
+  color: #f6df8a; 
+  font-size: .7rem; 
+  font-weight: 900; 
+  letter-spacing: 2.3px;
+  padding: 7px 16px; 
+  border-radius: 32px; 
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(212,175,55,0.25);
+  animation: ribbonSheen 2s linear infinite;
 }
-.pd-challenge-dates { font-size: .74rem; color: rgba(255,255,255,.75); font-weight: 600; }
-.pd-challenge-body { display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; }
-@media (max-width: 720px) { .pd-challenge-body { grid-template-columns: 1fr; } }
-.pd-challenge-title { font-family: var(--pd-font-display, 'Playfair Display', serif); font-size: 1.45rem; margin: 0 0 6px; color: #fff; }
-.pd-challenge-title i { color: #f6df8a; margin-right: 8px; }
-.pd-challenge-focus { font-size: .92rem; line-height: 1.6; color: rgba(255,255,255,.88); margin: 0 0 10px; max-width: 640px; }
-.pd-challenge-verse { font-size: .8rem; font-style: italic; color: rgba(255,255,255,.7); margin: 0; }
-.pd-challenge-verse span { color: #f6df8a; font-style: normal; font-weight: 700; }
-.pd-challenge-side { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.pd-challenge-ring-wrap { position: relative; width: 118px; height: 118px; }
-.pd-challenge-ring { width: 118px; height: 118px; transform: rotate(-90deg); }
-.pd-challenge-ring-bg { fill: none; stroke: rgba(255,255,255,.14); stroke-width: 9; }
+@keyframes ribbonSheen {
+  to { filter: hue-rotate(360deg); }
+}
+.pd-challenge-dates { 
+  font-size: .78rem; 
+  color: rgba(255,255,255,.85); 
+  font-weight: 600;
+  opacity: 0.9;
+}
+.pd-challenge-body { 
+  display: grid; 
+  grid-template-columns: 1fr auto; 
+  gap: 22px; 
+  align-items: center;
+}
+@media (max-width: 720px) { 
+  .pd-challenge-body { 
+    grid-template-columns: 1fr; 
+    gap: 18px; 
+  }
+}
+.pd-challenge-title { 
+  font-family: var(--pd-font-display, 'Playfair Display', serif); 
+  font-size: 1.55rem; 
+  margin: 0 0 8px; 
+  color: #fff; 
+  font-weight: 700;
+}
+.pd-challenge-title i { 
+  color: #f6df8a; 
+  margin-right: 10px; 
+  font-size: 1.3em;
+}
+.pd-challenge-focus { 
+  font-size: 1rem; 
+  line-height: 1.7; 
+  color: rgba(255,255,255,.95); 
+  margin: 0 0 12px; 
+  max-width: 680px; 
+  font-weight: 400;
+}
+.pd-challenge-verse { 
+  font-size: 0.9rem; 
+  font-style: italic; 
+  color: rgba(255,255,255,.85); 
+  margin: 0; 
+  font-family: 'Lora', serif;
+}
+.pd-challenge-verse span { 
+  color: #f6df8a; 
+  font-style: normal; 
+  font-weight: 700; 
+  font-size: 0.95rem;
+}
+.pd-challenge-side { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  gap: 14px; 
+}
+.pd-challenge-ring-wrap { 
+  position: relative; 
+  width: 124px; 
+  height: 124px; 
+  animation: ringFloat 3s ease-in-out infinite;
+}
+@keyframes ringFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.pd-challenge-ring { 
+  width: 124px; 
+  height: 124px; 
+  transform: rotate(-90deg);
+}
+.pd-challenge-ring-bg { 
+  fill: none; 
+  stroke: rgba(255,255,255,.18); 
+  stroke-width: 10;
+}
 .pd-challenge-ring-fg {
-  fill: none; stroke: #d4af37; stroke-width: 9;
-  stroke-linecap: round; stroke-dasharray: 326.7; stroke-dashoffset: 326.7;
-  transition: stroke-dashoffset .6s cubic-bezier(.22,1,.36,1);
+  fill: none; 
+  stroke: #d4af37; 
+  stroke-width: 10;
+  stroke-linecap: round; 
+  stroke-dasharray: 390; 
+  stroke-dashoffset: 390;
+  transition: stroke-dashoffset .7s cubic-bezier(.22,1,.36,1);
 }
-.pd-challenge-ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
-.pd-challenge-ring-label strong { font-size: 1.6rem; line-height: 1; font-family: var(--pd-font-display, 'Playfair Display', serif); }
-.pd-challenge-ring-label span { font-size: .62rem; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.7); margin-top: 2px; }
+.pd-challenge-ring-label { 
+  position: absolute; 
+  inset: 0; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center; 
+  color: #fff; 
+}
+.pd-challenge-ring-label strong { 
+  font-size: 1.8rem; 
+  line-height: 1; 
+  font-family: var(--pd-font-display, 'Playfair Display', serif);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.pd-challenge-ring-label span { 
+  font-size: .68rem; 
+  letter-spacing: 1.2px; 
+  text-transform: uppercase; 
+  color: rgba(255,255,255,.8); 
+  margin-top: 3px; 
+}
 .pd-challenge-today {
-  border: none; cursor: pointer; width: 100%;
-  background: linear-gradient(135deg, #d4af37, #b8922a); color: #1f2937;
-  font-weight: 800; font-size: .8rem; padding: 11px 18px; border-radius: 30px;
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  box-shadow: 0 8px 20px rgba(212,175,55,.35); transition: .25s var(--pd-ease);
+  border: none; 
+  cursor: pointer; 
+  width: 100%;
+  background: linear-gradient(135deg, #d4af37, #b8922a); 
+  color: #1f2937;
+  font-weight: 800; 
+  font-size: .85rem; 
+  padding: 13px 22px; 
+  border-radius: 32px;
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 10px;
+  box-shadow: 0 10px 24px rgba(212,175,55,.4); 
+  transition: .3s var(--pd-ease);
+  position: relative;
+  overflow: hidden;
 }
-.pd-challenge-today:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(212,175,55,.45); }
-.pd-challenge-today.done { background: rgba(255,255,255,.16); color: #fff; border: 1px solid rgba(255,255,255,.35); box-shadow: none; }
+.pd-challenge-today::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s;
+}
+.pd-challenge-today:hover::before { left: 100%; }
+.pd-challenge-today:hover { 
+  transform: translateY(-3px) scale(1.02); 
+  box-shadow: 0 14px 30px rgba(212,175,55,.5);
+}
+.pd-challenge-today.done { 
+  background: rgba(255,255,255,.2); 
+  color: #fff; 
+  border: 1px solid rgba(255,255,255,.45); 
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
 .pd-challenge-share {
-  font-size: .72rem; color: rgba(255,255,255,.75); cursor: pointer; text-decoration: underline dotted;
-  display: inline-flex; align-items: center; gap: 6px; transition: color .2s;
+  font-size: .78rem; 
+  color: rgba(255,255,255,.8); 
+  cursor: pointer; 
+  text-decoration: none;
+  display: inline-flex; 
+  align-items: center; 
+  gap: 7px; 
+  transition: color .25s, transform .25s;
+  padding: 8px 14px;
+  border-radius: 24px;
 }
-.pd-challenge-share:hover { color: #f6df8a; }
-.pd-challenge-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 16px; }
-@media (max-width: 720px) { .pd-challenge-days { grid-template-columns: repeat(4, 1fr); } }
-@media (max-width: 480px) { .pd-challenge-days { grid-template-columns: repeat(3, 1fr); } }
+.pd-challenge-share:hover { 
+  color: #f6df8a; 
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.1);
+}
+.pd-challenge-days { 
+  display: grid; 
+  grid-template-columns: repeat(7, 1fr); 
+  gap: 10px; 
+  margin-top: 20px; 
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+@media (max-width: 720px) { 
+  .pd-challenge-days { 
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 8px; 
+  }
+}
+@media (max-width: 480px) { 
+  .pd-challenge-days { 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 6px; 
+  }
+}
 .pd-challenge-day {
-  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16);
-  border-radius: 14px; padding: 8px 6px; text-align: center; transition: .25s var(--pd-ease);
+  background: rgba(255,255,255,.1); 
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 16px; 
+  padding: 10px 8px; 
+  text-align: center; 
+  transition: .3s var(--pd-ease);
+  cursor: pointer;
+}
+.pd-challenge-day:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.35);
+  transform: translateY(-2px);
 }
 .pd-challenge-day.done {
-  background: rgba(212,175,55,.2); border-color: rgba(212,175,55,.65);
+  background: rgba(212,175,55,.25); 
+  border-color: rgba(212,175,55,.7);
+  box-shadow: 0 4px 10px rgba(212,175,55,0.2);
 }
-.pd-challenge-day-name { font-size: .58rem; font-weight: 900; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,.65); }
-.pd-challenge-day.done .pd-challenge-day-name { color: #f6df8a; }
-.pd-challenge-day-check { font-size: .95rem; margin-top: 3px; min-height: 1em; }
-.pd-challenge-day-check i { color: #f6df8a; }
-.pd-challenge-day-tip { font-size: .62rem; color: rgba(255,255,255,.55); margin-top: 3px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.pd-challenge-day.done .pd-challenge-day-tip { color: rgba(255,255,255,.8); }
+.pd-challenge-day-name { 
+  font-size: .64rem; 
+  font-weight: 900; 
+  letter-spacing: 1.3px; 
+  text-transform: uppercase; 
+  color: rgba(255,255,255,.75); 
+}
+.pd-challenge-day.done .pd-challenge-day-name { 
+  color: #f6df8a; 
+  font-size: .68rem;
+}
+.pd-challenge-day-check { 
+  font-size: 1.1rem; 
+  margin-top: 5px; 
+  min-height: 1.2em; 
+}
+.pd-challenge-day-check i { 
+  color: #f6df8a; 
+  animation: checkPop 0.4s var(--pd-ease);
+}
+@keyframes checkPop {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+.pd-challenge-day-tip { 
+  font-size: .68rem; 
+  color: rgba(255,255,255,.65); 
+  margin-top: 4px; 
+  line-height: 1.4; 
+  display: -webkit-box; 
+  -webkit-line-clamp: 2; 
+  -webkit-box-orient: vertical; 
+  overflow: hidden; 
+}
+.pd-challenge-day.done .pd-challenge-day-tip { 
+  color: rgba(255,255,255,.9); 
+}
 
 /* --- In-app notification center -------------------------------------------- */
 .pd-notif-panel {
