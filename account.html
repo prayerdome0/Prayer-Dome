@@ -890,7 +890,7 @@
                 'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
                 'auth/popup-closed-by-user': 'Google sign-in was cancelled.',
                 'auth/popup-blocked': 'Your browser blocked the Google sign-in window. Please allow pop-ups and try again.',
-                'auth/operation-not-allowed': 'This sign-in method is not enabled in Firebase Authentication.'
+                'auth/operation-not-allowed': 'This sign-in method is not currently available.'
             };
             return messages[error?.code] || fallback || error?.message || 'Something went wrong. Please try again.';
         }
@@ -1336,21 +1336,7 @@
             } catch (e) { return []; }
         }
 
-        async function loadMyCertificates() {
-            const listEl = document.getElementById('myCertificatesList');
-            if (!listEl) return;
-            let certs = certLocalList().map(c => ({ ...c, course: c.course || c.title || 'Prayer Dome Academy Lesson' }));
-            if (auth.currentUser) {
-                try {
-                    const snap = await getDocs(query(collection(db, "certificates"), where("userId", "==", auth.currentUser.uid), orderBy("date", "desc"), limit(100)));
-                    snap.forEach(d => {
-                        const c = d.data();
-                        if (c && c.id && !certs.some(x => x.id === c.id)) {
-                            certs.push({ id: c.id, lessonId: c.lessonId, title: c.course || c.title, course: c.course || c.title, score: c.score, date: c.date, name: c.name, downloads: c.downloads || 0 });
-                        }
-                    });
-                } catch (e) { /* offline — local list only */ }
-            }
+        function renderMyCertificateCards(listEl, certs) {
             if (!certs.length) {
                 listEl.innerHTML = '<div class="certificates-empty" style="text-align:center; padding: 18px; color: var(--text-sub);"><i class="fas fa-award"></i> No certificates yet. Pass an Academy quiz with 80% or higher to earn your first one — visit the <a href="/quiz.html" style="color: var(--accent-gold);">Quiz Centre</a>.</div>';
                 return;
@@ -1358,7 +1344,11 @@
             const certName = (document.getElementById('certNameInput')?.value || '').trim() || 'Prayer Dome Member';
             listEl.innerHTML = certs.map(c => {
                 const name = c.name && c.name !== 'Prayer Dome Member' ? c.name : certName;
-                const date = c.date ? new Date(c.date).toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
+                const rawDate = c.date && typeof c.date.toDate === 'function' ? c.date.toDate() : c.date;
+                const parsedDate = rawDate ? new Date(rawDate) : null;
+                const date = parsedDate && !Number.isNaN(parsedDate.getTime())
+                    ? parsedDate.toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
+                const certDate = parsedDate && !Number.isNaN(parsedDate.getTime()) ? parsedDate.toISOString() : '';
                 return `<div class="cert-card" style="display:flex; gap:14px; align-items:center; flex-wrap:wrap; background: var(--bg-secondary, rgba(10,77,155,.04)); border:1px solid rgba(212,175,55,.3); border-radius:16px; padding:14px; margin-bottom:10px;">
                     <div style="width:46px; height:46px; border-radius:14px; background: linear-gradient(135deg, #0A4D9B, #0a3d7a); display:flex; align-items:center; justify-content:center; color:#f6df8a; font-size:1.25rem; flex-shrink:0;"><i class="fas fa-certificate"></i></div>
                     <div style="flex:1; min-width:180px;">
@@ -1367,13 +1357,12 @@
                         <p style="margin:2px 0 0; font-size:.68rem; color: var(--accent-gold); font-family:monospace;">${escapeHtml(c.id || '')}</p>
                     </div>
                     <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <button class="btn btn-primary btn-sm cert-download-btn" data-cert-id="${escapeHtml(c.id || '')}" data-cert-course="${escapeHtml(c.course || c.title || 'Prayer Dome Academy Lesson')}" data-cert-score="${Math.round(c.score || 0)}" data-cert-date="${escapeHtml(c.date || '')}" data-cert-name="${escapeHtml(name)}"><i class="fas fa-download"></i> Download</button>
-                        <button class="btn btn-outline btn-sm" onclick="printCertificate('${escapeHtml(c.id || '')}','${escapeHtml(c.course || c.title || 'Prayer Dome Academy Lesson')}',${Math.round(c.score || 0)},'${escapeHtml(c.date || '')}','${escapeHtml(name)}')"><i class="fas fa-print"></i> Print</button>
+                        <button class="btn btn-primary btn-sm cert-download-btn" data-cert-id="${escapeHtml(c.id || '')}" data-cert-course="${escapeHtml(c.course || c.title || 'Prayer Dome Academy Lesson')}" data-cert-score="${Math.round(c.score || 0)}" data-cert-date="${escapeHtml(certDate)}" data-cert-name="${escapeHtml(name)}"><i class="fas fa-download"></i> Download</button>
+                        <button class="btn btn-outline btn-sm cert-print-btn" data-cert-id="${escapeHtml(c.id || '')}" data-cert-course="${escapeHtml(c.course || c.title || 'Prayer Dome Academy Lesson')}" data-cert-score="${Math.round(c.score || 0)}" data-cert-date="${escapeHtml(certDate)}" data-cert-name="${escapeHtml(name)}"><i class="fas fa-print"></i> Print</button>
                     </div>
                 </div>`;
             }).join('');
 
-            // Bind download buttons (generates PNG + bumps the tracked download count).
             listEl.querySelectorAll('.cert-download-btn').forEach(btn => {
                 if (!window.PDCertificate) return;
                 const opts = {
@@ -1387,18 +1376,58 @@
                 };
                 PDCertificate.bindButton(btn, opts);
             });
+            listEl.querySelectorAll('.cert-print-btn').forEach(btn => {
+                btn.addEventListener('click', () => printCertificate(
+                    btn.dataset.certId, btn.dataset.certCourse, Number(btn.dataset.certScore),
+                    btn.dataset.certDate, btn.dataset.certName
+                ));
+            });
+        }
+
+        async function loadMyCertificates() {
+            const listEl = document.getElementById('myCertificatesList');
+            if (!listEl) return;
+            let certs = certLocalList().map(c => ({ ...c, course: c.course || c.title || 'Prayer Dome Academy Lesson' }));
+
+            // Show saved certificates immediately. A slow connection must never
+            // leave this section on an endless “Loading” state.
+            renderMyCertificateCards(listEl, certs);
+            if (!auth.currentUser) return certs;
+
+            try {
+                const request = getDocs(query(collection(db, "certificates"), where("userId", "==", auth.currentUser.uid), orderBy("date", "desc"), limit(100)));
+                const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Certificate sync timed out')), 6000));
+                const snap = await Promise.race([request, timeout]);
+                snap.forEach(d => {
+                    const c = d.data();
+                    if (c && c.id && !certs.some(x => x.id === c.id)) {
+                        certs.push({ id: c.id, lessonId: c.lessonId, title: c.course || c.title, course: c.course || c.title, score: c.score, date: c.date, name: c.name, downloads: c.downloads || 0 });
+                    }
+                });
+                renderMyCertificateCards(listEl, certs);
+            } catch (e) {
+                // The local certificate library remains fully usable offline.
+                console.warn('Certificate sync unavailable:', e.message || e);
+            }
+            return certs;
         }
 
         window.printCertificate = async function (id, course, score, date, name) {
             if (!window.PDCertificate) return showToast('Printing is not available in this browser — use Download instead.', 'error');
+            // Open synchronously so popup blockers do not discard the print window
+            // while the certificate canvas is being prepared.
+            const win = window.open('', '_blank');
+            if (!win) return showToast('Popup blocked — allow popups or use Download instead.', 'error');
+            win.document.write('<!DOCTYPE html><html><head><title>Preparing certificate…</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f3f0e6;font-family:Arial;color:#1d2a6b}</style></head><body><p>Preparing your certificate…</p></body></html>');
+            win.document.close();
             try {
                 const dataUrl = await PDCertificate.preview({ id, course, score, date, name });
-                const win = window.open('', '_blank');
-                if (!win) return showToast('Popup blocked — allow popups or use Download instead.', 'error');
-                win.document.write(`<!DOCTYPE html><html><head><title>Certificate ${escapeHtml(id)}</title><style>body{margin:0;display:flex;justify-content:center;background:#f3f0e6}img{width:100%;max-width:1000px}</style></head><body><img src="${dataUrl}" onload="window.print()" alt="Prayer Dome certificate"></body></html>`);
+                win.document.open();
+                win.document.write(`<!DOCTYPE html><html><head><title>Certificate ${escapeHtml(id)}</title><style>body{margin:0;display:flex;justify-content:center;background:#f3f0e6}img{width:100%;max-width:1000px;height:auto}</style></head><body><img src="${dataUrl}" onload="setTimeout(function(){window.print()},150)" alt="Prayer Dome certificate"></body></html>`);
                 win.document.close();
             } catch (e) {
                 console.error(e);
+                win.close();
                 showToast('Could not print — use Download instead.', 'error');
             }
         };
@@ -1497,16 +1526,16 @@
                 document.getElementById('loginForm').style.display = 'none';
                 document.getElementById('registerForm').style.display = 'none';
                 document.getElementById('profileSection').style.display = 'block';
-                try {
-                    await ensureUserProfile(user);
-                    await loadProfileData(user);
-                    await loadMyCertificates();
-                    await checkEmailVerification();
-                    await handleEmailVerificationLink();
-                } catch (error) {
-                    console.error('Profile loading error:', error);
+                const [profileResult] = await Promise.allSettled([
+                    ensureUserProfile(user).then(() => loadProfileData(user)),
+                    loadMyCertificates(),
+                    checkEmailVerification()
+                ]);
+                if (profileResult.status === 'rejected') {
+                    console.error('Profile loading error:', profileResult.reason);
                     showToast('You are signed in, but we could not load your profile yet. Please refresh.', 'error');
                 }
+                await handleEmailVerificationLink().catch(error => console.error('Verification link error:', error));
             } else {
                 document.getElementById('authTabs').style.display = 'flex';
                 document.getElementById('profileSection').style.display = 'none';

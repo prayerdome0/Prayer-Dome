@@ -31,7 +31,9 @@ from reportlab.platypus import (BaseDocTemplate, Frame, Image, PageTemplate,
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / 'scripts' / 'documents-src'
 OUT = ROOT / 'documents'
-LOGO = ROOT / 'assets' / 'logo-badge-256.png'
+# Optimized copy of the official Prayer Dome mark committed with the website.
+# The same logo is embedded in every generated document, including the user guide.
+LOGO = ROOT / 'assets' / 'logo.png'
 
 BLUE = HexColor('#0A4D9B')
 BLUE_DEEP = HexColor('#07244d')
@@ -69,6 +71,12 @@ META = {
         'title': 'Small Group Discussion Guide',
         'category': 'Fellowship',
         'tagline': 'Meetings, questions and covenant',
+    },
+    'user-guide': {
+        'title': 'Prayer Dome Website User Guide',
+        'category': 'Website Guide',
+        'tagline': 'What is available and how to use it',
+        'output': ROOT / 'Prayer-Dome-User-Guide.pdf',
     },
 }
 
@@ -215,8 +223,9 @@ def build(slug: str):
         return
     meta = META.get(slug, {'title': slug.replace('-', ' ').title(),
                            'category': 'Guide', 'tagline': ''})
+    output_path = meta.get('output', OUT / (slug + '.pdf'))
     doc = BaseDocTemplate(
-        str(OUT / (slug + '.pdf')), pagesize=A4,
+        str(output_path), pagesize=A4,
         leftMargin=MARGIN, rightMargin=MARGIN,
         topMargin=MARGIN, bottomMargin=20 * mm,
         title=meta['title'], author='Prayer Dome',
@@ -233,8 +242,8 @@ def build(slug: str):
               Paragraph('<font color="#a67c00"><b>“He hath done all things well.” — Mark 7:37</b></font>',
                         ParagraphStyle('Close', parent=BODY, alignment=TA_CENTER))]
     doc.build(story)
-    size = (OUT / (slug + '.pdf')).stat().st_size
-    print('built', slug + '.pdf', f'({size} bytes)')
+    size = output_path.stat().st_size
+    print('built', output_path.relative_to(ROOT), f'({size} bytes)')
 
 
 def main():

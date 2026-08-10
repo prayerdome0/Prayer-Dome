@@ -1,62 +1,49 @@
+<p align="center">
+  <img src="assets/logo.png" alt="Prayer Dome logo" width="180">
+</p>
+
 # Prayer Dome
 
-Prayer Dome is a static, Firebase-backed Christian prayer and Bible community
-web app. It is also packaged as an Android app with Capacitor for Google Play
-publishing.
+**A House of Prayer for All Nations**
 
-## Web app
+Prayer Dome is a Christian community website for prayer, Bible study, discipleship, worship, testimony, fellowship and practical care. Visit **[prayerdome.net](https://prayerdome.net)**.
 
-The production web app is hosted at [prayerdome.net](https://prayerdome.net).
-Firebase/Vercel hosting serves the website files from the repository root.
+> “He hath done all things well.” — Mark 7:37
 
-## Android app
+## What is on the website
 
-The Android wrapper uses application ID `net.prayerdome.app` and embeds a clean
-copy of the website bundle. It is ready to open in Android Studio after the
-Capacitor sync step:
+- **Home** — announcements, featured Scripture, daily devotional, weekly prayer challenge, events and news.
+- **Prayer Wall** — share requests, pray with others and celebrate answered prayer.
+- **Bible** — read Scripture, search passages, write notes and follow reading progress.
+- **Prayer Dome Academy** — lessons, Bible stories, quizzes, resources and completion certificates.
+- **Live Services** — current broadcasts, upcoming services, live conversation and prayer responses.
+- **Sermons** — teachings and Bible stories with Scripture, reflection, prayer and narration.
+- **Radio and Media** — gospel radio, podcasts, worship video and other Christian content.
+- **News and Events** — ministry updates, Christian news and gathering information.
+- **Testimonies and Gallery** — approved stories and images celebrating God’s faithfulness.
+- **Community Chat** — respectful conversation for signed-in members.
+- **Membership, Giving and Support** — membership applications, giving options and member care requests.
+- **Documents** — statement of faith, discipleship guides, prayer tools, handbooks and the website user guide.
 
-```bash
-npm install
-npm run mobile:sync
-npm run mobile:open
-```
+## How to use Prayer Dome
 
-Build a test APK from the command line:
+1. Open [prayerdome.net](https://prayerdome.net).
+2. Use the main menu or Home page cards to choose an area.
+3. Create an account when you want to post, save progress, join conversations or use member features.
+4. Choose a language and light or dark appearance using the controls in the top bar.
+5. Select the notification bell to review ministry notices and live-service alerts.
+6. On a supported phone, use **Add to Home Screen** or **Install App** for quick access.
 
-```bash
-npm run mobile:build:debug
-# android/app/build/outputs/apk/debug/app-debug.apk
-```
+## Academy certificates
 
-Build a Play Store bundle after configuring a release keystore:
+Pass an Academy quiz with **80% or higher** to earn a certificate. Open **Account → My Certificates**, then choose **Download** or **Print**. Enter your preferred full name before taking a quiz so it appears correctly on the certificate.
 
-```bash
-npm run mobile:build:release
-# android/app/build/outputs/bundle/release/app-release.aab
-```
+## Guides and documents
 
-See [`mobile/README.md`](mobile/README.md) and
-[`mobile/PLAY-STORE.md`](mobile/PLAY-STORE.md) for Android Studio, signing,
-Play Console, and GitHub Actions instructions. The release keystore and
-passwords must never be committed.
+Open the **[Resource Library](https://prayerdome.net/resources.html)** to read, download or print all Prayer Dome documents. Every published document uses the official Prayer Dome logo.
 
-## Tests
+The complete **[Prayer Dome Website User Guide](https://prayerdome.net/Prayer-Dome-User-Guide.pdf)** explains each feature, account use, Academy certificates, mobile access, privacy, safety and troubleshooting.
 
-```bash
-npm test
-```
+## Help
 
-## Deployment (Vercel)
-
-The site is a static bundle served from the repository root plus the
-dependency-free serverless handlers in `api/`. Deploys need **no build step**,
-so `package.json` deliberately has no `build` script (Vercel auto-runs any
-script named `build`, and heavy CI-style checks there break deployments).
-
-- The full verification gate is `npm run verify:all` (JS validation + SEO
-  drift check + unit/DOM tests + Firebase Functions verify). Run it locally
-  and in CI before pushing.
-- `node scripts/validate-production.mjs` alone is a fast, pure-Node syntax
-  check of all first-party JS and inline scripts.
-- The `postinstall` hook installs `functions/` dependencies for local
-  development and is skipped automatically on Vercel (`VERCEL=1`).
+Use the **[Contact page](https://prayerdome.net/contact.html)** for prayer support, account help, document requests or accessibility feedback. When reporting a website problem, include the page name, what you selected and what appeared. Never send your password.

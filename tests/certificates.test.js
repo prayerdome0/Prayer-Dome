@@ -105,7 +105,7 @@ function sliceBalanced(code, marker) {
       const btns = [...d.querySelectorAll('.cert-download-btn')];
       t('account: download buttons bound to PDCertificate',
         btns.length === 3 && btns.every(b => b.__opts && b.__opts.id && typeof b.__opts.onDownload === 'function'));
-      t('account: print buttons present', d.querySelectorAll('button[onclick^="printCertificate"]').length === 3);
+      t('account: print buttons present', d.querySelectorAll('.cert-print-btn').length === 3);
     }).catch(e => { fail++; console.log('FAIL  account exception: ' + e.stack); });
   } catch (e) { fail++; console.log('FAIL  account exception: ' + e.stack); }
 })();

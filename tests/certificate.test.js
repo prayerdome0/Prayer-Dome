@@ -29,7 +29,7 @@ function makeCtx(log) {
   return ctx;
 }
 
-function runHarness(opts, { logoOk = true, toBlobOk = true } = {}) {
+function runHarness(opts, { logoOk = true, toBlobOk = true, toBlobHangs = false } = {}) {
   const logs = { drew: null, saved: [], alerts: [] };
   const sandbox = {
     console: { error() {}, log() {}, warn() {} },
@@ -56,7 +56,7 @@ function runHarness(opts, { logoOk = true, toBlobOk = true } = {}) {
           const ctx = makeCtx();
           const canvas = { width: 0, height: 0, getContext: () => { logs.drew = ctx; return ctx; } };
           if (toBlobOk) {
-            canvas.toBlob = cb => cb({ fake: true });
+            canvas.toBlob = cb => { if (!toBlobHangs) cb({ fake: true }); };
             canvas.toDataURL = () => 'data:image/png;base64,AAAA';
           }
           return canvas;
@@ -103,6 +103,12 @@ function assertOpsSane(ops) {
   let rejected = false;
   try { await h4.PC.download({ name: 'x', course: 'y' }); } catch (e) { rejected = true; }
   t('download() rejects cleanly when canvas export fails', rejected);
+
+  // Android WebViews can expose toBlob without ever invoking its callback.
+  const hHang = runHarness({}, { toBlobHangs: true });
+  const hangOk = await hHang.PC.download({ name: 'Mobile Member', course: 'Prayer 101', id: 'PD-MOBILE-1' });
+  t('download() falls back when the browser toBlob callback hangs',
+    hangOk === true && hHang.logs.saved[0] === 'prayer-dome-certificate-pd-mobile-1.png');
 
   // preview() renders a data URL (used for the account-page Print flow)
   const h5 = runHarness({ name: 'Print Me', course: 'Prayer 101', score: 85, id: 'PD-PRINT-1' });

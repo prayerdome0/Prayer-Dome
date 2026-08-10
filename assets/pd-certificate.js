@@ -26,16 +26,29 @@
 
   var logoPromise = null;
 
+  function loadedPageLogo() {
+    if (typeof document === 'undefined' || typeof document.querySelectorAll !== 'function') return null;
+    var images = document.querySelectorAll('img[src*="/assets/logo"]');
+    for (var i = 0; i < images.length; i++) {
+      if (images[i].complete && images[i].naturalWidth && images[i].naturalHeight) return images[i];
+    }
+    return null;
+  }
+
   function loadLogo() {
     if (!logoPromise) {
       logoPromise = new Promise(function (resolve) {
         var settled = false;
         function done(img) { if (!settled) { settled = true; resolve(img); } }
+        var onPage = loadedPageLogo();
+        if (onPage) { done(onPage); return; }
+        if (typeof Image === 'undefined') { done(null); return; }
         var img = new Image();
         img.onload = function () { done(img); };
         img.onerror = function () { done(null); };
         img.src = '/assets/logo.png';
-        setTimeout(function () { done(null); }, 4000);
+        // A slow or unavailable image must never leave certificate buttons spinning.
+        setTimeout(function () { done(null); }, 1800);
       });
     }
     return logoPromise;
@@ -89,6 +102,27 @@
     ctx.beginPath();
     ctx.moveTo(cx, cy - r); ctx.lineTo(cx + r, cy); ctx.lineTo(cx, cy + r); ctx.lineTo(cx - r, cy);
     ctx.closePath(); ctx.fill();
+  }
+
+  function fallbackMark(ctx) {
+    // Fast vector fallback for offline WebViews: the certificate still displays
+    // a recognisable Prayer Dome book-and-dome mark if the PNG is unavailable.
+    ctx.save();
+    ctx.translate(W / 2, 184);
+    ctx.strokeStyle = NAVY_SOFT;
+    ctx.lineWidth = 13;
+    ctx.beginPath();
+    ctx.moveTo(-110, 28); ctx.quadraticCurveTo(-82, -74, 0, -112);
+    ctx.quadraticCurveTo(82, -74, 110, 28); ctx.stroke();
+    ctx.fillStyle = GOLD;
+    ctx.beginPath();
+    ctx.moveTo(-96, 44); ctx.lineTo(-8, 82); ctx.lineTo(0, 98); ctx.lineTo(8, 82); ctx.lineTo(96, 44);
+    ctx.lineTo(18, 112); ctx.lineTo(0, 124); ctx.lineTo(-18, 112); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = NAVY;
+    ctx.font = "700 48px " + SERIF;
+    ctx.textAlign = 'center';
+    ctx.fillText('PD', 0, 12);
+    ctx.restore();
   }
 
   function spaced(ctx, text, cx, y, spacing) {
@@ -152,6 +186,8 @@
       var lw = (lh * logo.naturalWidth) / logo.naturalHeight;
       if (lw > 260) { lw = 260; lh = (lw * logo.naturalHeight) / logo.naturalWidth; }
       ctx.drawImage(logo, (W - lw) / 2, 88, lw, lh);
+    } else {
+      fallbackMark(ctx);
     }
 
     ctx.fillStyle = GOLD_DARK;
@@ -237,16 +273,34 @@
     }, 400);
   }
 
+  function dataUrlBlob(canvas) {
+    try {
+      var dataUrl = canvas.toDataURL('image/png');
+      var bin = atob(dataUrl.split(',')[1]);
+      var buf = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+      return new Blob([buf], { type: 'image/png' });
+    } catch (e) { return null; }
+  }
+
   function toBlobP(canvas) {
     return new Promise(function (resolve) {
-      if (canvas.toBlob) { canvas.toBlob(resolve, 'image/png'); return; }
-      try {
-        var dataUrl = canvas.toDataURL('image/png');
-        var bin = atob(dataUrl.split(',')[1]);
-        var buf = new Uint8Array(bin.length);
-        for (var i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
-        resolve(new Blob([buf], { type: 'image/png' }));
-      } catch (e) { resolve(null); }
+      var settled = false;
+      function done(blob) {
+        if (settled) return;
+        settled = true;
+        resolve(blob || dataUrlBlob(canvas));
+      }
+      if (canvas.toBlob) {
+        try {
+          canvas.toBlob(done, 'image/png');
+          // Some Android WebViews expose toBlob but never invoke its callback.
+          // Fall back to toDataURL so the button always finishes.
+          setTimeout(function () { done(null); }, 2500);
+          return;
+        } catch (e) { /* use the synchronous fallback below */ }
+      }
+      done(null);
     });
   }
 
@@ -297,6 +351,9 @@
       });
     });
   }
+
+  // Start loading the official mark before a member presses Download.
+  loadLogo();
 
   window.PDCertificate = {
     download: download,
