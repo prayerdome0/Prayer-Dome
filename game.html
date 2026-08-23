@@ -1,0 +1,934 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Faith Journey Game | Prayer Dome</title>
+  <meta name="description" content="Embark on a spiritual journey of growth, faith, and daily challenges at Prayer Dome.">
+  <link rel="icon" type="image/png" href="/assets/logo.png">
+  <link rel="apple-touch-icon" href="/assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@500;700;800;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/assets/pd-brand.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <style>
+    .game-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    
+    .game-hero {
+      text-align: center;
+      padding: 50px 20px;
+      background: linear-gradient(135deg, rgba(10,77,155,0.9), rgba(7,36,77,0.95));
+      border-radius: 30px;
+      color: white;
+      margin-bottom: 40px;
+      box-shadow: var(--pd-shadow-lg);
+      border: 1px solid rgba(212,175,55,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .game-hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      font-weight: 900;
+      margin-bottom: 12px;
+      color: var(--pd-gold);
+    }
+    
+    .game-hero p {
+      font-size: 1.1rem;
+      max-width: 700px;
+      margin: 0 auto 24px;
+      opacity: 0.9;
+    }
+
+    .game-stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    
+    .game-stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 20px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: var(--pd-shadow-sm);
+      transition: transform 0.2s;
+    }
+    
+    .game-stat-card:hover {
+      transform: translateY(-4px);
+    }
+    
+    .game-stat-card i {
+      font-size: 2rem;
+      color: var(--pd-gold);
+      margin-bottom: 10px;
+    }
+    
+    .game-stat-card .val {
+      font-size: 2.2rem;
+      font-weight: 850;
+      color: var(--pd-blue);
+      display: block;
+    }
+    
+    .game-stat-card .lbl {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Stages Journey Map */
+    .journey-map-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 30px;
+      margin-bottom: 40px;
+      box-shadow: var(--pd-shadow-md);
+    }
+    
+    .journey-map-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--pd-blue);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .journey-path {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      padding: 40px 0;
+      overflow-x: auto;
+      gap: 20px;
+    }
+    
+    .journey-path::before {
+      content: '';
+      position: absolute;
+      left: 30px;
+      right: 30px;
+      height: 6px;
+      background: #e2e8f0;
+      z-index: 1;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    
+    .journey-path-fill {
+      position: absolute;
+      left: 30px;
+      height: 6px;
+      background: var(--pd-blue);
+      z-index: 1;
+      top: 50%;
+      transform: translateY(-50%);
+      transition: width 0.5s ease-in-out;
+      width: 0%;
+    }
+    
+    .journey-step {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      flex: 0 0 100px;
+      text-align: center;
+    }
+    
+    .journey-step-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: white;
+      border: 4px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      transition: all 0.3s;
+      box-shadow: var(--pd-shadow-sm);
+    }
+    
+    .journey-step.active .journey-step-circle {
+      border-color: var(--pd-gold);
+      background: var(--pd-blue);
+      color: white;
+      transform: scale(1.15);
+      box-shadow: 0 0 20px rgba(10,77,155,0.4);
+    }
+    
+    .journey-step.completed .journey-step-circle {
+      border-color: var(--pd-blue);
+      background: #22c55e;
+      color: white;
+    }
+    
+    .journey-step-label {
+      margin-top: 12px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+    
+    .journey-step.active .journey-step-label {
+      color: var(--pd-blue);
+    }
+    
+    /* Play Panels */
+    .play-panels {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+    }
+    
+    .challenge-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: var(--pd-shadow-md);
+    }
+    
+    .challenge-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--pd-blue);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .situation-card {
+      background: linear-gradient(135deg, rgba(10,77,155,0.03), rgba(212,175,55,0.03));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    
+    .situation-text {
+      font-family: 'Lora', serif;
+      font-size: 1.2rem;
+      line-height: 1.6;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+    
+    .situation-option {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 16px 20px;
+      background: var(--bg-elev);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      margin-bottom: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .situation-option:hover {
+      border-color: var(--pd-blue);
+      background: rgba(10,77,155,0.04);
+      transform: translateX(4px);
+    }
+    
+    .situation-option.correct {
+      border-color: #22c55e;
+      background: rgba(34,197,94,0.06);
+    }
+    
+    .situation-option.incorrect {
+      border-color: var(--pd-red);
+      background: rgba(239,68,68,0.06);
+    }
+    
+    /* Mystery Challenge */
+    .mystery-box {
+      text-align: center;
+      padding: 30px;
+      background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(10,77,155,0.05));
+      border: 2px dashed var(--pd-gold);
+      border-radius: 20px;
+      margin-bottom: 24px;
+    }
+    
+    .mystery-box i {
+      font-size: 3rem;
+      color: var(--pd-gold);
+      margin-bottom: 12px;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+    
+    /* Badges & Leaderboard */
+    .sidebar-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--pd-shadow-sm);
+    }
+    
+    .sidebar-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--pd-blue);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .badge-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      text-align: center;
+    }
+    
+    .badge-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0.4;
+      transition: opacity 0.3s;
+    }
+    
+    .badge-item.unlocked {
+      opacity: 1;
+    }
+    
+    .badge-item img, .badge-item i {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(212,175,55,0.1);
+      color: var(--pd-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 6px;
+      border: 2px solid var(--pd-gold);
+    }
+    
+    .badge-item span {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    
+    .leader-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .leader-row:last-child {
+      border-bottom: 0;
+    }
+    
+    .leader-rank {
+      font-weight: 900;
+      font-size: 1rem;
+      width: 24px;
+      color: var(--text-dim);
+    }
+    
+    .leader-rank.rank-1 { color: var(--pd-gold); }
+    .leader-rank.rank-2 { color: #94a3b8; }
+    .leader-rank.rank-3 { color: #b45309; }
+    
+    .leader-name {
+      flex: 1;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    
+    .leader-score {
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: var(--pd-blue);
+    }
+    
+    @media (max-width: 900px) {
+      .play-panels {
+        grid-template-columns: 1fr;
+      }
+      .game-stats-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+  
+  <script src="/translation-data.js"></script>
+  <script src="/assets/pd-verse-data.js" defer></script>
+  <script src="/assets/pd-verse-alerts.js" defer></script>
+  <script src="/assets/pd-app.js" defer></script>
+</head>
+<body class="pd-acad-page">
+<div class="pd-aurora" aria-hidden="true"><span></span></div>
+
+<aside class="pd-drawer" id="pdDrawer" aria-label="Main menu">
+  <nav class="pd-drawer-nav">
+    <a class="pd-drawer-link" href="/"><i class="fas fa-home"></i> Home</a>
+    <a class="pd-drawer-link" href="/lessons"><i class="fas fa-graduation-cap"></i> Teaching</a>
+    <a class="pd-drawer-link" href="/stories"><i class="fas fa-book-open-reader"></i> Stories</a>
+    <a class="pd-drawer-link" href="/quiz"><i class="fas fa-star"></i> Quizzes</a>
+    <a class="pd-drawer-link" href="/game.html"><i class="fas fa-gamepad"></i> Faith Journey</a>
+    <a class="pd-drawer-link" href="/resources"><i class="fas fa-folder-open"></i> Resources</a>
+    <a class="pd-drawer-link" href="/sermons"><i class="fas fa-microphone-lines"></i> Sermons</a>
+    <a class="pd-drawer-link" href="/prayer"><i class="fas fa-hands-praying"></i> Prayer Wall</a>
+    <a class="pd-drawer-link" href="/account"><i class="fas fa-user-circle"></i> Account</a>
+  </nav>
+</aside>
+<header class="pd-topbar">
+  <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+  <a href="/" class="pd-topbar-center">
+    <div class="pd-topbar-logo"><img src="/assets/logo.png" alt="PD Logo"></div>
+    <div class="pd-topbar-word">PRAYER DOME</div>
+  </a>
+  <div class="pd-topbar-right">
+    <select class="pd-lang-select" aria-label="Language">
+      <option value="en">🇬🇧 English</option>
+      <option value="tum">🇲🇼 Tumbuka</option>
+      <option value="ssw">🇸🇿 siSwati</option>
+      <option value="bem">🇿🇲 Bemba</option>
+      <option value="nya">🇲🇼 Nyanja</option>
+    </select>
+    <button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="fas fa-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>
+  </div>
+</header>
+
+<main class="game-wrap">
+  <section class="game-hero">
+    <span class="pd-acad-eyebrow"><i class="fas fa-gamepad"></i> PRAYERDOME FAITH JOURNEY</span>
+    <h1>Your Spiritual Growth Journey</h1>
+    <p>Travel through different spiritual stages, solve daily situational challenges, earn Faith Points (XP), collect beautiful badges, and maintain your streak!</p>
+    <div>
+      <button class="pd-acad-btn pd-acad-btn-primary" onclick="scrollPlay()"><i class="fas fa-play"></i> Play Today's Challenge</button>
+      <button class="pd-acad-btn pd-acad-btn-secondary" onclick="scrollMystery()"><i class="fas fa-gift"></i> Mystery Challenge</button>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="game-stats-row">
+    <div class="game-stat-card">
+      <i class="fas fa-star"></i>
+      <span class="val" id="xpVal">120</span>
+      <span class="lbl">Faith Points (XP)</span>
+    </div>
+    <div class="game-stat-card">
+      <i class="fas fa-trophy"></i>
+      <span class="val" id="levelVal">1</span>
+      <span class="lbl">Current Level</span>
+    </div>
+    <div class="game-stat-card">
+      <i class="fas fa-fire"></i>
+      <span class="val" id="streakVal">1</span>
+      <span class="lbl">Daily Streak</span>
+    </div>
+    <div class="game-stat-card">
+      <i class="fas fa-medal"></i>
+      <span class="val" id="badgesVal">1</span>
+      <span class="lbl">Badges Earned</span>
+    </div>
+  </section>
+
+  <!-- JOURNEY MAP -->
+  <section class="journey-map-card">
+    <div class="journey-map-title">
+      <i class="fas fa-map-location-dot"></i> Your Growth Pathway
+    </div>
+    <div class="journey-path" id="journeyPath">
+      <!-- Generated dynamically -->
+    </div>
+  </section>
+
+  <!-- PLAY PANELS -->
+  <div class="play-panels">
+    <!-- CHALLENGE ZONE -->
+    <section class="challenge-panel" id="playZone">
+      <div class="challenge-title">
+        <i class="fas fa-bolt-lightning"></i> <span id="challengeHeadline">Situation Challenge</span>
+      </div>
+      <div class="situation-card">
+        <div class="situation-text" id="challengeText">Loading next challenge...</div>
+        <div id="optionsBox">
+          <!-- Options go here -->
+        </div>
+        <div id="explanationBox" style="display:none; margin-top:16px; padding:16px; border-radius:12px; background:rgba(10,77,155,0.05); font-size:0.92rem; line-height:1.5;">
+          <!-- Explanation -->
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:0.85rem; color:var(--text-sub); font-weight:700;"><i class="fas fa-award"></i> Reward: <strong style="color:var(--pd-gold);">+50 XP</strong></span>
+        <button class="pd-acad-btn pd-acad-btn-secondary" id="nextChallengeBtn" onclick="nextSituation()" style="display:none;">Next Challenge <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </section>
+
+    <!-- SIDEBAR -->
+    <div>
+      <!-- MYSTERY CHALLENGE BOX -->
+      <div class="sidebar-card">
+        <div class="sidebar-title"><i class="fas fa-dice"></i> Daily Mystery Box</div>
+        <div class="mystery-box">
+          <i class="fas fa-box-open"></i>
+          <p style="font-size:0.88rem; font-weight:600; margin-bottom:14px;">A random daily spiritual test awaits!</p>
+          <button class="pd-acad-btn pd-acad-btn-primary btn-block" onclick="startMysteryChallenge()">PLAY MYSTERY</button>
+        </div>
+      </div>
+
+      <!-- BADGES -->
+      <div class="sidebar-card">
+        <div class="sidebar-title"><i class="fas fa-award"></i> Achievement Badges</div>
+        <div class="badge-grid" id="badgeGrid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- LEADERBOARD -->
+      <div class="sidebar-card">
+        <div class="sidebar-title"><i class="fas fa-ranking-star"></i> Community Leaders</div>
+        <div id="leaderboardList">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, orderBy, limit, onSnapshot, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+  // standard firebase init
+  var FCM_CONFIG = {
+    apiKey: 'AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo',
+    authDomain: 'prayer-dome.firebaseapp.com',
+    projectId: 'prayer-dome',
+    storageBucket: 'prayer-dome.firebasestorage.app',
+    messagingSenderId: '198295153196',
+    appId: '1:198295153196:web:1222b31948d7974ba3bf89'
+  };
+  const app = initializeApp(FCM_CONFIG);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  let user = null;
+  let gameData = {
+    xp: 120,
+    level: 1,
+    streak: 1,
+    unlockedStage: 0,
+    badges: ['first-step'],
+    lastPlayed: ''
+  };
+
+  const STAGES = [
+    { label: "Beginner", icon: "🌱", key: "start" },
+    { label: "Prayer", icon: "🙏", key: "prayer" },
+    { label: "The Word", icon: "📖", key: "word" },
+    { label: "Love", icon: "❤️", key: "love" },
+    { label: "Forgiveness", icon: "🤝", key: "forgiveness" },
+    { label: "Faith", icon: "🕊️", key: "faith" },
+    { label: "Service", icon: "⭐", key: "service" },
+    { label: "Growth", icon: "👑", key: "growth" }
+  ];
+
+  const BADGE_DEFS = [
+    { id: 'first-step', name: "First Step", icon: "🌱", desc: "Completed first activity" },
+    { id: 'word-seeker', name: "Word Seeker", icon: "📖", desc: "Completed 10 Bible activities" },
+    { id: 'prayer-warrior', name: "Prayer Warrior", icon: "🙏", desc: "Completed 20 prayer challenges" },
+    { id: 'streak-builder', name: "Streak Builder", icon: "🔥", desc: "Maintained a 7-day streak" },
+    { id: 'faith-champion', name: "Journey Champion", icon: "🏆", desc: "Unlocked all spiritual stages" }
+  ];
+
+  const SITUATIONS = [
+    {
+      stage: 1,
+      text: "You see someone struggling with heavy bags in the rain, but you are in a rush to meet a friend. What do you do?",
+      options: [
+        { text: "Pretend not to see them and walk past quickly.", correct: false, xp: 0, exp: "Helping others in need is a foundational practice of Christlike love." },
+        { text: "Stop and help them carry their bags, even if it makes you late.", correct: true, xp: 50, exp: "Excellent choice! Jesus taught us to love our neighbors as ourselves. (+50 XP)" },
+        { text: "Say a quick 'God bless you' and keep running.", correct: false, xp: 10, exp: "While encouraging words are good, practical support is what's truly needed here." }
+      ]
+    },
+    {
+      stage: 2,
+      text: "A family member says something hurtful to you during a discussion. What is your response?",
+      options: [
+        { text: "Respond immediately with a sharp, hurtful remark.", correct: false, xp: 0, exp: "Lashing back creates strife. Patience and forgiveness build unity." },
+        { text: "Take a deep breath, remain silent, and choose to forgive them in your heart.", correct: true, xp: 50, exp: "Wonderful! Proverbs 15:1 teaches that a soft answer turns away wrath. (+50 XP)" },
+        { text: "Walk away angrily and refuse to speak to them for a week.", correct: false, xp: 5, exp: "Holding onto silent anger builds resentment, separating you from love." }
+      ]
+    },
+    {
+      stage: 3,
+      text: "You discover that a colleague took credit for a project you worked hard on. What do you do?",
+      options: [
+        { text: "Confront them aggressively in front of the team.", correct: false, xp: 0, exp: "Hostility damages relationships and compromises your testimony." },
+        { text: "Speak to them privately with grace, expressing your concerns while offering forgiveness.", correct: true, xp: 50, exp: "Outstanding choice. Maturing in Christ means speaking the truth in love. (+50 XP)" },
+        { text: "Complain to other coworkers behind their back.", correct: false, xp: 5, exp: "Gossip and slander only serve to worsen conflict." }
+      ]
+    },
+    {
+      stage: 4,
+      text: "You have spare time on a Saturday afternoon. How do you choose to spend it?",
+      options: [
+        { text: "Spend the entire afternoon scrolling on social media.", correct: false, xp: 0, exp: "While rest is good, using time productively builds spiritual disciplines." },
+        { text: "Devote 30 minutes to prayer and Bible reading, and visit a lonely neighbor.", correct: true, xp: 50, exp: "Amazing choice! Redeeming the time for spiritual devotion and community service brings great growth. (+50 XP)" },
+        { text: "Catch up on sleep all day without acknowledging God.", correct: false, xp: 10, exp: "Rest is necessary, but maintaining an active prayer life keeps you spiritually vibrant." }
+      ]
+    }
+  ];
+
+  let currentSituationIdx = 0;
+
+  window.scrollPlay = function() {
+    document.getElementById('playZone').scrollIntoView({ behavior: 'smooth' });
+  };
+  window.scrollMystery = function() {
+    document.querySelector('.mystery-box').scrollIntoView({ behavior: 'smooth' });
+  };
+
+  function updateUI() {
+    document.getElementById('xpVal').textContent = gameData.xp;
+    document.getElementById('levelVal').textContent = gameData.level;
+    document.getElementById('streakVal').textContent = gameData.streak;
+    document.getElementById('badgesVal').textContent = gameData.badges.length;
+
+    renderJourneyMap();
+    renderBadges();
+  }
+
+  function renderJourneyMap() {
+    const path = document.getElementById('journeyPath');
+    path.innerHTML = '';
+    
+    // Add path fill width
+    const fillPercent = (gameData.unlockedStage / (STAGES.length - 1)) * 100;
+    const fillEl = document.createElement('div');
+    fillEl.className = 'journey-path-fill';
+    fillEl.style.width = fillPercent + '%';
+    path.appendChild(fillEl);
+
+    STAGES.forEach((s, idx) => {
+      const active = idx === gameData.unlockedStage;
+      const completed = idx < gameData.unlockedStage;
+      
+      const step = document.createElement('div');
+      step.className = `journey-step ${active ? 'active' : ''} ${completed ? 'completed' : ''}`;
+      step.innerHTML = `
+        <div class="journey-step-circle">${s.icon}</div>
+        <div class="journey-step-label">${s.label}</div>
+      `;
+      path.appendChild(step);
+    });
+  }
+
+  function renderBadges() {
+    const grid = document.getElementById('badgeGrid');
+    grid.innerHTML = BADGE_DEFS.map(b => {
+      const unlocked = gameData.badges.includes(b.id);
+      return `
+        <div class="badge-item ${unlocked ? 'unlocked' : ''}" title="${b.desc}">
+          <i>${b.icon}</i>
+          <span>${b.name}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.nextSituation = function() {
+    currentSituationIdx = (currentSituationIdx + 1) % SITUATIONS.length;
+    const challenge = SITUATIONS[currentSituationIdx];
+    
+    document.getElementById('challengeHeadline').textContent = "Situation Challenge";
+    document.getElementById('challengeText').textContent = challenge.text;
+    document.getElementById('explanationBox').style.display = 'none';
+    document.getElementById('nextChallengeBtn').style.display = 'none';
+
+    const optsBox = document.getElementById('optionsBox');
+    optsBox.innerHTML = challenge.options.map((opt, oIdx) => `
+      <button class="situation-option" onclick="submitOption(${oIdx})">${opt.text}</button>
+    `).join('');
+  };
+
+  window.submitOption = function(optIdx) {
+    const challenge = SITUATIONS[currentSituationIdx];
+    const opt = challenge.options[optIdx];
+    
+    const btns = document.querySelectorAll('.situation-option');
+    btns.forEach((btn, idx) => {
+      btn.disabled = true;
+      if (idx === optIdx) {
+        btn.classList.add(opt.correct ? 'correct' : 'incorrect');
+      }
+    });
+
+    const expBox = document.getElementById('explanationBox');
+    expBox.innerHTML = `<strong>${opt.correct ? '✓ Correct Decision!' : '✗ Let\'s Reflect'}</strong><p style="margin-top:6px;">${opt.exp}</p>`;
+    expBox.style.display = 'block';
+
+    if (opt.xp > 0) {
+      addXP(opt.xp);
+      confetti({ particleCount: 80, spread: 60, origin: { y: 0.8 } });
+      
+      // Unlock next stage if possible
+      if (gameData.unlockedStage < STAGES.length - 1) {
+        gameData.unlockedStage++;
+        if (gameData.unlockedStage === STAGES.length - 1) {
+          unlockBadge('faith-champion');
+        }
+      }
+    }
+
+    document.getElementById('nextChallengeBtn').style.display = 'block';
+    saveLocalState();
+    syncToFirebase();
+  };
+
+  function addXP(amount) {
+    gameData.xp += amount;
+    const newLvl = Math.floor(gameData.xp / 500) + 1;
+    if (newLvl > gameData.level) {
+      gameData.level = newLvl;
+      confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+      alert(`🎉 LEVEL UP! You reached Level ${gameData.level}!`);
+    }
+    updateUI();
+  }
+
+  function unlockBadge(id) {
+    if (!gameData.badges.includes(id)) {
+      gameData.badges.push(id);
+      updateUI();
+      alert(`🎖️ BADGE UNLOCKED: ${BADGE_DEFS.find(b => b.id === id).name}!`);
+    }
+  }
+
+  window.startMysteryChallenge = function() {
+    const types = ["Bible Challenge", "Memory Challenge", "Word Scramble", "Situation Challenge", "30-Second Challenge"];
+    const chosenType = types[Math.floor(Math.random() * types.length)];
+    
+    document.getElementById('challengeHeadline').textContent = `🎁 Mystery: ${chosenType}`;
+    
+    let text = "";
+    let options = [];
+
+    if (chosenType === "Bible Challenge") {
+      text = "Find the correct missing word: 'Thy word is a lamp unto my feet, and a light unto my ____.'";
+      options = [
+        { text: "Path", correct: true, xp: 50, exp: "Psalm 119:105 (+50 XP)" },
+        { text: "Life", correct: false, xp: 0, exp: "Wrong, the word is 'path'." },
+        { text: "Heart", correct: false, xp: 0, exp: "Wrong, the word is 'path'." }
+      ];
+    } else if (chosenType === "Memory Challenge") {
+      text = "Which of the following is the correct order of the Fruits of the Spirit (Galatians 5:22-23)?";
+      options = [
+        { text: "Love, Joy, Peace, Patience, Kindness...", correct: true, xp: 50, exp: "Correct! Galatians 5:22-23 (+50 XP)" },
+        { text: "Faith, Hope, Charity, Prayer...", correct: false, xp: 0, exp: "Incorrect." }
+      ];
+    } else if (chosenType === "Word Scramble") {
+      text = "Unscramble the word: 'V A S A L I N O T'";
+      options = [
+        { text: "SALVATION", correct: true, xp: 50, exp: "Perfect! You unscrambled Salvation! (+50 XP)" },
+        { text: "ELEVATION", correct: false, xp: 0, exp: "Incorrect." }
+      ];
+    } else if (chosenType === "Situation Challenge") {
+      text = "A neighbor starts gossiping about another church member. What do you do?";
+      options = [
+        { text: "Politely change the subject or speak well of the member.", correct: true, xp: 50, exp: "Right choice! Protect community unity. (+50 XP)" },
+        { text: "Listen carefully and share the story with your family.", correct: false, xp: 0, exp: "Gossip divides friends and family." }
+      ];
+    } else {
+      text = "30-Second Challenge: Close your eyes, take a deep breath, and express gratitude to God for three things right now.";
+      options = [
+        { text: "Done! I expressed my gratitude.", correct: true, xp: 50, exp: "Beautiful! Praise and gratitude strengthen your faith. (+50 XP)" },
+        { text: "Skip challenge.", correct: false, xp: 0, exp: "You skipped this opportunity." }
+      ];
+    }
+
+    document.getElementById('challengeText').textContent = text;
+    document.getElementById('explanationBox').style.display = 'none';
+    document.getElementById('nextChallengeBtn').style.display = 'none';
+
+    const optsBox = document.getElementById('optionsBox');
+    optsBox.innerHTML = options.map((opt, oIdx) => `
+      <button class="situation-option" onclick="submitMysteryOption(${oIdx})">${opt.text}</button>
+    `).join('');
+    
+    document.getElementById('playZone').scrollIntoView({ behavior: 'smooth' });
+  };
+
+  window.submitMysteryOption = function(optIdx) {
+    const btns = document.querySelectorAll('.situation-option');
+    // Read challenge details
+    const heading = document.getElementById('challengeHeadline').textContent;
+    let correct = false;
+    let xp = 0;
+    let exp = "";
+    
+    // Auto-eval based on option texts for simplicity
+    const selectedText = btns[optIdx].textContent;
+    if (selectedText.includes("Path") || selectedText.includes("Love, Joy") || selectedText.includes("SALVATION") || selectedText.includes("Politely") || selectedText.includes("Done!")) {
+      correct = true;
+      xp = 50;
+      exp = "Fantastic! You solved the daily Mystery Challenge successfully! (+50 XP)";
+    } else {
+      exp = "Ah, that wasn't the correct answer. Review the Bible passages and try again!";
+    }
+
+    btns.forEach((btn, idx) => {
+      btn.disabled = true;
+      if (idx === optIdx) {
+        btn.classList.add(correct ? 'correct' : 'incorrect');
+      }
+    });
+
+    const expBox = document.getElementById('explanationBox');
+    expBox.innerHTML = `<strong>${correct ? '✓ Completed!' : '✗ Let\'s Try Again'}</strong><p style="margin-top:6px;">${exp}</p>`;
+    expBox.style.display = 'block';
+
+    if (correct && xp > 0) {
+      addXP(xp);
+      confetti({ particleCount: 100, spread: 80, origin: { y: 0.8 } });
+      unlockBadge('word-seeker');
+    }
+
+    document.getElementById('nextChallengeBtn').style.display = 'block';
+    saveLocalState();
+    syncToFirebase();
+  };
+
+  function saveLocalState() {
+    localStorage.setItem('pd_faith_journey_data', JSON.stringify(gameData));
+  }
+
+  function loadLocalState() {
+    const raw = localStorage.getItem('pd_faith_journey_data');
+    if (raw) {
+      gameData = JSON.parse(raw);
+    }
+  }
+
+  async function syncToFirebase() {
+    if (user) {
+      try {
+        await setDoc(doc(db, "users", user.uid, "game", "progress"), gameData, { merge: true });
+        // Also save to global leaderboard
+        await setDoc(doc(db, "leaderboard", user.uid), {
+          uid: user.uid,
+          name: user.displayName || user.email.split('@')[0] || 'Member',
+          xp: gameData.xp,
+          level: gameData.level,
+          streak: gameData.streak,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+      } catch(e) {
+        console.error("Firebase sync error", e);
+      }
+    }
+  }
+
+  async function loadFirebaseState(uid) {
+    try {
+      const snap = await getDoc(doc(db, "users", uid, "game", "progress"));
+      if (snap.exists()) {
+        gameData = snap.data();
+        updateUI();
+      }
+    } catch(e) {
+      console.error(e);
+    }
+  }
+
+  // Leaderboard sync
+  function startLeaderboardListener() {
+    const qLeaders = query(collection(db, "leaderboard"), orderBy("xp", "desc"), limit(5));
+    onSnapshot(qLeaders, (snap) => {
+      const list = document.getElementById('leaderboardList');
+      if (!list) return;
+      let html = '';
+      let rank = 1;
+      snap.forEach(doc => {
+        const item = doc.data();
+        html += `
+          <div class="leader-row">
+            <span class="leader-rank rank-${rank}">${rank}</span>
+            <span class="leader-name">${item.name}</span>
+            <span class="leader-score">${item.xp} XP</span>
+          </div>
+        `;
+        rank++;
+      });
+      if (html) {
+        list.innerHTML = html;
+      } else {
+        list.innerHTML = '<p style="font-size:0.8rem;text-align:center;color:var(--text-sub);">No community scores yet.</p>';
+      }
+    }, () => {
+      // Fallback local leaderboard
+      const list = document.getElementById('leaderboardList');
+      if (list) list.innerHTML = `
+        <div class="leader-row"><span class="leader-rank rank-1">1</span><span class="leader-name">Pastor John</span><span class="leader-score">3,250 XP</span></div>
+        <div class="leader-row"><span class="leader-rank rank-2">2</span><span class="leader-name">Sister Sarah</span><span class="leader-score">2,400 XP</span></div>
+        <div class="leader-row"><span class="leader-rank rank-3">3</span><span class="leader-name">Brother David</span><span class="leader-score">1,950 XP</span></div>
+      `;
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadLocalState();
+    updateUI();
+    nextSituation();
+    startLeaderboardListener();
+
+    onAuthStateChanged(auth, u => {
+      if (u) {
+        user = u;
+        loadFirebaseState(u.uid);
+      }
+    });
+  });
+</script>
+</body>
+</html>

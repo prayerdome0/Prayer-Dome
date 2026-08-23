@@ -279,6 +279,9 @@
 <h2 class="section-label"><i class="fas fa-podcast"></i> Podcast Center</h2>
 <div class="pod-grid" id="podGrid"></div>
 
+<h2 class="section-label"><i class="fas fa-compact-disc"></i> Worship &amp; Music Library</h2>
+<div class="pod-grid" id="worshipSongsGrid"><p style="color:var(--text-sub);">Loading worship library...</p></div>
+
 <footer class="pd-page-footer">
     <p class="pd-page-verse"><i class="fas fa-bible" style="color: var(--accent-gold);"></i> “He does everything blamelessly.” — Mark 7:37</p>
     <p>© Prayer Dome Ministry · A House of Prayer for All Nations</p>
@@ -361,6 +364,83 @@
         });
         renderRadio();
         renderPodcasts();
+        renderWorshipSongs();
+    }
+
+    async function renderWorshipSongs() {
+        const grid = document.getElementById('worshipSongsGrid');
+        if (!grid) return;
+        
+        try {
+            const appMod = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
+            const fsMod = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+            
+            var FCM_CONFIG = {
+                apiKey: 'AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo',
+                authDomain: 'prayer-dome.firebaseapp.com',
+                projectId: 'prayer-dome',
+                storageBucket: 'prayer-dome.firebasestorage.app',
+                messagingSenderId: '198295153196',
+                appId: '1:198295153196:web:1222b31948d7974ba3bf89'
+            };
+            const app = appMod.initializeApp(FCM_CONFIG);
+            const db = fsMod.getFirestore(app);
+            
+            const snap = await fsMod.getDocs(fsMod.query(fsMod.collection(db, "worshipSongs"), fsMod.orderBy("createdAt", "desc")));
+            if (snap.empty) {
+                grid.innerHTML = '<p style="color:var(--text-sub);">No worship songs uploaded yet.</p>';
+                return;
+            }
+            
+            let html = '';
+            snap.forEach(d => {
+                const s = d.data();
+                const cover = s.coverUrl || '/assets/hero-worship.jpg';
+                const dlBtn = s.allowDownload !== false ? `<a href="${esc(s.audioUrl)}" download class="btn btn-sm btn-outline" style="margin-left:10px;"><i class="fas fa-download"></i> Download</a>` : '';
+                
+                html += `
+                    <div class="pod-card" style="display:flex; flex-direction:column; justify-content:space-between; border: 1px solid var(--border); border-radius:18px; padding:16px;">
+                        <div>
+                            <img src="${esc(cover)}" style="width:100%; height:140px; object-fit:cover; border-radius:12px; margin-bottom:12px;">
+                            <span class="pod-series"><i class="fas fa-music"></i> ${esc(s.category || 'Worship')}</span>
+                            <h3 style="font-size:1.1rem; font-weight:800; margin:6px 0;">${esc(s.title)}</h3>
+                            <p style="font-size:0.85rem; font-weight:700; color:var(--accent-gold); margin-bottom:8px;">Minister: ${esc(s.artist)}</p>
+                            <p style="font-size:0.8rem; color:var(--text-dim); line-height:1.4;">${esc(s.description || '')}</p>
+                        </div>
+                        <div style="margin-top:14px; display:flex; gap:10px; align-items:center;">
+                            <button class="pod-play btn btn-primary" data-pd-radio="${esc(s.audioUrl)}" data-pd-radio-name="${esc(s.title)}" style="flex:1;"><i class="fas fa-play"></i> Play</button>
+                            ${dlBtn}
+                        </div>
+                        <p style="font-size:0.65rem; color:var(--text-dim); margin-top:8px; text-align:center;" class="audio-credit">PrayerDome Team Production</p>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+            
+            if (window.PDApp && PDApp.radio) {
+                PDApp.radio.init();
+            }
+            
+            setTimeout(() => {
+                document.querySelectorAll('[data-pd-radio]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const player = document.getElementById('radioAudio') || document.querySelector('audio');
+                        if (player) {
+                            player.addEventListener('ended', () => {
+                                const card = btn.closest('.pod-card');
+                                if (card) {
+                                    const credit = card.querySelector('.audio-credit');
+                                    if (credit) credit.textContent = "Produced by PrayerDome Team";
+                                }
+                            });
+                        }
+                    });
+                });
+            }, 500);
+        } catch(e) {
+            console.error(e);
+            grid.innerHTML = '<p style="color:var(--text-sub);">Error loading worship songs.</p>';
+        }
     }
 </script>
 </body>
