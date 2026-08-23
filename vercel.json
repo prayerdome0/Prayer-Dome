@@ -96,6 +96,10 @@
       "destination": "/live.html"
     },
     {
+      "source": "/game",
+      "destination": "/game.html"
+    },
+    {
       "source": "/video",
       "destination": "/video.html"
     },

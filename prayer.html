@@ -863,7 +863,7 @@
                     
                     <div class="prayer-actions">
                         <button class="action-btn ${hasPrayed ? 'prayed' : ''}" onclick="togglePray('${p.id}', this)" ${p.answered ? 'disabled' : ''}>
-                            <i class="fas fa-pray"></i> <span>${p.prayedCount || 0}</span> Prayed
+                            <i class="fas fa-hands-praying"></i> <span>${p.prayedCount || 0}</span> Praying For You
                         </button>
                         <button class="action-btn ${followed ? 'prayed' : ''}" style="${followed ? 'color: var(--accent-gold);' : ''}" onclick="followPrayer('${p.id}')" title="Get updates on this prayer">
                             <i class="fas ${followed ? 'fa-bell' : 'fa-bell'}" style="color: var(--accent-gold);"></i> <span>${followed ? 'Following ✓' : 'Follow'}</span>
