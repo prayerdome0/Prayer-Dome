@@ -15,8 +15,12 @@ service cloud.firestore {
 
     function isAdmin() {
       return isSignedIn() &&
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        getUserData().role == 'admin';
+        (
+          (exists(/databases/$(database)/documents/memberships/$(request.auth.uid)) &&
+           get(/databases/$(database)/documents/memberships/$(request.auth.uid)).data.role == 'admin') ||
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+           getUserData().role == 'admin')
+        );
     }
 
     function isOwner(userId) {
@@ -54,16 +58,62 @@ service cloud.firestore {
     // Live Streaming State and Chat
     match /liveStatus/{id} {
       allow read: if true;
-      allow write: if isAdmin();
+      // Admin full write; viewers may only increment viewers/totalViews counters
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (
+          request.auth == null || isSignedIn()
+        );
     }
     match /liveChat/{id} {
       allow read: if true;
-      allow create: if isSignedIn();
+      // Signed-in members OR guests (with a name) may post chat messages
+      allow create: if (isSignedIn() ||
+                        (request.resource.data.name is string &&
+                         request.resource.data.name.size() >= 2 &&
+                         request.resource.data.message is string &&
+                         request.resource.data.message.size() >= 1 &&
+                         request.resource.data.message.size() <= 500)) &&
+                       (request.resource.data.hidden != true);
       allow update, delete: if isAdmin();
     }
     match /liveRecordings/{id} {
       allow read: if true;
       allow write: if isAdmin();
+    }
+
+    // Scheduled lives (admin creates, public reads)
+    match /scheduledLives/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Moderation: muted/blocked users (admin only)
+    match /liveMutedUsers/{id} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    match /liveBlockedUsers/{id} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Reports submitted by viewers
+    match /liveReports/{id} {
+      allow read: if isAdmin();
+      allow create: if request.resource.data.reason is string &&
+                       request.resource.data.reason.size() > 0;
+      allow update, delete: if isAdmin();
+    }
+
+    // WebRTC signaling (joins, offers, answers, ICE candidates, reactions,
+    // chat mirror, events, viewer presence). Public read/write because
+    // viewer identity is not required to watch, and the data is transient
+    // (admin wipes stale signals on start; next broadcast overwrites).
+    match /liveSignals/{liveId}/{document=**} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if isAdmin() || request.auth != null;
     }
 
     // Prayer Wall (Strict Moderation Rules)

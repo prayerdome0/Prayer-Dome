@@ -38,3 +38,8 @@ __pycache__/
 
 # Local Python environments
 .venv/
+
+# Live-build injection scratch scripts (dev only)
+scripts/new_live_js.js
+scripts/inject_live_js.py
+scripts/upgrade_live.py

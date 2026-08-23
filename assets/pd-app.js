@@ -1179,7 +1179,9 @@
         '</div>' +
         '<div class="pd-hero-live" id="pdHeroLive" style="display:none"><span class="pd-live-dot"></span> LIVE NOW — Watch</div>';
       // If a live stream is active, show the live pill linking to /live.html
-      if (live.getStatus() && live.getStatus().live) {
+      var st = live.getStatus();
+      var isLiveNow = !!(st && (st.isLive || st.live));
+      if (isLiveNow) {
         var pill = $('#pdHeroLive', hero);
         if (pill) {
           pill.style.display = 'flex';
@@ -1249,17 +1251,24 @@
       // Watch Firestore live status so viewers see admin broadcasts.
       if (fb && fb.db && fb.doc) {
         fsWatch(fb.doc(fb.db, 'liveStatus', 'current'), function (d) {
-          if (d) { live._status = d; lsSet('pd_live_status', d); broadcast('live', d); }
+          if (d) {
+            // Normalize: accept both `isLive` (new WebRTC control room) and `live` (legacy)
+            if (typeof d.isLive === 'boolean' && typeof d.live !== 'boolean') d.live = d.isLive;
+            if (typeof d.live === 'boolean' && typeof d.isLive !== 'boolean') d.isLive = d.live;
+            live._status = d; lsSet('pd_live_status', d); broadcast('live', d);
+          }
         });
       }
       // Join as a viewer once per tab session.
       live._viewerId = sessionStorage.getItem('pd_viewer_id') || uid('vw');
       sessionStorage.setItem('pd_viewer_id', live._viewerId);
-      if (live.getStatus() && live.getStatus().live) live.joinViewer();
+      var s0 = live.getStatus();
+      if (s0 && (s0.isLive || s0.live)) live.joinViewer();
       window.addEventListener('beforeunload', function () { live.leaveViewer(); });
       // Keep the viewer count honest: refresh presence and counts every 15s.
       setInterval(function () {
-        if (live.getStatus() && live.getStatus().live) {
+        var sc = live.getStatus();
+        if (sc && (sc.isLive || sc.live)) {
           live.ping();
           live.syncViewerCount();
         }
@@ -1281,7 +1290,7 @@
     },
     joinViewer: function () {
       var s = live._status;
-      if (!s || !s.live) return;
+      if (!s || (!s.live && !s.isLive)) return;
       var viewers = lsGet('pd_live_viewers', {});
       if (viewers[live._viewerId]) return;
       viewers[live._viewerId] = Date.now();
