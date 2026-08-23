@@ -38,6 +38,36 @@
     function log() { try { console.log.apply(console, ['[PDLive]'].concat(Array.prototype.slice.call(arguments))); } catch (e) {} }
     function warn() { try { console.warn.apply(console, ['[PDLive]'].concat(Array.prototype.slice.call(arguments))); } catch (e) {} }
 
+    function liveServerConfig() {
+        var cfg = global.PD_LIVE_SERVER || {};
+        return cfg && cfg.enabled ? cfg : null;
+    }
+    function resolveEndpoint(url, liveId) {
+        if (!url) return '';
+        return String(url).replace(/\{liveId\}/g, encodeURIComponent(liveId || 'current'));
+    }
+    function authHeaders(cfg, extra) {
+        var h = Object.assign({}, extra || {});
+        if (cfg && cfg.bearerToken) h.Authorization = 'Bearer ' + cfg.bearerToken;
+        return h;
+    }
+    async function waitForIceGatheringComplete(pc) {
+        if (!pc || pc.iceGatheringState === 'complete') return;
+        await new Promise(function (resolve) {
+            var done = function () {
+                if (pc.iceGatheringState === 'complete') {
+                    pc.removeEventListener('icegatheringstatechange', done);
+                    resolve();
+                }
+            };
+            pc.addEventListener('icegatheringstatechange', done);
+            setTimeout(function () {
+                pc.removeEventListener('icegatheringstatechange', done);
+                resolve();
+            }, 2500);
+        });
+    }
+
     /* ------------------------------------------------------------------ */
     /*                       SIGNALING (Firestore)                         */
     /* ------------------------------------------------------------------ */
@@ -119,7 +149,10 @@
             title: '',
             description: '',
             category: 'service',
+            presenterName: '',
+            tickerText: '',
             commentsEnabled: true,
+            source: 'webrtc',
             cameraOn: true,
             micOn: true,
             facingMode: 'user',
@@ -139,6 +172,9 @@
         this.listeners = {};
         this._timer = null;
         this._iceServers = (opts && opts.iceServers) || ICE_SERVERS;
+        this.mediaPc = null;
+        this.mediaSessionUrl = null;
+        this.mediaServer = liveServerConfig();
     }
 
     Broadcaster.prototype.on = function (ev, fn) {
@@ -152,6 +188,36 @@
         if (viewerCount <= 4) return { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30, max: 30 } };
         if (viewerCount <= 8) return { width: { ideal: 854 }, height: { ideal: 480 }, frameRate: { ideal: 24, max: 30 } };
         return { width: { ideal: 640 }, height: { ideal: 360 }, frameRate: { ideal: 20, max: 24 } };
+    };
+
+    Broadcaster.prototype.publishToMediaServer = async function (liveId) {
+        var cfg = this.mediaServer;
+        if (!cfg || !cfg.whipEndpoint) throw new Error('Live media server is not configured');
+        var endpoint = resolveEndpoint(cfg.whipEndpoint, liveId);
+        var pc = new RTCPeerConnection({ iceServers: (cfg.iceServers || this._iceServers), bundlePolicy: 'max-bundle' });
+        this.mediaPc = pc;
+        this.stream.getTracks().forEach(function (track) { pc.addTrack(track); });
+        var offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        await waitForIceGatheringComplete(pc);
+        var res = await fetch(endpoint, {
+            method: 'POST',
+            headers: authHeaders(cfg, { 'Content-Type': 'application/sdp', 'Accept': 'application/sdp' }),
+            body: pc.localDescription.sdp
+        });
+        if (!res.ok) throw new Error('Live server rejected publish request (' + res.status + ')');
+        this.mediaSessionUrl = res.headers.get('Location') || null;
+        var answer = await res.text();
+        await pc.setRemoteDescription({ type: 'answer', sdp: answer });
+        var self = this;
+        pc.onconnectionstatechange = function () {
+            var s = pc.connectionState;
+            self.state.connectionQuality = (s === 'failed' || s === 'disconnected') ? 'unstable' : 'good';
+            if (s === 'failed') self.state.status = 'reconnecting';
+            self.broadcastState();
+            self.emit('state', self.snapshot());
+        };
+        return true;
     };
 
     Broadcaster.prototype.createPeer = async function (viewerId, polite) {
@@ -269,10 +335,11 @@
         var category = opts.category || 'service';
         var facing = opts.facingMode || 'user';
 
-        // 1. Camera
-        this.stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 720 } },
-            audio: true
+        // 1. Camera. Admin pages may pass an already-approved stream so the
+        // phone does not open/request the camera twice.
+        this.stream = opts.stream || await navigator.mediaDevices.getUserMedia({
+            video: opts.cameraOn === false ? false : { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 720 } },
+            audio: opts.audio === false ? false : true
         });
         this.state.cameraOn = true;
         this.state.micOn = !opts.muted;
@@ -283,6 +350,12 @@
         var liveId = 'live_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
         this.state.liveId = liveId;
         this.signal = new Signal(this.fb, liveId);
+
+        var usingMediaServer = !!(this.mediaServer && this.mediaServer.preferMediaServer !== false && this.mediaServer.whipEndpoint && this.mediaServer.whepEndpoint);
+        this.state.source = usingMediaServer ? 'media-server' : 'webrtc';
+        if (usingMediaServer) {
+            await this.publishToMediaServer(liveId);
+        }
 
         // 3. Cloud recording
         if (global.PDCloudVideo) {
@@ -296,10 +369,12 @@
         }
 
         // 4. Write live status document.
-        var hlsUrl = 'https://res.cloudinary.com/' + CLOUD_NAME + '/video/upload/hls/' + liveId + '.m3u8';
+        var hlsUrl = (usingMediaServer && this.mediaServer.hlsUrl) ? resolveEndpoint(this.mediaServer.hlsUrl, liveId) : 'https://res.cloudinary.com/' + CLOUD_NAME + '/video/upload/hls/' + liveId + '.m3u8';
         this.state.title = title;
         this.state.description = description;
         this.state.category = category;
+        this.state.presenterName = (opts.presenterName || opts.adminName || 'Prayer Dome Ministry Team').trim();
+        this.state.tickerText = (opts.tickerText || '').trim();
         this.state.commentsEnabled = opts.commentsEnabled !== false;
         this.state.startedAt = Date.now();
         this.state.isLive = true;
@@ -314,8 +389,12 @@
             title: title,
             description: description,
             category: category,
+            presenterName: this.state.presenterName,
+            tickerText: this.state.tickerText,
             commentsEnabled: this.state.commentsEnabled,
-            source: 'webrtc',
+            source: this.state.source,
+            serverMode: usingMediaServer,
+            playbackMode: usingMediaServer ? 'whep' : 'webrtc',
             startedBy: (opts && opts.adminEmail) || 'admin',
             startedByUid: (opts && opts.adminUid) || null,
             startTime: this.fb.serverTimestamp(),
@@ -360,7 +439,9 @@
             };
             self.state.totalViews++;
             self.state.peakViewers = Math.max(self.state.peakViewers, Object.keys(self.state.viewers).length);
-            self.createPeer(viewerId, false).catch(function (err) { warn('createPeer error', err); });
+            if (!usingMediaServer) {
+                self.createPeer(viewerId, false).catch(function (err) { warn('createPeer error', err); });
+            }
             self.emit('viewer:joined', self.state.viewers[viewerId]);
             self.broadcastState();
         });
@@ -438,6 +519,8 @@
             title: this.state.title,
             description: this.state.description,
             category: this.state.category,
+            presenterName: this.state.presenterName,
+            tickerText: this.state.tickerText,
             commentsEnabled: this.state.commentsEnabled,
             viewers: Object.keys(this.state.viewers).length,
             viewersList: viewersList,
@@ -449,6 +532,7 @@
             totalShares: this.state.totalShares,
             totalViews: this.state.totalViews,
             newFollowers: this.state.newFollowers,
+            source: this.state.source,
             status: this.state.status,
             startedAt: this.state.startedAt,
             updatedAt: Date.now()
@@ -462,6 +546,8 @@
             newFollowers: payload.newFollowers,
             totalViews: payload.totalViews,
             peakViewers: this.state.peakViewers,
+            presenterName: payload.presenterName,
+            tickerText: payload.tickerText,
             connectionQuality: payload.connectionQuality,
             duration: payload.duration,
             status: payload.status
@@ -569,7 +655,12 @@
             delete self.peers[id];
         });
 
-        // Stop camera.
+        // Stop media-server publish session, then stop camera.
+        if (this.mediaPc) { try { this.mediaPc.close(); } catch (e) {} this.mediaPc = null; }
+        if (this.mediaSessionUrl && this.mediaServer) {
+            fetch(this.mediaSessionUrl, { method: 'DELETE', headers: authHeaders(this.mediaServer) }).catch(function () {});
+            this.mediaSessionUrl = null;
+        }
         if (this.stream) this.stream.getTracks().forEach(function (t) { t.stop(); });
 
         // Finalize cloud recording.
@@ -602,7 +693,7 @@
             hlsUrl: this.state.hlsUrl,
             thumbnail: cloud ? cloud.thumbnail : null,
             totalBytes: cloud ? cloud.totalBytes : 0,
-            source: 'webrtc',
+            source: this.state.source || 'webrtc',
             endedAt: new Date().toISOString()
         };
 
@@ -674,8 +765,10 @@
             viewerCount: 0,
             title: '',
             description: '',
+            presenterName: '',
+            tickerText: '',
             commentsEnabled: true,
-            mode: 'webrtc', // webrtc | hls
+            mode: 'webrtc', // webrtc | whep | hls
             hlsUrl: null,
             reactions: {},
             pinnedCommentId: null
@@ -685,6 +778,8 @@
         this.hls = null;
         this.reconnectAttempts = 0;
         this._iceServers = (opts && opts.iceServers) || ICE_SERVERS;
+        this.mediaServer = liveServerConfig();
+        this.mediaSessionUrl = null;
     }
 
     Viewer.prototype.on = function (ev, fn) {
@@ -713,10 +808,12 @@
 
         this.signal = new Signal(this.fb, status.liveId);
 
-        // Decide mode: WebRTC if viewer count < MAX, else HLS fallback.
+        // Decide mode. A configured media server gives true one-to-many WHEP
+        // playback; the older browser mesh remains as a local fallback only.
         var viewerCount = Number(status.viewers) || 0;
-        var useWebRTC = viewerCount < MAX_WEBRTC_VIEWERS && status.source === 'webrtc';
-        this.state.mode = useWebRTC ? 'webrtc' : 'hls';
+        var useWhep = status.source === 'media-server' && this.mediaServer && this.mediaServer.whepEndpoint;
+        var useWebRTC = !useWhep && viewerCount < MAX_WEBRTC_VIEWERS && status.source === 'webrtc';
+        this.state.mode = useWhep ? 'whep' : (useWebRTC ? 'webrtc' : 'hls');
 
         // Register presence (write top-level doc so admin collection listeners see it).
         var userInfo = opts_userInfo(this.opts) || {};
@@ -737,7 +834,9 @@
         });
         this.state.joined = true;
 
-        if (useWebRTC) {
+        if (useWhep) {
+            await this.connectWHEP();
+        } else if (useWebRTC) {
             await this.connectWebRTC();
         } else {
             this.connectHLS();
@@ -753,6 +852,8 @@
             self.state.viewerCount = data.viewers || 0;
             self.state.title = data.title || self.state.title;
             self.state.description = data.description || self.state.description;
+            self.state.presenterName = data.presenterName || self.state.presenterName;
+            self.state.tickerText = data.tickerText || self.state.tickerText;
             self.state.commentsEnabled = data.commentsEnabled !== false;
             self.state.connectionQuality = data.connectionQuality || 'good';
             self.state.reactions = data.reactions || {};
@@ -800,6 +901,8 @@
         this.state.liveId = d.liveId || null;
         this.state.title = d.title || 'Prayer Dome Live';
         this.state.description = d.description || '';
+        this.state.presenterName = d.presenterName || d.adminName || d.startedByName || this.state.presenterName || 'Prayer Dome Ministry Team';
+        this.state.tickerText = d.tickerText || d.ticker || this.state.tickerText || '';
         this.state.hlsUrl = d.hlsUrl || null;
         this.state.viewerCount = Number(d.viewers) || 0;
         this.state.commentsEnabled = d.commentsEnabled !== false;
@@ -877,6 +980,55 @@
         }
     };
 
+    Viewer.prototype.connectWHEP = async function () {
+        var self = this;
+        var cfg = this.mediaServer;
+        if (!cfg || !cfg.whepEndpoint) { this.connectHLS(); return; }
+        this.state.status = 'connecting';
+        this.emit('state', this.state);
+        try {
+            this.pc = new RTCPeerConnection({ iceServers: (cfg.iceServers || this._iceServers), bundlePolicy: 'max-bundle' });
+            this.pc.addTransceiver('audio', { direction: 'recvonly' });
+            this.pc.addTransceiver('video', { direction: 'recvonly' });
+            this.pc.ontrack = function (e) {
+                if (self.videoEl && e.streams && e.streams[0]) {
+                    self.videoEl.srcObject = e.streams[0];
+                    self.videoEl.play().catch(function () {});
+                    self.state.status = 'connected';
+                    self.emit('state', self.state);
+                    self.emit('stream', e.streams[0]);
+                }
+            };
+            this.pc.onconnectionstatechange = function () {
+                var s = self.pc.connectionState;
+                if (s === 'connected') {
+                    self.state.status = 'connected';
+                    self.state.connectionQuality = 'good';
+                } else if (s === 'failed' || s === 'disconnected') {
+                    self.state.status = 'reconnecting';
+                    self.state.connectionQuality = 'unstable';
+                }
+                self.emit('state', self.state);
+            };
+            var offer = await this.pc.createOffer();
+            await this.pc.setLocalDescription(offer);
+            await waitForIceGatheringComplete(this.pc);
+            var endpoint = resolveEndpoint(cfg.whepEndpoint, this.state.liveId || 'current');
+            var res = await fetch(endpoint, {
+                method: 'POST',
+                headers: authHeaders(cfg, { 'Content-Type': 'application/sdp', 'Accept': 'application/sdp' }),
+                body: this.pc.localDescription.sdp
+            });
+            if (!res.ok) throw new Error('Live server rejected playback request (' + res.status + ')');
+            this.mediaSessionUrl = res.headers.get('Location') || null;
+            var answer = await res.text();
+            await this.pc.setRemoteDescription({ type: 'answer', sdp: answer });
+        } catch (e) {
+            warn('WHEP playback failed, falling back to HLS:', e);
+            this.switchToHLS();
+        }
+    };
+
     Viewer.prototype.switchToHLS = function () {
         this.state.mode = 'hls';
         this.state.status = 'connecting';
@@ -938,6 +1090,10 @@
         this.state.joined = false;
         clearInterval(this._heartbeat);
         if (this.pc) { try { this.pc.close(); } catch (e) {} this.pc = null; }
+        if (this.mediaSessionUrl && this.mediaServer) {
+            fetch(this.mediaSessionUrl, { method: 'DELETE', headers: authHeaders(this.mediaServer) }).catch(function () {});
+            this.mediaSessionUrl = null;
+        }
         if (this.hls) { try { this.hls.destroy(); } catch (e) {} this.hls = null; }
         if (this.videoEl) { try { this.videoEl.pause(); this.videoEl.srcObject = null; this.videoEl.removeAttribute('src'); } catch (e) {} }
         if (this.signal) {
