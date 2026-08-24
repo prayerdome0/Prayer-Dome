@@ -44,3 +44,17 @@ for (const s of ['view-certificates', 'loadCertificates', 'renderCertificates',
     process.exitCode = 1;
   }
 }
+
+// Facebook drafts are a manual publishing workflow. Keep the visual library,
+// search, caption copy and image hand-off controls from being accidentally
+// reduced to the old 25-row text-only table.
+for (const s of ['view-facebook', 'Generated posts with images', 'facebookPostSearch',
+  'facebook-post-card', 'loadAllFacebookPosts', 'copyFacebookPost',
+  'copyFacebookImage', 'downloadFacebookImage', "collection(db, 'facebookPosts')"]) {
+  if (html.includes(s)) {
+    console.log('PASS  Facebook post library includes ' + s);
+  } else {
+    console.error('FAIL  Facebook post library is missing ' + s);
+    process.exitCode = 1;
+  }
+}

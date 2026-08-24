@@ -512,6 +512,76 @@
         @keyframes floatUpCR { 0%{opacity:0;transform:translateY(0) scale(.5)} 15%{opacity:1} 100%{opacity:0;transform:translateY(-180px) translateX(var(--dx,0)) scale(1)} }
 
 
+
+        /* --- FACEBOOK POST LIBRARY --- */
+        .facebook-campaign-copy { max-width: 900px; }
+        .facebook-workflow-note { display:flex; gap:13px; align-items:flex-start; margin-top:18px; padding:14px 16px; border:1px solid rgba(24,119,242,.22); border-radius:14px; background:rgba(24,119,242,.06); color:var(--text-main); }
+        .facebook-workflow-note > i { color:#1877f2; font-size:1.15rem; margin-top:2px; }
+        .facebook-workflow-note strong { display:block; font-size:.82rem; margin-bottom:4px; }
+        .facebook-workflow-note p { margin:0; color:var(--text-sub); font-size:.76rem; line-height:1.55; }
+        .facebook-library-heading { display:flex; flex-direction:column; gap:4px; }
+        .facebook-library-heading p { margin:0; color:var(--text-sub); font-family:'Montserrat', sans-serif; font-size:.76rem; font-weight:500; line-height:1.45; }
+        .facebook-library-header-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+        .facebook-library-toolbar { padding:18px 25px; display:grid; grid-template-columns:minmax(220px,1.8fr) repeat(2,minmax(145px,.6fr)); gap:12px; background:var(--bg-main); border-bottom:1px solid var(--border); }
+        .facebook-filter-field { min-width:0; }
+        .facebook-filter-field label { display:block; margin:0 0 5px; color:var(--text-sub); font-size:.67rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
+        .facebook-filter-field input, .facebook-filter-field select { width:100%; min-height:40px; border:1px solid var(--border); border-radius:10px; padding:9px 11px; background:var(--bg-panel); color:var(--text-main); font:inherit; font-size:.8rem; outline:none; }
+        .facebook-filter-field input:focus, .facebook-filter-field select:focus { border-color:#1877f2; box-shadow:0 0 0 3px rgba(24,119,242,.12); }
+        .facebook-search-input-wrap { position:relative; }
+        .facebook-search-input-wrap i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#1877f2; pointer-events:none; font-size:.8rem; }
+        .facebook-search-input-wrap input { padding-left:33px; }
+        .facebook-results-bar { min-height:56px; padding:12px 25px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+        .facebook-results-summary { color:var(--text-sub); font-size:.78rem; line-height:1.45; }
+        .facebook-posts-grid { padding:20px 25px 25px; display:grid; grid-template-columns:repeat(auto-fill, minmax(310px, 1fr)); gap:18px; }
+        .facebook-post-card { min-width:0; overflow:hidden; display:flex; flex-direction:column; background:var(--bg-main); border:1px solid var(--border); border-radius:18px; box-shadow:0 3px 10px rgba(15,23,42,.04); transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+        .facebook-post-card:hover { border-color:rgba(24,119,242,.42); box-shadow:0 12px 26px rgba(15,23,42,.09); transform:translateY(-2px); }
+        .facebook-post-image { position:relative; aspect-ratio:1.91 / 1; overflow:hidden; background:linear-gradient(135deg,#07244d,#0A4D9B); }
+        .facebook-post-image img { width:100%; height:100%; display:block; object-fit:cover; }
+        .facebook-image-fallback { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:8px; color:rgba(255,255,255,.88); font-size:.8rem; font-weight:700; background:linear-gradient(135deg,#07244d,#0A4D9B); }
+        .facebook-image-fallback i { color:#f6df8a; }
+        .facebook-post-number { position:absolute; top:10px; left:10px; padding:5px 9px; border-radius:20px; color:#fff; background:rgba(2,6,23,.72); border:1px solid rgba(255,255,255,.25); font-size:.65rem; font-weight:800; letter-spacing:.02em; }
+        .facebook-post-status { position:absolute; top:10px; right:10px; padding:5px 9px; border-radius:20px; font-size:.62rem; font-weight:800; letter-spacing:.03em; text-transform:uppercase; }
+        .facebook-post-status.is-ready { color:#075985; background:#e0f2fe; }
+        .facebook-post-status.is-copied { color:#166534; background:#dcfce7; }
+        body.dark-mode .facebook-post-status.is-ready { color:#bae6fd; background:rgba(14,116,144,.42); }
+        body.dark-mode .facebook-post-status.is-copied { color:#bbf7d0; background:rgba(22,101,52,.45); }
+        .facebook-post-body { padding:15px; display:flex; flex:1; flex-direction:column; gap:11px; }
+        .facebook-post-meta { display:flex; justify-content:space-between; align-items:center; gap:8px; color:var(--text-sub); font-size:.68rem; font-weight:700; }
+        .facebook-post-meta span { display:inline-flex; align-items:center; gap:5px; min-width:0; }
+        .facebook-post-meta .facebook-post-date { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .facebook-caption-label { display:flex; align-items:center; gap:6px; margin:0; color:var(--text-main); font-size:.7rem; font-weight:800; }
+        .facebook-caption-label i { color:#1877f2; }
+        .facebook-caption { width:100%; min-height:112px; resize:vertical; border:1px solid var(--border); border-radius:10px; padding:10px; background:var(--bg-panel); color:var(--text-main); font:inherit; font-size:.78rem; line-height:1.55; }
+        .facebook-caption:focus { outline:2px solid rgba(24,119,242,.28); outline-offset:1px; }
+        .facebook-post-actions { display:flex; flex-wrap:wrap; gap:7px; align-items:center; margin-top:auto; }
+        .facebook-post-actions .btn { justify-content:center; }
+        .facebook-copy-caption { background:#1877f2; color:#fff; border:1px solid #1877f2; }
+        .facebook-copy-caption:hover { background:#1465d1; border-color:#1465d1; box-shadow:0 4px 12px rgba(24,119,242,.28); }
+        .facebook-image-link { text-decoration:none; }
+        .facebook-post-hint { margin:0; color:var(--text-sub); font-size:.67rem; line-height:1.45; }
+        .facebook-post-hint i { color:#1877f2; margin-right:3px; }
+        .facebook-empty-state { grid-column:1 / -1; padding:42px 20px; border:1px dashed var(--border); border-radius:16px; color:var(--text-sub); text-align:center; background:var(--bg-main); }
+        .facebook-empty-state i { display:block; margin-bottom:10px; color:#1877f2; font-size:1.55rem; }
+        .facebook-empty-state strong { display:block; margin-bottom:5px; color:var(--text-main); font-size:.9rem; }
+        .facebook-empty-state p { margin:0; font-size:.76rem; line-height:1.5; }
+        .facebook-load-more { padding:0 25px 24px; text-align:center; }
+        .facebook-load-more p { margin:0 0 10px; color:var(--text-sub); font-size:.74rem; }
+        .facebook-list-loader { grid-column:1 / -1; display:flex; min-height:150px; align-items:center; justify-content:center; gap:10px; color:var(--text-sub); font-size:.82rem; }
+        .facebook-list-loader .spinner { width:26px; height:26px; }
+        @media (max-width: 800px) {
+            .facebook-library-toolbar { grid-template-columns:1fr 1fr; }
+            .facebook-search-field { grid-column:1 / -1; }
+        }
+        @media (max-width: 560px) {
+            .facebook-library-toolbar { grid-template-columns:1fr; padding:16px; }
+            .facebook-search-field { grid-column:auto; }
+            .facebook-results-bar, .facebook-posts-grid, .facebook-load-more { padding-left:16px; padding-right:16px; }
+            .facebook-posts-grid { grid-template-columns:1fr; gap:14px; }
+            .facebook-library-header-actions { width:100%; }
+            .facebook-library-header-actions .btn { flex:1; justify-content:center; }
+            .facebook-post-actions .btn { flex:1 1 calc(50% - 7px); }
+        }
+
         .status-rejected { background: rgba(100,116,139,0.15); color: #64748b; }
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
@@ -1251,25 +1321,41 @@
 
             <!-- FACEBOOK CAMPAIGN VIEW -->
             <div id="view-facebook" class="section-view">
-                <div class="page-title"><span><i class="fab fa-facebook" style="color:#1877f2;"></i> Facebook Website Campaign</span><button class="btn btn-outline btn-sm" onclick="loadFacebookCampaign()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
-                <div class="panel-card" style="max-width:900px;">
-                    <div class="panel-header"><h3><i class="fas fa-calendar-check"></i> 30-day automated campaign</h3><span id="facebookConnectionBadge" class="badge badge-info">Manual copy & paste</span></div>
+                <div class="page-title"><span><i class="fab fa-facebook" style="color:#1877f2;"></i> Facebook Post Library</span><button class="btn btn-outline btn-sm" onclick="loadFacebookCampaign()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
+
+                <div class="panel-card facebook-campaign-copy">
+                    <div class="panel-header"><h3><i class="fas fa-calendar-check"></i> 30-day draft campaign</h3><span id="facebookConnectionBadge" class="badge badge-info">Manual copy &amp; paste</span></div>
                     <div style="padding:0 25px 25px;">
-                        <p style="line-height:1.65;color:var(--text-sub);">Each campaign generates <strong>90 ready-to-copy Facebook posts</strong> promoting Prayer Dome. They are spaced evenly across 30 days (three per day), each with a website link and a rotating ministry image. A new campaign is generated every 30 days while automation is enabled. <strong>Nothing is posted automatically to Facebook.</strong></p>
+                        <p style="line-height:1.65;color:var(--text-sub);">Each campaign creates <strong>90 ready-to-post Facebook drafts</strong> for Prayer Dome. Every draft has a caption, website link and ministry image. Nothing is posted automatically: you choose a saved draft below, copy its caption and add its image to your Facebook Page.</p>
                         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:18px 0;">
-                            <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-layer-group"></i></div><div><div class="stat-label">Queued</div><div class="stat-value" id="facebookQueued">—</div></div></div>
-                            <div class="stat-card"><div class="stat-icon green"><i class="fas fa-check"></i></div><div><div class="stat-label">Copied</div><div class="stat-value" id="facebookPublished">—</div></div></div>
+                            <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-layer-group"></i></div><div><div class="stat-label">Ready to copy</div><div class="stat-value" id="facebookQueued">—</div></div></div>
+                            <div class="stat-card"><div class="stat-icon green"><i class="fas fa-copy"></i></div><div><div class="stat-label">Copied</div><div class="stat-value" id="facebookPublished">—</div></div></div>
                             <div class="stat-card"><div class="stat-icon orange"><i class="fas fa-calendar-day"></i></div><div><div class="stat-label">Next campaign</div><div class="stat-value" id="facebookNextCampaign" style="font-size:1rem">—</div></div></div>
                         </div>
                         <div class="form-group"><label><input id="facebookEnabled" type="checkbox" style="width:auto;margin-right:8px;"> Enable automatic campaign generation every 30 days</label></div>
                         <div class="form-group"><label>Website URL</label><input id="facebookWebsiteUrl" class="form-control" type="url" value="https://prayerdome.net" maxlength="200"></div>
+                        <div class="form-group"><label>Facebook Page URL <span style="font-weight:500;color:var(--text-sub);">(optional)</span></label><input id="facebookPageUrl" class="form-control" type="url" placeholder="https://www.facebook.com/your-page" maxlength="300"><small style="color:var(--text-sub);">Saved here so the <strong>Open Facebook</strong> button takes you straight to your Page.</small></div>
                         <div style="display:flex;gap:10px;flex-wrap:wrap;"><button class="btn btn-primary" onclick="saveFacebookCampaign()"><i class="fas fa-save"></i> Save Settings</button><button class="btn btn-outline" onclick="generateFacebookCampaign()"><i class="fas fa-wand-magic-sparkles"></i> Generate 90 Posts Now</button></div>
-                        <p style="font-size:.75rem;color:var(--text-sub);margin:15px 0 0;"><i class="fas fa-copy"></i> Choose a post below, copy its text, then paste it into Facebook. Use the attached image link to download or add the matching image to your post.</p>
+                        <div class="facebook-workflow-note" role="note"><i class="fas fa-wand-magic-sparkles"></i><div><strong>Fast posting workflow</strong><p>Find a draft below, select <strong>Copy caption</strong>, then select <strong>Copy image</strong> or <strong>Download image</strong>. In Facebook, paste the caption and attach or paste the matching image. The draft stays here so you can reuse it whenever you need it.</p></div></div>
                     </div>
                 </div>
+
                 <div class="panel-card" style="margin-top:20px;">
-                    <div class="panel-header"><h3><i class="fas fa-list"></i> Latest Facebook posts</h3></div>
-                    <div class="table-responsive"><table><thead><tr><th>Suggested date</th><th>Post preview</th><th>Image</th><th>Action</th></tr></thead><tbody id="facebookPostsList"><tr><td colspan="4">Open this page to load campaign posts.</td></tr></tbody></table></div>
+                    <div class="panel-header">
+                        <div class="facebook-library-heading"><h3><i class="fas fa-images"></i> Generated posts with images</h3><p id="facebookLibraryStatus">Open this page to load saved Facebook drafts.</p></div>
+                        <div class="facebook-library-header-actions">
+                            <button class="btn btn-outline btn-sm" id="facebookLoadAllButton" onclick="loadAllFacebookPosts()"><i class="fas fa-layer-group"></i> Load all posts</button>
+                            <button class="btn btn-primary btn-sm" onclick="openFacebookPage()"><i class="fab fa-facebook-f"></i> Open Facebook</button>
+                        </div>
+                    </div>
+                    <div class="facebook-library-toolbar">
+                        <div class="facebook-filter-field facebook-search-field"><label for="facebookPostSearch">Find a generated post</label><div class="facebook-search-input-wrap"><i class="fas fa-search"></i><input id="facebookPostSearch" type="search" placeholder="Search caption, post number or date" autocomplete="off" oninput="filterFacebookPosts()"></div></div>
+                        <div class="facebook-filter-field"><label for="facebookPostStatus">Status</label><select id="facebookPostStatus" onchange="filterFacebookPosts()"><option value="all">All drafts</option><option value="queued">Ready to copy</option><option value="copied">Copied before</option><option value="with-image">Has an image</option><option value="missing-image">Needs an image</option></select></div>
+                        <div class="facebook-filter-field"><label for="facebookPostSort">Sort drafts</label><select id="facebookPostSort" onchange="filterFacebookPosts()"><option value="scheduled-asc">Suggested date: soonest</option><option value="scheduled-desc">Suggested date: latest</option><option value="copied-first">Copied first</option></select></div>
+                    </div>
+                    <div class="facebook-results-bar"><span class="facebook-results-summary" id="facebookPostsSummary" aria-live="polite">Loading drafts…</span><button class="btn btn-outline btn-sm" id="facebookClearFilters" onclick="clearFacebookPostFilters()" hidden><i class="fas fa-times"></i> Clear filters</button></div>
+                    <div id="facebookPostsList" class="facebook-posts-grid" aria-live="polite"><div class="facebook-empty-state"><i class="fas fa-folder-open"></i><strong>Your generated Facebook posts will appear here.</strong><p>Use “Generate 90 Posts Now” to create the first set of drafts.</p></div></div>
+                    <div id="facebookLoadMoreWrap" class="facebook-load-more" hidden><p id="facebookLoadMoreText"></p><button id="facebookLoadMoreButton" class="btn btn-outline btn-sm" onclick="loadMoreFacebookPosts()"><i class="fas fa-chevron-down"></i> Load older posts</button></div>
                 </div>
             </div>
 
@@ -1736,7 +1822,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, getDoc, doc, updateDoc, setDoc, deleteDoc, query, where, orderBy, serverTimestamp, increment, addDoc, limit, onSnapshot, Timestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, getDoc, doc, updateDoc, setDoc, deleteDoc, query, where, orderBy, startAfter, serverTimestamp, increment, addDoc, limit, onSnapshot, Timestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js";
 
@@ -4762,54 +4848,529 @@
             loadLiveRecordings(); // Reuse recordings list for analytics table
         };
 
-        // Facebook campaign administration. Posts are generated as manual copy-and-paste drafts.
-        window.loadFacebookCampaign = async function() {
-            const badge = document.getElementById('facebookConnectionBadge');
+        // Facebook campaign administration. Drafts remain in the library until an
+        // administrator chooses to copy them; no Facebook credentials are used.
+        const FACEBOOK_POST_PAGE_SIZE = 90;
+        let facebookPostsCache = [];
+        let facebookPostsCursor = null;
+        let facebookPostsHasMore = true;
+        let facebookPostsLoading = false;
+        let facebookPostsPendingRequest = null;
+        let facebookPostsLoadVersion = 0;
+        let facebookPostActionsBound = false;
+
+        function facebookPostTime(post) {
+            const value = post?.scheduledAt;
+            if (value?.toMillis) return value.toMillis();
+            if (value?.toDate) return value.toDate().getTime();
+            if (value instanceof Date) return value.getTime();
+            if (typeof value === 'number') return value;
+            const parsed = Date.parse(value);
+            return Number.isFinite(parsed) ? parsed : 0;
+        }
+
+        function formatFacebookPostDate(post) {
+            const time = facebookPostTime(post);
+            return time ? moment(time).format('D MMM YYYY · h:mm A') : 'No suggested date';
+        }
+
+        function safeFacebookUrl(value) {
+            if (!value) return '';
             try {
-                const settings = await getDoc(doc(db, 'socialCampaigns', 'facebook'));
+                const base = /^https?:$/i.test(window.location.protocol) ? window.location.origin : 'https://prayerdome.net';
+                const url = new URL(String(value), base);
+                return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+            } catch (_) {
+                return '';
+            }
+        }
+
+        function facebookPostImageUrl(post) {
+            return safeFacebookUrl(post?.imageUrl || post?.image || post?.featuredImage || post?.socialImage || '');
+        }
+
+        function isFacebookPostCopied(post) {
+            return ['copied', 'posted', 'published'].includes(String(post?.status || '').toLowerCase());
+        }
+
+        function normaliseFacebookPost(snapshot) {
+            const data = snapshot.data() || {};
+            return {
+                ...data,
+                id: snapshot.id,
+                message: String(data.message || data.caption || data.text || ''),
+                imageUrl: data.imageUrl || data.image || data.featuredImage || data.socialImage || '',
+                status: data.status || 'queued'
+            };
+        }
+
+        function getFacebookPostById(id) {
+            return facebookPostsCache.find(post => post.id === id) || null;
+        }
+
+        async function resolveFacebookPost(id) {
+            const cached = getFacebookPostById(id);
+            if (cached) return cached;
+            const snapshot = await getDoc(doc(db, 'facebookPosts', id));
+            if (!snapshot.exists()) throw new Error('Post was not found');
+            const post = normaliseFacebookPost(snapshot);
+            facebookPostsCache.push(post);
+            return post;
+        }
+
+        function facebookFiltersAreActive() {
+            return Boolean(
+                document.getElementById('facebookPostSearch')?.value.trim() ||
+                document.getElementById('facebookPostStatus')?.value !== 'all' ||
+                document.getElementById('facebookPostSort')?.value !== 'scheduled-asc'
+            );
+        }
+
+        function filteredFacebookPosts() {
+            const search = (document.getElementById('facebookPostSearch')?.value || '').trim().toLowerCase();
+            const status = document.getElementById('facebookPostStatus')?.value || 'all';
+            const sort = document.getElementById('facebookPostSort')?.value || 'scheduled-asc';
+            const posts = facebookPostsCache.filter(post => {
+                const imageUrl = facebookPostImageUrl(post);
+                if (status === 'queued' && isFacebookPostCopied(post)) return false;
+                if (status === 'copied' && !isFacebookPostCopied(post)) return false;
+                if (status === 'with-image' && !imageUrl) return false;
+                if (status === 'missing-image' && imageUrl) return false;
+                if (!search) return true;
+                const searchable = [
+                    post.message,
+                    post.campaignNumber ? `post ${post.campaignNumber}` : '',
+                    post.status,
+                    formatFacebookPostDate(post)
+                ].join(' ').toLowerCase();
+                return searchable.includes(search);
+            });
+
+            return posts.sort((left, right) => {
+                if (sort === 'copied-first') {
+                    const copiedDifference = Number(isFacebookPostCopied(right)) - Number(isFacebookPostCopied(left));
+                    if (copiedDifference) return copiedDifference;
+                }
+                const leftTime = facebookPostTime(left);
+                const rightTime = facebookPostTime(right);
+                return sort === 'scheduled-desc' || sort === 'copied-first' ? rightTime - leftTime : leftTime - rightTime;
+            });
+        }
+
+        function renderFacebookPostCard(post) {
+            const message = post.message || 'This draft does not have a caption yet.';
+            const imageUrl = facebookPostImageUrl(post);
+            const copied = isFacebookPostCopied(post);
+            const postNumber = post.campaignNumber ? `Post ${escapeHTML(String(post.campaignNumber))}` : 'Saved draft';
+            const statusText = copied ? 'Copied' : 'Ready';
+            const statusClass = copied ? 'is-copied' : 'is-ready';
+            const escapedId = escapeHTML(String(post.id));
+            const image = imageUrl
+                ? `<img src="${escapeHTML(imageUrl)}" alt="Prayer Dome image for ${postNumber}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.hidden=false;"><div class="facebook-image-fallback" hidden><i class="fas fa-image"></i> Image unavailable</div>`
+                : `<div class="facebook-image-fallback"><i class="fas fa-image"></i> Image needs to be added</div>`;
+            const imageActions = imageUrl
+                ? `<button type="button" class="btn btn-outline btn-sm" data-facebook-action="copy-image" data-facebook-post-id="${escapedId}"><i class="fas fa-images"></i> Copy image</button><button type="button" class="btn btn-outline btn-sm" data-facebook-action="download-image" data-facebook-post-id="${escapedId}"><i class="fas fa-download"></i> Download</button><a class="btn btn-outline btn-sm facebook-image-link" href="${escapeHTML(imageUrl)}" target="_blank" rel="noopener noreferrer"><i class="fas fa-up-right-from-square"></i> Open</a>`
+                : `<span class="badge badge-warning"><i class="fas fa-triangle-exclamation"></i> Needs image</span>`;
+
+            return `<article class="facebook-post-card">
+                <div class="facebook-post-image">
+                    ${image}
+                    <span class="facebook-post-number">${postNumber}</span>
+                    <span class="facebook-post-status ${statusClass}">${statusText}</span>
+                </div>
+                <div class="facebook-post-body">
+                    <div class="facebook-post-meta"><span class="facebook-post-date"><i class="far fa-calendar"></i> ${escapeHTML(formatFacebookPostDate(post))}</span><span><i class="fas fa-link"></i> Website included</span></div>
+                    <label class="facebook-caption-label" for="facebook-caption-${escapedId}"><i class="fas fa-align-left"></i> Ready-to-copy caption</label>
+                    <textarea id="facebook-caption-${escapedId}" class="facebook-caption" readonly aria-label="Facebook caption for ${postNumber}">${escapeHTML(message)}</textarea>
+                    <div class="facebook-post-actions">
+                        <button type="button" class="btn btn-sm facebook-copy-caption" data-facebook-action="copy-caption" data-facebook-post-id="${escapedId}"><i class="fas fa-copy"></i> ${copied ? 'Copy again' : 'Copy caption'}</button>
+                        ${imageActions}
+                    </div>
+                    <p class="facebook-post-hint"><i class="fas fa-circle-info"></i> Copy the caption, then paste or attach the matching image in Facebook.</p>
+                </div>
+            </article>`;
+        }
+
+        function updateFacebookPaginationControls() {
+            const wrap = document.getElementById('facebookLoadMoreWrap');
+            const button = document.getElementById('facebookLoadMoreButton');
+            const text = document.getElementById('facebookLoadMoreText');
+            const loadAllButton = document.getElementById('facebookLoadAllButton');
+            if (wrap) wrap.hidden = !facebookPostsHasMore;
+            if (button) {
+                button.disabled = facebookPostsLoading;
+                button.innerHTML = facebookPostsLoading
+                    ? '<i class="fas fa-spinner fa-spin"></i> Loading posts…'
+                    : '<i class="fas fa-chevron-down"></i> Load older posts';
+            }
+            if (text && facebookPostsHasMore) {
+                text.textContent = `${facebookPostsCache.length} draft${facebookPostsCache.length === 1 ? '' : 's'} loaded. Load older generated posts to search the rest of your library.`;
+            }
+            if (loadAllButton) {
+                loadAllButton.disabled = facebookPostsLoading || !facebookPostsHasMore;
+                loadAllButton.innerHTML = facebookPostsLoading
+                    ? '<i class="fas fa-spinner fa-spin"></i> Loading…'
+                    : facebookPostsHasMore
+                        ? '<i class="fas fa-layer-group"></i> Load all posts'
+                        : '<i class="fas fa-check"></i> All posts loaded';
+            }
+        }
+
+        function updateFacebookPostMetrics() {
+            const queued = facebookPostsCache.filter(post => !isFacebookPostCopied(post)).length;
+            const copied = facebookPostsCache.filter(isFacebookPostCopied).length;
+            const suffix = facebookPostsHasMore ? '+' : '';
+            const queuedEl = document.getElementById('facebookQueued');
+            const copiedEl = document.getElementById('facebookPublished');
+            if (queuedEl) queuedEl.textContent = `${queued}${suffix}`;
+            if (copiedEl) copiedEl.textContent = `${copied}${suffix}`;
+        }
+
+        function renderFacebookPosts() {
+            const list = document.getElementById('facebookPostsList');
+            const summary = document.getElementById('facebookPostsSummary');
+            const libraryStatus = document.getElementById('facebookLibraryStatus');
+            const clear = document.getElementById('facebookClearFilters');
+            if (!list) return;
+
+            const posts = filteredFacebookPosts();
+            const allLoaded = !facebookPostsHasMore;
+            const loadedLabel = `${facebookPostsCache.length} generated draft${facebookPostsCache.length === 1 ? '' : 's'} loaded`;
+            const libraryMessage = facebookPostsCache.length
+                ? `${loadedLabel}${allLoaded ? ' — all saved posts are ready to browse.' : ' — load older drafts to search the full library.'}`
+                : 'No generated Facebook drafts have been found yet.';
+
+            if (libraryStatus) libraryStatus.textContent = libraryMessage;
+            if (summary) {
+                if (!facebookPostsCache.length) {
+                    summary.textContent = 'No drafts to show yet. Generate a campaign to create captions and images.';
+                } else if (!posts.length) {
+                    summary.textContent = `No matching drafts in ${facebookPostsCache.length} loaded posts${facebookPostsHasMore ? '. Load older posts to keep searching.' : '.'}`;
+                } else {
+                    summary.textContent = `Showing ${posts.length} of ${facebookPostsCache.length} loaded draft${facebookPostsCache.length === 1 ? '' : 's'}${facebookPostsHasMore ? ' — more saved posts are available.' : '.'}`;
+                }
+            }
+            if (clear) clear.hidden = !facebookFiltersAreActive();
+
+            if (!facebookPostsCache.length) {
+                list.innerHTML = `<div class="facebook-empty-state"><i class="fas fa-folder-open"></i><strong>No generated Facebook posts yet.</strong><p>Choose “Generate 90 Posts Now” above. Each saved draft will include a caption and a matching image.</p></div>`;
+            } else if (!posts.length) {
+                list.innerHTML = `<div class="facebook-empty-state"><i class="fas fa-magnifying-glass"></i><strong>No drafts match those filters.</strong><p>Clear the filters, change your search, or load older posts to search more generated drafts.</p></div>`;
+            } else {
+                list.innerHTML = posts.map(renderFacebookPostCard).join('');
+            }
+            updateFacebookPostMetrics();
+            updateFacebookPaginationControls();
+        }
+
+        function showFacebookPostsLoading() {
+            const list = document.getElementById('facebookPostsList');
+            const summary = document.getElementById('facebookPostsSummary');
+            if (list) list.innerHTML = '<div class="facebook-list-loader"><div class="spinner"></div> Loading generated Facebook posts…</div>';
+            if (summary) summary.textContent = 'Loading your saved drafts…';
+        }
+
+        async function fetchFacebookPostsPage({ reset = false } = {}) {
+            if (facebookPostsLoading && facebookPostsPendingRequest) {
+                await facebookPostsPendingRequest;
+                if (!reset) return 0;
+            }
+            if (!reset && !facebookPostsHasMore) return 0;
+
+            if (reset) {
+                facebookPostsCache = [];
+                facebookPostsCursor = null;
+                facebookPostsHasMore = true;
+            }
+
+            facebookPostsLoading = true;
+            const request = (async () => {
+                const clauses = [orderBy('scheduledAt', 'desc')];
+                if (facebookPostsCursor) clauses.push(startAfter(facebookPostsCursor));
+                // Fetch one extra document so the library can accurately tell
+                // whether there are older drafts without making the user click
+                // “Load older posts” into an empty result.
+                clauses.push(limit(FACEBOOK_POST_PAGE_SIZE + 1));
+                const snapshot = await getDocs(query(collection(db, 'facebookPosts'), ...clauses));
+                const pageDocs = snapshot.docs.slice(0, FACEBOOK_POST_PAGE_SIZE);
+                const seen = new Set(facebookPostsCache.map(post => post.id));
+                pageDocs.forEach(item => {
+                    if (!seen.has(item.id)) facebookPostsCache.push(normaliseFacebookPost(item));
+                });
+                facebookPostsCursor = pageDocs[pageDocs.length - 1] || facebookPostsCursor;
+                facebookPostsHasMore = snapshot.docs.length > FACEBOOK_POST_PAGE_SIZE;
+                return pageDocs.length;
+            })();
+            facebookPostsPendingRequest = request;
+            try {
+                return await request;
+            } finally {
+                if (facebookPostsPendingRequest === request) facebookPostsPendingRequest = null;
+                facebookPostsLoading = false;
+            }
+        }
+
+        function bindFacebookPostActions() {
+            if (facebookPostActionsBound) return;
+            const list = document.getElementById('facebookPostsList');
+            if (!list) return;
+            facebookPostActionsBound = true;
+            list.addEventListener('click', async event => {
+                const actionButton = event.target.closest('[data-facebook-action]');
+                if (!actionButton || !list.contains(actionButton)) return;
+                const id = actionButton.dataset.facebookPostId;
+                if (!id) return;
+                if (actionButton.dataset.facebookAction === 'copy-caption') await window.copyFacebookPost(id);
+                if (actionButton.dataset.facebookAction === 'copy-image') await window.copyFacebookImage(id);
+                if (actionButton.dataset.facebookAction === 'download-image') await window.downloadFacebookImage(id);
+            });
+        }
+
+        window.loadFacebookCampaign = async function() {
+            bindFacebookPostActions();
+            const badge = document.getElementById('facebookConnectionBadge');
+            const requestVersion = ++facebookPostsLoadVersion;
+            showFacebookPostsLoading();
+            try {
+                const [settings] = await Promise.all([
+                    getDoc(doc(db, 'socialCampaigns', 'facebook')),
+                    fetchFacebookPostsPage({ reset: true })
+                ]);
+                if (requestVersion !== facebookPostsLoadVersion) return;
                 const data = settings.exists() ? settings.data() : {};
                 document.getElementById('facebookEnabled').checked = data.enabled !== false;
                 document.getElementById('facebookWebsiteUrl').value = data.websiteUrl || 'https://prayerdome.net';
+                document.getElementById('facebookPageUrl').value = data.facebookPageUrl || data.pageUrl || '';
                 document.getElementById('facebookNextCampaign').textContent = data.nextGenerationAt?.toDate ? moment(data.nextGenerationAt.toDate()).format('D MMM YYYY') : 'Not scheduled';
-                const postSnap = await getDocs(query(collection(db, 'facebookPosts'), orderBy('scheduledAt', 'desc'), limit(25)));
-                let queued = 0, published = 0, html = '';
-                postSnap.forEach(item => {
-                    const post = item.data();
-                    if (post.status === 'copied') published++; else if (post.status === 'queued') queued++;
-                    const date = post.scheduledAt?.toDate ? moment(post.scheduledAt.toDate()).format('D MMM YYYY, HH:mm') : '—';
-                    html += `<tr><td>${date}</td><td style="max-width:420px;white-space:normal">${escapeHTML((post.message || '').slice(0, 170))}</td><td>${post.imageUrl ? `<a href="${escapeHTML(post.imageUrl)}" target="_blank" rel="noopener"><i class="fas fa-image"></i> Open image</a>` : '—'}</td><td><button class="btn btn-outline btn-sm" onclick="copyFacebookPost('${item.id}')"><i class="fas fa-copy"></i> Copy</button></td></tr>`;
-                });
-                document.getElementById('facebookPostsList').innerHTML = html || '<tr><td colspan="4">No generated posts yet.</td></tr>';
-                document.getElementById('facebookQueued').textContent = queued;
-                document.getElementById('facebookPublished').textContent = published;
-                badge.textContent = 'Manual copy & paste';
-                badge.className = 'badge badge-info';
-            } catch (error) { console.error(error); toast('Could not load Facebook campaign: ' + error.message, 'error'); }
+                if (badge) {
+                    badge.textContent = 'Manual copy & paste';
+                    badge.className = 'badge badge-info';
+                }
+                renderFacebookPosts();
+            } catch (error) {
+                console.error('Could not load Facebook campaign:', error);
+                if (requestVersion !== facebookPostsLoadVersion) return;
+                const list = document.getElementById('facebookPostsList');
+                const summary = document.getElementById('facebookPostsSummary');
+                const libraryStatus = document.getElementById('facebookLibraryStatus');
+                if (list) list.innerHTML = `<div class="facebook-empty-state"><i class="fas fa-triangle-exclamation"></i><strong>Could not load the Facebook post library.</strong><p>${escapeHTML(error.message || 'Please check your connection and try again.')}</p></div>`;
+                if (summary) summary.textContent = 'Your saved posts could not be loaded.';
+                if (libraryStatus) libraryStatus.textContent = 'Refresh to try loading the generated posts again.';
+                toast('Could not load Facebook campaign: ' + error.message, 'error');
+            }
         };
-        window.copyFacebookPost = async function(id) {
+
+        window.filterFacebookPosts = function() {
+            renderFacebookPosts();
+        };
+
+        window.clearFacebookPostFilters = function() {
+            const search = document.getElementById('facebookPostSearch');
+            const status = document.getElementById('facebookPostStatus');
+            const sort = document.getElementById('facebookPostSort');
+            if (search) search.value = '';
+            if (status) status.value = 'all';
+            if (sort) sort.value = 'scheduled-asc';
+            renderFacebookPosts();
+            search?.focus();
+        };
+
+        window.loadMoreFacebookPosts = async function() {
+            if (facebookPostsLoading || !facebookPostsHasMore) return;
             try {
-                const post = await getDoc(doc(db, 'facebookPosts', id));
-                if (!post.exists()) throw new Error('Post was not found');
-                await navigator.clipboard.writeText(post.data().message || '');
-                await updateDoc(post.ref, { status: 'copied', copiedAt: serverTimestamp() });
-                toast('Post copied — paste it into Facebook and add the linked image.');
-                loadFacebookCampaign();
-            } catch (error) { toast('Could not copy post: ' + error.message, 'error'); }
+                facebookPostsLoading = true;
+                updateFacebookPaginationControls();
+                // Let the UI paint the loading state before the Firestore request starts.
+                await new Promise(resolve => setTimeout(resolve, 0));
+                await fetchFacebookPostsPage();
+                renderFacebookPosts();
+            } catch (error) {
+                console.error('Could not load older Facebook posts:', error);
+                toast('Could not load older Facebook posts: ' + error.message, 'error');
+            } finally {
+                facebookPostsLoading = false;
+                updateFacebookPaginationControls();
+            }
+        };
+
+        window.loadAllFacebookPosts = async function() {
+            if (facebookPostsLoading) return;
+            if (!facebookPostsHasMore) return toast('All generated Facebook posts are already loaded.', 'info');
+            try {
+                while (facebookPostsHasMore) {
+                    await fetchFacebookPostsPage();
+                    renderFacebookPosts();
+                }
+                toast(`${facebookPostsCache.length} generated Facebook posts are ready to search.`);
+            } catch (error) {
+                console.error('Could not load all Facebook posts:', error);
+                toast('Could not load all Facebook posts: ' + error.message, 'error');
+            } finally {
+                renderFacebookPosts();
+            }
+        };
+
+        async function copyTextToClipboard(text) {
+            let clipboardError = null;
+            if (navigator.clipboard?.writeText && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    return;
+                } catch (error) {
+                    clipboardError = error;
+                }
+            }
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.setAttribute('readonly', '');
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            textarea.style.pointerEvents = 'none';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                const copied = document.execCommand && document.execCommand('copy');
+                if (copied) return;
+            } catch (error) {
+                clipboardError = error;
+            } finally {
+                textarea.remove();
+            }
+            throw clipboardError || new Error('Clipboard access is not available in this browser.');
+        }
+
+        window.copyFacebookPost = async function(id) {
+            let post = null;
+            try {
+                post = await resolveFacebookPost(id);
+                if (!post.message) throw new Error('This draft does not have a caption to copy.');
+                await copyTextToClipboard(post.message);
+                try {
+                    await updateDoc(doc(db, 'facebookPosts', post.id), {
+                        status: 'copied',
+                        copiedAt: serverTimestamp(),
+                        lastCopiedBy: adminUser?.email || adminUser?.uid || 'administrator',
+                        copyCount: increment(1)
+                    });
+                    post.status = 'copied';
+                    post.copyCount = Number(post.copyCount || 0) + 1;
+                    post.copiedAt = new Date();
+                    renderFacebookPosts();
+                } catch (trackingError) {
+                    console.warn('Caption was copied but its status could not be updated:', trackingError);
+                    toast('Caption copied. Its copied status could not be saved, but you can still paste it in Facebook.', 'info');
+                }
+                toast('Caption copied — switch to Facebook and paste it into your Page.');
+            } catch (error) {
+                console.error('Could not copy Facebook caption:', error);
+                if (post?.message) window.prompt('Copy this Facebook caption:', post.message);
+                toast('Could not access the clipboard. Select the caption in the card and copy it manually.', 'error');
+            }
+        };
+
+        async function fetchFacebookImageBlob(url) {
+            const response = await fetch(url, { credentials: 'omit' });
+            if (!response.ok) throw new Error(`Image download failed (${response.status}).`);
+            const blob = await response.blob();
+            if (!blob.type.startsWith('image/')) throw new Error('The saved file is not an image.');
+            return blob;
+        }
+
+        function facebookImageFilename(post, blob) {
+            const extension = blob?.type?.split('/')[1]?.replace(/[^a-z0-9]/gi, '') || 'png';
+            const number = String(post.campaignNumber || post.id || 'draft').replace(/[^a-z0-9_-]/gi, '-');
+            return `prayer-dome-facebook-post-${number}.${extension}`;
+        }
+
+        function openFacebookImage(url) {
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.target = '_blank';
+            anchor.rel = 'noopener noreferrer';
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+        }
+
+        window.downloadFacebookImage = async function(id, options = {}) {
+            try {
+                const post = await resolveFacebookPost(id);
+                const imageUrl = facebookPostImageUrl(post);
+                if (!imageUrl) throw new Error('This draft does not have an image to download.');
+                const blob = await fetchFacebookImageBlob(imageUrl);
+                const downloadUrl = URL.createObjectURL(blob);
+                const anchor = document.createElement('a');
+                anchor.href = downloadUrl;
+                anchor.download = facebookImageFilename(post, blob);
+                document.body.appendChild(anchor);
+                anchor.click();
+                anchor.remove();
+                window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+                if (!options.quiet) toast('Image downloaded — add this file to your Facebook post.');
+                return true;
+            } catch (error) {
+                console.warn('Could not download Facebook image:', error);
+                const post = getFacebookPostById(id);
+                const imageUrl = facebookPostImageUrl(post);
+                if (imageUrl) openFacebookImage(imageUrl);
+                if (!options.quiet) toast('The image opened in a new tab. Save it there, then add it to Facebook.', 'info');
+                return false;
+            }
+        };
+
+        window.copyFacebookImage = async function(id) {
+            try {
+                const post = await resolveFacebookPost(id);
+                const imageUrl = facebookPostImageUrl(post);
+                if (!imageUrl) throw new Error('This draft does not have an image to copy.');
+                if (!navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
+                    throw new Error('Direct image copying is not supported by this browser.');
+                }
+                const blob = await fetchFacebookImageBlob(imageUrl);
+                await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+                toast('Image copied — paste it into Facebook, or use Download if Facebook does not accept the paste.');
+            } catch (error) {
+                console.warn('Could not copy Facebook image:', error);
+                const downloaded = await window.downloadFacebookImage(id, { quiet: true });
+                if (downloaded) {
+                    toast('Your browser saved the image instead. Upload it in Facebook after pasting the caption.', 'info');
+                } else {
+                    toast('Could not copy the image. Use Open to save it, then attach it in Facebook.', 'error');
+                }
+            }
+        };
+
+        window.openFacebookPage = function() {
+            const enteredUrl = document.getElementById('facebookPageUrl')?.value.trim();
+            const pageUrl = safeFacebookUrl(enteredUrl || 'https://www.facebook.com/');
+            if (!pageUrl) return toast('Enter a valid Facebook Page URL first.', 'error');
+            window.open(pageUrl, '_blank', 'noopener,noreferrer');
         };
 
         window.saveFacebookCampaign = async function() {
             if (!adminUser) return toast('Not authenticated', 'error');
             const websiteUrl = document.getElementById('facebookWebsiteUrl').value.trim();
-            try { new URL(websiteUrl); } catch (_) { return toast('Enter a valid website URL', 'error'); }
+            const facebookPageUrl = document.getElementById('facebookPageUrl').value.trim();
+            const safeWebsiteUrl = safeFacebookUrl(websiteUrl);
+            const safePageUrl = facebookPageUrl ? safeFacebookUrl(facebookPageUrl) : '';
+            if (!safeWebsiteUrl) return toast('Enter a valid website URL', 'error');
+            if (facebookPageUrl && !safePageUrl) return toast('Enter a valid Facebook Page URL', 'error');
             try {
-                await setDoc(doc(db, 'socialCampaigns', 'facebook'), { enabled: document.getElementById('facebookEnabled').checked, websiteUrl, updatedAt: serverTimestamp(), updatedBy: adminUser.email }, { merge: true });
+                await setDoc(doc(db, 'socialCampaigns', 'facebook'), {
+                    enabled: document.getElementById('facebookEnabled').checked,
+                    websiteUrl: safeWebsiteUrl,
+                    facebookPageUrl: safePageUrl || null,
+                    updatedAt: serverTimestamp(),
+                    updatedBy: adminUser.email
+                }, { merge: true });
                 await logAdminActivity('facebook_campaign_settings_saved', 'Updated Facebook campaign settings');
                 toast('Facebook campaign settings saved');
                 loadFacebookCampaign();
             } catch (error) { toast('Could not save settings: ' + error.message, 'error'); }
         };
+
         window.generateFacebookCampaign = async function() {
-            if (!confirm('Generate 90 Facebook posts and schedule them over the next 30 days?')) return;
+            if (!confirm('Generate 90 Facebook drafts with captions and images, spaced over the next 30 days?')) return;
             try {
                 showLoading();
                 const generate = httpsCallable(cloudFunctions, 'generateFacebookCampaign');
