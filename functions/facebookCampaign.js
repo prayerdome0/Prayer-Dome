@@ -1,8 +1,8 @@
 /*
  * Facebook Page campaign service.
  *
- * The Page access token is deliberately read only in Cloud Functions. Never add
- * it to admin.html, Firestore, or a client-side environment variable.
+ * This service creates ready-to-copy drafts only. It never calls the Facebook
+ * API and does not require a Page ID or access token.
  */
 const functions = require('firebase-functions/v1');
 const admin = require('firebase-admin');
@@ -28,16 +28,6 @@ const MESSAGE_TEMPLATES = [
   'Join a global community seeking God in prayer. Start your journey with Prayer Dome: {url}',
   'Discover a place for worship, discipleship, testimonies and prayer at Prayer Dome: {url}'
 ];
-
-function config() {
-  // Runtime environment names are convenient for modern deployments; functions
-  // config supports existing Firebase deployments.
-  const legacy = functions.config().facebook || {};
-  return {
-    token: process.env.FACEBOOK_PAGE_ACCESS_TOKEN || legacy.page_access_token || '',
-    pageId: process.env.FACEBOOK_PAGE_ID || legacy.page_id || ''
-  };
-}
 
 async function requireAdmin(context) {
   if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Sign in as an administrator.');
@@ -101,7 +91,6 @@ async function generateCampaign({ force = false, actor = 'automatic scheduler' }
   batch.set(settingsRef, {
     enabled: settings.enabled !== false,
     websiteUrl: cleanSiteUrl(settings.websiteUrl),
-    pageId: settings.pageId || '',
     nextGenerationAt: admin.firestore.Timestamp.fromMillis(start.getTime() + CAMPAIGN_DAYS * 24 * 60 * 60 * 1000),
     lastGeneratedAt: admin.firestore.FieldValue.serverTimestamp(),
     lastGeneratedBy: actor,
@@ -111,33 +100,9 @@ async function generateCampaign({ force = false, actor = 'automatic scheduler' }
   return { created: posts.length, start: start.toISOString() };
 }
 
-async function publishPost(ref, post, settings) {
-  const serverConfig = config();
-  const pageId = settings.pageId || serverConfig.pageId;
-  if (!pageId || !serverConfig.token) return { skipped: 'facebook_not_configured' };
-
-  // Publishing via /photos gives every website promotion an image, caption and
-  // clickable URL. Image URLs must be publicly reachable from Facebook.
-  const body = new URLSearchParams({
-    url: post.imageUrl,
-    caption: post.message,
-    access_token: serverConfig.token
-  });
-  const response = await fetch(`https://graph.facebook.com/v22.0/${encodeURIComponent(pageId)}/photos`, {
-    method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body
-  });
-  const payload = await response.json();
-  if (!response.ok || payload.error) throw new Error(payload.error?.message || 'Facebook rejected the post.');
-  await ref.update({ status: 'published', facebookPostId: payload.post_id || payload.id || '', publishedAt: admin.firestore.FieldValue.serverTimestamp(), error: admin.firestore.FieldValue.delete() });
-  return { published: true };
-}
-
 exports.getFacebookCampaignStatus = functions.https.onCall(async (_data, context) => {
   await requireAdmin(context);
-  const serverConfig = config();
-  const settings = (await admin.firestore().collection('socialCampaigns').doc('facebook').get()).data() || {};
-  const pageIdConfigured = Boolean(serverConfig.pageId || settings.pageId);
-  return { connected: Boolean(serverConfig.token && pageIdConfigured), pageIdConfigured };
+  return { manual: true };
 });
 
 exports.generateFacebookCampaign = functions.https.onCall(async (data, context) => {
@@ -145,24 +110,12 @@ exports.generateFacebookCampaign = functions.https.onCall(async (data, context) 
   return generateCampaign({ force: data?.force === true, actor: context.auth.token.email || context.auth.uid });
 });
 
-// The hourly check makes a campaign due on the exact 30-day cadence, while the
-// actual posts are paced through the month rather than sent as a 90-post burst.
+// This hourly check creates the next set of drafts after 30 days. It never
+// contacts Facebook: administrators copy each post and publish it themselves.
 exports.facebookCampaignScheduler = functions.pubsub.schedule('0 * * * *').timeZone('Africa/Lusaka').onRun(async () => {
   try {
     const generation = await generateCampaign();
-    if (generation.created) console.log(`Generated ${generation.created} Facebook campaign posts.`);
-
-    const db = admin.firestore();
-    const settings = (await db.collection('socialCampaigns').doc('facebook').get()).data() || {};
-    if (settings.enabled === false) return null;
-    const due = await db.collection('facebookPosts').where('status', '==', 'queued').where('scheduledAt', '<=', admin.firestore.Timestamp.now()).orderBy('scheduledAt').limit(10).get();
-    for (const item of due.docs) {
-      try { await publishPost(item.ref, item.data(), settings); }
-      catch (error) {
-        console.error('Facebook post failed', item.id, error);
-        await item.ref.update({ status: 'failed', error: error.message, failedAt: admin.firestore.FieldValue.serverTimestamp() });
-      }
-    }
+    if (generation.created) console.log(`Generated ${generation.created} manual Facebook campaign drafts.`);
   } catch (error) { console.error('Facebook campaign scheduler failed:', error); }
   return null;
 });
