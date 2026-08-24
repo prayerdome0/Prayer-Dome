@@ -570,6 +570,7 @@
             <div class="nav-item" onclick="switchView('languages', this)"><i class="fas fa-language"></i> Languages</div>
             <div class="nav-item" onclick="switchView('translations', this)"><i class="fas fa-language"></i> Translation Review</div>
             <div class="nav-item" onclick="switchView('notifications', this)"><i class="fas fa-bell"></i> Notifications</div>
+            <div class="nav-item" onclick="switchView('facebook', this)"><i class="fab fa-facebook"></i> Facebook Campaign</div>
             <div class="nav-item" onclick="switchView('contacts', this)"><i class="fas fa-envelope"></i> Contact Messages</div>
             <div class="nav-item" onclick="switchView('certificates', this)"><i class="fas fa-award"></i> Certificates</div>
         </div>
@@ -1248,6 +1249,30 @@
                 </div>
             </div>
 
+            <!-- FACEBOOK CAMPAIGN VIEW -->
+            <div id="view-facebook" class="section-view">
+                <div class="page-title"><span><i class="fab fa-facebook" style="color:#1877f2;"></i> Facebook Website Campaign</span><button class="btn btn-outline btn-sm" onclick="loadFacebookCampaign()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
+                <div class="panel-card" style="max-width:900px;">
+                    <div class="panel-header"><h3><i class="fas fa-calendar-check"></i> 30-day automated campaign</h3><span id="facebookConnectionBadge" class="badge badge-info">Manual copy & paste</span></div>
+                    <div style="padding:0 25px 25px;">
+                        <p style="line-height:1.65;color:var(--text-sub);">Each campaign generates <strong>90 ready-to-copy Facebook posts</strong> promoting Prayer Dome. They are spaced evenly across 30 days (three per day), each with a website link and a rotating ministry image. A new campaign is generated every 30 days while automation is enabled. <strong>Nothing is posted automatically to Facebook.</strong></p>
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:18px 0;">
+                            <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-layer-group"></i></div><div><div class="stat-label">Queued</div><div class="stat-value" id="facebookQueued">—</div></div></div>
+                            <div class="stat-card"><div class="stat-icon green"><i class="fas fa-check"></i></div><div><div class="stat-label">Copied</div><div class="stat-value" id="facebookPublished">—</div></div></div>
+                            <div class="stat-card"><div class="stat-icon orange"><i class="fas fa-calendar-day"></i></div><div><div class="stat-label">Next campaign</div><div class="stat-value" id="facebookNextCampaign" style="font-size:1rem">—</div></div></div>
+                        </div>
+                        <div class="form-group"><label><input id="facebookEnabled" type="checkbox" style="width:auto;margin-right:8px;"> Enable automatic campaign generation every 30 days</label></div>
+                        <div class="form-group"><label>Website URL</label><input id="facebookWebsiteUrl" class="form-control" type="url" value="https://prayerdome.net" maxlength="200"></div>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;"><button class="btn btn-primary" onclick="saveFacebookCampaign()"><i class="fas fa-save"></i> Save Settings</button><button class="btn btn-outline" onclick="generateFacebookCampaign()"><i class="fas fa-wand-magic-sparkles"></i> Generate 90 Posts Now</button></div>
+                        <p style="font-size:.75rem;color:var(--text-sub);margin:15px 0 0;"><i class="fas fa-copy"></i> Choose a post below, copy its text, then paste it into Facebook. Use the attached image link to download or add the matching image to your post.</p>
+                    </div>
+                </div>
+                <div class="panel-card" style="margin-top:20px;">
+                    <div class="panel-header"><h3><i class="fas fa-list"></i> Latest Facebook posts</h3></div>
+                    <div class="table-responsive"><table><thead><tr><th>Suggested date</th><th>Post preview</th><th>Image</th><th>Action</th></tr></thead><tbody id="facebookPostsList"><tr><td colspan="4">Open this page to load campaign posts.</td></tr></tbody></table></div>
+                </div>
+            </div>
+
             <!-- NOTIFICATIONS VIEW -->
             <div id="view-notifications" class="section-view">
                 <div class="page-title"><i class="fas fa-bell"></i> Broadcast Notifications</div>
@@ -1713,11 +1738,13 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, getDoc, doc, updateDoc, setDoc, deleteDoc, query, where, orderBy, serverTimestamp, increment, addDoc, limit, onSnapshot, Timestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo", authDomain: "prayer-dome.firebaseapp.com", projectId: "prayer-dome", storageBucket: "prayer-dome.firebasestorage.app", messagingSenderId: "198295153196", appId: "1:198295153196:web:1222b31948d7974ba3bf89" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        const cloudFunctions = getFunctions(app);
 
         // Hand Firestore to the shared premium layer (pd-app.js) so banners,
         // news, notifications, live status and stats sync to every page.
@@ -4735,6 +4762,64 @@
             loadLiveRecordings(); // Reuse recordings list for analytics table
         };
 
+        // Facebook campaign administration. Posts are generated as manual copy-and-paste drafts.
+        window.loadFacebookCampaign = async function() {
+            const badge = document.getElementById('facebookConnectionBadge');
+            try {
+                const settings = await getDoc(doc(db, 'socialCampaigns', 'facebook'));
+                const data = settings.exists() ? settings.data() : {};
+                document.getElementById('facebookEnabled').checked = data.enabled !== false;
+                document.getElementById('facebookWebsiteUrl').value = data.websiteUrl || 'https://prayerdome.net';
+                document.getElementById('facebookNextCampaign').textContent = data.nextGenerationAt?.toDate ? moment(data.nextGenerationAt.toDate()).format('D MMM YYYY') : 'Not scheduled';
+                const postSnap = await getDocs(query(collection(db, 'facebookPosts'), orderBy('scheduledAt', 'desc'), limit(25)));
+                let queued = 0, published = 0, html = '';
+                postSnap.forEach(item => {
+                    const post = item.data();
+                    if (post.status === 'copied') published++; else if (post.status === 'queued') queued++;
+                    const date = post.scheduledAt?.toDate ? moment(post.scheduledAt.toDate()).format('D MMM YYYY, HH:mm') : '—';
+                    html += `<tr><td>${date}</td><td style="max-width:420px;white-space:normal">${escapeHTML((post.message || '').slice(0, 170))}</td><td>${post.imageUrl ? `<a href="${escapeHTML(post.imageUrl)}" target="_blank" rel="noopener"><i class="fas fa-image"></i> Open image</a>` : '—'}</td><td><button class="btn btn-outline btn-sm" onclick="copyFacebookPost('${item.id}')"><i class="fas fa-copy"></i> Copy</button></td></tr>`;
+                });
+                document.getElementById('facebookPostsList').innerHTML = html || '<tr><td colspan="4">No generated posts yet.</td></tr>';
+                document.getElementById('facebookQueued').textContent = queued;
+                document.getElementById('facebookPublished').textContent = published;
+                badge.textContent = 'Manual copy & paste';
+                badge.className = 'badge badge-info';
+            } catch (error) { console.error(error); toast('Could not load Facebook campaign: ' + error.message, 'error'); }
+        };
+        window.copyFacebookPost = async function(id) {
+            try {
+                const post = await getDoc(doc(db, 'facebookPosts', id));
+                if (!post.exists()) throw new Error('Post was not found');
+                await navigator.clipboard.writeText(post.data().message || '');
+                await updateDoc(post.ref, { status: 'copied', copiedAt: serverTimestamp() });
+                toast('Post copied — paste it into Facebook and add the linked image.');
+                loadFacebookCampaign();
+            } catch (error) { toast('Could not copy post: ' + error.message, 'error'); }
+        };
+
+        window.saveFacebookCampaign = async function() {
+            if (!adminUser) return toast('Not authenticated', 'error');
+            const websiteUrl = document.getElementById('facebookWebsiteUrl').value.trim();
+            try { new URL(websiteUrl); } catch (_) { return toast('Enter a valid website URL', 'error'); }
+            try {
+                await setDoc(doc(db, 'socialCampaigns', 'facebook'), { enabled: document.getElementById('facebookEnabled').checked, websiteUrl, updatedAt: serverTimestamp(), updatedBy: adminUser.email }, { merge: true });
+                await logAdminActivity('facebook_campaign_settings_saved', 'Updated Facebook campaign settings');
+                toast('Facebook campaign settings saved');
+                loadFacebookCampaign();
+            } catch (error) { toast('Could not save settings: ' + error.message, 'error'); }
+        };
+        window.generateFacebookCampaign = async function() {
+            if (!confirm('Generate 90 Facebook posts and schedule them over the next 30 days?')) return;
+            try {
+                showLoading();
+                const generate = httpsCallable(cloudFunctions, 'generateFacebookCampaign');
+                const result = await generate({ force: true });
+                toast(`${result.data.created || 90} Facebook posts generated`);
+                await loadFacebookCampaign();
+            } catch (error) { toast('Could not generate posts: ' + error.message, 'error'); }
+            finally { hideLoading(); }
+        };
+
         /* ===== Update switchView to include new views ===== */
         const _origSwitchView = window.switchView;
         window.switchView = async (viewId, navElement) => {
@@ -4754,7 +4839,7 @@
                 'aivideo': 'AI Video Studio', 'media': 'Media Upload', 'content': 'Prayers & Testimonies',
                 'news': 'News Center', 'sermons': 'Sermon Center', 'banners': 'Hero Banners',
                 'languages': 'Languages', 'translations': 'Translation Review',
-                'notifications': 'Notifications', 'contacts': 'Contact Messages', 'certificates': 'Certificates'
+                'notifications': 'Notifications', 'facebook': 'Facebook Campaign', 'contacts': 'Contact Messages', 'certificates': 'Certificates'
             };
             if (mobileTitle) mobileTitle.textContent = titles[viewId] || viewId;
             if (window.innerWidth <= 992) document.getElementById('sidebar').style.left = '-280px';
@@ -4777,6 +4862,7 @@
                 else if (viewId === 'news') await loadAdminNews();
                 else if (viewId === 'sermons') await loadAdminSermons();
                 else if (viewId === 'translations') await loadTranslationReview();
+                else if (viewId === 'facebook') await loadFacebookCampaign();
                 else if (viewId === 'devotionals') await loadAdminDevotionals();
                 else if (viewId === 'verses') await loadVerseSchedule();
                 else if (viewId === 'aivideo') await loadAiVideos();

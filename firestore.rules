@@ -236,6 +236,14 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Facebook campaign settings and generated posts are administrator-only.
+    match /socialCampaigns/{id} {
+      allow read, write: if isAdmin();
+    }
+    match /facebookPosts/{id} {
+      allow read, write: if isAdmin();
+    }
+
     // Admin Logs
     match /adminLogs/{id} {
       allow read: if isAdmin();
