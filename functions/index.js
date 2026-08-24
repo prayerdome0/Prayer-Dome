@@ -4,6 +4,7 @@
 const functions = require('firebase-functions/v1');
 const admin = require('firebase-admin');
 const shareHandler = require('./share');
+const facebookCampaign = require('./facebookCampaign');
 const crypto = require('crypto');
 
 if (!admin.getApps().length) {
@@ -332,3 +333,8 @@ exports.sendTestNotification = functions.firestore
       return null;
     }
   });
+
+// Facebook campaign functions are kept in a dedicated module so Page credentials never reach the browser.
+exports.getFacebookCampaignStatus = facebookCampaign.getFacebookCampaignStatus;
+exports.generateFacebookCampaign = facebookCampaign.generateFacebookCampaign;
+exports.facebookCampaignScheduler = facebookCampaign.facebookCampaignScheduler;
