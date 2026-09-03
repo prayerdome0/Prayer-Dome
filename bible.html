@@ -700,7 +700,7 @@
         };
 
         function render(book, ch) {
-            let html = `<div class="chapter-title">${book} ${ch}</div><div class="verses-container">`;
+            let html = `<div class="chapter-title">${book} ${ch}</div><div class="verses-container" data-pd-no-auto>`;
             currentVerses.forEach((v, i) => {
                 const verseText = v.text || '';
                 html += `<span class="verse-item" id="v-${i}" onclick="selVerse(${i})"><span class="verse-num">${v.verse}</span>${verseText}</span> `;

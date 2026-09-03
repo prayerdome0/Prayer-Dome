@@ -510,7 +510,7 @@ function renderVOTD() {
   document.getElementById('votdWrap').innerHTML =
     '<div class="votd pd-reveal">' +
       '<div class="label"><i class="fas fa-sun"></i> ' + esc(pdT('verse.of.day', lang)) + '</div>' +
-      '<div class="text">' + esc(v.text) + '</div>' +
+      '<div class="text" data-pd-no-auto>' + esc(v.text) + '</div>' +
       '<div class="ref">— ' + esc(v.ref) + '</div>' +
       (v.reviewed ? '' :
         '<div style="margin-top:12px;font-size:.7rem;opacity:.88;position:relative;z-index:2">' +
@@ -569,7 +569,7 @@ function singleHTML(v) {
       (r.fellBack ? '<span class="draft-pill"><i class="fas fa-circle-info"></i> English shown — no ' +
                     esc(pdLanguage(lang).endonym) + ' text yet</span>' : '') +
     '</div>' +
-    '<div class="verse-text">' + esc(r.text) + '</div>' +
+    '<div class="verse-text" data-pd-no-auto>' + esc(r.text) + '</div>' +
     '<div class="verse-acts">' +
       '<button class="vbtn" onclick="speak(' + JSON.stringify(v.id) + ')"><i class="fas fa-volume-high"></i> ' + esc(pdT('action.listen', lang)) + '</button>' +
       '<button class="vbtn" onclick="copyVerse(' + JSON.stringify(v.id) + ')"><i class="fas fa-copy"></i> ' + esc(pdT('action.copy', lang)) + '</button>' +
@@ -585,7 +585,7 @@ function parallelCells(v) {
     const r = pdRenderVerse(v, l.code);
     return '<div class="cell">' +
       '<span class="lang-pill">' + esc(l.endonym) + '</span> ' + draftPill(r.reviewed) +
-      '<p>' + esc(r.text) + '</p>' +
+      '<p data-pd-no-auto>' + esc(r.text) + '</p>' +
       '<button class="vbtn" style="margin-top:10px" onclick="speak(' + JSON.stringify(v.id) + ',\'' + l.code + '\')">' +
         '<i class="fas fa-volume-high"></i> ' + esc(pdT('action.listen', l.code)) + '</button>' +
     '</div>';

@@ -14,7 +14,7 @@
   },
   "functions": {
     "api/*.js": {
-      "includeFiles": "{assets/pd-academy-data.js,assets/pd-content-data.js,functions/share.js,sermons-data.js}",
+      "includeFiles": "{assets/pd-academy-data.js,assets/pd-content-data.js,functions/share.js,functions/translate.js,sermons-data.js}",
       "maxDuration": 10
     }
   },
