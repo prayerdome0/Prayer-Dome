@@ -4,6 +4,7 @@
 const functions = require('firebase-functions/v1');
 const admin = require('firebase-admin');
 const shareHandler = require('./share');
+const translateHandler = require('./translate');
 const facebookCampaign = require('./facebookCampaign');
 const crypto = require('crypto');
 
@@ -13,6 +14,12 @@ if (!admin.getApps().length) {
 
 // Dynamic social sharing pages for news and testimony links.
 exports.share = functions.https.onRequest((req, res) => shareHandler(req, res));
+
+// Same-origin relay for the app's auto-translation tier (pd-i18n.js sends
+// batches of text the reviewed phrase pack does not cover yet). See
+// functions/translate.js for the plain module this wraps — the identical
+// module also runs as api/translate.js on Vercel.
+exports.translate = functions.https.onRequest((req, res) => translateHandler(req, res));
 
 // ==========================================
 // Secure Server-Side Cloudinary Signing

@@ -20,8 +20,11 @@
  *   * The key is the exact English string as it appears in the markup, with
  *     surrounding whitespace, decorative emoji and a trailing colon removed —
  *     pd-i18n.js strips and restores those automatically.
- *   * Omit a language rather than guessing. A missing entry falls back to
- *     English, which is always safe; a wrong entry misleads a worshipper.
+ *   * Omit a language rather than guessing. A missing entry first falls back
+ *     to English, then the reader's browser offers it to the live auto tier
+ *     (Google, via the site's own /api/translate relay) which renders it
+ *     badged "auto" until a reviewer promotes it here. A wrong entry misleads
+ *     a worshipper; an "auto" one is at least labelled as unreviewed.
  *   * Proper nouns (Prayer Dome, Cloudinary, Facebook, people's names, place
  *     names, currency codes) are deliberately absent: they are not translated.
  * ===========================================================================
