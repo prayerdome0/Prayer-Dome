@@ -287,6 +287,9 @@
       });
       var sel = $('.pd-lang-select');
       if (sel) sel.value = code;
+      // Translate the *whole* page, not only tagged elements. pd-i18n.js walks
+      // every text node and readable attribute against the phrase pack.
+      if (window.PDI18n) { try { window.PDI18n.apply(code); } catch (e) {} }
       broadcast('lang', { code: code });
     },
     t: function (key) {
@@ -419,6 +422,14 @@
         var txt = i18n.t(el.getAttribute('data-pd-t'));
         if (txt) el.innerHTML = txt;
       });
+      // Translate the rest of the page and keep watching for content the app
+      // renders later (prayer cards, chat messages, admin tables, dialogs).
+      if (window.PDI18n) {
+        try {
+          if (lang !== 'en') window.PDI18n.apply(lang);
+          else window.PDI18n.observe();
+        } catch (e) {}
+      }
       document.dispatchEvent(new CustomEvent('pd:lang', { detail: { code: lang } }));
       on('store:languages', i18n.applyEnabled);
     },

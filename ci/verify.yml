@@ -1,0 +1,48 @@
+name: Verify
+
+# Every push and pull request runs the same checks a release runs:
+# production lint, the managed-SEO check, the full test suite and the
+# Cloud Functions verification.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, test and verify functions
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Use Python 3
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Lint (production validation and managed SEO)
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Verify Cloud Functions
+        run: npm run functions:verify
+
+      - name: Build the Vercel bundle
+        run: npm run build:vercel

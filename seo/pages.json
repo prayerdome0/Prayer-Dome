@@ -197,13 +197,6 @@
       "schema": "webpage",
       "noindex": true
     },
-    "Chat.html": {
-      "path": "/Chat.html",
-      "title": "Chat | Prayer Dome",
-      "description": "Prayer Dome chat (legacy page).",
-      "schema": "webpage",
-      "noindex": true
-    },
     "sermons.html": {
       "path": "/sermons",
       "title": "Sermons & Bible Stories Read Aloud | Listen Online | Prayer Dome",
