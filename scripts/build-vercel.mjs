@@ -34,6 +34,11 @@ const PUBLIC_ROOT_FILES = [
   'sw.js',
   'translation-data.js'
 ];
+// Source artefacts that live in a published directory but are build inputs only.
+const EXCLUDED_PUBLIC_FILES = new Set([
+  join('assets', 'logo-master.png'),
+  join('assets', 'logo-source.png')
+]);
 
 function copyRequired(source, destination) {
   if (!existsSync(source)) {
@@ -60,7 +65,12 @@ for (const directory of PUBLIC_DIRECTORIES) {
   if (!existsSync(source) || !statSync(source).isDirectory()) {
     throw new Error(`Required public directory is missing: ${directory}`);
   }
-  cpSync(source, join(OUTPUT, directory), { recursive: true });
+  cpSync(source, join(OUTPUT, directory), {
+    recursive: true,
+    // Design-time originals are kept in the repository for scripts/build-logo.py
+    // but must never be published: they are large and serve no visitor.
+    filter: (from) => !EXCLUDED_PUBLIC_FILES.has(relative(ROOT, from))
+  });
 }
 
 let files = 0;

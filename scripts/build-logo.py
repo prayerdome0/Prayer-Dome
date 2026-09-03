@@ -3,7 +3,7 @@
 Prayer Dome — official logo renderer (real-logo mode)
 =====================================================
 
-Uses the authoritative Prayer Dome mark committed as ``logo.png`` at the
+Uses the authoritative Prayer Dome mark committed as ``assets/logo-master.png`` at the
 repository root (3264 px, transparent) and derives the canonical asset set:
 
     assets/logo.png        512 px  (site, certificate, PWA 512, OG)
@@ -30,7 +30,7 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "logo.png"
+SRC = ROOT / "assets" / "logo-master.png"
 
 # Target sizes
 WANTED = [
@@ -56,7 +56,7 @@ def load_square():
     alpha = im.split()[3]
     bbox = alpha.getbbox()
     if bbox is None:
-        raise SystemExit("logo.png appears fully transparent")
+        raise SystemExit("source logo appears fully transparent")
     cropped = im.crop(bbox)
     w, h = cropped.size
     pad = int(max(w, h) * 0.08)
@@ -69,7 +69,7 @@ def load_square():
 
 def main():
     if not SRC.exists():
-        raise SystemExit(f"missing {SRC} — commit the real logo as logo.png first")
+        raise SystemExit(f"missing {SRC} — commit the real logo as assets/logo-master.png first")
     square = load_square()
     print(f"source square {square.size} from {SRC}")
 

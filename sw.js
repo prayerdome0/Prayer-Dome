@@ -3,12 +3,15 @@
 // shade) even when the app is closed — see /assets/pd-verse-data.js.
 try { importScripts('/assets/pd-verse-data.js'); } catch (e) { /* verses unavailable offline */ }
 // Bump CACHE_NAME whenever the precache list changes.
-const CACHE_NAME = 'prayer-dome-v15';
+const CACHE_NAME = 'prayer-dome-v16';
 
 // Shell assets worth having available offline.
 const PRECACHE = [
     '/',
     '/index.html',
+    // The dedicated offline shell shown when a navigation cannot be served at
+    // all — far friendlier than falling back to a half-empty home page.
+    '/offline.html',
     '/devotional-data.js',
     '/bible.html',
     '/prayer.html',
@@ -48,6 +51,8 @@ const PRECACHE = [
     '/assets/pd-academy.js',
     '/assets/pd-certificate.js',
     '/assets/pd-app.js',
+    '/assets/pd-phrases.js',
+    '/assets/pd-i18n.js',
     '/assets/pd-cloud-video.js',
     '/assets/pd-verse-data.js',
     '/assets/pd-verse-alerts.js',
@@ -131,7 +136,14 @@ self.addEventListener('fetch', event => {
                     return res;
                 })
                 .catch(() =>
-                    caches.match(req).then(hit => hit || caches.match('/index.html'))
+                    caches.match(req)
+                        .then(hit => hit || caches.match('/offline.html'))
+                        .then(hit => hit || caches.match('/index.html'))
+                        .then(hit => hit || new Response(
+                            '<!doctype html><meta charset="utf-8"><title>Offline</title>' +
+                            '<p style="font:16px system-ui;padding:24px">Prayer Dome is offline.</p>',
+                            { headers: { 'Content-Type': 'text/html; charset=utf-8' }, status: 503 }
+                        ))
                 )
         );
         return;
