@@ -112,7 +112,7 @@
                 ctx.strokeRect(26, 26, 972, 460);
 
                 ctx.fillStyle = '#f6df8a';
-                ctx.font = 'bold 26px Montserrat, Arial, sans-serif';
+                ctx.font = 'bold 26px Inter, Arial, sans-serif';
                 ctx.fillText((verse.icon || '') + '  ' + (verse.slotLabel || 'Daily Verse').toUpperCase(), 70, 96);
 
                 // Verse body — wrapped
@@ -130,11 +130,11 @@
                 lines.forEach(function (l) { ctx.fillText(l, 70, y); y += 46; });
 
                 ctx.fillStyle = '#f6df8a';
-                ctx.font = 'bold 30px Montserrat, Arial, sans-serif';
+                ctx.font = 'bold 30px Inter, Arial, sans-serif';
                 ctx.fillText(verse.reference + '  (' + (verse.translation || 'KJV') + ')', 70, Math.min(y + 22, 430));
 
                 ctx.fillStyle = 'rgba(255,255,255,0.75)';
-                ctx.font = '600 22px Montserrat, Arial, sans-serif';
+                ctx.font = '600 22px Inter, Arial, sans-serif';
                 ctx.fillText('PRAYER DOME  ·  A House of Prayer for All Nations', 70, 468);
 
                 var logo = new Image();

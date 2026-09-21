@@ -414,7 +414,7 @@ function render(meta) {
   <meta http-equiv="refresh" content="0;url=${target}">
   <style>
     *{box-sizing:border-box}
-    body{font-family:Montserrat,Arial,sans-serif;background:linear-gradient(180deg,#f6f9ff,#eef3fb);color:#0f172a;
+    body{font-family:Inter,Arial,sans-serif;background:linear-gradient(180deg,#f6f9ff,#eef3fb);color:#0f172a;
       display:grid;min-height:100vh;place-items:center;text-align:center;padding:24px;margin:0}
     .card{max-width:520px;background:#fff;border-radius:22px;padding:30px 24px;box-shadow:0 18px 46px rgba(10,77,155,.14)}
     .logo{width:76px;height:76px;object-fit:contain;margin:0 auto 6px;display:block}

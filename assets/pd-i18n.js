@@ -356,7 +356,7 @@
         st.textContent =
           '.pd-auto-chip{display:inline-block;vertical-align:middle;margin:0 7px 0 0;padding:2px 7px;' +
           'border-radius:999px;border:1px dashed rgba(100,116,139,.55);background:rgba(100,116,139,.12);' +
-          'font:700 8px/1.5 "Montserrat",system-ui,sans-serif;letter-spacing:1.2px;text-transform:uppercase;' +
+          'font:700 8px/1.5 "Inter",system-ui,sans-serif;letter-spacing:1.2px;text-transform:uppercase;' +
           'color:inherit;opacity:.8;cursor:help;user-select:none}' +
           'body.dark-mode .pd-auto-chip{background:rgba(148,163,184,.16);border-color:rgba(148,163,184,.4)}';
         (global.document.head || global.document.documentElement).appendChild(st);

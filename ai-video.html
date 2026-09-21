@@ -15,7 +15,7 @@
 <meta property="og:description" content="Create narrated, branded Prayer Dome videos in the browser and publish them to the app library.">
 <meta property="og:image" content="/assets/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="/assets/pd-brand.css">
 <link rel="manifest" href="/manifest.json">
@@ -31,7 +31,7 @@
      studio header from sticking. */
   body{overflow-x:hidden;max-width:100%;}
   body{
-    margin:0; font-family:'Montserrat',system-ui,sans-serif; color:#0f172a;
+    margin:0; font-family:'Inter',system-ui,sans-serif; color:#0f172a;
     background:linear-gradient(180deg,#f6f9ff 0%,#eef3fb 100%); min-height:100vh;
   }
   body.dark-mode{background:#0b1220;color:#e8eefc;}
@@ -60,7 +60,7 @@
   .card h2{font-family:'Playfair Display',serif;font-size:1.05rem;margin:0 0 4px;display:flex;align-items:center;gap:9px;}
   .card h2 .num{
     width:26px;height:26px;flex:none;border-radius:50%;background:#0A4D9B;color:#fff;
-    font-family:'Montserrat',sans-serif;font-size:.78rem;font-weight:800;display:grid;place-items:center;
+    font-family:'Inter',sans-serif;font-size:.78rem;font-weight:800;display:grid;place-items:center;
   }
   .hint{font-size:.76rem;color:#64748b;margin:0 0 14px;line-height:1.55;}
   body.dark-mode .hint{color:#94a3b8;}
@@ -527,17 +527,17 @@ window.dispatchEvent(new Event('pd-studio-cloud-ready'));
         ctx.drawImage(logoImg, (W - ls) / 2, H * 0.24, ls, ls);
       }
       ctx.fillStyle = theme.text;
-      ctx.font = '800 ' + (W * 0.055) + 'px Montserrat, sans-serif';
+      ctx.font = '800 ' + (W * 0.055) + 'px Inter, sans-serif';
       ctx.fillText('PRAYER DOME', W / 2, H * 0.58);
       ctx.fillStyle = theme.accent;
-      ctx.font = '600 ' + (W * 0.028) + 'px Montserrat, sans-serif';
+      ctx.font = '600 ' + (W * 0.028) + 'px Inter, sans-serif';
       ctx.fillText('A House of Prayer for All Nations', W / 2, H * 0.645);
       ctx.fillStyle = 'rgba(255,255,255,.82)';
-      ctx.font = '500 ' + (W * 0.024) + 'px Montserrat, sans-serif';
+      ctx.font = '500 ' + (W * 0.024) + 'px Inter, sans-serif';
       ctx.fillText('prayerdome.net', W / 2, H * 0.71);
       if (opts.disclose) {
         ctx.fillStyle = 'rgba(255,255,255,.62)';
-        ctx.font = '500 ' + (W * 0.018) + 'px Montserrat, sans-serif';
+        ctx.font = '500 ' + (W * 0.018) + 'px Inter, sans-serif';
         ctx.fillText('Visuals produced with AI assistance · Scripture unchanged', W / 2, H * 0.80);
       }
       ctx.restore();
@@ -546,7 +546,7 @@ window.dispatchEvent(new Event('pd-studio-cloud-ready'));
 
     if (opts.kind === 'title') {
       ctx.fillStyle = theme.accent;
-      ctx.font = '700 ' + (W * 0.022) + 'px Montserrat, sans-serif';
+      ctx.font = '700 ' + (W * 0.022) + 'px Inter, sans-serif';
       ctx.fillText((opts.scripture || 'PRAYER DOME').toUpperCase(), W / 2, H * 0.34);
       ctx.fillStyle = theme.text;
       ctx.font = '700 ' + (W * 0.062) + 'px "Playfair Display", Georgia, serif';
@@ -571,7 +571,7 @@ window.dispatchEvent(new Event('pd-studio-cloud-ready'));
 
     if (opts.scripture) {
       ctx.fillStyle = theme.accent;
-      ctx.font = '700 ' + (W * 0.021) + 'px Montserrat, sans-serif';
+      ctx.font = '700 ' + (W * 0.021) + 'px Inter, sans-serif';
       ctx.fillText(opts.scripture.toUpperCase(), W / 2, H - H * 0.085);
     }
     ctx.restore();
@@ -587,7 +587,7 @@ window.dispatchEvent(new Event('pd-studio-cloud-ready'));
     if (logoReady) ctx.drawImage(logoImg, x, y, s, s);
     ctx.textAlign = 'right';
     ctx.fillStyle = 'rgba(255,255,255,.88)';
-    ctx.font = '700 ' + (W * 0.016) + 'px Montserrat, sans-serif';
+    ctx.font = '700 ' + (W * 0.016) + 'px Inter, sans-serif';
     ctx.fillText('PRAYER DOME', x + s, y + s + W * 0.026);
     ctx.restore();
   }
