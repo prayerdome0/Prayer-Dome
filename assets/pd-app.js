@@ -206,6 +206,7 @@
       ui.drawer();
       ui.splash();
       ui.syncTheme();
+      ui.offlineBanner();
       try { watchBranding(); } catch (e) { /* branding sweep is best-effort */ }
       // Auto-show the friendly "Allow notifications?" pop-up once per
       // device, ~6s after the app loads, so members get the OS push
@@ -216,6 +217,30 @@
         }
       }, 6000);
     },
+    /* Professional offline state: never hides the app — it explains what
+       still works (downloaded Bible, saved content) and disappears the
+       moment connectivity returns. */
+    offlineBanner: function () {
+      if (document.getElementById('pdOfflineBanner')) return;
+      var el = document.createElement('div');
+      el.id = 'pdOfflineBanner';
+      el.setAttribute('role', 'status');
+      el.style.cssText = 'position:fixed;left:50%;bottom:14px;transform:translateX(-50%) translateY(140%);z-index:99990;'
+        + 'display:flex;align-items:center;gap:10px;max-width:min(92vw,480px);padding:12px 18px;border-radius:16px;'
+        + 'background:#0d1b33;color:#e6eefb;font:600 .8rem/1.45 Inter,system-ui,sans-serif;'
+        + 'box-shadow:0 16px 40px rgba(0,0,0,.4);transition:transform .35s cubic-bezier(.2,.9,.3,1.1);';
+      el.innerHTML = '<i class="fas fa-wifi" style="color:#4DA3FF;flex-shrink:0;"></i>'
+        + '<span>You’re offline. Some features are unavailable, but your downloaded Bible and saved content are still available.</span>';
+      document.body.appendChild(el);
+      var show = function () {
+        if (!navigator.onLine) el.style.transform = 'translateX(-50%) translateY(0)';
+      };
+      var hide = function () { el.style.transform = 'translateX(-50%) translateY(140%)'; };
+      window.addEventListener('offline', show);
+      window.addEventListener('online', hide);
+      show();
+    },
+
     drawer: function () {
       var btn = $('#pdMenuBtn');
       var drawer = $('#pdDrawer');
