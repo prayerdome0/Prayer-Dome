@@ -719,126 +719,126 @@
       ['When someone is in Christ, what does 2 Corinthians 5:17 say has happened?', 'Nothing has changed', 'They have become a new creation', 'They are only slightly improved', 'They are already perfect', 1],
       ['What is grace?', 'A reward we earn', "God's unearned favour shown in Christ", 'A feeling at church', 'A natural talent', 1],
       ['What did Jesus promise everyone who comes to Him in John 6:37?', 'He will never drive them away', 'Wealth', 'An easy life', 'Popularity', 0],
-      ['A person can earn salvation by attending church regularly.', 'True', 'False', 1]
+      ['A person can earn salvation by attending church regularly.', 'True', 'False', 1],
       ['What follows genuine salvation?', 'Growing as a disciple', 'Nothing further', 'Retiring from church life', 'Instant perfection', 0]
     ],
     'l02': [
       ['How many books are in the Bible?', '27', '39', '66', '72', 2],
       ['The Bible is divided into which two main parts?', 'Songs and stories', 'Old and New Testaments', 'Law and prophets only', 'Gospels and letters only', 1],
       ['What does Psalm 119:105 call God’s Word?', 'A lamp for our feet', 'A hammer only', 'A mirror only', 'A treasure map', 0],
-      ['The Bible’s teachings were written over many centuries by many authors under God’s inspiration.', 'True', 'False', 0]
+      ['The Bible’s teachings were written over many centuries by many authors under God’s inspiration.', 'True', 'False', 0],
       ['Why should we read the Bible regularly?', 'To know God and grow', 'To win arguments', 'To finish it quickly', 'By tradition only', 0]
     ],
     'l03': [
       ['Which example of living, working faith does James 2 give?', 'Abraham offering Isaac', 'Noah refusing to build', 'Paul refusing to write', 'Moses refusing the rock', 0],
       ['What does James 2:19 say even demons do?', 'Serve the poor', 'Believe — and shudder', 'Pray daily', 'Fast twice a week', 1],
       ['Good works are the fruit of salvation, not its what?', 'Root or cause', 'Evidence', 'Goal', 'Promise', 0],
-      ['James teaches that faith is shown by what a person does.', 'True', 'False', 0]
+      ['James teaches that faith is shown by what a person does.', 'True', 'False', 0],
       ['How does faith come, according to Romans 10:17?', 'From hearing the Word of Christ', 'From wealth', 'From birth', 'From strong feelings', 0]
     ],
     'l04': [
       ['What pattern of prayer did Jesus model in Matthew 6?', 'The Lord’s Prayer', 'The Aaronic blessing', 'The Psalms of Ascent', 'The Shema', 0],
       ['According to 1 John 5:14, what gives confidence in prayer?', 'Asking according to His will', 'A loud voice', 'Impressive words', 'Repetition only', 0],
       ['What should accompany our asking, Philippians 4:6?', 'Thanksgiving', 'Complaints', 'Proofs', 'Payments', 0],
-      ['Jesus promised that whatever we ask for selfishly will be granted.', 'True', 'False', 1]
+      ['Jesus promised that whatever we ask for selfishly will be granted.', 'True', 'False', 1],
       ['What had Jesus done the night before choosing the twelve?', 'Prayed all night to God', 'Interviewed the crowds', 'Held an election', 'Waited for volunteers', 0]
     ],
     'l05': [
       ['Who prays, “I rise before dawn and cry for help”?', 'The psalmist in Psalm 119', 'King Saul', 'Peter', 'Job’s friends', 0],
       ['In Luke 6:12, where did Jesus go to pray?', 'To the mountainside, and prayed all night', 'To the market', 'To the temple courts', 'Home to sleep', 0],
       ['In Acts 16, what happened while Paul and Silas prayed and sang at night?', 'The prison doors flew open', 'A storm ended', 'A meal appeared', 'A boat arrived', 0],
-      ['Paul and Silas prayed and sang to God at midnight in prison.', 'True', 'False', 0]
+      ['Paul and Silas prayed and sang to God at midnight in prison.', 'True', 'False', 0],
       ['What is one benefit of setting a fixed time to pray at night?', 'It builds holy consistency', 'It impresses others', 'It replaces work', 'It earns salvation', 0]
     ],
     'l06': [
       ['How long did Jesus fast before His temptation?', 'Three days', 'Seven days', 'Forty days', 'One day', 2],
       ['In Matthew 6, how should fasting look to other people?', 'Normal and unnoticed', 'Sad and visible', 'Loud and public', 'Widely announced', 0],
       ['What fast does Isaiah 58 say God chooses?', 'Afflicting others', 'Loosing chains of injustice and sharing bread', 'Going without water', 'Public mourning only', 1],
-      ['Jesus taught that fasting should be done to be seen by others.', 'True', 'False', 1]
+      ['Jesus taught that fasting should be done to be seen by others.', 'True', 'False', 1],
       ['Fasting is never a substitute for what?', 'Obedience and love', 'Prayer', 'Scripture', 'Worship', 0]
     ],
     'l07': [
       ['Which step comes first: observation, interpretation or application?', 'Observation', 'Interpretation', 'Application', 'Memorization', 0],
       ['Interpretation asks which key question?', 'What does it mean?', 'What do I feel?', 'What sounds best?', 'What is popular?', 0],
       ['Application turns Bible study into what?', 'Obedient living', 'Endless debate', 'Notes only', 'Pride', 0],
-      ['Applying Scripture means obeying what it says, not just knowing it.', 'True', 'False', 0]
+      ['Applying Scripture means obeying what it says, not just knowing it.', 'True', 'False', 0],
       ['A good study habit includes asking the Spirit for what?', 'Illumination and understanding', 'New scriptures', 'Visions only', 'Quick success', 0]
     ],
     'l08': [
       ['What did young Samuel reply when God called him?', '“Speak, Lord, your servant is listening”', '“Who is there?”', '“Not now, Lord”', '“I am sleeping”', 0],
       ['Where is God’s voice most clearly heard today?', 'In Scripture', 'In dreams only', 'In coincidences', 'In silence alone', 0],
       ['What must guard every impression we believe is from God?', 'The written Word', 'Popular opinion', 'Personal comfort', 'The number of signs', 0],
-      ['Any inner impression should be tested against the written Word of God.', 'True', 'False', 0]
+      ['Any inner impression should be tested against the written Word of God.', 'True', 'False', 0],
       ['Psalm 46:10 invites us to do what?', '“Be still and know that I am God”', 'Run faster', 'Speak louder', 'Sleep more', 0]
     ],
     'l09': [
       ['What three parts make a clear testimony?', 'Before, meeting Christ, and life now', 'Childhood, school, work', 'Problems, people, plans', 'Dreams, signs, numbers', 0],
       ['What tone should a shared testimony carry?', 'Honest and humble', 'Proud', 'Vague', 'Silent fear', 0],
       ['Whose story did the healed man in Mark 5 proclaim?', 'What Jesus had done for him', 'His travels', 'His family tree', 'His wealth', 0],
-      ['A testimony should make much of Jesus, not of the speaker.', 'True', 'False', 0]
+      ['A testimony should make much of Jesus, not of the speaker.', 'True', 'False', 0],
       ['What is the best length for a testimony you share?', 'Short, clear and focused', 'As long as possible', 'One sentence only', 'Whatever fills the time', 0]
     ],
     'l10': [
       ['The Holy Spirit is…', 'God — the third Person of the Trinity', 'A force without personality', 'An angel', 'A feeling', 0],
       ['What did Jesus promise the Spirit of truth would do in John 16:13?', 'Guide us into all truth', 'Speak only one language', 'Remain in heaven', 'Replace Scripture', 0],
       ['At Pentecost, what filled the house where believers prayed?', 'A mighty rushing wind', 'Lamp smoke', 'Rain', 'Music only', 0],
-      ['The Holy Spirit is a person, not merely a force.', 'True', 'False', 0]
+      ['The Holy Spirit is a person, not merely a force.', 'True', 'False', 0],
       ['What does Romans 8:9 say about the Spirit and believers?', 'The Spirit lives in them', 'The Spirit visits rarely', 'The Spirit stays distant', 'The Spirit ignores them', 0]
     ],
     'l11': [
       ['How many aspects of the fruit does Galatians 5:22-23 list?', 'Five', 'Seven', 'Nine', 'Twelve', 2],
       ['Against what is there no law?', 'The fruit of the Spirit', 'Pride', 'Anger', 'Gossip', 0],
       ['According to John 15, fruit grows when a branch does what?', 'Abides in the vine', 'Breaks away', 'Compares itself', 'Rests alone', 0],
-      ['The fruit of the Spirit grows gradually as we abide in Christ.', 'True', 'False', 0]
+      ['The fruit of the Spirit grows gradually as we abide in Christ.', 'True', 'False', 0],
       ['Which of these is NOT fruit of the Spirit?', 'Kindness', 'Faithfulness', 'Gentleness', 'Arrogance', 3]
     ],
     'l12': [
       ['Who distributes spiritual gifts?', 'The Spirit, as He determines', 'Church committees only', 'Birth order', 'Personal ambition', 0],
       ['What does 1 Peter 4:10 tell us to do with our gifts?', 'Serve one another as faithful stewards', 'Hide them', 'Trade them', 'Boast about them', 0],
       ['Without what is any gift worthless, per 1 Corinthians 13?', 'Love', 'Volume', 'Technique', 'Payment', 0],
-      ['Spiritual gifts are given mainly to make the owner look spiritual.', 'True', 'False', 1]
+      ['Spiritual gifts are given mainly to make the owner look spiritual.', 'True', 'False', 1],
       ['How should a gift be exercised when the church gathers?', 'Decently and in order', 'Randomly', 'Competitively', 'Secretly', 0]
     ],
     'l13': [
       ['What does 1 Peter 5:7 tell us to do with anxiety?', 'Cast it on God, who cares for us', 'Hide it', 'Post about it', 'Feed it', 0],
       ['Isaiah 41:10 repeats which assurance twice?', '“Fear not… I am with you”', '“Buy fields”', '“Build towers”', '“Rest always”', 0],
       ['Per Jesus in Matthew 6:27, what does worry add to our lives?', 'Nothing — not a single hour', 'Extra years', 'Wisdom', 'Riches', 0],
-      ['Philippians 4 tells believers to pray with thanksgiving instead of worrying.', 'True', 'False', 0]
+      ['Philippians 4 tells believers to pray with thanksgiving instead of worrying.', 'True', 'False', 0],
       ['What does God’s perfect love do to fear?', 'Casts it out', 'Feeds it', 'Explains it', 'Rewards it', 0]
     ],
     'l14': [
       ['A steward manages what?', 'What belongs to another — God’s resources', 'Only personal money', 'Other people', 'Nothing at all', 0],
       ['What does Proverbs 11:3 say guides the upright?', 'Their integrity', 'Their luck', 'Their feelings', 'Their wealth', 0],
       ['Being faithful with little proves what?', 'We can be trusted with much', 'We are perfect', 'We are wealthy', 'We are senior', 0],
-      ['A steward is responsible for resources that ultimately belong to God.', 'True', 'False', 0]
+      ['A steward is responsible for resources that ultimately belong to God.', 'True', 'False', 0],
       ['Tithing and honest records are expressions of what?', 'Stewardship', 'Showmanship', 'Fear', 'Trend-following', 0]
     ],
     'l15': [
       ['How often did Jesus tell Peter to forgive?', 'Seventy times seven', 'Once', 'Three times', 'Ten times', 0],
       ['What did Jesus pray from the cross?', '“Father, forgive them”', '“Judge them now”', '“Protect me”', '“End this”', 0],
       ['Ephesians 4:26 says not to let the sun go down while…', '…you are still angry', '…you are working', '…you are travelling', '…you are eating', 0],
-      ['Forgiving someone means pretending the hurt never happened.', 'True', 'False', 1]
+      ['Forgiving someone means pretending the hurt never happened.', 'True', 'False', 1],
       ['Forgiveness releases what?', 'The debt and revenge into God’s hands', 'All healthy boundaries', 'The truth', 'Justice entirely', 0]
     ],
     'l16': [
       ['What is the gospel in one line?', 'Christ died for our sins, was buried, and rose again', 'Be good and hope', 'Try harder', 'Attend church', 0],
       ['What did the Word become in John 1 to dwell among us?', 'Flesh', 'A soldier', 'A scribe', 'An earthly priest', 0],
       ['According to Acts 1:8, who does Jesus call to be His witnesses?', 'All believers', 'Only apostles', 'Only pastors', 'Only scholars', 0],
-      ['Every believer is called to be a witness for Christ.', 'True', 'False', 0]
+      ['Every believer is called to be a witness for Christ.', 'True', 'False', 0],
       ['A simple way to begin a spiritual conversation is by…', 'Asking caring questions and listening', 'Debating loudly', 'Quoting only', 'Avoiding people', 0]
     ],
     'l17': [
       ['Jesus said the greatest among you will be what?', 'A servant', 'A celebrity', 'A critic', 'A silent guest', 0],
       ['Every member of the body of Christ has been given what?', 'A part to play', 'Nothing', 'Only prayer duty', 'Only money duty', 0],
       ['What attitude should service in the church carry?', 'A willing heart, as for the Lord', 'Reluctance', 'Competition', 'Complaint', 0],
-      ['Jesus taught that greatness in God’s kingdom is measured by service.', 'True', 'False', 0]
+      ['Jesus taught that greatness in God’s kingdom is measured by service.', 'True', 'False', 0],
       ['Which ministry often begins with the simplest acts?', 'Hospitality and helps', 'Only preaching', 'Only music', 'Only travel', 0]
     ],
     'l18': [
       ['What does 2 Corinthians 9:7 say God loves?', 'A cheerful giver', 'A rich giver', 'A reluctant giver', 'A famous giver', 0],
       ['What did the widow in Mark 12 place in the offering?', 'Two small coins — all she had', 'Ten percent of plenty', 'A lamb', 'Nothing', 0],
       ['Giving is first an act of what?', 'Worship and trust', 'Marketing', 'Tax planning', 'Pressure', 0],
-      ['God loves gifts given cheerfully, not under compulsion.', 'True', 'False', 0]
+      ['God loves gifts given cheerfully, not under compulsion.', 'True', 'False', 0],
       ['What did Jesus teach about treasure?', 'Store it up in heaven', 'Bury it in fear', 'Spend it all on self', 'Lend only to friends', 0]
     ]
   };
