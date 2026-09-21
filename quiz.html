@@ -1235,7 +1235,16 @@
         function academyProgress(){ try{ return JSON.parse(localStorage.getItem('pd_academy_progress'))||{completedLessons:[],passedQuizzes:{},certificates:[]}; }catch(e){ return {completedLessons:[],passedQuizzes:{},certificates:[]}; } }
         function saveAcademyProgress(p){ localStorage.setItem('pd_academy_progress', JSON.stringify(p)); renderAcademyQuizzes(); }
         function escapeAcademyHtml(v){ const d=document.createElement('div'); d.textContent=v==null?'':String(v); return d.innerHTML; }
-        function academyName(){ return localStorage.getItem('pd_certificate_name') || 'Prayer Dome Member'; }
+        // Certificates use the signed-in profile name automatically.
+        function academyName(){
+            try {
+                const p = window.PD_PROFILE || JSON.parse(localStorage.getItem('pd_profile') || 'null');
+                if (p && (p.fullName || p.displayName)) return p.fullName || p.displayName;
+            } catch(e) {}
+            const u = firebase.auth().currentUser;
+            if (u && (u.displayName || u.email)) return u.displayName || u.email.split('@')[0];
+            return localStorage.getItem('pd_certificate_name') || 'Prayer Dome Member';
+        }
         function renderAcademyQuizzes(){
             const root=document.getElementById('academyQuizGrid'); if(!root || !window.PD_ACADEMY) return;
             const progress=academyProgress();

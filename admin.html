@@ -131,7 +131,7 @@
     <!-- SDKs -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <script src="/assets/pd-upload.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="/assets/pd-cloud-video.js"></script>
     <script src="/assets/pd-live-server-config.js"></script>
@@ -2686,25 +2686,30 @@
         window.rejectGalleryImage = async function(id) { const reason=prompt("Rejection reason:"); showLoading(); try { await updateDoc(doc(db,"gallery",id),{ status:'rejected', rejectionReason:reason, rejectedAt:serverTimestamp(), rejectedBy:adminUser?.email }); toast("Image rejected"); loadGallery(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
         window.deleteGalleryImage = async function(id) { if(!confirm("Delete permanently?")) return; showLoading(); try { await deleteDoc(doc(db,"gallery",id)); toast("Image deleted"); loadGallery(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
 
-        window.uploadGalleryImage = function() {
-            if(typeof cloudinary === 'undefined') return toast("Cloudinary not loaded", "error");
-            cloudinary.createUploadWidget({ cloudName:'prayerdome', uploadPreset:'gallery_uploads', folder:'official_gallery', cropping:true, croppingAspectRatio:16/9, multiple:false, maxFileSize:10*1024*1024, clientAllowedFormats:['jpg','jpeg','png','webp','gif'] }, async (error, result) => {
-                if(error) return toast("Upload failed: " + error.message, "error");
-                if(result && result.event === "success") {
-                    const title = prompt("Enter image title:", "Prayer Dome Event");
-                    if(!title) return toast("Image not saved - title required", "error");
-                    const category = prompt("Enter category (pastors/worship/ministries/church):", "church");
-                    const description = prompt("Enter a short description (optional):", "");
-                    showLoading();
-                    try {
-                        await addDoc(collection(db,"gallery"),{ title:title, category:category||'church', description:description||'', url:result.info.secure_url, publicId:result.info.public_id, userId:adminUser?.uid, userEmail:adminUser?.email, userName:adminUser?.displayName || adminUser?.email?.split('@')[0] || 'Admin', status:'approved', createdAt:serverTimestamp(), approvedAt:serverTimestamp(), approvedBy:adminUser?.email });
-                        toast("✅ Image uploaded and approved!");
-                        loadGallery(); loadDashboardPerformance();
-                        confetti({ particleCount:100, spread:70 });
-                    } catch(error) { toast("Error saving: " + error.message, 'error'); }
-                    finally { hideLoading(); }
-                }
-            }).open();
+        window.uploadGalleryImage = async function() {
+            // Pick with the device's own chooser first, then ask for details.
+            const res = await PDUpload.pick({
+                title: 'Add gallery photo',
+                accept: 'image/*',
+                preset: 'gallery_uploads',
+                folder: 'official_gallery',
+                maxBytes: 10*1024*1024,
+                onError: (m) => toast(m, 'error')
+            });
+            if (!res.ok) return;
+            const uploaded = res.files[0];
+            const title = prompt("Enter image title:", "Prayer Dome Event");
+            if(!title) return toast("Image not saved - title required", "error");
+            const category = prompt("Enter category (pastors/worship/ministries/church):", "church");
+            const description = prompt("Enter a short description (optional):", "");
+            showLoading();
+            try {
+                await addDoc(collection(db,"gallery"),{ title:title, category:category||'church', description:description||'', url:uploaded.url, publicId:uploaded.publicId, userId:adminUser?.uid, userEmail:adminUser?.email, userName:adminUser?.displayName || adminUser?.email?.split('@')[0] || 'Admin', status:'approved', createdAt:serverTimestamp(), approvedAt:serverTimestamp(), approvedBy:adminUser?.email });
+                toast("✅ Image uploaded and approved!");
+                loadGallery(); loadDashboardPerformance();
+                confetti({ particleCount:100, spread:70 });
+            } catch(error) { toast("Error saving: " + error.message, 'error'); }
+            finally { hideLoading(); }
         };
 
         window.filterGallery = function() { const searchTerm=document.getElementById('gallerySearch')?.value.toLowerCase(); if(!searchTerm) return loadGallery(); const filtered=allGalleryCache.filter(img=>img.title?.toLowerCase().includes(searchTerm)||img.category?.toLowerCase().includes(searchTerm)); const grid=document.getElementById('galleryGrid'); if(filtered.length===0){ grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;">No matching images</div>'; return; } grid.innerHTML=filtered.map(img=>`<div class="gallery-item"><img src="${img.url}" class="gallery-image"><div class="gallery-info"><div class="gallery-title">${escapeHTML(img.title)}</div><div class="gallery-meta"><span><i class="fas fa-user"></i> ${escapeHTML(img.userName)}</span><span>${img.createdAt?moment(img.createdAt.toDate()).fromNow():'Recently'}</span></div><div class="gallery-meta"><span>${img.category}</span><span class="badge ${img.status==='approved'?'badge-success':'badge-warning'}">${img.status}</span></div><div class="gallery-actions">${img.status==='pending'?`<button class="btn btn-sm btn-success" onclick="approveGalleryImage('${img.id}')">Approve</button>`:''}<button class="btn btn-sm btn-outline" onclick="deleteGalleryImage('${img.id}')">Delete</button></div></div></div>`).join(''); };
@@ -3205,14 +3210,18 @@
             deleteDoc(doc(db, 'aiVideos', id)).then(() => { toast('AI video deleted'); loadAiVideos(); }).catch(e => toast(e.message, 'error'));
         };
 
-        window.uploadNewsImage = function() {
-            if(typeof cloudinary === 'undefined') return toast('Cloudinary not loaded', 'error');
-            cloudinary.createUploadWidget({ cloudName:'prayerdome', uploadPreset:'news_images', folder:'news', maxFileSize:8*1024*1024 }, (error, result) => {
-                if(!error && result && result.event === 'success'){
-                    document.getElementById('newsImage').value = result.info.secure_url;
-                    toast('Image uploaded ✅');
-                }
-            }).open();
+        window.uploadNewsImage = async function() {
+            const res = await PDUpload.pick({
+                title: 'News image',
+                accept: 'image/*',
+                preset: 'news_images',
+                folder: 'news',
+                maxBytes: 8*1024*1024,
+                onError: (m) => toast(m, 'error')
+            });
+            if (!res.ok) return;
+            document.getElementById('newsImage').value = res.files[0].url;
+            toast('Image attached ✅');
         };
 
         // ==================== HERO BANNERS (admin) ====================
@@ -3569,7 +3578,7 @@
             document.getElementById('notifLink').value = '';
         };
 
-        window.uploadFinancialReport = function() {
+        window.uploadFinancialReport = async function() {
             if(typeof cloudinary === 'undefined') return toast("Cloudinary not loaded", "error");
             const branch = prompt("Select branch (eswatini/zambia/ireland):", "eswatini");
             if (!branch) return;
@@ -3577,18 +3586,23 @@
             if (!reportDate) return;
             const totalIncome = parseFloat(prompt("Total Income (E):", "0"));
             const totalExpense = parseFloat(prompt("Total Expense (E):", "0"));
-            cloudinary.createUploadWidget({ cloudName:'prayerdome', uploadPreset:'financial_reports', folder:`financial_reports/${branch}`, allowedFormats:['pdf','jpg','jpeg','png'], maxFileSize:10*1024*1024 }, async (error, result) => {
-                if(error) return toast("Upload failed: " + error.message, "error");
-                if(result && result.event === "success") {
-                    showLoading();
-                    try {
-                        await addDoc(collection(db, "financialReports"), { branch, date:reportDate, totalIncome, totalExpense, surplus: totalIncome - totalExpense, documentUrl:result.info.secure_url, documentPublicId:result.info.public_id, status:'submitted', submittedBy:adminUser?.email, submittedAt:serverTimestamp(), notes:prompt("Additional notes (optional):", "") || "" });
-                        toast("✅ Financial report uploaded successfully!");
-                        loadFinancialReports();
-                    } catch(error) { toast("Error: " + error.message, "error"); }
-                    finally { hideLoading(); }
-                }
-            }).open();
+            showLoading();
+            try {
+                const res = await PDUpload.pick({
+                    title: 'Financial report file',
+                    accept: 'application/pdf,image/*',
+                    preset: 'financial_reports',
+                    folder: `financial_reports/${branch}`,
+                    maxBytes: 10*1024*1024,
+                    onError: (m) => toast(m, 'error')
+                });
+                if (!res.ok) return;
+                const uploaded = res.files[0];
+                await addDoc(collection(db, "financialReports"), { branch, date:reportDate, totalIncome, totalExpense, surplus: totalIncome - totalExpense, documentUrl:uploaded.url, documentPublicId:uploaded.publicId, status:'submitted', submittedBy:adminUser?.email, submittedAt:serverTimestamp(), notes:prompt("Additional notes (optional):", "") || "" });
+                toast("✅ Financial report uploaded successfully!");
+                loadFinancialReports();
+            } catch(error) { toast("Error: " + error.message, "error"); }
+            finally { hideLoading(); }
         };
         
         window.loadFinancialReports = async function(){ const tbody=document.getElementById('financialReportsList'); if(!tbody) return; tbody.innerHTML='<td colspan="9"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try { const branchFilter=document.getElementById('reportBranchFilter')?.value||'all'; const statusFilter=document.getElementById('reportStatusFilter')?.value||'all'; const dateFilter=document.getElementById('reportDateFilter')?.value||''; const snapshot=await getDocs(query(collection(db,"financialReports"),orderBy("date","desc"))); let reports=[]; snapshot.forEach(doc=>{reports.push({id:doc.id,...doc.data()});}); let filtered=reports; if(branchFilter!=='all') filtered=filtered.filter(r=>r.branch===branchFilter); if(statusFilter!=='all') filtered=filtered.filter(r=>r.status===statusFilter); if(dateFilter) filtered=filtered.filter(r=>r.date===dateFilter); document.getElementById('totalReportsCount').innerText=filtered.length; document.getElementById('pendingReportsCount').innerText=filtered.filter(r=>r.status==='submitted').length; document.getElementById('approvedReportsCount').innerText=filtered.filter(r=>r.status==='approved').length; document.getElementById('totalIncomeAll').innerText=`E${filtered.reduce((sum,r)=>sum+(r.totalIncome||0),0).toFixed(2)}`; if(filtered.length===0){ tbody.innerHTML='<td colspan="9">No reports found<\/td>'; return; } let html=''; filtered.forEach(report=>{ const statusBadge=report.status==='approved'?'<span class="badge badge-success">Approved</span>':(report.status==='rejected'?'<span class="badge badge-danger">Rejected</span>':'<span class="badge badge-warning">Pending</span>'); const surplusColor=(report.surplus||0)>=0?'var(--accent-green)':'var(--accent-red)'; html+=`<tr><td>${moment(report.date).format('MMM D, YYYY')}</td><td>${report.branch==='eswatini'?'🇸🇿 Eswatini':report.branch==='zambia'?'🇿🇲 Zambia':'🇮🇪 Ireland'}</td><td>${escapeHTML(report.submittedBy)}</td><td style="color:var(--accent-green);font-weight:bold;">E${(report.totalIncome||0).toFixed(2)}</td><td style="color:var(--accent-red);">E${(report.totalExpense||0).toFixed(2)}</td><td style="color:${surplusColor};font-weight:bold;">E${(report.surplus||0).toFixed(2)}</td><td>${report.approvedBy?escapeHTML(report.approvedBy):'-'}</td><td>${statusBadge}</td><td>${report.documentUrl?`<button class="btn btn-sm btn-primary" onclick="viewDoc('${report.documentUrl}','auto')"><i class="fas fa-eye"></i></button>`:'-'}</td></tr>`; }); tbody.innerHTML=html; } catch(error){ console.error("Error loading reports:",error); tbody.innerHTML='<td colspan="9">Error loading reports<\/td>'; toast("Error loading financial reports", "error"); } };

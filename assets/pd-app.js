@@ -103,7 +103,12 @@
 
   /* ------------------------------------------------------------ Firestore */
   function setFirestore(bindings) {
-    if (bindings && bindings.db) fb = bindings;
+    if (bindings && bindings.db) {
+      fb = bindings;
+      // Exposed so feature modules (e.g. the Academy's profile sync) can
+      // reach Firestore without each page re-wiring its own handle.
+      try { window.PDApp._fb = bindings; } catch (e) {}
+    }
   }
   function fsGet(docRef, fallback) {
     if (!fb || !fb.getDoc) return Promise.resolve(fallback);

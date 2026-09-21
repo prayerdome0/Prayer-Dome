@@ -136,7 +136,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <script src="/assets/pd-upload.js"></script>
 
     <style>
         :root {
@@ -979,26 +979,20 @@
             }
         };
 
-        window.openCloudinary = () => {
-            if (typeof cloudinary === 'undefined') {
-                toast("Cloudinary not loaded", "error");
-                return;
-            }
-            cloudinary.createUploadWidget({ 
-                cloudName: 'prayerdome', 
-                uploadPreset: 'donation_proofs', 
-                multiple: false,
-                clientAllowedFormats: ['jpg', 'jpeg', 'png', 'pdf'],
-                maxFileSize: 5 * 1024 * 1024
-            }, (error, result) => {
-                if (!error && result && result.event === "success") {
-                    uploadedReceiptUrl = result.info.secure_url;
-                    document.getElementById('receiptUrl').value = uploadedReceiptUrl;
-                    document.getElementById('upLabel').innerHTML = "✅ RECEIPT ATTACHED";
-                    document.getElementById('upLabel').style.color = "#3b82f6";
-                    toast("Receipt uploaded successfully!", "success");
-                }
-            }).open();
+        window.openCloudinary = async () => {
+            const res = await PDUpload.pick({
+                title: 'Attach donation proof',
+                accept: 'image/*,application/pdf',
+                preset: 'donation_proofs',
+                maxBytes: 5 * 1024 * 1024,
+                onError: (m) => toast(m, 'error')
+            });
+            if (!res.ok) return;
+            uploadedReceiptUrl = res.files[0].url;
+            document.getElementById('receiptUrl').value = uploadedReceiptUrl;
+            document.getElementById('upLabel').innerHTML = "✅ RECEIPT ATTACHED";
+            document.getElementById('upLabel').style.color = "#3b82f6";
+            toast("Receipt attached successfully!", "success");
         };
 
         window.copy = (text) => { 
