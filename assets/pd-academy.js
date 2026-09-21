@@ -147,7 +147,12 @@
     var pool = q.questions.map(function (raw, i) { return { raw: raw, id: i }; });
     pool = shuffle(pool).slice(0, Math.min(count, pool.length));
     return pool.map(function (p) {
-      return { id: p.id, text: p.raw[0], options: shuffle([{ t: p.raw[1], correct: p.raw[5] === 0 }, { t: p.raw[2], correct: p.raw[5] === 1 }, { t: p.raw[3], correct: p.raw[5] === 2 }, { t: p.raw[4], correct: p.raw[5] === 3 }]) };
+      // True/False questions use the compact [text, 'True', 'False', answerIdx] form.
+      var isTF = p.raw.length === 4 && p.raw[1] === 'True' && p.raw[2] === 'False';
+      var options = isTF
+        ? shuffle([{ t: 'True', correct: p.raw[3] === 0 }, { t: 'False', correct: p.raw[3] === 1 }])
+        : shuffle([{ t: p.raw[1], correct: p.raw[5] === 0 }, { t: p.raw[2], correct: p.raw[5] === 1 }, { t: p.raw[3], correct: p.raw[5] === 2 }, { t: p.raw[4], correct: p.raw[5] === 3 }]);
+      return { id: p.id, text: p.raw[0], tf: isTF, options: options };
     });
   }
   function b(el, txt) { if (el) el.innerHTML = '<i class="fas fa-check"></i> ' + esc(txt); el.disabled = true; }
