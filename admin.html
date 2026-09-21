@@ -624,6 +624,7 @@
             <div class="nav-item" onclick="switchView('live-analytics', this)"><i class="fas fa-chart-line"></i> Live Analytics</div>
             <div class="nav-item" onclick="switchView('live-schedule', this)"><i class="fas fa-calendar-star"></i> Schedule Live</div>
             <div class="nav-item" onclick="switchView('members', this)"><i class="fas fa-users"></i> Members CRM</div>
+            <div class="nav-item" onclick="openTeamManagement()"><i class="fas fa-user-tie"></i> Team Management</div>
             <div class="nav-item" onclick="switchView('announcements', this)"><i class="fas fa-bullhorn"></i> Notices</div>
             <div class="nav-item" onclick="switchView('care', this)"><i class="fas fa-hand-holding-heart"></i> Member Care</div>
             <div class="nav-item" onclick="switchView('gallery', this)"><i class="fas fa-images"></i> Gallery Management</div>
@@ -3610,6 +3611,9 @@
         window.viewDoc = function(url,type){ const img=document.getElementById('docImagePreview'), pdf=document.getElementById('docPdfBtn'); if(url.toLowerCase().includes('.pdf')){ if(img) img.style.display='none'; if(pdf){ pdf.style.display='inline-flex'; pdf.href=url; } } else { if(img){ img.style.display='block'; img.src=url; } if(pdf) pdf.style.display='none'; } openModal('modalViewDoc'); };
         window.exportFinancialReports = function() { toast("Export feature - CSV export ready", "info"); };
         window.uploadMedia = function(){ window.uploadGalleryImage(); };
+        // Team roster management lives on the public team page; the admin
+        // tools there activate automatically for administrator accounts.
+        window.openTeamManagement = function(){ window.open('/team.html?admin=1', '_blank'); toast('Opening Team Management…'); };
         window.deleteRecord = async function(col,id){ if(!confirm("Delete permanently?")) return; showLoading(); try{ await deleteDoc(doc(db,col,id)); toast("Deleted"); if(col==='events') await loadEvents(); if(col==='gallery') await loadGallery(); if(col==='prayers'||col==='testimonies') await loadContent(); if(col==='contactMessages') await loadContactMessages(); if(col==='certificates') await loadCertificates(); if(col==='announcements') await loadAnnouncements(); if(col==='memberCareRequests') await loadCareRequests(); if(col==='liveRecordings') await loadLiveRecordings(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
         
         function setupAdminRealtimeListeners() {

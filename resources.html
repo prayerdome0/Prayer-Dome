@@ -142,7 +142,8 @@
 <script src="/assets/pd-verse-alerts.js" defer></script>
 <script src="/assets/pd-phrases.js" defer></script>
 <script src="/assets/pd-i18n.js" defer></script>
-<script src="/assets/pd-app.js" defer></script><script src="/assets/pd-academy.js" defer></script>
+<script src="/assets/pd-app.js" defer></script>
+<script src="/assets/pd-upload.js" defer></script><script src="/assets/pd-academy.js" defer></script>
 </head>
 <body class="pd-acad-page">
 <div class="pd-aurora" aria-hidden="true"><span></span></div>
@@ -404,6 +405,7 @@
       window.closeResourceEditor();
       await loadLive();
       window.showToast && window.showToast(wasEdit ? 'Resource updated ✓' : 'Resource published ✓', 'success');
+      if (!wasEdit) notifyNewResource(name, data.category);
     } catch (e) {
       console.error(e);
       resError(e.code === 'permission-denied'
@@ -426,6 +428,26 @@
     catch (e) { window.showToast && window.showToast('Could not restore right now.', 'error'); }
   };
 
+  /* Members' devices learn about a new resource the same way they learn
+     about live services: the queued notification is delivered by the
+     Prayer Dome push pipeline in the background. */
+  async function notifyNewResource(title, category) {
+    try {
+      if (!db || !LIVE.isAdmin) return;
+      var tokens = await db.tokens();
+      if (!tokens.length) return;
+      await db.addDoc('notifications', {
+        title: '📚 New resource available',
+        message: '"' + title + '"' + (category ? ' (' + category + ')' : '') + ' has been added to the Resource Library.',
+        type: 'resources',
+        tokens: tokens,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        createdBy: 'resource-library'
+      });
+    } catch (e) { console.warn('resource notification failed', e); }
+  }
+
   /* ---------------- Firestore wiring ---------------- */
   var db = null;
   function wireFirestore() {
@@ -437,7 +459,13 @@
       doc: function (name, id) { return fb.doc(fb.db, name, id); },
       addDoc: function (name, data) { return fb.addDoc(fb.collection(fb.db, name), data); },
       updateDoc: function (ref, data) { return fb.updateDoc(ref, data); },
-      getDocs: function (name) { return fb.getDocs(fb.collection(fb.db, name)); }
+      getDocs: function (name) { return fb.getDocs(fb.collection(fb.db, name)); },
+      tokens: async function () {
+        var snap = await fb.getDocs(fb.collection(fb.db, 'userTokens'));
+        var out = [];
+        snap.forEach(function (d) { var t = d.data(); if (t && t.active !== false && t.token) out.push(t.token); });
+        return out;
+      }
     };
     return true;
   }

@@ -160,12 +160,16 @@
         }
 
         var cancelled = false;
+        var settled = false;
         function close() {
+            if (settled) return;
+            settled = true;
             cancelled = true;
             api._xhr = null;
             if (objectUrl) URL.revokeObjectURL(objectUrl);
             if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
             if (activeModal === overlay) activeModal = null;
+            api._resolve({ ok: false, cancelled: true });
         }
         closeBtn.addEventListener('click', close);
         cancel.addEventListener('click', close);
@@ -183,6 +187,7 @@
                     onProgress: function (p) { setProgress(p); state.textContent = 'Uploading'; },
                     shouldAbort: function () { return cancelled; }
                 });
+                settled = true;
                 setProgress(100);
                 state.textContent = 'Upload complete';
                 if (objectUrl) URL.revokeObjectURL(objectUrl);
@@ -191,6 +196,7 @@
                 card.style.opacity = '0';
                 card.style.transform = 'scale(.96)';
                 setTimeout(function () { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); if (activeModal === overlay) activeModal = null; }, 190);
+                overlay.addEventListener('click', function (e) { if (e.target === overlay) e.stopPropagation(); });
                 api._resolve({ ok: true, files: [result] });
             } catch (err) {
                 if (cancelled) { return; }
