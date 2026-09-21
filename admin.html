@@ -3472,6 +3472,28 @@
             loadAdminRadio();
         };
         
+        /* ===== Live-start notifications =====
+         * Going live must actually tell members: gather the registered device
+         * tokens and queue a branded push via the sendPushNotification Cloud
+         * Function. Never blocks the broadcast itself. */
+        window.notifyLiveStarted = async function(title, presenterName) {
+            try {
+                const tokensSnapshot = await getDocs(collection(db, 'userTokens'));
+                const tokens = [];
+                tokensSnapshot.forEach(d => { const t = d.data(); if (t && t.active !== false && t.token) tokens.push(t.token); });
+                if (!tokens.length) return;
+                await addDoc(collection(db, 'notifications'), {
+                    title: '🔴 Prayer Dome is LIVE',
+                    message: `"${title}" is streaming now${presenterName ? ' — ' + presenterName : ''}. Tap to watch.`,
+                    type: 'live',
+                    tokens,
+                    status: 'pending',
+                    createdAt: serverTimestamp(),
+                    createdBy: adminUser?.email || 'admin'
+                });
+            } catch (e) { console.warn('live notification failed', e); }
+        };
+
         window.sendPushNotificationToAll = async function(title, message, type = 'general') {
             if (!adminUser) { toast("Admin not logged in", "error"); return; }
             showLoading();
@@ -4243,6 +4265,7 @@
                 showRTMPanel();
                 toast('🔴 Live started — configure OBS with the RTMP info below');
                 confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 } });
+                notifyLiveStarted(title, presenterName);
             } catch(e) {
                 console.error(e);
                 toast('Could not start live: ' + e.message, 'error');
@@ -4453,6 +4476,7 @@
                 await logAdminActivity('live_started_device', { title, category: crSelectedCategory });
                 toast('🔴 You are LIVE on Prayer Dome — broadcasting in real time');
                 confetti({ particleCount: 140, spread: 90, origin: { y: 0.6 } });
+                notifyLiveStarted(title, presenterName);
             } catch(e) {
                 console.error(e);
                 toast('Could not start camera: ' + (e.name === 'NotAllowedError' ? 'camera permission denied' : e.message), 'error');

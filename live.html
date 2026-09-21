@@ -236,6 +236,18 @@
         .reconnect-banner { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,.75); color:#fff; padding:14px 22px; border-radius:14px; display:none; align-items:center; gap:10px; font-weight:700; font-size:.88rem; backdrop-filter:blur(8px); }
         .reconnect-banner.show { display:inline-flex; }
         .reconnect-banner i { animation:spin 1s linear infinite; }
+        /* Tap-for-sound: browsers start live video muted so autoplay is
+           allowed; this invites one tap to open the audio. */
+        .unmute-overlay { position:absolute; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,10,26,.25); z-index:6; cursor:pointer; border:0; width:100%; }
+        .unmute-overlay.show { display:flex; }
+        .unmute-overlay span { display:inline-flex; align-items:center; gap:10px; background:var(--pd-gold); color:#07244d; font-weight:800; font-size:.92rem; padding:12px 20px; border-radius:50px; box-shadow:0 10px 30px rgba(0,0,0,.4); animation:unmutePulse 2.2s ease-in-out infinite; }
+        @keyframes unmutePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+        /* Cannot reach the broadcast — offer a real retry action. */
+        .unreachable-box { position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:14px; background:rgba(2,10,26,.88); color:#fff; text-align:center; padding:20px; z-index:7; }
+        .unreachable-box.show { display:flex; }
+        .unreachable-box i { font-size:2rem; color:var(--pd-gold); }
+        .unreachable-box p { font-size:.9rem; color:#dbe7f7; max-width:340px; }
+        .unreachable-box button { background:var(--pd-gold); border:0; color:#07244d; font-weight:800; padding:11px 26px; border-radius:50px; font-size:.88rem; cursor:pointer; }
         @keyframes spin { to { transform:rotate(360deg); } }
         .viewer-count-badge { position:absolute; top:12px; right:12px; background:rgba(0,0,0,.6); color:#fff; padding:6px 12px; border-radius:20px; font-size:.75rem; font-weight:800; display:flex; align-items:center; gap:7px; backdrop-filter:blur(8px); }
         .reactions-layer { position:absolute; bottom:70px; left:0; right:0; height:200px; pointer-events:none; overflow:hidden; }
@@ -438,6 +450,15 @@
                 <div class="tv-name-overlay" id="tvNameOverlay"><div><div class="role">Now Ministering</div><div class="name" id="tvPresenterName">Prayer Dome Ministry Team</div></div></div>
                 <div class="live-ticker" id="liveTicker"><div class="live-ticker-label">Prayer Dome</div><div class="live-ticker-track" id="liveTickerText">THEME: WALKING IN FAITH • PRAYER LINE: 097X XXX XXX • SUNDAY SERVICE: 08:00 • WEDNESDAY BIBLE STUDY: 18:00 • JOIN US FOR PRAYER</div></div>
                 <div class="reconnect-banner" id="reconnectBanner"><i class="fas fa-circle-notch"></i> Reconnecting to Live…</div>
+                <button class="unmute-overlay" id="unmuteOverlay" aria-label="Turn on sound"><span><i class="fas fa-volume-high"></i> Tap for sound</span></button>
+                <div class="unreachable-box" id="unreachableBox">
+                    <i class="fas fa-tower-broadcast"></i>
+                    <div>
+                        <strong>Unable to reach the broadcast</strong>
+                        <p>Your connection to the live stream was interrupted. Check your internet and try again.</p>
+                    </div>
+                    <button onclick="retryLive()"><i class="fas fa-rotate-right"></i> Try Again</button>
+                </div>
                 <div class="connection-pill good" id="connectionPill"><span class="dot"></span> <span id="connectionText">Connection: Good</span></div>
                 <div class="duration-pill" id="durationPill">00:00</div>
             </div>
@@ -731,6 +752,19 @@
                         s.connectionQuality === 'unstable' ? 'Connection: Unstable' : 'Connection: Good';
             $('connectionText').textContent = txt;
             $('reconnectBanner').classList.toggle('show', s.status === 'reconnecting');
+            // Lost the broadcast entirely — offer a real retry action.
+            const unreach = $('unreachableBox');
+            if (unreach) unreach.classList.toggle('show', s.status === 'unreachable');
+            if (s.status === 'connected') {
+                const v = $('liveVideo');
+                const uo = $('unmuteOverlay');
+                // Autoplay policies start the stream muted; invite one tap
+                // for sound (and hide it again as soon as audio is on).
+                if (uo) uo.classList.toggle('show', !!(v && v.muted));
+            } else {
+                const uo = $('unmuteOverlay');
+                if (uo) uo.classList.remove('show');
+            }
             // comments state
             const composer = $('chatComposer');
             const locked = $('chatLocked');
@@ -778,6 +812,31 @@
             hls.on(Hls.Events.MANIFEST_PARSED, () => v.play().catch(()=>{}));
         }
     }
+
+    /* ---------- audio + recovery ---------- */
+    (function setupAudioAffordance() {
+        const overlay = document.getElementById('unmuteOverlay');
+        const video = document.getElementById('liveVideo');
+        if (!overlay || !video) return;
+        const openAudio = () => {
+            video.muted = false;
+            video.volume = 1;
+            video.play().catch(() => {});
+            overlay.classList.remove('show');
+        };
+        overlay.addEventListener('click', openAudio);
+        // If the member unmutes through the native controls, hide the overlay.
+        video.addEventListener('volumechange', () => { if (!video.muted) overlay.classList.remove('show'); });
+    })();
+
+    window.retryLive = async function () {
+        const box = $('unreachableBox');
+        if (box) box.classList.remove('show');
+        if (!viewer) { joinAsViewer(); return; }
+        viewer.reconnectAttempts = 0;
+        try { await viewer.retry(); }
+        catch (e) { console.error('manual retry failed', e); toast('Still unable to connect — please check your internet'); }
+    };
 
     window.guestChat = function() {
         const name = prompt('Enter a name to join chat as a guest:', guestName || 'Guest');
