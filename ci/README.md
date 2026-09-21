@@ -1,21 +1,29 @@
 # Continuous integration
 
-`verify.yml` is the GitHub Actions workflow for this repository. It runs the
-same checks a release runs — `npm run lint`, `npm test`, `npm run
-functions:verify` and `npm run build:vercel` — on every push and pull request.
+GitHub Actions runs the same checks a release runs: production lint, the
+managed-SEO check, the full test suite, Cloud Functions verification and the
+Android build.
+
+## Workflows in this folder
+
+`verify.yml` runs on every push and pull request:
+
+- `npm run lint` — production validation + managed SEO
+- `npm test` — the full test suite
+- `npm run functions:verify` — Cloud Functions install/verify
+- `npm run build:vercel` — builds the production bundle
 
 ## Installing it
 
-The workflow is kept here rather than in `.github/workflows/` because the
-GitHub App used to push this branch does not hold the `workflows` permission
-and the push is rejected outright. Enabling it is a one-time, one-command step
-for a maintainer with normal repository access:
+The workflow files are kept here (and `mobile/android-build.yml`) rather than
+in `.github/workflows/` because the GitHub App used to push this branch does
+not hold the `workflows` permission and GitHub rejects such pushes outright.
+A maintainer with normal repository access activates them with one command:
 
 ```bash
-mkdir -p .github/workflows
-git mv ci/verify.yml .github/workflows/verify.yml
-git commit -m "Enable the Verify workflow"
+node scripts/install-workflows.mjs
 git push
 ```
 
-Nothing else needs to change — the workflow is complete and ready to run.
+After that, every push to `main` verifies the project and the Android build
+attaches installable APK/AAB artifacts to the workflow run.

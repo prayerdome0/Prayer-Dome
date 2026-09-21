@@ -23,11 +23,42 @@
   }
   function saveState(s) { return storeSet('pd_academy_progress', s); }
   function memberName() {
+    // The signed-in member's profile is the single source of truth for the
+    // name that appears on certificates. Cached values keep this working
+    // offline; the legacy manual key is only a last-resort fallback.
     try {
-      var p = storeGet('pd_profile', null) || storeGet('pd_account_profile', null) || storeGet('prayerdome_user_profile', null);
+      var p = window.PD_PROFILE || storeGet('pd_profile', null) || storeGet('pd_account_profile', null) || storeGet('prayerdome_user_profile', null);
       if (p && p.fullName) return p.fullName;
+      if (p && p.displayName) return p.displayName;
     } catch (e) {}
     return localStorage.getItem('pd_certificate_name') || 'Prayer Dome Member';
+  }
+  // Keep the cached profile fresh: when pd-app has Firestore bindings and a
+  // member is signed in, load users/{uid} once and cache it. Future
+  // certificates automatically use the updated profile name.
+  function syncMemberProfile() {
+    try {
+      var pd = window.PDApp;
+      if (!pd || !pd._fb) return;
+      var fb = pd._fb;
+      var u = fb.auth && fb.auth.currentUser;
+      if (!u) return;
+      if (window.PD_PROFILE && (window.PD_PROFILE.uid === u.uid) && window.PD_PROFILE.fullName) return;
+      fb.getDoc(fb.doc(fb.db, 'users', u.uid)).then(function (snap) {
+        if (!snap.exists()) return;
+        var d = snap.data();
+        var profile = {
+          uid: u.uid,
+          fullName: d.fullName || u.displayName || (u.email || '').split('@')[0] || '',
+          displayName: d.fullName || u.displayName || '',
+          email: d.email || u.email || '',
+          phone: d.phone || d.phoneNumber || '',
+          photoURL: d.photoURL || u.photoURL || ''
+        };
+        window.PD_PROFILE = profile;
+        storeSet('pd_profile', profile);
+      }).catch(function () {});
+    } catch (e) {}
   }
   function pct() {
     var total = DATA.lessons.length || 1;
@@ -116,7 +147,12 @@
     var pool = q.questions.map(function (raw, i) { return { raw: raw, id: i }; });
     pool = shuffle(pool).slice(0, Math.min(count, pool.length));
     return pool.map(function (p) {
-      return { id: p.id, text: p.raw[0], options: shuffle([{ t: p.raw[1], correct: p.raw[5] === 0 }, { t: p.raw[2], correct: p.raw[5] === 1 }, { t: p.raw[3], correct: p.raw[5] === 2 }, { t: p.raw[4], correct: p.raw[5] === 3 }]) };
+      // True/False questions use the compact [text, 'True', 'False', answerIdx] form.
+      var isTF = p.raw.length === 4 && p.raw[1] === 'True' && p.raw[2] === 'False';
+      var options = isTF
+        ? shuffle([{ t: 'True', correct: p.raw[3] === 0 }, { t: 'False', correct: p.raw[3] === 1 }])
+        : shuffle([{ t: p.raw[1], correct: p.raw[5] === 0 }, { t: p.raw[2], correct: p.raw[5] === 1 }, { t: p.raw[3], correct: p.raw[5] === 2 }, { t: p.raw[4], correct: p.raw[5] === 3 }]);
+      return { id: p.id, text: p.raw[0], tf: isTF, options: options };
     });
   }
   function b(el, txt) { if (el) el.innerHTML = '<i class="fas fa-check"></i> ' + esc(txt); el.disabled = true; }
@@ -873,7 +909,10 @@
     }
   }, 1000);
 
-  document.addEventListener('DOMContentLoaded', function () { initLessonsPage(); initStoriesPage(); initResourcesPage(); initCoursesPage(); updateOverview(); });
-  window.PD_ACADEMY_APP = { DATA: DATA, pct: pct, state: quizState, memberName: memberName, courseState: courseState, saveCourseState: saveCourseState };
+  document.addEventListener('DOMContentLoaded', function () { initLessonsPage(); initStoriesPage(); initResourcesPage(); initCoursesPage(); updateOverview(); syncMemberProfile(); });
+  // Also sync shortly after load, in case pd-app's Firestore bindings and the
+  // auth session land after DOMContentLoaded.
+  setTimeout(syncMemberProfile, 2500);
+  window.PD_ACADEMY_APP = { DATA: DATA, pct: pct, state: quizState, memberName: memberName, courseState: courseState, saveCourseState: saveCourseState, syncMemberProfile: syncMemberProfile };
 })();
 

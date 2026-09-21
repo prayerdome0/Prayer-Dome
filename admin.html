@@ -126,12 +126,12 @@
     
     <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     
     <!-- SDKs -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <script src="/assets/pd-upload.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="/assets/pd-cloud-video.js"></script>
     <script src="/assets/pd-live-server-config.js"></script>
@@ -170,7 +170,7 @@
             --border: #1e293b;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { display: flex; height: 100vh; overflow: hidden; background: var(--bg-main); color: var(--text-main); transition: 0.3s; }
 
         /* Luxury Font */
@@ -224,7 +224,7 @@
         .live-form-grid { display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
         @media (max-width:700px){ .live-form-grid { grid-template-columns: 1fr; } }
         .rtmp-box { background: rgba(0,0,0,.3); border:1px solid rgba(212,175,55,.3); border-radius:14px; padding:14px 16px; margin-top:14px; font-family: ui-monospace, monospace; font-size:.75rem; word-break:break-all; }
-        .rtmp-box strong { color: #f6df8a; display:block; margin-bottom:4px; font-family:Montserrat, sans-serif; font-size:.72rem; letter-spacing:.5px; text-transform:uppercase; }
+        .rtmp-box strong { color: #f6df8a; display:block; margin-bottom:4px; font-family:Inter, sans-serif; font-size:.72rem; letter-spacing:.5px; text-transform:uppercase; }
         .rtmp-box p { margin: 0 0 10px; color: rgba(255,255,255,.9); }
         .live-help { font-size:.8rem; color: rgba(255,255,255,.75); margin-top:12px; line-height:1.55; }
 
@@ -520,7 +520,7 @@
         .facebook-workflow-note strong { display:block; font-size:.82rem; margin-bottom:4px; }
         .facebook-workflow-note p { margin:0; color:var(--text-sub); font-size:.76rem; line-height:1.55; }
         .facebook-library-heading { display:flex; flex-direction:column; gap:4px; }
-        .facebook-library-heading p { margin:0; color:var(--text-sub); font-family:'Montserrat', sans-serif; font-size:.76rem; font-weight:500; line-height:1.45; }
+        .facebook-library-heading p { margin:0; color:var(--text-sub); font-family:'Inter', sans-serif; font-size:.76rem; font-weight:500; line-height:1.45; }
         .facebook-library-header-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
         .facebook-library-toolbar { padding:18px 25px; display:grid; grid-template-columns:minmax(220px,1.8fr) repeat(2,minmax(145px,.6fr)); gap:12px; background:var(--bg-main); border-bottom:1px solid var(--border); }
         .facebook-filter-field { min-width:0; }
@@ -624,6 +624,7 @@
             <div class="nav-item" onclick="switchView('live-analytics', this)"><i class="fas fa-chart-line"></i> Live Analytics</div>
             <div class="nav-item" onclick="switchView('live-schedule', this)"><i class="fas fa-calendar-star"></i> Schedule Live</div>
             <div class="nav-item" onclick="switchView('members', this)"><i class="fas fa-users"></i> Members CRM</div>
+            <div class="nav-item" onclick="openTeamManagement()"><i class="fas fa-user-tie"></i> Team Management</div>
             <div class="nav-item" onclick="switchView('announcements', this)"><i class="fas fa-bullhorn"></i> Notices</div>
             <div class="nav-item" onclick="switchView('care', this)"><i class="fas fa-hand-holding-heart"></i> Member Care</div>
             <div class="nav-item" onclick="switchView('gallery', this)"><i class="fas fa-images"></i> Gallery Management</div>
@@ -2686,25 +2687,30 @@
         window.rejectGalleryImage = async function(id) { const reason=prompt("Rejection reason:"); showLoading(); try { await updateDoc(doc(db,"gallery",id),{ status:'rejected', rejectionReason:reason, rejectedAt:serverTimestamp(), rejectedBy:adminUser?.email }); toast("Image rejected"); loadGallery(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
         window.deleteGalleryImage = async function(id) { if(!confirm("Delete permanently?")) return; showLoading(); try { await deleteDoc(doc(db,"gallery",id)); toast("Image deleted"); loadGallery(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
 
-        window.uploadGalleryImage = function() {
-            if(typeof cloudinary === 'undefined') return toast("Cloudinary not loaded", "error");
-            cloudinary.createUploadWidget({ cloudName:'prayerdome', uploadPreset:'gallery_uploads', folder:'official_gallery', cropping:true, croppingAspectRatio:16/9, multiple:false, maxFileSize:10*1024*1024, clientAllowedFormats:['jpg','jpeg','png','webp','gif'] }, async (error, result) => {
-                if(error) return toast("Upload failed: " + error.message, "error");
-                if(result && result.event === "success") {
-                    const title = prompt("Enter image title:", "Prayer Dome Event");
-                    if(!title) return toast("Image not saved - title required", "error");
-                    const category = prompt("Enter category (pastors/worship/ministries/church):", "church");
-                    const description = prompt("Enter a short description (optional):", "");
-                    showLoading();
-                    try {
-                        await addDoc(collection(db,"gallery"),{ title:title, category:category||'church', description:description||'', url:result.info.secure_url, publicId:result.info.public_id, userId:adminUser?.uid, userEmail:adminUser?.email, userName:adminUser?.displayName || adminUser?.email?.split('@')[0] || 'Admin', status:'approved', createdAt:serverTimestamp(), approvedAt:serverTimestamp(), approvedBy:adminUser?.email });
-                        toast("✅ Image uploaded and approved!");
-                        loadGallery(); loadDashboardPerformance();
-                        confetti({ particleCount:100, spread:70 });
-                    } catch(error) { toast("Error saving: " + error.message, 'error'); }
-                    finally { hideLoading(); }
-                }
-            }).open();
+        window.uploadGalleryImage = async function() {
+            // Pick with the device's own chooser first, then ask for details.
+            const res = await PDUpload.pick({
+                title: 'Add gallery photo',
+                accept: 'image/*',
+                preset: 'gallery_uploads',
+                folder: 'official_gallery',
+                maxBytes: 10*1024*1024,
+                onError: (m) => toast(m, 'error')
+            });
+            if (!res.ok) return;
+            const uploaded = res.files[0];
+            const title = prompt("Enter image title:", "Prayer Dome Event");
+            if(!title) return toast("Image not saved - title required", "error");
+            const category = prompt("Enter category (pastors/worship/ministries/church):", "church");
+            const description = prompt("Enter a short description (optional):", "");
+            showLoading();
+            try {
+                await addDoc(collection(db,"gallery"),{ title:title, category:category||'church', description:description||'', url:uploaded.url, publicId:uploaded.publicId, userId:adminUser?.uid, userEmail:adminUser?.email, userName:adminUser?.displayName || adminUser?.email?.split('@')[0] || 'Admin', status:'approved', createdAt:serverTimestamp(), approvedAt:serverTimestamp(), approvedBy:adminUser?.email });
+                toast("✅ Image uploaded and approved!");
+                loadGallery(); loadDashboardPerformance();
+                confetti({ particleCount:100, spread:70 });
+            } catch(error) { toast("Error saving: " + error.message, 'error'); }
+            finally { hideLoading(); }
         };
 
         window.filterGallery = function() { const searchTerm=document.getElementById('gallerySearch')?.value.toLowerCase(); if(!searchTerm) return loadGallery(); const filtered=allGalleryCache.filter(img=>img.title?.toLowerCase().includes(searchTerm)||img.category?.toLowerCase().includes(searchTerm)); const grid=document.getElementById('galleryGrid'); if(filtered.length===0){ grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;">No matching images</div>'; return; } grid.innerHTML=filtered.map(img=>`<div class="gallery-item"><img src="${img.url}" class="gallery-image"><div class="gallery-info"><div class="gallery-title">${escapeHTML(img.title)}</div><div class="gallery-meta"><span><i class="fas fa-user"></i> ${escapeHTML(img.userName)}</span><span>${img.createdAt?moment(img.createdAt.toDate()).fromNow():'Recently'}</span></div><div class="gallery-meta"><span>${img.category}</span><span class="badge ${img.status==='approved'?'badge-success':'badge-warning'}">${img.status}</span></div><div class="gallery-actions">${img.status==='pending'?`<button class="btn btn-sm btn-success" onclick="approveGalleryImage('${img.id}')">Approve</button>`:''}<button class="btn btn-sm btn-outline" onclick="deleteGalleryImage('${img.id}')">Delete</button></div></div></div>`).join(''); };
@@ -3205,14 +3211,18 @@
             deleteDoc(doc(db, 'aiVideos', id)).then(() => { toast('AI video deleted'); loadAiVideos(); }).catch(e => toast(e.message, 'error'));
         };
 
-        window.uploadNewsImage = function() {
-            if(typeof cloudinary === 'undefined') return toast('Cloudinary not loaded', 'error');
-            cloudinary.createUploadWidget({ cloudName:'prayerdome', uploadPreset:'news_images', folder:'news', maxFileSize:8*1024*1024 }, (error, result) => {
-                if(!error && result && result.event === 'success'){
-                    document.getElementById('newsImage').value = result.info.secure_url;
-                    toast('Image uploaded ✅');
-                }
-            }).open();
+        window.uploadNewsImage = async function() {
+            const res = await PDUpload.pick({
+                title: 'News image',
+                accept: 'image/*',
+                preset: 'news_images',
+                folder: 'news',
+                maxBytes: 8*1024*1024,
+                onError: (m) => toast(m, 'error')
+            });
+            if (!res.ok) return;
+            document.getElementById('newsImage').value = res.files[0].url;
+            toast('Image attached ✅');
         };
 
         // ==================== HERO BANNERS (admin) ====================
@@ -3472,6 +3482,28 @@
             loadAdminRadio();
         };
         
+        /* ===== Live-start notifications =====
+         * Going live must actually tell members: gather the registered device
+         * tokens and queue a branded push via the sendPushNotification Cloud
+         * Function. Never blocks the broadcast itself. */
+        window.notifyLiveStarted = async function(title, presenterName) {
+            try {
+                const tokensSnapshot = await getDocs(collection(db, 'userTokens'));
+                const tokens = [];
+                tokensSnapshot.forEach(d => { const t = d.data(); if (t && t.active !== false && t.token) tokens.push(t.token); });
+                if (!tokens.length) return;
+                await addDoc(collection(db, 'notifications'), {
+                    title: '🔴 Prayer Dome is LIVE',
+                    message: `"${title}" is streaming now${presenterName ? ' — ' + presenterName : ''}. Tap to watch.`,
+                    type: 'live',
+                    tokens,
+                    status: 'pending',
+                    createdAt: serverTimestamp(),
+                    createdBy: adminUser?.email || 'admin'
+                });
+            } catch (e) { console.warn('live notification failed', e); }
+        };
+
         window.sendPushNotificationToAll = async function(title, message, type = 'general') {
             if (!adminUser) { toast("Admin not logged in", "error"); return; }
             showLoading();
@@ -3547,7 +3579,7 @@
             document.getElementById('notifLink').value = '';
         };
 
-        window.uploadFinancialReport = function() {
+        window.uploadFinancialReport = async function() {
             if(typeof cloudinary === 'undefined') return toast("Cloudinary not loaded", "error");
             const branch = prompt("Select branch (eswatini/zambia/ireland):", "eswatini");
             if (!branch) return;
@@ -3555,18 +3587,23 @@
             if (!reportDate) return;
             const totalIncome = parseFloat(prompt("Total Income (E):", "0"));
             const totalExpense = parseFloat(prompt("Total Expense (E):", "0"));
-            cloudinary.createUploadWidget({ cloudName:'prayerdome', uploadPreset:'financial_reports', folder:`financial_reports/${branch}`, allowedFormats:['pdf','jpg','jpeg','png'], maxFileSize:10*1024*1024 }, async (error, result) => {
-                if(error) return toast("Upload failed: " + error.message, "error");
-                if(result && result.event === "success") {
-                    showLoading();
-                    try {
-                        await addDoc(collection(db, "financialReports"), { branch, date:reportDate, totalIncome, totalExpense, surplus: totalIncome - totalExpense, documentUrl:result.info.secure_url, documentPublicId:result.info.public_id, status:'submitted', submittedBy:adminUser?.email, submittedAt:serverTimestamp(), notes:prompt("Additional notes (optional):", "") || "" });
-                        toast("✅ Financial report uploaded successfully!");
-                        loadFinancialReports();
-                    } catch(error) { toast("Error: " + error.message, "error"); }
-                    finally { hideLoading(); }
-                }
-            }).open();
+            showLoading();
+            try {
+                const res = await PDUpload.pick({
+                    title: 'Financial report file',
+                    accept: 'application/pdf,image/*',
+                    preset: 'financial_reports',
+                    folder: `financial_reports/${branch}`,
+                    maxBytes: 10*1024*1024,
+                    onError: (m) => toast(m, 'error')
+                });
+                if (!res.ok) return;
+                const uploaded = res.files[0];
+                await addDoc(collection(db, "financialReports"), { branch, date:reportDate, totalIncome, totalExpense, surplus: totalIncome - totalExpense, documentUrl:uploaded.url, documentPublicId:uploaded.publicId, status:'submitted', submittedBy:adminUser?.email, submittedAt:serverTimestamp(), notes:prompt("Additional notes (optional):", "") || "" });
+                toast("✅ Financial report uploaded successfully!");
+                loadFinancialReports();
+            } catch(error) { toast("Error: " + error.message, "error"); }
+            finally { hideLoading(); }
         };
         
         window.loadFinancialReports = async function(){ const tbody=document.getElementById('financialReportsList'); if(!tbody) return; tbody.innerHTML='<td colspan="9"><div class="spinner" style="width:30px;height:30px;"></div></td>'; try { const branchFilter=document.getElementById('reportBranchFilter')?.value||'all'; const statusFilter=document.getElementById('reportStatusFilter')?.value||'all'; const dateFilter=document.getElementById('reportDateFilter')?.value||''; const snapshot=await getDocs(query(collection(db,"financialReports"),orderBy("date","desc"))); let reports=[]; snapshot.forEach(doc=>{reports.push({id:doc.id,...doc.data()});}); let filtered=reports; if(branchFilter!=='all') filtered=filtered.filter(r=>r.branch===branchFilter); if(statusFilter!=='all') filtered=filtered.filter(r=>r.status===statusFilter); if(dateFilter) filtered=filtered.filter(r=>r.date===dateFilter); document.getElementById('totalReportsCount').innerText=filtered.length; document.getElementById('pendingReportsCount').innerText=filtered.filter(r=>r.status==='submitted').length; document.getElementById('approvedReportsCount').innerText=filtered.filter(r=>r.status==='approved').length; document.getElementById('totalIncomeAll').innerText=`E${filtered.reduce((sum,r)=>sum+(r.totalIncome||0),0).toFixed(2)}`; if(filtered.length===0){ tbody.innerHTML='<td colspan="9">No reports found<\/td>'; return; } let html=''; filtered.forEach(report=>{ const statusBadge=report.status==='approved'?'<span class="badge badge-success">Approved</span>':(report.status==='rejected'?'<span class="badge badge-danger">Rejected</span>':'<span class="badge badge-warning">Pending</span>'); const surplusColor=(report.surplus||0)>=0?'var(--accent-green)':'var(--accent-red)'; html+=`<tr><td>${moment(report.date).format('MMM D, YYYY')}</td><td>${report.branch==='eswatini'?'🇸🇿 Eswatini':report.branch==='zambia'?'🇿🇲 Zambia':'🇮🇪 Ireland'}</td><td>${escapeHTML(report.submittedBy)}</td><td style="color:var(--accent-green);font-weight:bold;">E${(report.totalIncome||0).toFixed(2)}</td><td style="color:var(--accent-red);">E${(report.totalExpense||0).toFixed(2)}</td><td style="color:${surplusColor};font-weight:bold;">E${(report.surplus||0).toFixed(2)}</td><td>${report.approvedBy?escapeHTML(report.approvedBy):'-'}</td><td>${statusBadge}</td><td>${report.documentUrl?`<button class="btn btn-sm btn-primary" onclick="viewDoc('${report.documentUrl}','auto')"><i class="fas fa-eye"></i></button>`:'-'}</td></tr>`; }); tbody.innerHTML=html; } catch(error){ console.error("Error loading reports:",error); tbody.innerHTML='<td colspan="9">Error loading reports<\/td>'; toast("Error loading financial reports", "error"); } };
@@ -3574,6 +3611,9 @@
         window.viewDoc = function(url,type){ const img=document.getElementById('docImagePreview'), pdf=document.getElementById('docPdfBtn'); if(url.toLowerCase().includes('.pdf')){ if(img) img.style.display='none'; if(pdf){ pdf.style.display='inline-flex'; pdf.href=url; } } else { if(img){ img.style.display='block'; img.src=url; } if(pdf) pdf.style.display='none'; } openModal('modalViewDoc'); };
         window.exportFinancialReports = function() { toast("Export feature - CSV export ready", "info"); };
         window.uploadMedia = function(){ window.uploadGalleryImage(); };
+        // Team roster management lives on the public team page; the admin
+        // tools there activate automatically for administrator accounts.
+        window.openTeamManagement = function(){ window.open('/team.html?admin=1', '_blank'); toast('Opening Team Management…'); };
         window.deleteRecord = async function(col,id){ if(!confirm("Delete permanently?")) return; showLoading(); try{ await deleteDoc(doc(db,col,id)); toast("Deleted"); if(col==='events') await loadEvents(); if(col==='gallery') await loadGallery(); if(col==='prayers'||col==='testimonies') await loadContent(); if(col==='contactMessages') await loadContactMessages(); if(col==='certificates') await loadCertificates(); if(col==='announcements') await loadAnnouncements(); if(col==='memberCareRequests') await loadCareRequests(); if(col==='liveRecordings') await loadLiveRecordings(); } catch(e){ toast(e.message,'error'); } finally { hideLoading(); } };
         
         function setupAdminRealtimeListeners() {
@@ -4243,6 +4283,7 @@
                 showRTMPanel();
                 toast('🔴 Live started — configure OBS with the RTMP info below');
                 confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 } });
+                notifyLiveStarted(title, presenterName);
             } catch(e) {
                 console.error(e);
                 toast('Could not start live: ' + e.message, 'error');
@@ -4453,6 +4494,7 @@
                 await logAdminActivity('live_started_device', { title, category: crSelectedCategory });
                 toast('🔴 You are LIVE on Prayer Dome — broadcasting in real time');
                 confetti({ particleCount: 140, spread: 90, origin: { y: 0.6 } });
+                notifyLiveStarted(title, presenterName);
             } catch(e) {
                 console.error(e);
                 toast('Could not start camera: ' + (e.name === 'NotAllowedError' ? 'camera permission denied' : e.message), 'error');

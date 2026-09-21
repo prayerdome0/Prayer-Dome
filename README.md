@@ -36,7 +36,7 @@ Prayer Dome is a Christian community website for prayer, Bible study, disciplesh
 
 ## Academy certificates
 
-Pass an Academy quiz with **80% or higher** to earn a certificate. Open **Account → My Certificates**, then choose **Download** or **Print**. Enter your preferred full name before taking a quiz so it appears correctly on the certificate.
+Pass an Academy quiz with **80% or higher** to earn a certificate. Open **Account → My Certificates**, then choose **Download** or **Print**. Certificates are issued automatically to **your profile name** — keep your Profile Details up to date and every future certificate uses the correct name, with no typing required.
 
 ## Guides and documents
 

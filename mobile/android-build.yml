@@ -1,5 +1,18 @@
 name: Android build
 
+# Real Prayer Dome Android CI: produces an installable debug APK and release
+# APK/AAB entirely on GitHub's servers — no developer machine is required.
+#
+# One-time activation (the GitHub App used to push this repository cannot
+# create workflow files itself). From a maintainer account with normal
+# permissions run:
+#
+#   node scripts/install-workflows.mjs
+#
+# which copies this file and ci/verify.yml into .github/workflows/ and commits
+# them. After that every push to main builds the app automatically, and the
+# artifacts (APK/AAB) are attached to the workflow run for download.
+
 on:
   workflow_dispatch:
   push:
@@ -20,10 +33,15 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build APK and AAB
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -44,12 +62,24 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: npm
 
       - name: Install JavaScript dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Prepare and sync Capacitor
         run: npm run mobile:sync
+
+      - name: Add google-services.json when the secret is configured
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            printf '%s' "$GOOGLE_SERVICES_JSON" | base64 --decode > android/app/google-services.json
+            echo "google-services.json added — native push notifications are enabled."
+          else
+            echo "No GOOGLE_SERVICES_JSON secret; the app uses web push delivery."
+          fi
 
       - name: Configure release signing when secrets are available
         env:

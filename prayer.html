@@ -126,10 +126,10 @@
     <!-- PD-SEO:END -->
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <script src="/assets/pd-upload.js"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -162,7 +162,7 @@
             --nav-bg: rgba(15, 23, 42, 0.9);
         }
 
-        body { font-family: 'Montserrat', sans-serif; background: var(--bg-primary); color: var(--text-main); transition: 0.3s; min-height: 100vh; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-main); transition: 0.3s; min-height: 100vh; }
 
         /* Header - Same as index */
         header { background: var(--bg-card); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); backdrop-filter: blur(10px); background: var(--nav-bg);}
@@ -980,29 +980,24 @@
         document.getElementById('submitModal').style.display = 'flex';
     };
 
-    window.uploadPrayerImage = () => {
-        if (typeof cloudinary === 'undefined') {
-            showToast("Cloudinary not loaded", "error");
-            return;
-        }
-        cloudinary.createUploadWidget({
-            cloudName: 'prayerdome',
-            uploadPreset: 'gallery_uploads',
+    window.uploadPrayerImage = async () => {
+        const res = await PDUpload.pick({
+            title: 'Attach a photo',
+            accept: 'image/*',
+            preset: 'gallery_uploads',
             folder: 'prayers',
-            clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp'],
-            maxFileSize: 5000000
-        }, (error, result) => {
-            if (!error && result && result.event === "success") {
-                uploadedImageUrl = result.info.secure_url;
-                document.getElementById('pImagePreview').innerHTML = `
-                    <div style="position:relative; margin-top: 15px; border-radius: 16px; overflow:hidden;">
-                        <img src="${uploadedImageUrl}" style="width:100%; height: 140px; object-fit:cover;">
-                        <button onclick="removeImage(event)" style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:28px; height:28px; cursor:pointer;"><i class="fas fa-times"></i></button>
-                    </div>
-                `;
-                showToast('Image attached!', 'success');
-            }
-        }).open();
+            maxBytes: 5000000,
+            onError: (m) => showToast(m, 'error')
+        });
+        if (!res.ok) return;
+        uploadedImageUrl = res.files[0].url;
+        document.getElementById('pImagePreview').innerHTML = `
+            <div style="position:relative; margin-top: 15px; border-radius: 16px; overflow:hidden;">
+                <img src="${uploadedImageUrl}" style="width:100%; height: 140px; object-fit:cover;">
+                <button onclick="removeImage(event)" style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:28px; height:28px; cursor:pointer;"><i class="fas fa-times"></i></button>
+            </div>
+        `;
+        showToast('Image attached!', 'success');
     };
 
     window.removeImage = (e) => {

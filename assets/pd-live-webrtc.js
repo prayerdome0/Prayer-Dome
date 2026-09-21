@@ -24,11 +24,25 @@
     'use strict';
 
     var CLOUD_NAME = 'prayerdome';
-    var MAX_WEBRTC_VIEWERS = 12;          // soft cap on mesh viewers before HLS fallback
+    var MAX_WEBRTC_VIEWERS = 20;          // soft cap on mesh viewers (quality adapts below it)
+    // Connectivity: STUN alone fails for viewers behind symmetric NAT — very
+    // common on mobile carrier networks. A TURN relay is what makes
+    // "viewer can actually watch the admin" true in the real world. The relay
+    // list below can be overridden by window.PD_LIVE_SERVER.iceServers.
     var ICE_SERVERS = [
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' }
+        { urls: 'stun:stun2.l.google.com:19302' },
+        {
+            urls: [
+                'turn:openrelay.metered.ca:80',
+                'turn:openrelay.metered.ca:443',
+                'turn:openrelay.metered.ca:443?transport=tcp',
+                'turns:openrelay.metered.ca:443?transport=tcp'
+            ],
+            username: 'openrelayproject',
+            credential: 'openrelayproject'
+        }
     ];
 
     function uid(prefix) {
@@ -41,6 +55,25 @@
     function liveServerConfig() {
         var cfg = global.PD_LIVE_SERVER || {};
         return cfg && cfg.enabled ? cfg : null;
+    }
+    // Decide the ICE configuration for a connection: an explicitly configured
+    // media server list wins, otherwise the built-in STUN+TURN defaults apply.
+    function iceServersFor(cfg, fallback) {
+        if (cfg && Array.isArray(cfg.iceServers) && cfg.iceServers.length) return cfg.iceServers;
+        return fallback || ICE_SERVERS;
+    }
+    // Probe an HLS playlist before relying on it. A browser broadcast has no
+    // Cloudinary HLS variant until a recording finishes processing, so a blind
+    // switch used to leave viewers with a dead player — now we only switch
+    // when the playlist genuinely exists.
+    async function probeHls(url) {
+        if (!url) return false;
+        try {
+            var res = await fetch(url, { method: 'GET', headers: { 'Range': 'bytes=0-256' } });
+            if (!res.ok && res.status !== 206) return false;
+            var text = await res.text();
+            return /#EXTM3U/.test(text);
+        } catch (e) { return false; }
     }
     function resolveEndpoint(url, liveId) {
         if (!url) return '';
@@ -171,10 +204,10 @@
         };
         this.listeners = {};
         this._timer = null;
-        this._iceServers = (opts && opts.iceServers) || ICE_SERVERS;
         this.mediaPc = null;
         this.mediaSessionUrl = null;
         this.mediaServer = liveServerConfig();
+        this._iceServers = (opts && opts.iceServers) || iceServersFor(this.mediaServer, ICE_SERVERS);
     }
 
     Broadcaster.prototype.on = function (ev, fn) {
@@ -252,22 +285,37 @@
             self.updateConnectionQuality();
         };
 
-            // Wait for the viewer's offer, then answer.
+            // Wait for the viewer's offer, then answer. If the connection is
+            // momentarily not 'stable' (media renegotiation), retry instead of
+            // dropping the offer — a dropped offer left the viewer stuck on
+            // "connecting" forever.
             this.signal.onDoc('viewers/' + viewerId + '/offer', async function (offer) {
                 if (!offer) return;
-                try {
-                    if (pc.signalingState !== 'stable' && !polite) return;
-                    await pc.setRemoteDescription(new RTCSessionDescription(offer));
-                    var answer = await pc.createAnswer();
-                    await pc.setLocalDescription(answer);
-                    await self.signal.set('viewers/' + viewerId + '/answer', {
-                        type: answer.type,
-                        sdp: answer.sdp,
-                        createdAt: self.fb.serverTimestamp()
-                    });
-                } catch (err) {
-                    warn('answer failed for', viewerId, err);
-                }
+                var attempts = 0;
+                var answerNow = async function () {
+                    attempts++;
+                    try {
+                        if (pc.signalingState === 'have-local-offer') {
+                            // Roll back our local offer; the viewer's wins.
+                            await pc.setLocalDescription({ type: 'rollback' });
+                        } else if (pc.signalingState !== 'stable' && attempts < 6) {
+                            setTimeout(answerNow, 600);
+                            return;
+                        }
+                        await pc.setRemoteDescription(new RTCSessionDescription(offer));
+                        var answer = await pc.createAnswer();
+                        await pc.setLocalDescription(answer);
+                        await self.signal.set('viewers/' + viewerId + '/answer', {
+                            type: answer.type,
+                            sdp: answer.sdp,
+                            createdAt: self.fb.serverTimestamp()
+                        });
+                    } catch (err) {
+                        if (attempts < 6) setTimeout(answerNow, 600 * attempts);
+                        else warn('answer failed for', viewerId, err);
+                    }
+                };
+                answerNow();
             });
 
             this.signal.onCol('viewers/' + viewerId + '/candidates', function (ev) {
@@ -777,8 +825,8 @@
         this.unsubs = [];
         this.hls = null;
         this.reconnectAttempts = 0;
-        this._iceServers = (opts && opts.iceServers) || ICE_SERVERS;
         this.mediaServer = liveServerConfig();
+        this._iceServers = (opts && opts.iceServers) || iceServersFor(this.mediaServer, ICE_SERVERS);
         this.mediaSessionUrl = null;
     }
 
@@ -809,10 +857,11 @@
         this.signal = new Signal(this.fb, status.liveId);
 
         // Decide mode. A configured media server gives true one-to-many WHEP
-        // playback; the older browser mesh remains as a local fallback only.
-        var viewerCount = Number(status.viewers) || 0;
+        // playback; the WebRTC mesh is the standard path. HLS is only used
+        // when a playlist genuinely exists (verified with a probe) — a blind
+        // switch used to leave members staring at a dead player.
         var useWhep = status.source === 'media-server' && this.mediaServer && this.mediaServer.whepEndpoint;
-        var useWebRTC = !useWhep && viewerCount < MAX_WEBRTC_VIEWERS && status.source === 'webrtc';
+        var useWebRTC = !useWhep && status.source === 'webrtc';
         this.state.mode = useWhep ? 'whep' : (useWebRTC ? 'webrtc' : 'hls');
 
         // Register presence (write top-level doc so admin collection listeners see it).
@@ -839,7 +888,11 @@
         } else if (useWebRTC) {
             await this.connectWebRTC();
         } else {
-            this.connectHLS();
+            // Only play HLS if the playlist is really there; otherwise the
+            // broadcast is a browser stream — use WebRTC instead.
+            var hlsReady = await probeHls(this.state.hlsUrl);
+            if (hlsReady) this.connectHLS();
+            else { this.state.mode = 'webrtc'; await this.connectWebRTC(); }
         }
 
         // Listen for state updates.
@@ -953,7 +1006,9 @@
             this.signal.onDoc('viewers/' + this.state.viewerId + '/answer', async function (ans) {
                 if (!ans || !self.pc) return;
                 try {
-                    if (self.pc.signalingState !== 'stable') {
+                    // Only apply while we still expect it (after our own offer).
+                    // Duplicate snapshots after 'stable' are ignored safely.
+                    if (self.pc.signalingState === 'have-local-offer') {
                         await self.pc.setRemoteDescription(new RTCSessionDescription(ans));
                     }
                 } catch (e) { warn('setRemoteDescription failed', e); }
@@ -1030,11 +1085,31 @@
     };
 
     Viewer.prototype.switchToHLS = function () {
-        this.state.mode = 'hls';
+        var self = this;
         this.state.status = 'connecting';
         this.emit('state', this.state);
-        if (this.pc) { try { this.pc.close(); } catch (e) {} this.pc = null; }
-        this.connectHLS();
+        // Verify the playlist exists before swapping the player over. Without
+        // this check a browser-only broadcast (no Cloudinary HLS variant yet)
+        // would replace a reconnecting video with a permanently dead one.
+        probeHls(this.state.hlsUrl).then(function (ok) {
+            if (!ok) {
+                warn('HLS playlist not available; staying on WebRTC');
+                if (self.reconnectAttempts >= 4) {
+                    self.state.status = 'unreachable';
+                    self.emit('state', self.state);
+                    return;
+                }
+                setTimeout(function () {
+                    if (!self.state.isLive) return;
+                    if (self.pc) { try { self.pc.close(); } catch (e) {} self.pc = null; }
+                    self.connectWebRTC().catch(function () { self.attemptReconnect(); });
+                }, 2000);
+                return;
+            }
+            self.state.mode = 'hls';
+            if (self.pc) { try { self.pc.close(); } catch (e) {} self.pc = null; }
+            self.connectHLS();
+        });
     };
 
     Viewer.prototype.connectHLS = function () {
@@ -1062,7 +1137,13 @@
                 if (data.fatal) {
                     self.state.status = 'reconnecting';
                     self.emit('state', self.state);
-                    setTimeout(function () { if (self.state.isLive) self.connectHLS(); }, 3000);
+                    // Retry a couple of times, then verify whether the
+                    // playlist still exists before hammering it forever.
+                    if (self.reconnectAttempts < 3) self.attemptReconnect();
+                    else probeHls(url).then(function (ok) {
+                        if (!ok) { self.state.status = 'unreachable'; self.emit('state', self.state); }
+                        else if (self.state.isLive) self.connectHLS();
+                    });
                 }
             });
         }
@@ -1073,16 +1154,30 @@
         this.reconnectAttempts++;
         this.state.status = 'reconnecting';
         this.emit('state', this.state);
-        if (this.reconnectAttempts > 3) {
-            // Fall back to HLS.
-            this.switchToHLS();
+        if (this.reconnectAttempts > 6) {
+            // Give up gracefully — the UI shows a "Try again" action.
+            this.state.status = 'unreachable';
+            this.emit('state', this.state);
             return;
         }
         setTimeout(function () {
             if (!self.state.isLive) return;
             if (self.pc) { try { self.pc.close(); } catch (e) {} self.pc = null; }
-            self.connectWebRTC().catch(function () { self.switchToHLS(); });
-        }, 1500 * this.reconnectAttempts);
+            self.connectWebRTC().catch(function () {
+                if (self.reconnectAttempts >= 3) self.switchToHLS();
+                else self.attemptReconnect();
+            });
+        }, Math.min(1500 * this.reconnectAttempts, 5000));
+    };
+
+    // Manual retry from the viewer UI after an 'unreachable' state.
+    Viewer.prototype.retry = function () {
+        this.reconnectAttempts = 0;
+        this.state.status = 'reconnecting';
+        this.emit('state', this.state);
+        var self = this;
+        if (self.pc) { try { self.pc.close(); } catch (e) {} self.pc = null; }
+        return self.connectWebRTC().catch(function () { self.switchToHLS(); });
     };
 
     Viewer.prototype.leave = function () {

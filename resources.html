@@ -133,7 +133,7 @@
   <link rel="icon" type="image/png" href="/assets/logo.png">
   <link rel="apple-touch-icon" href="/assets/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="/assets/pd-brand.css">
   <script src="/assets/pd-motion.js" defer></script><script src="/assets/pd-content-data.js" defer></script>
@@ -142,7 +142,8 @@
 <script src="/assets/pd-verse-alerts.js" defer></script>
 <script src="/assets/pd-phrases.js" defer></script>
 <script src="/assets/pd-i18n.js" defer></script>
-<script src="/assets/pd-app.js" defer></script><script src="/assets/pd-academy.js" defer></script>
+<script src="/assets/pd-app.js" defer></script>
+<script src="/assets/pd-upload.js" defer></script><script src="/assets/pd-academy.js" defer></script>
 </head>
 <body class="pd-acad-page">
 <div class="pd-aurora" aria-hidden="true"><span></span></div>
@@ -174,8 +175,345 @@
   </section>
   <section class="pd-acad-grid pd-acad-grid-3 pd-acad-stats"><div class="pd-acad-stat"><strong data-acad-resource-count>0</strong><span>Downloadable documents</span></div><div class="pd-acad-stat"><strong>PDF</strong><span>Print-ready format</span></div><div class="pd-acad-stat"><strong>2026</strong><span>Current edition</span></div></section>
   <section class="pd-acad-grid" id="resourceGrid"></section>
+  <!-- ADMIN: Resource Management (administrators only) -->
+  <section id="resourceAdminPanel" class="pd-acad-card" style="display:none; margin-top:24px; border:1px solid rgba(10,77,155,.25);">
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <h3 style="margin:0;"><i class="fas fa-folder-plus" style="color:var(--pd-acad-blue)"></i> Resource Management</h3>
+      <span style="font-size:.62rem; font-weight:800; letter-spacing:.6px; background:rgba(10,77,155,.12); color:var(--pd-acad-blue); border-radius:50px; padding:4px 12px;">ADMIN</span>
+      <button class="pd-acad-btn pd-acad-btn-primary" style="margin-left:auto;" onclick="openResourceEditor()"><i class="fas fa-plus"></i> Add Resource</button>
+    </div>
+    <p style="font-size:.78rem; color:var(--pd-acad-muted); margin:8px 0 14px;">Published resources appear above for every member. Files open the device picker and upload in the background.</p>
+    <div id="resourceAdminList" style="display:grid; gap:10px;"></div>
+  </section>
+
+  <!-- ADMIN: editor modal -->
+  <div id="resourceEditorOverlay" style="display:none; position:fixed; inset:0; background:rgba(4,12,28,.7); backdrop-filter:blur(6px); z-index:1000; align-items:center; justify-content:center; padding:16px;" onclick="if(event.target===this)closeResourceEditor()">
+    <div style="background:var(--bg-primary,#fff); color:var(--text-main,#0f172a); border-radius:22px; max-width:520px; width:100%; max-height:88vh; overflow:auto;" onclick="event.stopPropagation()">
+      <div style="display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border-color,#e5eaf2); position:sticky; top:0; background:var(--bg-primary,#fff); border-radius:22px 22px 0 0;">
+        <img src="/assets/logo.png" alt="" style="width:30px;height:30px;border-radius:8px;object-fit:contain;">
+        <h3 id="resourceEditorTitle" style="margin:0; font-size:1rem; color:#0A4D9B; flex:1;">Add Resource</h3>
+        <button onclick="closeResourceEditor()" style="border:0;background:var(--bg-card,#f1f4f9);width:32px;height:32px;border-radius:50%;cursor:pointer;color:inherit;"><i class="fas fa-xmark"></i></button>
+      </div>
+      <div style="padding:18px 20px; display:grid; gap:12px;">
+        <label style="display:grid;gap:5px;font-size:.78rem;font-weight:700;">Resource name<input id="resName" maxlength="120" style="margin-top:4px;padding:11px 12px;border-radius:12px;border:1px solid var(--border-color,#d7dee9);background:var(--bg-card,#fff);color:inherit;font:inherit;"></label>
+        <label style="display:grid;gap:5px;font-size:.78rem;font-weight:700;">Description<textarea id="resDescription" maxlength="400" rows="3" style="margin-top:4px;padding:11px 12px;border-radius:12px;border:1px solid var(--border-color,#d7dee9);background:var(--bg-card,#fff);color:inherit;font:inherit;resize:vertical;"></textarea></label>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <label style="display:grid;gap:5px;font-size:.78rem;font-weight:700;">Category
+            <select id="resCategory" style="margin-top:4px;padding:11px 12px;border-radius:12px;border:1px solid var(--border-color,#d7dee9);background:var(--bg-card,#fff);color:inherit;font:inherit;">
+              <option>Sunday School</option>
+              <option>Bible Study</option>
+              <option>Teaching Notes</option>
+              <option>Church Document</option>
+              <option>Study Guide</option>
+              <option>Forms</option>
+              <option>Educational</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label style="display:grid;gap:5px;font-size:.78rem;font-weight:700;">Edition / Date<input id="resVersion" maxlength="40" placeholder="e.g. 2026 edition" style="margin-top:4px;padding:11px 12px;border-radius:12px;border:1px solid var(--border-color,#d7dee9);background:var(--bg-card,#fff);color:inherit;font:inherit;"></label>
+        </div>
+        <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
+          <button type="button" class="pd-acad-btn pd-acad-btn-secondary" onclick="pickResourceFile()"><i class="fas fa-file-arrow-up"></i> Choose File (PDF, document, image)</button>
+          <div id="resFileState" style="font-size:.75rem;color:var(--pd-acad-muted);">Required — opens your device picker</div>
+        </div>
+        <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
+          <button type="button" class="pd-acad-btn pd-acad-btn-secondary" onclick="pickResourceThumb()"><i class="fas fa-image"></i> Thumbnail (optional)</button>
+          <img id="resThumbPreview" src="/assets/logo.png" alt="" style="width:56px;height:56px;border-radius:12px;object-fit:cover;background:#eef2f8;">
+        </div>
+        <div id="resourceEditorError" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:12px;padding:10px 12px;font-size:.8rem;"></div>
+      </div>
+      <div style="display:flex; gap:10px; padding:0 20px 20px;">
+        <button class="pd-acad-btn pd-acad-btn-secondary" style="flex:1; justify-content:center;" onclick="closeResourceEditor()">Cancel</button>
+        <button class="pd-acad-btn pd-acad-btn-primary" id="resourceEditorSave" style="flex:1; justify-content:center;" onclick="saveResource()"><i class="fas fa-cloud-arrow-up"></i> Publish Resource</button>
+      </div>
+    </div>
+  </div>
+
   <div class="pd-acad-card" style="margin-top:24px"><h3><i class="fas fa-envelope" style="color:var(--pd-acad-gold)"></i> Need another format?</h3><p>Contact the ministry team if you need a document in another language, printable format or large-print edition.</p><p style="margin-top:14px"><a class="pd-acad-btn pd-acad-btn-primary" href="mailto:info@prayerdome.net"><i class="fas fa-envelope"></i> info@prayerdome.net</a></p></div>
 </main>
 <footer style="text-align:center;padding:30px;color:var(--pd-acad-muted)"><strong style="color:var(--pd-acad-blue)">Prayer Dome</strong> · Resources for every member and team.</footer>
+
+<script>
+/* Resource library data layer: merges the built-in documents with the
+   live Firestore collection and gives administrators management tools. */
+(function () {
+  'use strict';
+  var LIVE = { items: [], isAdmin: false };
+  var EDIT = { id: null, fileUrl: '', fileMeta: '', thumbUrl: '' };
+
+  function fmtBytes(n) {
+    n = Number(n) || 0;
+    if (!n) return '';
+    if (n < 1048576) return Math.round(n / 1024) + ' KB';
+    return (n / 1048576).toFixed(1) + ' MB';
+  }
+
+  function iconFor(item) {
+    var f = (item.format || '').toUpperCase();
+    if (f.indexOf('PDF') >= 0) return 'fa-file-pdf';
+    if (/^image\//.test(item.fileType || '') || f.indexOf('IMAGE') >= 0) return 'fa-file-image';
+    if (/^video\//.test(item.fileType || '') || f.indexOf('VIDEO') >= 0) return 'fa-file-video';
+    if (/^audio\//.test(item.fileType || '') || f.indexOf('AUDIO') >= 0) return 'fa-file-audio';
+    return 'fa-file-lines';
+  }
+
+  function cardHtml(r, index) {
+    var isDoc = String(r.url || '').startsWith('/');
+    var dlLabel = isDoc ? 'Download' : 'Save offline';
+    return '<article class="pd-acad-card pd-lift pd-acad-resource" style="animation:pdFadeUp .4s ease both;animation-delay:' + (index * 0.04) + 's">'
+      + '<div class="pd-acad-icon gold"><i class="fas ' + iconFor(r) + '"></i></div>'
+      + '<div style="flex:1"><h3>' + esc(r.title) + '</h3><p>' + esc(r.description || '') + '</p>'
+      + '<div class="pd-acad-meta"><span class="pd-acad-chip">' + esc(r.category || 'Resource') + '</span>'
+      + '<span class="pd-acad-chip gold">' + esc(r.format || 'FILE') + '</span>'
+      + (r.version ? '<span class="pd-acad-chip">' + esc(r.version) + '</span>' : '')
+      + (r.size ? '<span class="pd-acad-chip">' + esc(r.size) + '</span>' : '') + '</div></div>'
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
+      + '<a class="pd-acad-btn pd-acad-btn-secondary" href="' + esc(r.url) + '" target="_blank" rel="noopener"><i class="fas fa-eye"></i> Open</a>'
+      + '<a class="pd-acad-btn pd-acad-btn-primary" href="' + esc(r.downloadUrl || r.url) + '" download onclick="markSaved(this)"><i class="fas fa-download"></i> ' + dlLabel + '</a>'
+      + '</div></article>';
+  }
+
+  function esc(v) { var d = document.createElement('div'); d.textContent = v == null ? '' : String(v); return d.innerHTML; }
+
+  window.markSaved = function (el) {
+    try {
+      var url = el.getAttribute('href');
+      var saved = JSON.parse(localStorage.getItem('pd_saved_resources') || '[]');
+      if (saved.indexOf(url) < 0) { saved.push(url); localStorage.setItem('pd_saved_resources', JSON.stringify(saved.slice(-60))); }
+    } catch (e) {}
+  };
+
+  function renderAll() {
+    var grid = document.getElementById('resourceGrid');
+    if (!grid) return;
+    var builtin = (window.PD_ACADEMY && window.PD_ACADEMY.DATA && window.PD_ACADEMY.DATA.resources) || [];
+    var live = LIVE.items.filter(function (r) { return !r.archived; });
+    var countEl = document.querySelector('[data-acad-resource-count]');
+    var all = live.concat(builtin);
+    if (countEl) countEl.textContent = all.length;
+    grid.innerHTML = all.map(cardHtml).join('');
+    renderAdmin();
+  }
+  window.renderResourcesAll = renderAll;
+
+  /* ---------------- ADMIN ---------------- */
+  function renderAdmin() {
+    var panel = document.getElementById('resourceAdminPanel');
+    if (!panel || !LIVE.isAdmin) return;
+    panel.style.display = 'block';
+    var list = document.getElementById('resourceAdminList');
+    if (!LIVE.items.length) {
+      list.innerHTML = '<div style="font-size:.8rem;color:var(--pd-acad-muted);">No custom resources yet — the built-in documents below are shown to members.</div>';
+      return;
+    }
+    list.innerHTML = LIVE.items.map(function (r) {
+      return '<div style="display:flex;align-items:center;gap:12px;border:1px solid var(--border-color,#e5eaf2);border-radius:14px;padding:10px 14px;flex-wrap:wrap;' + (r.archived ? 'opacity:.55;' : '') + '">'
+        + '<div style="flex:1;min-width:180px;"><div style="font-weight:800;font-size:.85rem;">' + esc(r.title) + ' ' + (r.archived ? '<span style="font-size:.62rem;background:#fef3c7;color:#92400e;border-radius:50px;padding:2px 8px;font-weight:800;">ARCHIVED</span>' : '') + '</div>'
+        + '<div style="font-size:.72rem;color:var(--pd-acad-muted);">' + esc(r.category || '') + ' · ' + esc(r.format || '') + '</div></div>'
+        + (r.archived
+          ? '<button class="pd-acad-btn pd-acad-btn-secondary" onclick="restoreResource(\'' + r.id + '\')"><i class="fas fa-rotate-left"></i> Restore</button>'
+          : '<button class="pd-acad-btn pd-acad-btn-secondary" onclick="openResourceEditor(\'' + r.id + '\')"><i class="fas fa-pen"></i> Edit</button>'
+            + '<button class="pd-acad-btn pd-acad-btn-secondary" onclick="archiveResource(\'' + r.id + '\')"><i class="fas fa-box-archive"></i> Archive</button>')
+        + '</div>';
+    }).join('');
+  }
+
+  function findItem(id) { return LIVE.items.find(function (r) { return r.id === id; }) || null; }
+
+  window.openResourceEditor = function (id) {
+    var item = id ? findItem(id) : null;
+    EDIT.id = item ? item.id : null;
+    EDIT.fileUrl = item ? (item.downloadUrl || item.url || '') : '';
+    EDIT.fileMeta = item ? (item.format || '') : '';
+    EDIT.thumbUrl = item ? (item.thumbnail || '') : '';
+    document.getElementById('resourceEditorTitle').textContent = item ? 'Edit Resource' : 'Add Resource';
+    document.getElementById('resName').value = item ? item.title || '' : '';
+    document.getElementById('resDescription').value = item ? item.description || '' : '';
+    document.getElementById('resCategory').value = item ? (item.category || 'Other') : 'Other';
+    document.getElementById('resVersion').value = item ? item.version || '' : '';
+    document.getElementById('resFileState').textContent = EDIT.fileUrl ? 'Attached ✓ ' + EDIT.fileMeta : 'Required — opens your device picker';
+    document.getElementById('resThumbPreview').src = EDIT.thumbUrl || '/assets/logo.png';
+    document.getElementById('resourceEditorError').style.display = 'none';
+    document.getElementById('resourceEditorOverlay').style.display = 'flex';
+  };
+  window.closeResourceEditor = function () {
+    document.getElementById('resourceEditorOverlay').style.display = 'none';
+    EDIT.id = null; EDIT.fileUrl = ''; EDIT.thumbUrl = '';
+  };
+  function resError(msg) {
+    var box = document.getElementById('resourceEditorError');
+    box.textContent = msg; box.style.display = 'block';
+  }
+
+  window.pickResourceFile = async function () {
+    var res = await window.PDUpload.pick({
+      title: 'Resource file',
+      accept: 'application/pdf,image/*,video/*,audio/*,.doc,.docx,.xls,.xlsx,.ppt,.pptx',
+      preset: 'gallery_uploads',
+      folder: 'resources',
+      maxBytes: 25 * 1024 * 1024,
+      onError: resError
+    });
+    if (!res.ok) return;
+    var f = res.files[0];
+    EDIT.fileUrl = f.url;
+    EDIT.fileMeta = (f.format || 'file').toUpperCase();
+    document.getElementById('resFileState').textContent = 'Attached ✓ ' + EDIT.fileMeta + ' · ' + fmtBytes(f.bytes);
+  };
+
+  window.pickResourceThumb = async function () {
+    var res = await window.PDUpload.pick({
+      title: 'Thumbnail image',
+      accept: 'image/*',
+      preset: 'gallery_uploads',
+      folder: 'resources/thumbnails',
+      maxBytes: 5 * 1024 * 1024,
+      onError: resError
+    });
+    if (!res.ok) return;
+    EDIT.thumbUrl = res.files[0].url;
+    document.getElementById('resThumbPreview').src = EDIT.thumbUrl;
+  };
+
+  window.saveResource = async function () {
+    var name = document.getElementById('resName').value.trim();
+    if (!name) return resError('Please give the resource a name.');
+    if (!EDIT.fileUrl) return resError('Please choose the resource file.');
+    var btn = document.getElementById('resourceEditorSave');
+    btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Publishing…';
+    try {
+      var data = {
+        title: name,
+        description: document.getElementById('resDescription').value.trim(),
+        category: document.getElementById('resCategory').value,
+        version: document.getElementById('resVersion').value.trim(),
+        url: EDIT.fileUrl,
+        downloadUrl: EDIT.fileUrl,
+        format: EDIT.fileMeta || 'FILE',
+        thumbnail: EDIT.thumbUrl || '',
+        published: true,
+        archived: false,
+        updatedAt: new Date().toISOString()
+      };
+      var wasEdit = !!EDIT.id;
+      if (wasEdit) {
+        await db.updateDoc(db.doc('resources', EDIT.id), data);
+      } else {
+        data.createdAt = new Date().toISOString();
+        await db.addDoc('resources', data);
+      }
+      window.closeResourceEditor();
+      await loadLive();
+      window.showToast && window.showToast(wasEdit ? 'Resource updated ✓' : 'Resource published ✓', 'success');
+      if (!wasEdit) notifyNewResource(name, data.category);
+    } catch (e) {
+      console.error(e);
+      resError(e.code === 'permission-denied'
+        ? 'Your account does not have permission to manage resources.'
+        : 'Could not publish right now. Please try again.');
+    } finally {
+      btn.disabled = false; btn.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> Publish Resource';
+    }
+  };
+
+  window.archiveResource = async function (id) {
+    var item = findItem(id);
+    if (!item) return;
+    if (!confirm('Archive "' + item.title + '"?\nMembers will no longer see it. You can restore it anytime.')) return;
+    try { await db.updateDoc(db.doc('resources', id), { archived: true }); await loadLive(); }
+    catch (e) { window.showToast && window.showToast('Could not archive right now.', 'error'); }
+  };
+  window.restoreResource = async function (id) {
+    try { await db.updateDoc(db.doc('resources', id), { archived: false }); await loadLive(); }
+    catch (e) { window.showToast && window.showToast('Could not restore right now.', 'error'); }
+  };
+
+  /* Members' devices learn about a new resource the same way they learn
+     about live services: the queued notification is delivered by the
+     Prayer Dome push pipeline in the background. */
+  async function notifyNewResource(title, category) {
+    try {
+      if (!db || !LIVE.isAdmin) return;
+      var tokens = await db.tokens();
+      if (!tokens.length) return;
+      await db.addDoc('notifications', {
+        title: '📚 New resource available',
+        message: '"' + title + '"' + (category ? ' (' + category + ')' : '') + ' has been added to the Resource Library.',
+        type: 'resources',
+        tokens: tokens,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        createdBy: 'resource-library'
+      });
+    } catch (e) { console.warn('resource notification failed', e); }
+  }
+
+  /* ---------------- Firestore wiring ---------------- */
+  var db = null;
+  function wireFirestore() {
+    var pd = window.PDApp;
+    if (!pd || !pd._fb) return false;
+    var fb = pd._fb;
+    db = {
+      collection: function (name) { return fb.collection(fb.db, name); },
+      doc: function (name, id) { return fb.doc(fb.db, name, id); },
+      addDoc: function (name, data) { return fb.addDoc(fb.collection(fb.db, name), data); },
+      updateDoc: function (ref, data) { return fb.updateDoc(ref, data); },
+      getDocs: function (name) { return fb.getDocs(fb.collection(fb.db, name)); },
+      tokens: async function () {
+        var snap = await fb.getDocs(fb.collection(fb.db, 'userTokens'));
+        var out = [];
+        snap.forEach(function (d) { var t = d.data(); if (t && t.active !== false && t.token) out.push(t.token); });
+        return out;
+      }
+    };
+    return true;
+  }
+
+  async function loadLive() {
+    if (!db && !wireFirestore()) { setTimeout(loadLive, 1200); return; }
+    try {
+      var snap = await db.getDocs('resources');
+      var items = [];
+      snap.forEach(function (d) { items.push(Object.assign({ id: d.id }, d.data())); });
+      LIVE.items = items;
+      renderAll();
+    } catch (e) { console.warn('live resources unavailable', e); }
+  }
+
+  function checkAdmin() {
+    var pd = window.PDApp;
+    if (!pd || !pd._fb) { setTimeout(checkAdmin, 1200); return; }
+    var fb = pd._fb;
+    var tryAdmin = function (user) {
+      if (!user) return;
+      Promise.all([
+        fb.getDoc(fb.doc(fb.db, 'users', user.uid)),
+        fb.getDoc(fb.doc(fb.db, 'memberships', user.uid))
+      ]).then(function (results) {
+        var role = '';
+        results.forEach(function (snap) { if (snap.exists() && snap.data().role === 'admin') role = 'admin'; });
+        LIVE.isAdmin = role === 'admin';
+        renderAdmin();
+      }).catch(function () {});
+    };
+    // The auth session may still be restoring — poll briefly.
+    var tries = 0;
+    (function poll() {
+      tries++;
+      if (fb.auth && fb.auth.currentUser) tryAdmin(fb.auth.currentUser);
+      else if (tries < 15) setTimeout(poll, 1000);
+    })();
+  }
+
+  function boot() {
+    renderAll();
+    loadLive();
+    checkAdmin();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
 </body>
 </html>

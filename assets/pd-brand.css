@@ -71,9 +71,9 @@
   --pd-radius-lg:   32px;
 
   /* --- Prayer Dome type system -------------------------------------------
-     Montserrat (UI + body), Playfair Display (headline serif), Lora
+     Inter (UI + body), Playfair Display (headline serif), Lora
      (long-form reading) and Great Vibes (script accents, certificates). */
-  --pd-font-body:     'Montserrat', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --pd-font-body:     'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --pd-font-display:  'Playfair Display', Georgia, serif;
   --pd-font-serif:    'Lora', Georgia, serif;
   --pd-font-script:   'Great Vibes', 'Playfair Display', cursive;
@@ -1596,7 +1596,7 @@ body.dark-mode{
 .pd-share-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;}
 .pd-share-btn{
   display:inline-flex;align-items:center;gap:8px;border:none;cursor:pointer;text-decoration:none;
-  font:700 .78rem/1 var(--pd-font-body,'Montserrat',sans-serif);color:#fff;
+  font:700 .78rem/1 var(--pd-font-body,'Inter',sans-serif);color:#fff;
   padding:11px 16px;border-radius:999px;transition:transform .18s ease, box-shadow .18s ease;
 }
 .pd-share-btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(15,23,42,.18);}

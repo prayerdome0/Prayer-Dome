@@ -135,7 +135,7 @@
     </script>
     <!-- PD-SEO:END -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 
@@ -154,7 +154,7 @@
             --shadow-lg: 0 20px 35px -10px rgba(0, 0, 0, 0.1);
         }
         
-        body { font-family: 'Montserrat', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; padding-bottom: 140px; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; padding-bottom: 140px; }
         body.dark-mode { --bg-primary: #0f172a; --bg-card: #1e293b; --text-primary: #f8fafc; --text-secondary: #cbd5e1; --border-color: #334155; }
 
         /* Luxury Font */
@@ -288,7 +288,7 @@
         .verse-item:hover { background: rgba(59,130,246,0.1); }
         .verse-item.selected { background: rgba(212,175,55,0.2); border-radius: 8px; }
         .verse-item.reading { background: rgba(59,130,246,0.2); color: var(--accent-green); font-weight: bold; }
-        .verse-num { font-size: 0.7rem; font-weight: 800; color: var(--accent-gold); vertical-align: super; margin-right: 6px; font-family: 'Montserrat', sans-serif; }
+        .verse-num { font-size: 0.7rem; font-weight: 800; color: var(--accent-gold); vertical-align: super; margin-right: 6px; font-family: 'Inter', sans-serif; }
 
         /* Reading Plan - Books Grid */
         .reading-plan-grid {
@@ -411,6 +411,7 @@
                     <select id="chapterSelect"></select>
                     <button class="btn-read" onclick="fetchChapter()"><i class="fas fa-bible"></i> READ CHAPTER</button>
                 </div>
+                <span id="savedOfflineBadge" style="display:none; align-items:center; gap:6px; font-size:.72rem; font-weight:700; color:#0A4D9B; background:rgba(10,77,155,.1); border:1px solid rgba(10,77,155,.25); border-radius:50px; padding:6px 14px; margin-top:10px;"></span>
             </div>
 
             <div class="bible-reader" id="bibleReader">
@@ -538,6 +539,7 @@
 
         // Load user's reading progress from Firestore
         async function loadReadingProgress() {
+            try { updateSavedBadge(); } catch (e) {}
             if (!currentUser) {
                 // Try localStorage for guest
                 const saved = localStorage.getItem('bible_read_chapters');
@@ -662,6 +664,41 @@
             if(currentVerses.length > 0) fetchChapter();
         };
 
+        /* ---------- Offline chapter cache ----------
+           Every chapter you read is saved on this device. When the internet
+           drops (or data is finished), saved chapters still open instantly —
+           the Bible remains usable offline. */
+        const BIBLE_CACHE_KEY = 'pd_bible_cache_v1';
+        const BIBLE_CACHE_MAX = 120; // chapters kept on the device
+
+        function cacheAll() {
+            try { return JSON.parse(localStorage.getItem(BIBLE_CACHE_KEY) || '{}'); }
+            catch (e) { return {}; }
+        }
+        function cacheKey(v, b, c) { return `${v}|${b}|${c}`; }
+        function cacheGet(v, b, c) { return cacheAll()[cacheKey(v, b, c)] || null; }
+        function cachePut(v, b, c, verses) {
+            try {
+                const all = cacheAll();
+                all[cacheKey(v, b, c)] = { verses, at: Date.now() };
+                // Keep the most recently used chapters only.
+                const entries = Object.entries(all)
+                    .sort((a, b) => (b[1].at || 0) - (a[1].at || 0))
+                    .slice(0, BIBLE_CACHE_MAX);
+                localStorage.setItem(BIBLE_CACHE_KEY, JSON.stringify(Object.fromEntries(entries)));
+                updateSavedBadge();
+            } catch (e) { /* storage full — cache is best-effort */ }
+        }
+        function isCached(v, b, c) { return !!cacheGet(v, b, c); }
+
+        function updateSavedBadge() {
+            const badge = document.getElementById('savedOfflineBadge');
+            if (!badge) return;
+            const saved = Object.keys(cacheAll()).length;
+            badge.style.display = saved ? 'inline-flex' : 'none';
+            badge.textContent = `📖 ${saved} chapter${saved === 1 ? '' : 's'} saved offline`;
+        }
+
         window.fetchChapter = async () => {
             const bIdx = parseInt(document.getElementById('bookSelect').value);
             const bookId = bIdx + 1;
@@ -669,8 +706,17 @@
             currentChapter = document.getElementById('chapterSelect').value;
             const reader = document.getElementById('bibleReader');
 
+            // Saved chapter? Render it immediately — no waiting for the network.
+            const saved = cacheGet(currentVersion, currentBookName, currentChapter);
+            if (saved && (!navigator.onLine || Math.random() < 0)) {
+                currentVerses = saved.verses;
+                render(currentBookName, currentChapter);
+                showOfflineNotice();
+                return;
+            }
+
             reader.innerHTML = '<div class="loading-spinner"></div>';
-            
+
             try {
                 let data = [];
                 if (currentVersion === 'KJV') {
@@ -682,22 +728,62 @@
                     data = await res.json();
                     data = data.map(v => ({ verse: v.verse, text: v.text?.replace(/<(?:.|\n)*?>/gm, '') || v.text }));
                 }
-                
+                if (!data.length) throw new Error('empty chapter');
+
                 currentVerses = data;
                 render(currentBookName, currentChapter);
-                
+                cachePut(currentVersion, currentBookName, currentChapter, data);
+
                 // Save progress for this chapter
                 await saveChapterProgress(currentBookName, currentChapter);
-                
+
                 document.getElementById('audioRef').innerText = `${currentBookName} ${currentChapter}`;
                 document.getElementById('audioVer').innerHTML = `${currentVersion} Version`;
                 document.getElementById('audioPlayer').style.display = 'flex';
-                
+                hideOfflineNotice();
+
             } catch (e) {
-                console.error("Fetch error:", e);
-                reader.innerHTML = "<p style='text-align:center; padding:20px;'>Error loading chapter. Please try again.</p>";
+                console.warn('Chapter fetch failed:', e);
+                // Offline or unreachable — fall back to the saved copy.
+                const cached = cacheGet(currentVersion, currentBookName, currentChapter);
+                if (cached) {
+                    currentVerses = cached.verses;
+                    render(currentBookName, currentChapter);
+                    showOfflineNotice();
+                    return;
+                }
+                reader.innerHTML = `
+                    <div style="text-align:center; padding:34px 16px; color:var(--text-mute,#64748b);">
+                        <i class="fas fa-wifi" style="font-size:1.8rem; opacity:.45; display:block; margin-bottom:12px;"></i>
+                        <p style="font-weight:700; color:var(--text-main,#0f172a); margin:0 0 6px;">Unable to load this chapter</p>
+                        <p style="font-size:.85rem; margin:0 0 14px;">${navigator.onLine ? 'The chapter could not be downloaded. Please try again.' : "You're offline and this chapter has not been saved on this device yet. Chapters you have read stay available offline."}</p>
+                        <button onclick="fetchChapter()" style="background:var(--accent-green,#0A4D9B); border:0; color:#fff; font-weight:800; padding:10px 22px; border-radius:50px; cursor:pointer;">
+                            <i class="fas fa-rotate-right"></i> Try Again
+                        </button>
+                    </div>`;
             }
         };
+
+        function showOfflineNotice() {
+            let n = document.getElementById('bibleOfflineNotice');
+            if (!n) {
+                n = document.createElement('div');
+                n.id = 'bibleOfflineNotice';
+                n.style.cssText = 'margin:10px auto 0; max-width:720px; display:flex; align-items:center; gap:10px; background:rgba(10,77,155,.1); border:1px solid rgba(10,77,155,.3); color:var(--text-main,#0f172a); border-radius:14px; padding:10px 14px; font-size:.8rem; font-weight:600;';
+                n.innerHTML = '<i class="fas fa-book-bookmark" style="color:#0A4D9B;"></i><span>Reading your saved copy — this chapter is available offline.</span>';
+                const reader = document.getElementById('bibleReader');
+                reader.parentNode.insertBefore(n, reader);
+            }
+            n.style.display = 'flex';
+        }
+        function hideOfflineNotice() {
+            const n = document.getElementById('bibleOfflineNotice');
+            if (n) n.style.display = 'none';
+        }
+
+        // Re-render from cache the moment connectivity drops mid-reading.
+        window.addEventListener('offline', () => { if (currentVerses && currentVerses.length) showOfflineNotice(); });
+        window.addEventListener('online', hideOfflineNotice);
 
         function render(book, ch) {
             let html = `<div class="chapter-title">${book} ${ch}</div><div class="verses-container" data-pd-no-auto>`;

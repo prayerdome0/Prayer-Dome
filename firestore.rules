@@ -164,9 +164,12 @@ service cloud.firestore {
     }
 
     // Device Tokens for Push Notifications
+    // Members manage only their own token; administrators read the roster so
+    // broadcasts can be delivered. Token lists never leak to other members.
     match /userTokens/{tokenId} {
-      allow read, write: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow delete: if isSignedIn();
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create, update: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
     }
 
     // Sermons
@@ -252,8 +255,10 @@ service cloud.firestore {
     }
 
     // Notifications
+    // The in-app notification centre lists announcement documents; delivery
+    // documents (which carry device-token arrays) stay administrator-only.
     match /notifications/{id} {
-      allow read: if isSignedIn();
+      allow read: if isAdmin() || !('tokens' in resource.data);
       allow create: if isAdmin();
       allow update: if isAdmin();
       allow delete: if isAdmin();
@@ -284,6 +289,111 @@ service cloud.firestore {
     match /prayerChallenges/{userId} {
       allow read: if isOwner(userId) || isAdmin();
       allow write: if isOwner(userId) || isAdmin();
+    }
+
+    // ==========================================
+    // Team Management
+    // ==========================================
+    // Public sees active members only; archived profiles stay available to
+    // administrators (soft delete — nothing is lost by accident).
+    match /teamMembers/{id} {
+      allow read: if isAdmin() || resource.data.archived != true;
+      allow create, update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ==========================================
+    // Downloadable Resources library
+    // ==========================================
+    match /resources/{id} {
+      allow read: if isAdmin() || resource.data.published != false;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Prayer-wall style status posts (expire after 24h)
+    match /statuses/{id} {
+      allow read, create: if isSignedIn();
+      allow update, delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+    }
+
+    // Quiz progress and results (per member)
+    match /userQuiz/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create, update: if isOwner(userId);
+      allow delete: if isAdmin();
+    }
+
+    // Final exam submissions (member submits, admin reviews)
+    match /finalExamSubmissions/{id} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // Community study/fellowship groups — members create and join
+    match /customGroups/{id} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && (!('members' in request.resource.data) || request.auth.uid in request.resource.data.members);
+      allow update, delete: if isAdmin() || (isSignedIn() && resource.data.createdBy == request.auth.uid);
+    }
+
+    // Event RSVPs (per member, per event)
+    match /userEvents/{id} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create, update: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+    }
+
+    // Member care / support requests (member submits privately, admin manages)
+    match /memberCareRequests/{id} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    // Bible reading progress (per member — private)
+    match /bibleProgress/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    // Worship song library
+    match /worshipSongs/{id} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Private one-to-one chats — strictly between the participants
+    match /privateChats/{chatId} {
+      allow read: if isSignedIn() && request.auth.uid in resource.data.participants;
+      allow create: if isSignedIn() && request.auth.uid in request.resource.data.participants;
+      allow update: if isAdmin() || (isSignedIn() && request.auth.uid in resource.data.participants);
+      allow delete: if isAdmin();
+    }
+
+    // Game leaderboard (public board, each member owns their row)
+    match /leaderboard/{userId} {
+      allow read: if true;
+      allow create, update: if isOwner(userId);
+      allow delete: if isAdmin();
+    }
+
+    // Financial reports contain sensitive figures — administrators only.
+    match /financialReports/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    // Personal prayer reminder settings
+    match /userReminders/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    // Live prayer requests raised during a broadcast (public feed, signed-in authors)
+    match /livePrayers/{id} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
     }
   }
 }

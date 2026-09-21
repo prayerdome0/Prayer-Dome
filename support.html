@@ -126,11 +126,11 @@
     <!-- PD-SEO:END -->
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    <script src="/assets/pd-upload.js"></script>
 
     <style>
         :root {
@@ -149,7 +149,7 @@
             --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-base); color: var(--pd-navy); transition: 0.4s; overflow-x: hidden; padding-bottom: 120px; }
         body.dark-mode { --bg-base: #020617; --glass: rgba(15, 23, 42, 0.95); --pd-navy: #f8fafc; --border: #1e293b; }
 
@@ -1016,30 +1016,29 @@ window.loadMyPlans = async () => {
             document.getElementById('modalClaim').style.display = 'flex';
         };
 
-        // --- CLOUDINARY UPLOADS ---
-        window.triggerCloudinary = (context, docKey) => {
-            cloudinary.createUploadWidget({
-                cloudName: 'prayerdome',
-                uploadPreset: 'gallery_uploads', // Using standard unsigned preset
-                clientAllowedFormats:['jpg', 'jpeg', 'png', 'pdf'],
-                maxFileSize: 5000000
-            }, (error, result) => {
-                if (!error && result && result.event === "success") {
-                    const url = result.info.secure_url;
-                    
-                    if(context === 'deposit') {
-                        claimDocs['receipt'] = url;
-                        document.getElementById('stat_receipt').innerText = "✅ Uploaded";
-                        document.getElementById('stat_receipt').classList.add('success');
-                        toast('Payment receipt attached!');
-                    } else if (context === 'claim') {
-                        claimDocs[docKey] = url;
-                        document.getElementById(`stat_${docKey}`).innerText = "✅ Uploaded";
-                        document.getElementById(`stat_${docKey}`).classList.add('success');
-                        toast('Document attached successfully!');
-                    }
-                }
-            }).open();
+        // --- ATTACHMENTS (native picker, upload in background) ---
+        window.triggerCloudinary = async (context, docKey) => {
+            const res = await PDUpload.pick({
+                title: context === 'deposit' ? 'Attach payment receipt' : 'Attach document',
+                accept: 'image/*,application/pdf',
+                preset: 'gallery_uploads',
+                maxBytes: 5000000,
+                onError: (m) => toast(m, 'error')
+            });
+            if (!res.ok) return;
+            const url = res.files[0].url;
+
+            if(context === 'deposit') {
+                claimDocs['receipt'] = url;
+                document.getElementById('stat_receipt').innerText = "✅ Attached";
+                document.getElementById('stat_receipt').classList.add('success');
+                toast('Payment receipt attached!');
+            } else if (context === 'claim') {
+                claimDocs[docKey] = url;
+                document.getElementById(`stat_${docKey}`).innerText = "✅ Attached";
+                document.getElementById(`stat_${docKey}`).classList.add('success');
+                toast('Document attached successfully!');
+            }
         };
 
         window.submitClaim = async (planType, docsJson) => {
