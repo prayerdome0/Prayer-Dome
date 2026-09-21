@@ -670,6 +670,7 @@
 <script src="/assets/pd-phrases.js" defer></script>
 <script src="/assets/pd-i18n.js" defer></script>
 <script src="/assets/pd-app.js" defer></script>
+    <script src="/assets/pd-upload.js" defer></script>
 </head>
 <body>
     <header class="team-header">
@@ -701,28 +702,87 @@
         </div>
 
         <!-- Founder Featured Card -->
-        <div class="founder-featured">
+        <div class="founder-featured" id="founderCard">
             <div class="founder-image">
-                <img src="https://i.ibb.co/RTbNh1hB/founder-2.jpg" alt="Founder Seedwell Khayalethu Masuku"
+                <img id="founderImage" src="https://i.ibb.co/RTbNh1hB/founder-2.jpg" alt="Founder Seedwell Khayalethu Masuku"
                      loading="lazy" decoding="async"
                      onerror="this.onerror=null;this.src='/assets/logo.png';this.style.objectFit='contain';this.style.padding='16px';this.style.background='#fff';">
             </div>
-            <h1>Seedwell Khayalethu Masuku</h1>
-            <h3><i class="fas fa-crown"></i> Founder & Senior Pastor</h3>
-            <p>"A House of Prayer for All Nations – Matthew 21:13. Our calling is to see lives transformed through the power of prayer and the Word of God."</p>
+            <h1 id="founderName">Seedwell Khayalethu Masuku</h1>
+            <h3 id="founderTitle"><i class="fas fa-crown"></i> Founder &amp; Senior Pastor</h3>
+            <p id="founderQuote">"A House of Prayer for All Nations – Matthew 21:13. Our calling is to see lives transformed through the power of prayer and the Word of God."</p>
         </div>
 
         <!-- Category Tabs -->
-        <div class="category-tabs">
-            <button class="category-btn active" onclick="filterTeam('all')"><i class="fas fa-users"></i> All Team (16)</button>
-            <button class="category-btn" onclick="filterTeam('eswatini')"><i class="fas fa-flag"></i> Eswatini (6)</button>
-            <button class="category-btn" onclick="filterTeam('zambia')"><i class="fas fa-flag"></i> Zambia (2)</button>
-            <button class="category-btn" onclick="filterTeam('worship')"><i class="fas fa-music"></i> Worship (5)</button>
-            <button class="category-btn" onclick="filterTeam('ministries')"><i class="fas fa-church"></i> Ministries (2)</button>
+        <div class="category-tabs" id="categoryTabs">
+            <button class="category-btn active" onclick="filterTeam('all')"><i class="fas fa-users"></i> All Team</button>
+            <button class="category-btn" onclick="filterTeam('eswatini')"><i class="fas fa-flag"></i> Eswatini</button>
+            <button class="category-btn" onclick="filterTeam('zambia')"><i class="fas fa-flag"></i> Zambia</button>
+            <button class="category-btn" onclick="filterTeam('worship')"><i class="fas fa-music"></i> Worship</button>
+            <button class="category-btn" onclick="filterTeam('ministries')"><i class="fas fa-church"></i> Ministries</button>
         </div>
 
         <!-- Team Grid -->
         <div id="teamGrid" class="team-grid"></div>
+
+        <!-- ADMIN: Team Management (visible to administrators only) -->
+        <section id="teamAdminPanel" style="display:none; margin-top:28px; background:var(--bg-primary,#fff); border:1px solid rgba(10,77,155,.25); border-radius:20px; padding:22px;">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <h2 style="margin:0; font-size:1.05rem; color:#0A4D9B;"><i class="fas fa-user-gear"></i> Team Management</h2>
+                <span id="teamAdminBadge" style="font-size:.68rem; font-weight:800; letter-spacing:.6px; background:rgba(10,77,155,.12); color:#0A4D9B; border-radius:50px; padding:4px 12px;">ADMIN</span>
+                <button class="category-btn" style="margin-left:auto;" onclick="openTeamEditor()"><i class="fas fa-plus"></i> Add Team Member</button>
+            </div>
+            <p style="font-size:.78rem; color:var(--text-sub,#64748b); margin:8px 0 14px;">Changes appear on the public team page immediately. Removing a member archives their profile — nothing is deleted without a second confirmation.</p>
+            <div id="teamAdminList" style="display:grid; gap:10px;"></div>
+        </section>
+
+        <!-- ADMIN: editor modal -->
+        <div id="teamEditorOverlay" style="display:none; position:fixed; inset:0; background:rgba(4,12,28,.7); backdrop-filter:blur(6px); z-index:1000; align-items:center; justify-content:center; padding:16px;" onclick="if(event.target===this)closeTeamEditor()">
+            <div style="background:var(--bg-primary,#fff); color:var(--text-main,#0f172a); border-radius:22px; max-width:520px; width:100%; max-height:88vh; overflow:auto;" onclick="event.stopPropagation()">
+                <div style="display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border-color,#e5eaf2); position:sticky; top:0; background:var(--bg-primary,#fff); border-radius:22px 22px 0 0;">
+                    <img src="/assets/logo.png" alt="" style="width:30px;height:30px;border-radius:8px;object-fit:contain;">
+                    <h3 id="teamEditorTitle" style="margin:0; font-size:1rem; color:#0A4D9B; flex:1;">Add Team Member</h3>
+                    <button onclick="closeTeamEditor()" style="border:0;background:var(--bg-card,#f1f4f9);width:32px;height:32px;border-radius:50%;cursor:pointer;color:inherit;"><i class="fas fa-xmark"></i></button>
+                </div>
+                <div style="padding:18px 20px; display:grid; gap:12px;">
+                    <div style="display:flex; gap:14px; align-items:center;">
+                        <img id="tmPhotoPreview" src="/assets/logo.png" alt="" style="width:74px;height:74px;border-radius:16px;object-fit:cover;background:#eef2f8;">
+                        <div>
+                            <button type="button" class="category-btn" onclick="pickTeamPhoto()"><i class="fas fa-camera"></i> Choose Photo</button>
+                            <div id="tmPhotoState" style="font-size:.72rem;color:var(--text-sub,#64748b);margin-top:6px;">Photos open your device picker and upload automatically.</div>
+                        </div>
+                    </div>
+                    <label style="display:grid;gap:5px;font-size:.78rem;font-weight:700;">Full name<input id="tmName" maxlength="80" style="margin-top:4px;padding:11px 12px;border-radius:12px;border:1px solid var(--border-color,#d7dee9);background:var(--bg-card,#fff);color:inherit;font:inherit;"></label>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <label style="display:grid;gap:5px;font-size:.78rem;font-weight:700;">Position / Title<input id="tmTitle" maxlength="100" style="margin-top:4px;padding:11px 12px;border-radius:12px;border:1px solid var(--border-color,#d7dee9);background:var(--bg-card,#fff);color:inherit;font:inherit;"></label>
+                        <label style="display:grid;gap:5px;font-size:.78rem;font-weight:700;">Role label<input id="tmRole" maxlength="60" placeholder="e.g. Senior Pastor" style="margin-top:4px;padding:11px 12px;border-radius:12px;border:1px solid var(--border-color,#d7dee9);background:var(--bg-card,#fff);color:inherit;font:inherit;"></label>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <label style="display:grid;gap:5px;font-size:.78rem;font-weight:700;">Category
+                            <select id="tmCategory" style="margin-top:4px;padding:11px 12px;border-radius:12px;border:1px solid var(--border-color,#d7dee9);background:var(--bg-card,#fff);color:inherit;font:inherit;">
+                                <option value="eswatini">Eswatini</option>
+                                <option value="zambia">Zambia</option>
+                                <option value="worship">Worship</option>
+                                <option value="ministries">Ministries</option>
+                                <option value="founder">Founder</option>
+                            </select>
+                        </label>
+                        <label style="display:grid;gap:5px;font-size:.78rem;font-weight:700;">Country / Region<input id="tmCountry" maxlength="60" style="margin-top:4px;padding:11px 12px;border-radius:12px;border:1px solid var(--border-color,#d7dee9);background:var(--bg-card,#fff);color:inherit;font:inherit;"></label>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <label style="display:grid;gap:5px;font-size:.78rem;font-weight:700;">Email<input id="tmEmail" type="email" maxlength="120" style="margin-top:4px;padding:11px 12px;border-radius:12px;border:1px solid var(--border-color,#d7dee9);background:var(--bg-card,#fff);color:inherit;font:inherit;"></label>
+                        <label style="display:grid;gap:5px;font-size:.78rem;font-weight:700;">Phone<input id="tmPhone" type="tel" maxlength="30" style="margin-top:4px;padding:11px 12px;border-radius:12px;border:1px solid var(--border-color,#d7dee9);background:var(--bg-card,#fff);color:inherit;font:inherit;"></label>
+                    </div>
+                    <label style="display:grid;gap:5px;font-size:.78rem;font-weight:700;">Description<input id="tmDescription" maxlength="300" style="margin-top:4px;padding:11px 12px;border-radius:12px;border:1px solid var(--border-color,#d7dee9);background:var(--bg-card,#fff);color:inherit;font:inherit;"></label>
+                    <label style="display:grid;gap:5px;font-size:.78rem;font-weight:700;">Favourite scripture <span style="font-weight:400;color:var(--text-sub,#64748b)">(optional)</span><input id="tmScripture" maxlength="60" style="margin-top:4px;padding:11px 12px;border-radius:12px;border:1px solid var(--border-color,#d7dee9);background:var(--bg-card,#fff);color:inherit;font:inherit;"></label>
+                    <div id="teamEditorError" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:12px;padding:10px 12px;font-size:.8rem;"></div>
+                </div>
+                <div style="display:flex; gap:10px; padding:0 20px 20px;">
+                    <button class="category-btn" style="flex:1; justify-content:center;" onclick="closeTeamEditor()">Cancel</button>
+                    <button class="category-btn active" id="teamEditorSave" style="flex:1; justify-content:center;" onclick="saveTeamMember()"><i class="fas fa-cloud-arrow-up"></i> Save Member</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Footer -->
@@ -760,8 +820,9 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
-        // Team Data
-        const teamMembers = [
+        // Built-in roster: seeds Firestore on first admin edit and doubles as
+        // the offline/fallback presentation of the team.
+        const DEFAULT_TEAM = [
             { name: "Seedwell K. Masuku", title: "Founder & Senior Pastor", category: "founder", image: "https://i.ibb.co/RTbNh1hB/founder-2.jpg", description: "Visionary leader called to raise prayer warriors across nations. Founder of Prayer Dome Ministry with a heart for intercession and revival.", country: "Eswatini/Zambia", scripture: "Matthew 21:13" },
             { name: "Pastor Philmon Gumbi", title: "Prayer Dome Pastor - Eswatini", category: "eswatini", image: "https://i.ibb.co/6c7wRtJW/philmon.jpg", description: "Committed to leading prayer services and preaching the Word. Passionate about seeing lives transformed through the power of prayer.", country: "Eswatini", role: "Senior Pastor" },
             { name: "Pastor Sabelo Simelane", title: "Prayer Dome Pastor - Eswatini", category: "eswatini", image: "https://i.ibb.co/tp58qGfQ/sabelo-1.jpg", description: "Focuses on intercession, counseling, and encouraging members. Dedicated to spiritual growth and discipleship.", country: "Eswatini", role: "Pastor" },
@@ -782,13 +843,46 @@
 
         let currentFilter = "all";
 
+        // Live roster: Firestore documents when available, otherwise the
+        // built-in roster. Profiles carry contact details and ordering.
+        const TEAM_STATE = { members: null, admins: {} };
+
+        function activeMembers() {
+            if (TEAM_STATE.members && TEAM_STATE.members.length) {
+                return TEAM_STATE.members
+                    .filter(m => !m.archived)
+                    .sort((a, b) => (a.order || 999) - (b.order || 999) || String(a.name).localeCompare(String(b.name)));
+            }
+            return DEFAULT_TEAM;
+        }
+
+        window.renderTeam = renderTeam;
         function renderTeam() {
             const container = document.getElementById('teamGrid');
-            let filtered = teamMembers;
+            let filtered = activeMembers();
             if (currentFilter !== 'all') {
-                filtered = teamMembers.filter(member => member.category === currentFilter);
+                filtered = filtered.filter(member => member.category === currentFilter);
             }
-            
+
+            // Counts on the category tabs.
+            const all = activeMembers();
+            const counts = { all: all.length };
+            all.forEach(m => { counts[m.category] = (counts[m.category] || 0) + 1; });
+            document.querySelectorAll('#categoryTabs .category-btn').forEach(btn => {
+                const m = /filterTeam\('([a-z]+)'\)/.exec(btn.getAttribute('onclick') || '');
+                if (!m) return;
+                const cat = m[1];
+                const label = btn.dataset.baseLabel || (btn.dataset.baseLabel = btn.textContent.replace(/\s*\(\d+\)\s*$/, '').trim());
+                btn.textContent = label + (counts[cat] !== undefined ? ` (${counts[cat]})` : ' (0)');
+            });
+
+            renderFounder(all);
+            renderTeamAdmin();
+
+            if (!filtered.length) {
+                container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-sub,#64748b);"><i class="fas fa-users" style="font-size:1.6rem;opacity:.4;display:block;margin-bottom:10px;"></i>No team members in this category yet.</div>';
+                return;
+            }
             container.innerHTML = filtered.map((member, index) => `
                 <div class="team-card" style="animation-delay: ${index * 0.05}s">
                     <div class="team-image">
@@ -808,7 +902,8 @@
                         <div class="team-social">
                             <a href="#" onclick="shareTeamMember('${member.name}')"><i class="fas fa-share-alt"></i></a>
                             <a href="#" onclick="prayForMember('${member.name}')"><i class="fas fa-praying-hands"></i></a>
-                            <a href="#" onclick="contactMember('${member.name}')"><i class="fas fa-envelope"></i></a>
+                            ${member.email ? `<a href="mailto:${member.email}" title="Email ${member.name}"><i class="fas fa-envelope"></i></a>` : `<a href="#" onclick="contactMember('${member.name}')"><i class="fas fa-envelope"></i></a>`}
+                            ${member.phone ? `<a href="tel:${member.phone}" title="Call ${member.name}"><i class="fas fa-phone"></i></a>` : ''}
                         </div>
                     </div>
                 </div>
@@ -879,7 +974,226 @@
             if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
         };
 
-        renderTeam();
+        function renderFounder(all) {
+            const founder = all.find(m => m.category === 'founder');
+            if (!founder) return;
+            const img = document.getElementById('founderImage');
+            const name = document.getElementById('founderName');
+            const title = document.getElementById('founderTitle');
+            const quote = document.getElementById('founderQuote');
+            if (founder.image && img && img.src !== founder.image) img.src = founder.image;
+            if (name && founder.name) name.textContent = founder.name;
+            if (title && founder.title) title.innerHTML = '<i class="fas fa-crown"></i> ' + founder.title;
+            if (quote && founder.description) quote.textContent = '"' + founder.description + (founder.scripture ? ' – ' + founder.scripture : '') + '"';
+        }
+
+        /* ================= ADMIN: team management ================= */
+        function renderTeamAdmin() {
+            const panel = document.getElementById('teamAdminPanel');
+            if (!panel || !TEAM_STATE.isAdmin) return;
+            panel.style.display = 'block';
+            const members = TEAM_STATE.members || [];
+            const list = document.getElementById('teamAdminList');
+            if (!members.length) {
+                list.innerHTML = '<div style="font-size:.8rem;color:var(--text-sub,#64748b);">The live roster is empty — the built-in roster below is shown to members. Add your first member to take control.</div>';
+                return;
+            }
+            const sorted = members.slice().sort((a, b) => (a.archived ? 1 : 0) - (b.archived ? 1 : 0) || (a.order || 999) - (b.order || 999));
+            list.innerHTML = sorted.map(m => `
+                <div style="display:flex;align-items:center;gap:12px;border:1px solid var(--border-color,#e5eaf2);border-radius:14px;padding:10px 14px;${m.archived ? 'opacity:.55;' : ''}">
+                    <img src="${m.image || '/assets/logo.png'}" alt="" style="width:44px;height:44px;border-radius:12px;object-fit:cover;background:#eef2f8;" onerror="this.src='/assets/logo.png'">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:800;font-size:.85rem;">${m.name} ${m.archived ? '<span style="font-size:.62rem;background:#fef3c7;color:#92400e;border-radius:50px;padding:2px 8px;font-weight:800;">ARCHIVED</span>' : ''}</div>
+                        <div style="font-size:.72rem;color:var(--text-sub,#64748b);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.title || ''}${m.email ? ' · ' + m.email : ''}${m.phone ? ' · ' + m.phone : ''}</div>
+                    </div>
+                    ${m.archived
+                        ? `<button class="category-btn" onclick="restoreTeamMember('${m.id}')" title="Restore"><i class="fas fa-rotate-left"></i></button>`
+                        : `<button class="category-btn" onclick="openTeamEditor('${m.id}')" title="Edit"><i class="fas fa-pen"></i></button>
+                           <button class="category-btn" onclick="archiveTeamMember('${m.id}')" title="Archive" style="color:#b45309;"><i class="fas fa-box-archive"></i></button>`}
+                </div>
+            `).join('');
+        }
+
+        window.TEAM_PAGE = TEAM_STATE;
+    </script>
+
+    <!-- Firebase + team data layer (module) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo",
+            authDomain: "prayer-dome.firebaseapp.com",
+            projectId: "prayer-dome",
+            storageBucket: "prayer-dome.firebasestorage.app",
+            messagingSenderId: "198295153196",
+            appId: "1:198295153196:web:1222b31948d7974ba3bf89"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const state = window.TEAM_PAGE;
+        let isAdmin = false;
+        let editorId = null;      // null = adding a new member
+        let photoUrl = '';        // chosen/uploaded photo for the editor
+        let pendingFile = null;   // file chosen, upload starts on save
+
+        /* ---------- load the roster ---------- */
+        async function loadTeam() {
+            try {
+                const snap = await getDocs(query(collection(db, 'teamMembers'), orderBy('order', 'asc')));
+                const members = [];
+                snap.forEach(d => members.push(Object.assign({ id: d.id }, d.data())));
+                state.members = members;
+                window.renderTeam && window.renderTeam();
+            } catch (e) {
+                console.warn('team roster unavailable offline — showing the built-in roster', e);
+            }
+        }
+
+        /* ---------- admin detection ---------- */
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { setAdmin(false); return; }
+            try {
+                const [userSnap, memberSnap] = await Promise.all([
+                    getDoc(doc(db, 'users', user.uid)),
+                    getDoc(doc(db, 'memberships', user.uid))
+                ]);
+                const role = (userSnap.exists() && userSnap.data().role) || (memberSnap.exists() && memberSnap.data().role) || '';
+                setAdmin(role === 'admin');
+            } catch (e) { setAdmin(false); }
+        });
+
+        function setAdmin(v) {
+            isAdmin = v;
+            state.isAdmin = v;
+            window.renderTeam && window.renderTeam();
+        }
+
+        /* ---------- editor ---------- */
+        function openEditor(member) {
+            editorId = member ? member.id : null;
+            photoUrl = member ? (member.image || '') : '';
+            pendingFile = null;
+            document.getElementById('teamEditorTitle').textContent = member ? 'Edit Team Member' : 'Add Team Member';
+            document.getElementById('tmName').value = member?.name || '';
+            document.getElementById('tmTitle').value = member?.title || '';
+            document.getElementById('tmRole').value = member?.role || '';
+            document.getElementById('tmCategory').value = member?.category || 'eswatini';
+            document.getElementById('tmCountry').value = member?.country || '';
+            document.getElementById('tmEmail').value = member?.email || '';
+            document.getElementById('tmPhone').value = member?.phone || '';
+            document.getElementById('tmDescription').value = member?.description || '';
+            document.getElementById('tmScripture').value = member?.scripture || '';
+            document.getElementById('tmPhotoPreview').src = photoUrl || '/assets/logo.png';
+            document.getElementById('tmPhotoState').textContent = 'Photos open your device picker and upload automatically.';
+            document.getElementById('teamEditorError').style.display = 'none';
+            document.getElementById('teamEditorOverlay').style.display = 'flex';
+        }
+        window.openTeamEditor = function (id) {
+            const member = id && state.members ? state.members.find(m => m.id === id) : null;
+            openEditor(member || null);
+        };
+        window.closeTeamEditor = function () {
+            document.getElementById('teamEditorOverlay').style.display = 'none';
+            editorId = null; pendingFile = null;
+        };
+
+        window.pickTeamPhoto = async function () {
+            const res = await window.PDUpload.pick({
+                title: 'Team member photo',
+                accept: 'image/*',
+                preset: 'profile_photos',
+                folder: 'team',
+                maxBytes: 8 * 1024 * 1024,
+                onError: (m) => teamEditorError(m)
+            });
+            if (!res.ok) return;
+            const f = res.files[0];
+            photoUrl = f.url;
+            pendingFile = null;
+            document.getElementById('tmPhotoPreview').src = photoUrl;
+            document.getElementById('tmPhotoState').textContent = 'Photo attached ✓';
+        };
+
+        function teamEditorError(msg) {
+            const box = document.getElementById('teamEditorError');
+            box.textContent = msg;
+            box.style.display = 'block';
+        }
+
+        window.saveTeamMember = async function () {
+            if (!isAdmin) return;
+            const name = document.getElementById('tmName').value.trim();
+            if (!name) return teamEditorError('Please enter the member\'s full name.');
+            const btn = document.getElementById('teamEditorSave');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Saving…';
+            try {
+                const data = {
+                    name,
+                    title: document.getElementById('tmTitle').value.trim(),
+                    role: document.getElementById('tmRole').value.trim(),
+                    category: document.getElementById('tmCategory').value,
+                    country: document.getElementById('tmCountry').value.trim(),
+                    email: document.getElementById('tmEmail').value.trim(),
+                    phone: document.getElementById('tmPhone').value.trim(),
+                    description: document.getElementById('tmDescription').value.trim(),
+                    scripture: document.getElementById('tmScripture').value.trim(),
+                    image: photoUrl || '',
+                    archived: false,
+                    updatedAt: serverTimestamp()
+                };
+                if (editorId) {
+                    await updateDoc(doc(db, 'teamMembers', editorId), data);
+                } else {
+                    const existing = state.members || [];
+                    data.order = existing.length ? Math.max(...existing.map(m => m.order || 0)) + 1 : 1;
+                    data.createdAt = serverTimestamp();
+                    await setDoc(doc(collection(db, 'teamMembers')), data);
+                }
+                window.closeTeamEditor();
+                await loadTeam();
+                window.showToast && window.showToast(editorId ? 'Team member updated ✓' : 'Team member added ✓', 'success');
+            } catch (e) {
+                console.error(e);
+                teamEditorError(e.code === 'permission-denied'
+                    ? 'Your account does not have permission to manage the team.'
+                    : 'Could not save right now. Please check your connection and try again.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> Save Member';
+            }
+        };
+
+        /* ---------- archive / restore (soft delete) ---------- */
+        window.archiveTeamMember = async function (id) {
+            const m = state.members && state.members.find(x => x.id === id);
+            if (!m) return;
+            if (!confirm('Archive ' + m.name + '?\n\nThey will no longer appear on the public team page. You can restore them anytime — nothing is permanently deleted.')) return;
+            try {
+                await updateDoc(doc(db, 'teamMembers', id), { archived: true, archivedAt: serverTimestamp(), archivedBy: auth.currentUser?.uid || null });
+                await loadTeam();
+                window.showToast && window.showToast(m.name + ' archived — restore anytime from this panel.', 'info');
+            } catch (e) {
+                window.showToast && window.showToast('Could not archive right now. Please try again.', 'error');
+            }
+        };
+
+        window.restoreTeamMember = async function (id) {
+            try {
+                await updateDoc(doc(db, 'teamMembers', id), { archived: false, restoredAt: serverTimestamp() });
+                await loadTeam();
+                window.showToast && window.showToast('Team member restored ✓', 'success');
+            } catch (e) {
+                window.showToast && window.showToast('Could not restore right now. Please try again.', 'error');
+            }
+        };
+
+        loadTeam();
     </script>
 </body>
 </html>
