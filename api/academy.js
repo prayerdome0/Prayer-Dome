@@ -9,8 +9,13 @@ function getAcademyData() {
   const vm = require('vm');
   const sandbox = { window: {} };
   sandbox.window.PD_ACADEMY = {};
-  const file = path.join(__dirname, '..', 'assets', 'pd-academy-data.js');
-  vm.runInNewContext(fs.readFileSync(file, 'utf8'), sandbox, { filename: 'pd-academy-data.js' });
+  const assetsDir = path.join(__dirname, '..', 'assets');
+  // The main data file defines tracks/lessons/quizzes; the questions
+  // extension augments every quiz with a 30+ question bank. Load in order.
+  ['pd-academy-data.js', 'pd-academy-questions.js'].forEach(function (file) {
+    const p = path.join(assetsDir, file);
+    if (fs.existsSync(p)) vm.runInNewContext(fs.readFileSync(p, 'utf8'), sandbox, { filename: file });
+  });
   return sandbox.window.PD_ACADEMY.DATA;
 }
 
