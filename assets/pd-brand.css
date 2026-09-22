@@ -1375,6 +1375,756 @@ body.dark-mode .pd-chat-item .pd-chat-name { color: #93c5fd; }
   * { scroll-behavior: auto !important; }
 }
 
+/* ==========================================================================
+   E-Learning Flow Upgrade — student dashboard, lesson hero, quiz modal
+   ========================================================================== */
+
+/* --- Student dashboard ---------------------------------------------------- */
+.pd-acad-student-dashboard {
+  margin: 28px 0 8px;
+  background: linear-gradient(135deg, var(--pd-acad-soft), rgba(212,175,55,.06));
+  border: 1px solid var(--pd-acad-border);
+  border-radius: 28px;
+  padding: 26px 24px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.pd-acad-student-dashboard::before {
+  content: '';
+  position: absolute;
+  right: -120px; top: -120px;
+  width: 280px; height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,175,55,.18), transparent 65%);
+  pointer-events: none;
+}
+.pd-acad-student-dashboard-head {
+  display: flex;
+  gap: 18px;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 1;
+}
+.pd-acad-student-dashboard-head h2 {
+  margin: 8px 0 6px;
+  font-family: var(--pd-font-display);
+  font-size: clamp(1.4rem, 3.4vw, 1.95rem);
+  color: var(--pd-acad-blue);
+  line-height: 1.15;
+}
+.pd-acad-student-dashboard-head p {
+  margin: 0;
+  color: var(--pd-acad-muted);
+  max-width: 540px;
+  line-height: 1.6;
+}
+.pd-acad-student-dashboard-greet {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--pd-acad-card);
+  border: 1px solid var(--pd-acad-border);
+  color: var(--pd-acad-ink);
+  font-weight: 800;
+  font-size: .9rem;
+  box-shadow: var(--pd-shadow-sm);
+}
+.pd-acad-student-dashboard-greet i {
+  color: var(--pd-gold);
+}
+.pd-acad-student-grid {
+  position: relative;
+  z-index: 1;
+}
+.pd-acad-stat-card { display: flex; flex-direction: column; gap: 4px; }
+.pd-acad-stat-card strong {
+  font-size: 1.6rem;
+  line-height: 1.05;
+}
+.pd-acad-stat-card .pd-acad-progress {
+  margin: 6px 0 0;
+}
+.pd-acad-stat-wide { grid-column: span 2; }
+@media (max-width: 900px) { .pd-acad-stat-wide { grid-column: auto; } }
+
+/* --- Lesson hero banner -------------------------------------------------- */
+.pd-acad-lesson-hero {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  margin-bottom: 22px;
+  min-height: 200px;
+  display: flex;
+  align-items: flex-end;
+  background: var(--pd-grad-horizon);
+  color: #fff;
+  isolation: isolate;
+}
+.pd-acad-lesson-hero-img {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.05);
+}
+.pd-acad-lesson-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 30%, rgba(212,175,55,.30) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(7,36,77,.35) 0%, rgba(7,36,77,.65) 65%, rgba(7,36,77,.92) 100%);
+  pointer-events: none;
+}
+.pd-acad-lesson-hero-body {
+  position: relative;
+  z-index: 2;
+  padding: 26px 28px 24px;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.pd-acad-lesson-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.pd-acad-lesson-hero h2 {
+  font-family: var(--pd-font-display);
+  font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+  line-height: 1.05;
+  margin: 4px 0 8px;
+  color: #fff;
+  text-shadow: 0 4px 24px rgba(0,0,0,.4);
+  max-width: 760px;
+}
+.pd-acad-lesson-hero .subtitle {
+  color: rgba(255,255,255,.92);
+  margin: 0;
+  max-width: 620px;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.pd-acad-lesson-hero-stats {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 16px;
+  padding: 10px 16px;
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-weight: 800;
+  font-size: .82rem;
+}
+.pd-acad-lesson-hero-stats span { display: inline-flex; align-items: center; gap: 6px; }
+.pd-acad-lesson-hero-stats i { color: var(--pd-gold); }
+.pd-acad-lesson-progress {
+  position: relative;
+  z-index: 2;
+  padding: 14px 28px 22px;
+  width: 100%;
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+.pd-acad-lesson-progress-bar {
+  flex: 1;
+  min-width: 200px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.2);
+  overflow: hidden;
+}
+.pd-acad-lesson-progress-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--pd-gold), #fff);
+  transition: width .45s ease;
+}
+.pd-acad-lesson-progress-label {
+  color: #fff;
+  font-size: .82rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+.pd-acad-lesson-objectives {
+  background: rgba(212,175,55,.13);
+  border: 1px solid rgba(212,175,55,.4);
+  border-radius: 16px;
+  padding: 14px 18px;
+  margin-bottom: 22px;
+  color: var(--pd-acad-ink);
+}
+.pd-acad-lesson-objectives h4 {
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--pd-acad-blue);
+}
+.pd-acad-lesson-objectives ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--pd-acad-muted);
+  line-height: 1.7;
+}
+
+/* --- Take Quiz gate button ----------------------------------------------- */
+.pd-acad-quiz-gate {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.pd-acad-take-quiz-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 32px;
+  border-radius: 999px;
+  border: 0;
+  background: linear-gradient(135deg, var(--pd-gold) 0%, #b8941f 100%);
+  color: #1f1408;
+  font-weight: 900;
+  font-size: 1.05rem;
+  letter-spacing: .02em;
+  cursor: pointer;
+  box-shadow: 0 18px 40px rgba(212,175,55,.35), inset 0 0 0 1px rgba(255,255,255,.4);
+  transition: transform .3s var(--pd-ease-back), box-shadow .3s var(--pd-ease);
+  overflow: hidden;
+  isolation: isolate;
+}
+.pd-acad-take-quiz-cta::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--pd-gold), #fff, var(--pd-gold));
+  z-index: -1;
+  filter: blur(18px);
+  opacity: .55;
+  transition: opacity .3s;
+}
+.pd-acad-take-quiz-cta:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 28px 60px rgba(212,175,55,.45); }
+.pd-acad-take-quiz-cta:hover::after { opacity: 1; }
+.pd-acad-take-quiz-cta .pd-acad-cta-pulse {
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 2px solid var(--pd-gold);
+  opacity: .8;
+  animation: pd-cta-pulse 1.6s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes pd-cta-pulse {
+  0% { transform: scale(.94); opacity: .8; }
+  100% { transform: scale(1.15); opacity: 0; }
+}
+.pd-acad-take-quiz-cta i { font-size: 1.15rem; }
+
+.pd-acad-take-quiz-locked {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 28px;
+  border-radius: 999px;
+  border: 1.5px dashed var(--pd-acad-border);
+  background: var(--pd-acad-card);
+  color: var(--pd-acad-muted);
+  font-weight: 800;
+  font-size: .98rem;
+  cursor: not-allowed;
+}
+.pd-acad-take-quiz-locked i { color: var(--pd-acad-blue); }
+
+.pd-acad-completion-progress {
+  flex: 1 1 200px;
+  min-width: 200px;
+}
+.pd-acad-completion-progress .pd-acad-progress { margin: 6px 0 0; }
+.pd-acad-completion-progress small { color: var(--pd-acad-muted); font-size: .78rem; font-weight: 700; }
+
+.pd-acad-mark-read {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: 0;
+  background: linear-gradient(135deg, var(--pd-blue), var(--pd-blue-deep));
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--pd-glow-teal);
+  transition: transform .3s var(--pd-ease-back);
+}
+.pd-acad-mark-read:hover { transform: translateY(-2px) scale(1.02); }
+.pd-acad-mark-read.is-complete {
+  background: rgba(212,175,55,.16);
+  color: var(--pd-gold-deep);
+  border: 1px solid rgba(212,175,55,.5);
+  box-shadow: none;
+  cursor: default;
+}
+
+/* --- Quiz modal flow ----------------------------------------------------- */
+.pd-acad-quiz-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1080;
+  background: rgba(7,36,77,.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s var(--pd-ease);
+}
+.pd-acad-quiz-overlay.open { opacity: 1; pointer-events: auto; }
+.pd-acad-quiz-modal {
+  width: 100%;
+  max-width: 720px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: var(--pd-acad-card);
+  border-radius: 32px;
+  box-shadow: 0 30px 70px rgba(0,0,0,.35);
+  border: 1px solid var(--pd-acad-border);
+  color: var(--pd-acad-ink);
+  position: relative;
+  transform: translateY(20px) scale(.97);
+  transition: transform .35s var(--pd-ease-back);
+}
+.pd-acad-quiz-overlay.open .pd-acad-quiz-modal {
+  transform: none;
+}
+.pd-acad-quiz-modal-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: linear-gradient(135deg, var(--pd-blue-deep), var(--pd-blue));
+  color: #fff;
+  padding: 22px 26px 18px;
+  border-radius: 32px 32px 0 0;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+}
+.pd-acad-quiz-modal-head h3 {
+  margin: 0;
+  font-family: var(--pd-font-display);
+  font-size: 1.25rem;
+}
+.pd-acad-quiz-modal-head small {
+  display: block;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.78);
+}
+.pd-acad-quiz-modal-close {
+  border: none;
+  background: rgba(255,255,255,.18);
+  color: #fff;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .2s ease, background .2s ease;
+}
+.pd-acad-quiz-modal-close:hover { transform: rotate(90deg); background: rgba(255,255,255,.3); }
+
+.pd-acad-quiz-progress-strip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 26px;
+  background: var(--pd-acad-soft);
+  border-bottom: 1px solid var(--pd-acad-border);
+}
+.pd-acad-quiz-progress-strip strong {
+  color: var(--pd-blue);
+  font-family: var(--pd-font-display);
+  font-size: 1.05rem;
+}
+.pd-acad-quiz-progress-strip small {
+  margin-left: auto;
+  color: var(--pd-acad-muted);
+  font-size: .78rem;
+  font-weight: 700;
+}
+.pd-acad-quiz-progress-strip .pd-acad-progress {
+  flex: 1;
+  margin: 0;
+  background: rgba(10,77,155,.18);
+}
+.pd-acad-quiz-progress-strip .pd-acad-progress span {
+  background: linear-gradient(90deg, var(--pd-gold), #fff);
+}
+
+.pd-acad-quiz-question {
+  padding: 28px 26px 8px;
+}
+.pd-acad-quiz-question-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--pd-acad-soft);
+  color: var(--pd-blue);
+  border-radius: 999px;
+  font-size: .76rem;
+  font-weight: 900;
+  letter-spacing: .04em;
+  padding: 6px 12px;
+  margin-bottom: 14px;
+}
+.pd-acad-quiz-question h4 {
+  margin: 0;
+  font-family: var(--pd-font-display);
+  font-size: 1.45rem;
+  line-height: 1.25;
+  color: var(--pd-acad-ink);
+}
+.pd-acad-quiz-options {
+  padding: 18px 26px 8px;
+  display: grid;
+  gap: 12px;
+}
+.pd-acad-quiz-option {
+  text-align: left;
+  width: 100%;
+  background: var(--pd-acad-card);
+  border: 1.5px solid var(--pd-acad-border);
+  border-radius: 18px;
+  padding: 14px 16px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  font-size: 1rem;
+  transition: border-color .2s, background .2s, transform .25s var(--pd-ease-back);
+  position: relative;
+}
+.pd-acad-quiz-option:hover {
+  border-color: rgba(10,77,155,.45);
+  background: rgba(10,77,155,.04);
+  transform: translateY(-2px);
+}
+.pd-acad-quiz-option-letter {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--pd-acad-soft);
+  color: var(--pd-acad-blue);
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1.5px solid var(--pd-acad-border);
+  transition: background .2s, color .2s, border-color .2s;
+}
+.pd-acad-quiz-option-text { line-height: 1.55; }
+.pd-acad-quiz-option.is-correct {
+  background: linear-gradient(135deg, rgba(34,197,94,.18), rgba(34,197,94,.06));
+  border-color: #16a34a;
+  color: #14532d;
+}
+.pd-acad-quiz-option.is-correct .pd-acad-quiz-option-letter {
+  background: #16a34a;
+  color: #fff;
+  border-color: #16a34a;
+}
+.pd-acad-quiz-option.is-wrong {
+  background: linear-gradient(135deg, rgba(220,38,38,.16), rgba(220,38,38,.04));
+  border-color: #dc2626;
+  color: #7f1d1d;
+}
+.pd-acad-quiz-option.is-wrong .pd-acad-quiz-option-letter {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
+.pd-acad-quiz-option.is-faded { opacity: .55; }
+.pd-acad-quiz-option .pd-acad-option-mark {
+  margin-left: auto;
+  font-weight: 900;
+}
+.pd-acad-quiz-option.is-correct .pd-acad-option-mark { color: #16a34a; }
+.pd-acad-quiz-option.is-wrong .pd-acad-option-mark { color: #dc2626; }
+
+.pd-acad-quiz-feedback {
+  margin: 16px 26px 0;
+  border-radius: 18px;
+  padding: 14px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: .92rem;
+  line-height: 1.55;
+}
+.pd-acad-quiz-feedback i { font-size: 1.15rem; margin-top: 1px; }
+.pd-acad-quiz-feedback.correct { background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.4); color: #14532d; }
+.pd-acad-quiz-feedback.correct i { color: #16a34a; }
+.pd-acad-quiz-feedback.wrong { background: rgba(220,38,38,.10); border: 1px solid rgba(220,38,38,.4); color: #7f1d1d; }
+.pd-acad-quiz-feedback.wrong i { color: #dc2626; }
+.pd-acad-quiz-feedback strong { color: inherit; }
+.pd-acad-quiz-feedback em { font-style: normal; font-weight: 700; }
+
+.pd-acad-quiz-actions {
+  padding: 22px 26px 28px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  background: linear-gradient(180deg, transparent, rgba(212,175,55,.06));
+  border-top: 1px solid var(--pd-acad-border);
+  border-radius: 0 0 32px 32px;
+}
+.pd-acad-quiz-actions .pd-acad-btn { min-width: 140px; justify-content: center; }
+
+/* --- Quiz result screen -------------------------------------------------- */
+.pd-acad-quiz-result {
+  padding: 36px 30px 30px;
+  text-align: center;
+}
+.pd-acad-quiz-result .pd-acad-result-icon {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  margin: 0 auto 18px;
+  display: grid;
+  place-items: center;
+  font-size: 2.6rem;
+  color: #fff;
+  box-shadow: 0 18px 40px rgba(10,77,155,.4);
+  animation: pd-breathe 2.4s ease-in-out infinite;
+}
+.pd-acad-quiz-result.is-pass .pd-acad-result-icon { background: linear-gradient(135deg, #16a34a, #0a3d7a); }
+.pd-acad-quiz-result.is-fail .pd-acad-result-icon { background: linear-gradient(135deg, #d4af37, #a67c00); }
+.pd-acad-quiz-result h2 {
+  font-family: var(--pd-font-display);
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  margin: 0 0 8px;
+  color: var(--pd-acad-blue);
+}
+.pd-acad-quiz-result .pd-acad-result-score {
+  font-family: var(--pd-font-display);
+  font-size: clamp(2.8rem, 7vw, 4.2rem);
+  font-weight: 800;
+  margin: 6px 0 6px;
+  background: var(--pd-grad-dawn);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.pd-acad-quiz-result p { color: var(--pd-acad-muted); margin: 0 0 18px; }
+.pd-acad-quiz-result .pd-acad-result-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 22px;
+}
+.pd-acad-quiz-result-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* --- Quiz review screen -------------------------------------------------- */
+.pd-acad-quiz-review {
+  padding: 22px 26px 30px;
+  text-align: left;
+}
+.pd-acad-quiz-review-head {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.pd-acad-quiz-review-head h3 {
+  margin: 0;
+  font-family: var(--pd-font-display);
+  font-size: 1.4rem;
+  color: var(--pd-acad-blue);
+}
+.pd-acad-quiz-review-list {
+  display: grid;
+  gap: 14px;
+}
+.pd-acad-quiz-review-item {
+  border-radius: 18px;
+  padding: 14px 18px;
+  background: var(--pd-acad-card);
+  border: 1px solid var(--pd-acad-border);
+  border-left: 5px solid var(--pd-acad-border);
+}
+.pd-acad-quiz-review-item.is-correct { border-left-color: #16a34a; }
+.pd-acad-quiz-review-item.is-wrong { border-left-color: #dc2626; }
+.pd-acad-quiz-review-item h5 {
+  margin: 0 0 6px;
+  font-size: .98rem;
+  font-weight: 800;
+  color: var(--pd-acad-ink);
+}
+.pd-acad-quiz-review-item .pd-acad-review-line {
+  font-size: .88rem;
+  line-height: 1.55;
+  margin: 4px 0;
+  color: var(--pd-acad-muted);
+}
+.pd-acad-quiz-review-item .pd-acad-review-line strong { color: var(--pd-acad-ink); }
+.pd-acad-quiz-review-item .pd-acad-review-line em { font-style: normal; font-weight: 800; }
+.pd-acad-quiz-review-item .pd-acad-review-explain {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--pd-acad-soft);
+  border-radius: 12px;
+  color: var(--pd-acad-muted);
+  font-size: .85rem;
+}
+.pd-acad-quiz-review-item .pd-acad-review-status {
+  font-size: .76rem;
+  font-weight: 900;
+  letter-spacing: .04em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.pd-acad-quiz-review-item.is-correct .pd-acad-review-status { background: rgba(34,197,94,.16); color: #15803d; }
+.pd-acad-quiz-review-item.is-wrong .pd-acad-review-status { background: rgba(220,38,38,.14); color: #b91c1c; }
+
+/* --- Lesson share row --------------------------------------------------- */
+.pd-acad-lesson-share {
+  margin-top: 18px;
+  padding: 18px 20px;
+  background: var(--pd-acad-soft);
+  border-radius: 18px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  border: 1px solid var(--pd-acad-border);
+}
+.pd-acad-lesson-share strong { color: var(--pd-acad-blue); }
+.pd-acad-lesson-share small { color: var(--pd-acad-muted); font-size: .8rem; font-weight: 600; }
+
+/* --- Discussion area (lightweight preview) ------------------------------ */
+.pd-acad-discussion {
+  margin-top: 26px;
+  padding: 22px 24px 24px;
+  border-radius: 22px;
+  background: var(--pd-acad-card);
+  border: 1px solid var(--pd-acad-border);
+  box-shadow: var(--pd-shadow-sm);
+}
+.pd-acad-discussion-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.pd-acad-discussion-head h3 {
+  margin: 0;
+  font-family: var(--pd-font-display);
+  color: var(--pd-acad-blue);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pd-acad-discussion-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+.pd-acad-discussion-item {
+  border-radius: 16px;
+  background: var(--pd-acad-soft);
+  border: 1px solid var(--pd-acad-border);
+  padding: 12px 14px;
+  display: grid;
+  gap: 4px;
+}
+.pd-acad-discussion-item strong { color: var(--pd-acad-blue); font-size: .9rem; }
+.pd-acad-discussion-item small { color: var(--pd-acad-muted); font-size: .72rem; }
+.pd-acad-discussion-item p { margin: 0; font-size: .9rem; line-height: 1.55; color: var(--pd-acad-ink); }
+.pd-acad-discussion-empty {
+  text-align: center;
+  padding: 18px;
+  color: var(--pd-acad-muted);
+  font-size: .9rem;
+}
+.pd-acad-discussion-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+.pd-acad-discussion-form textarea {
+  width: 100%;
+  min-height: 90px;
+  border-radius: 14px;
+  border: 1px solid var(--pd-acad-border);
+  background: var(--pd-acad-card);
+  color: var(--pd-acad-ink);
+  padding: 12px;
+  font-family: inherit;
+  resize: vertical;
+  font-size: .95rem;
+}
+.pd-acad-discussion-form textarea:focus { outline: 2px solid var(--pd-gold); outline-offset: 2px; }
+
+/* --- Responsive fine-tuning --------------------------------------------- */
+@media (max-width: 640px) {
+  .pd-acad-lesson-hero-body { padding: 22px 18px 18px; }
+  .pd-acad-lesson-progress { padding: 10px 18px 18px; }
+  .pd-acad-quiz-question, .pd-acad-quiz-options, .pd-acad-quiz-feedback,
+  .pd-acad-quiz-actions, .pd-acad-quiz-result, .pd-acad-quiz-review { padding-left: 18px; padding-right: 18px; }
+  .pd-acad-quiz-modal-head { padding: 18px 18px 14px; }
+  .pd-acad-quiz-progress-strip { padding: 14px 18px; }
+  .pd-acad-take-quiz-cta, .pd-acad-take-quiz-locked { width: 100%; justify-content: center; }
+}
+
+
 /* --- Friendly "Allow notifications?" in-app pop-up ---------------------- */
 .pd-notif-pop-overlay {
   position: fixed; inset: 0; z-index: 1100;

@@ -140,6 +140,7 @@
   <script src="/assets/pd-motion.js" defer></script>
   <script src="/assets/pd-content-data.js" defer></script>
   <script src="/assets/pd-academy-data.js" defer></script>
+  <script src="/assets/pd-academy-questions.js" defer></script>
   <script src="/translation-data.js"></script>
 <script src="/assets/pd-verse-data.js" defer></script>
 <script src="/assets/pd-verse-alerts.js" defer></script>
@@ -148,6 +149,7 @@
 <script src="/assets/pd-app.js" defer></script>
   <script src="/assets/pd-certificate.js" defer></script>
   <script src="/assets/pd-academy.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body class="pd-acad-page">
 <div class="pd-aurora" aria-hidden="true"><span></span></div>
@@ -195,11 +197,36 @@
     </div>
   </section>
 
-  <section class="pd-acad-grid pd-acad-grid-4 pd-acad-stats">
+  <section class="pd-acad-grid pd-acad-grid-4 pd-acad-stats pd-acad-stats-hero">
     <div class="pd-acad-stat"><strong data-acad-lesson-count>0</strong><span>Detailed lessons</span></div>
     <div class="pd-acad-stat"><strong data-acad-quiz-count>0</strong><span>Linked quizzes</span></div>
     <div class="pd-acad-stat"><strong data-acad-cert-count>0</strong><span>Certificates earned</span></div>
     <div class="pd-acad-stat"><strong data-acad-progress>0%</strong><span>Your progress</span><div class="pd-acad-progress"><span data-acad-progress-bar></span></div></div>
+  </section>
+
+  <!-- Personal student dashboard -->
+  <section class="pd-acad-student-dashboard" id="studentDashboard" aria-label="Your learning progress">
+    <header class="pd-acad-student-dashboard-head">
+      <div>
+        <span class="pd-acad-chip gold"><i class="fas fa-chart-line"></i> Your Learning</span>
+        <h2>My progress, by the numbers</h2>
+        <p>Track lessons read, quizzes passed, average score, certificates earned and your current learning streak. Keep the streak alive by studying one lesson per day.</p>
+      </div>
+      <div class="pd-acad-student-dashboard-greet">
+        <i class="fas fa-user-graduate"></i>
+        <span id="studentGreeting">Welcome back, learner.</span>
+      </div>
+    </header>
+    <div class="pd-acad-student-grid pd-acad-grid pd-acad-grid-4">
+      <div class="pd-acad-stat pd-acad-stat-card"><strong id="dashLessons">0/0</strong><span>Lessons completed</span></div>
+      <div class="pd-acad-stat pd-acad-stat-card"><strong id="dashQuizzes">0/0</strong><span>Quizzes passed</span></div>
+      <div class="pd-acad-stat pd-acad-stat-card"><strong id="dashAvgScore">—</strong><span>Average quiz score</span></div>
+      <div class="pd-acad-stat pd-acad-stat-card"><strong id="dashStreak">0</strong><span><i class="fas fa-fire"></i> Learning streak (days)</span></div>
+      <div class="pd-acad-stat pd-acad-stat-card pd-acad-stat-wide"><strong id="dashProgress">0%</strong><span>Overall completion</span><div class="pd-acad-progress"><span id="dashProgressBar"></span></div></div>
+      <div class="pd-acad-stat pd-acad-stat-card"><strong id="dashNext">—</strong><span>Next recommended lesson</span></div>
+      <div class="pd-acad-stat pd-acad-stat-card"><strong id="dashCerts">0</strong><span>Certificates earned</span></div>
+      <div class="pd-acad-stat pd-acad-stat-card"><strong id="dashLast">—</strong><span>Last studied</span></div>
+    </div>
   </section>
 
   <div class="pd-acad-section-head">
@@ -225,6 +252,9 @@
     <div class="pd-acad-list" id="lessonList" aria-label="Lesson list"></div>
     <article class="pd-acad-reader" id="lessonReader">Loading lessons...</article>
   </section>
+
+  <!-- Modal container used by the quiz flow. Filled in by pd-academy.js. -->
+  <div id="pdLessonModalRoot" aria-live="polite"></div>
 </main>
 
 <footer style="text-align:center;padding:30px;color:var(--pd-acad-muted)"><strong style="color:var(--pd-acad-blue)">Prayer Dome</strong> · A House of Prayer for All Nations</footer>
