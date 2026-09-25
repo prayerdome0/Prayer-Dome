@@ -655,7 +655,10 @@
         broadcast('location', result);
       };
 
-      if (!navigator.geolocation) { location.ipFallback(finish); return; }
+      if (!navigator.geolocation) {
+        finish({ name: 'Location unavailable', coords: 'This device does not provide GPS location.' });
+        return;
+      }
       card.classList.add('pd-loc-loading');
       if (nameEl && subEl) { nameEl.textContent = i18n.t('location.detect'); subEl.textContent = '…'; }
       navigator.geolocation.getCurrentPosition(function (pos) {
@@ -681,9 +684,14 @@
           if (d.isp) extra.push(d.isp);
           if (extra.length) subEl.textContent = base.coords + ' · ' + extra.join(' · ');
         }).catch(function () { /* enrichment is optional */ });
-      }, function () {
-        location.ipFallback(finish);
-      }, { timeout: 8000, maximumAge: 300000 });
+      }, function (error) {
+        var message = error && error.code === 1
+          ? 'Location permission was denied. Enable it in device settings and retry.'
+          : error && error.code === 3
+            ? 'GPS timed out. Move to an open area and retry.'
+            : 'Unable to read GPS location. Check device settings and retry.';
+        finish({ name: 'Location unavailable', coords: message });
+      }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
 
       // Retry button.
       var retry = $('#pdLocationRetry', card);
@@ -1834,11 +1842,10 @@
   var layout = {
     HEADER_HTML: ''
       + '<button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="pd-i pd-i-menu"></i></button>'
-      + '<a href="/" class="pd-topbar-center"><div class="pd-topbar-logo"><img src="/assets/logo.png" alt="PD Logo"></div><div class="pd-topbar-word">PRAYER DOME</div></a>'
+      + '<a href="/" class="pd-topbar-center" aria-label="PrayerDome home"><div class="pd-topbar-logo"><img src="/assets/logo.png" alt="PrayerDome logo"></div></a>'
       + '<div class="pd-topbar-right">'
       + '<select class="pd-lang-select" aria-label="Language"><option value="en">English</option><option value="tum">Tumbuka</option><option value="ssw">siSwati</option><option value="bem">Bemba</option><option value="nya">Nyanja</option></select>'
       + '<button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="pd-i pd-i-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>'
-      + '<button class="theme-toggle-btn" onclick="toggleDarkMode&&toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>'
       + '</div>',
     DRAWER_LINKS: [
       {href:'/', icon:'pd-i-house', label:'Home'},
@@ -1881,11 +1888,6 @@
               var bell=document.createElement('button'); bell.className='pd-bell-btn'; bell.id='pdNotifBell'; bell.setAttribute('aria-label','Notifications');
               bell.innerHTML='<i class="pd-i pd-i-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span>';
               right.appendChild(bell);
-            }
-            if(!right.querySelector('.theme-toggle-btn')){
-              var th=document.createElement('button'); th.className='theme-toggle-btn'; th.setAttribute('aria-label','Toggle dark mode');
-              th.setAttribute('onclick','toggleDarkMode&&toggleDarkMode()'); th.innerHTML='<i class="pd-i pd-i-moon"></i>';
-              right.appendChild(th);
             }
           }
         }

@@ -2823,3 +2823,37 @@ body.dark-mode .pd-topbar {
 @media (min-width: 1200px) {
   html { font-size: 16px; }
 }
+
+/* Responsive safety layer: prevent legacy fixed-width sections and long text
+   from creating clipped content or sideways scrolling on compact devices. */
+html { max-width: 100%; overflow-x: clip; }
+body { max-width: 100%; overflow-x: clip; }
+img, video, iframe, canvas, svg { max-width: 100%; }
+button, input, select, textarea { max-width: 100%; }
+:where(h1,h2,h3,h4,p,a,button,label,li,td,th,blockquote,figcaption) { overflow-wrap: anywhere; }
+:where(.container,.content,.page-container,.main-content,.pd-page,.pd-section) { min-width: 0; }
+:where(.card,.pd-card,.content-card,.modal-card,.pd-acad-card) { min-width: 0; }
+@media (max-width: 640px) {
+  :where(h1,.page-title,.hero-title) { font-size: clamp(1.65rem, 8vw, 2.5rem); line-height: 1.16; }
+  :where(h2,.section-title) { font-size: clamp(1.3rem, 6vw, 1.9rem); line-height: 1.25; }
+  :where(.container,.content,.page-container,.main-content) { width: min(100% - 28px, 100%); }
+  :where(.grid,.card-grid,.stats-grid) { grid-template-columns: minmax(0, 1fr) !important; }
+  :where(table) { display: block; max-width: 100%; overflow-x: auto; }
+  :where(.modal-card) { width: min(100% - 24px, 640px); max-height: calc(100dvh - 24px); overflow-y: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* Keep device appearance automatic on every legacy/static page shell too. */
+.theme-toggle-btn, [data-pd-theme-toggle] { display: none !important; }
+.pd-topbar-word { display: none !important; }
+@media (max-width: 680px) {
+  [style*="grid-template-columns: 1fr 1fr"],
+  [style*="grid-template-columns:1fr 1fr"],
+  [style*="grid-template-columns: 1fr 1fr 1fr"] { grid-template-columns: minmax(0,1fr) !important; }
+  [style*="min-width: 260px"] { min-width: 0 !important; }
+  .pd-topbar { gap: 8px; }
+  .pd-topbar-right { gap: 6px; }
+  .pd-lang-select { max-width: 34vw; }
+}

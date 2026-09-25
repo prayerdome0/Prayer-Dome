@@ -1448,9 +1448,12 @@
                         </div>
                         <div class="form-group" style="grid-column: 1 / -1;">
                             <label>Signature Image</label>
-                            <div id="founderSigDisplay" style="background: var(--bg-input); border: 1px dashed var(--border); border-radius: 12px; padding: 14px; min-height: 72px; display:flex; align-items:center; justify-content:center; margin-bottom: 10px;">No signature saved yet — upload one below.</div>
+                            <div id="founderSigDisplay" style="background: var(--bg-input); border: 1px dashed var(--border); border-radius: 12px; padding: 14px; min-height: 72px; display:flex; align-items:center; justify-content:center; margin-bottom: 10px;">No signature saved yet — upload or draw one below.</div>
+                            <canvas id="founderSignatureCanvas" aria-label="Draw founder signature" style="display:block;width:100%;height:120px;touch-action:none;background:#fff;border:1px solid var(--border);border-radius:10px;margin:10px 0"></canvas>
                             <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                                <button class="btn btn-outline btn-sm" type="button" onclick="uploadFounderSignature()"><i class="pd-i pd-i-cloud-upload"></i> Upload / Draw Signature</button>
+                                <button class="btn btn-outline btn-sm" type="button" onclick="uploadFounderSignature()"><i class="pd-i pd-i-cloud-upload"></i> Upload Signature</button>
+                                <button class="btn btn-outline btn-sm" type="button" onclick="useDrawnFounderSignature()">Use Drawing</button>
+                                <button class="btn btn-outline btn-sm" type="button" onclick="clearFounderSignatureCanvas()">Clear Drawing</button>
                                 <input type="file" id="founderSigFileInput" accept="image/*" style="display:none;" onchange="handleFounderSigUpload(event)">
                                 <button class="btn btn-primary btn-sm" type="button" onclick="saveFounderSignature()"><i class="pd-i pd-i-save"></i> Save Signature</button>
                             </div>
@@ -1556,10 +1559,8 @@
         <div class="modal-card" style="max-width: 400px; text-align: center; padding: 40px;">
             <div class="sidebar-logo" style="margin: 0 auto 20px;"><img src="/assets/logo.png" alt="Logo"></div>
             <h2 style="margin-bottom: 10px; font-family: 'Poppins', serif; color: var(--accent-green);">Admin Access Only</h2>
-            <p style="color: var(--text-sub); margin-bottom: 25px; font-size: 0.9rem;">Sign in with your administrator credentials.</p>
-            <div class="form-group"><input type="email" id="adminEmail" class="form-control" placeholder="Admin Email"></div>
-            <div class="form-group"><input type="password" id="adminPassword" class="form-control" placeholder="Password"></div>
-            <button class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="adminLogin()">Authenticate</button>
+            <p style="color: var(--text-sub); margin-bottom: 25px; font-size: 0.9rem;">Admin access uses your existing PrayerDome account session. Sign in on the main site, then return here.</p>
+            <a class="btn btn-primary" style="display:block; width:100%; padding:14px; text-decoration:none;" href="index.html?next=admin">Continue to PrayerDome</a>
             <a href="index.html" style="display:block; margin-top:20px; color:var(--text-sub); text-decoration:none;">Return to Main Site</a>
         </div>
     </div>
@@ -1852,7 +1853,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, getDoc, doc, updateDoc, setDoc, deleteDoc, query, where, orderBy, startAfter, serverTimestamp, increment, addDoc, limit, onSnapshot, Timestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo", authDomain: "prayer-dome.firebaseapp.com", projectId: "prayer-dome", storageBucket: "prayer-dome.firebasestorage.app", messagingSenderId: "198295153196", appId: "1:198295153196:web:1222b31948d7974ba3bf89" };
@@ -1992,6 +1993,19 @@ window.toggleDarkMode = function() {
         // it automatically. Updates only affect certificates issued AFTER the
         // change — already-issued certificates keep the signature they had.
         let founderSigDataUrl = '';
+        (function initFounderSignaturePad(){
+            const canvas = document.getElementById('founderSignatureCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const resize = () => { const box=canvas.getBoundingClientRect(), ratio=window.devicePixelRatio||1; canvas.width=Math.max(1,box.width*ratio); canvas.height=Math.max(1,box.height*ratio); ctx.setTransform(ratio,0,0,ratio,0,0); ctx.lineWidth=2.4; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#163b68'; };
+            resize(); window.addEventListener('resize',resize);
+            let drawing=false;
+            canvas.addEventListener('pointerdown',e=>{drawing=true;canvas.setPointerCapture(e.pointerId);const r=canvas.getBoundingClientRect();ctx.beginPath();ctx.moveTo(e.clientX-r.left,e.clientY-r.top);});
+            canvas.addEventListener('pointermove',e=>{if(!drawing)return;const r=canvas.getBoundingClientRect();ctx.lineTo(e.clientX-r.left,e.clientY-r.top);ctx.stroke();});
+            ['pointerup','pointercancel','lostpointercapture'].forEach(name=>canvas.addEventListener(name,()=>drawing=false));
+        })();
+        window.clearFounderSignatureCanvas = function(){const c=document.getElementById('founderSignatureCanvas');if(c)c.getContext('2d').clearRect(0,0,c.width,c.height);};
+        window.useDrawnFounderSignature = function(){const c=document.getElementById('founderSignatureCanvas');if(!c)return;const ctx=c.getContext('2d');if(!ctx.getImageData(0,0,c.width,c.height).data.some((v,i)=>i%4===3&&v>0))return toast('Draw a signature before using it.','error');founderSigDataUrl=c.toDataURL('image/png');const d=document.getElementById('founderSigDisplay');if(d)d.innerHTML=`<img src="${escapeHTML(founderSigDataUrl)}" alt="Founder signature preview" style="max-height:90px;max-width:100%">`;toast('Drawing ready — save to apply it to future certificates.');};
 
         window.loadFounderSignatureUI = function () {
             const f = window.PDApp && PDApp.founder ? PDApp.founder.get() : {};
@@ -5670,12 +5684,11 @@ window.toggleDarkMode = function() {
                         watchLiveStatus();
                         // Keep session alive — refresh timestamp periodically
                         setInterval(() => saveAdminSession(user), 5*60*1000);
-                    } else { 
+                    } else {
                         clearAdminSession();
-                        await signOut(auth); 
-                        document.getElementById('loginModal').style.display = 'flex'; 
+                        document.getElementById('loginModal').style.display = 'flex';
                         document.getElementById('globalLoader').style.display = 'none';
-                        toast('Access Denied - Admin privileges required', 'error'); 
+                        toast('This account does not have administrator privileges.', 'error');
                     }
                 } catch(e) { 
                     console.error("Auth check error:", e); 
@@ -5684,17 +5697,13 @@ window.toggleDarkMode = function() {
                     if (!sess) document.getElementById('loginModal').style.display = 'flex';
                     document.getElementById('globalLoader').style.display = 'none';
                 }
-            } else { 
-                // Check if we have a recent valid session — restore without login if valid
-                const sess = getAdminSession();
-                if (sess && (Date.now() - sess.timestamp) < 7*24*60*60*1000) {
-                    // Session still valid but Firebase says no user — likely transient, keep loader
-                    document.getElementById('loginModal').style.display = 'none';
-                } else {
-                    clearAdminSession();
-                    document.getElementById('loginModal').style.display = 'flex'; 
-                }
+            } else {
+                // Firebase is the authority: never trust the local UI hint as an
+                // authentication credential. Return unauthenticated visitors to
+                // the single sign-in experience on the main PrayerDome site.
+                clearAdminSession();
                 document.getElementById('globalLoader').style.display = 'none';
+                document.getElementById('loginModal').style.display = 'flex';
             }
             hideLoading();
         });
@@ -5724,20 +5733,10 @@ window.toggleDarkMode = function() {
             }
         };
 
-        window.adminLogin = async () => { 
-            const email=document.getElementById('adminEmail').value, pass=document.getElementById('adminPassword').value; 
-            if(!email||!pass) return toast('Enter credentials','error'); 
-            showLoading(); 
-            try{ 
-                await setPersistence(auth, browserLocalPersistence);
-                await signInWithEmailAndPassword(auth, email, pass); 
-                toast('Welcome back, Admin', 'success');
-            } catch(e){ toast(e.message,'error'); } finally{ hideLoading(); } 
-        };
         window.logoutAdmin = async () => { 
             clearAdminSession();
             await signOut(auth); 
-            try { localStorage.clear(); sessionStorage.clear(); } catch(e) {}
+            // Preserve app preferences and cached learning progress on logout.
             window.location.href = 'index.html'; 
         };
         
