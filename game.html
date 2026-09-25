@@ -504,8 +504,17 @@
         <strong style="color:var(--pd-acad-blue); display:block; margin-bottom:4px;">Verse Scramble</strong><small style="color:var(--pd-acad-muted);">Reorder words to reveal the verse</small>
         <div style="margin-top:10px;"><span class="pd-acad-chip" style="font-size:.7rem;">Puzzle</span></div>
       </button>
+      <button class="pd-acad-card" onclick="switchGame('trivia')" id="gameTab-trivia" style="text-align:left; padding:18px; border:1px solid var(--pd-acad-border); cursor:pointer;"><div class="pd-acad-chip gold">Bible Trivia</div><strong style="display:block;margin:10px 0 4px;color:var(--pd-acad-blue);">Bible Trivia</strong><small>Quick questions grounded in Scripture.</small></button>
+      <button class="pd-acad-card" onclick="switchGame('characters')" id="gameTab-characters" style="text-align:left; padding:18px; border:1px solid var(--pd-acad-border); cursor:pointer;"><div class="pd-acad-chip">Character Match</div><strong style="display:block;margin:10px 0 4px;color:var(--pd-acad-blue);">Character Match</strong><small>Connect Bible people with their stories.</small></button>
+      <button class="pd-acad-card" onclick="switchGame('sequence')" id="gameTab-sequence" style="text-align:left; padding:18px; border:1px solid var(--pd-acad-border); cursor:pointer;"><div class="pd-acad-chip">Story Sequence</div><strong style="display:block;margin:10px 0 4px;color:var(--pd-acad-blue);">Story Sequence Challenge</strong><small>Choose the right order of key events.</small></button>
     </div>
     <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;"><span class="pd-acad-chip"><i class="pd-i pd-i-info"></i> Progress auto-saves and syncs with Academy</span><span class="pd-acad-chip"><i class="pd-i pd-i-trophy"></i> Earn XP & unlock levels</span></div>
+  </section>
+
+  <section class="pd-acad-card" id="panel-extra-games" style="display:none;padding:24px;margin-bottom:20px" aria-live="polite">
+    <h3 id="extraGameTitle" style="color:var(--pd-acad-blue)"></h3><p id="extraGamePrompt"></p>
+    <div id="extraGameChoices" style="display:grid;gap:10px"></div><p id="extraGameFeedback" role="status"></p>
+    <button class="pd-acad-btn pd-acad-btn-ghost" id="extraGameNext" type="button" style="display:none">Try another</button>
   </section>
 
   <!-- GAME PANELS -->
@@ -991,17 +1000,43 @@
   }
 
   // ── Professional Bible Games Hub ──
+  var EXTRA_GAME_DATA = {
+    trivia: [{q:'Which book tells the story of the early church after Jesus’ ascension?',a:['Acts','Genesis','Psalms'],ok:0,ref:'Acts 1:8; Acts 2'}, {q:'Who was swallowed by a great fish?',a:['Jonah','Moses','Elijah'],ok:0,ref:'Jonah 1:17'}],
+    characters: [{q:'Who trusted God and faced Goliath?',a:['David','Solomon','Thomas'],ok:0,ref:'1 Samuel 17'}, {q:'Who led Israel out of Egypt?',a:['Moses','Nehemiah','Peter'],ok:0,ref:'Exodus 3–14'}],
+    sequence: [{q:'Choose the correct order of the Easter story.',a:['Crucifixion → burial → resurrection','Resurrection → birth → crucifixion','Burial → birth → crucifixion'],ok:0,ref:'Luke 23–24'}, {q:'Choose the correct order in the parable of the lost son.',a:['Leaves home → returns → welcomed by father','Welcomed → leaves → returns','Returns → leaves → welcomed'],ok:0,ref:'Luke 15:11–32'}]
+  };
+  var extraGameRound = 0;
+  function renderExtraGame(type){
+    var bank=EXTRA_GAME_DATA[type]||[], item=bank[extraGameRound%bank.length];
+    var names={trivia:'Bible Trivia',characters:'Character Match',sequence:'Story Sequence Challenge'};
+    document.getElementById('extraGameTitle').textContent=names[type];
+    document.getElementById('extraGamePrompt').textContent=item.q;
+    document.getElementById('extraGameFeedback').textContent='';
+    document.getElementById('extraGameNext').style.display='none';
+    document.getElementById('extraGameChoices').innerHTML=item.a.map(function(answer,index){return '<button type="button" class="pd-acad-btn pd-acad-btn-ghost" data-answer="'+index+'" style="justify-content:flex-start;border:1px solid var(--pd-acad-border)">'+answer+'</button>';}).join('');
+    document.getElementById('extraGameChoices').querySelectorAll('[data-answer]').forEach(function(button){button.addEventListener('click',function(){
+      var correct=Number(button.dataset.answer)===item.ok;
+      document.querySelectorAll('#extraGameChoices button').forEach(function(b){b.disabled=true;});
+      document.getElementById('extraGameFeedback').textContent=(correct?'Correct! ':'Not quite. Review the passage. ')+item.ref;
+      document.getElementById('extraGameNext').style.display='inline-flex';
+      if(correct){addXP(25);saveLocalState();syncToFirebase();}
+    });});
+    document.getElementById('extraGameNext').onclick=function(){extraGameRound++;renderExtraGame(type);};
+  }
+
   window.switchGame = function(id){
-    ['journey','memory','quiz','scramble'].forEach(function(k){
-      var panel = document.getElementById('panel-'+k);
+    ['journey','memory','quiz','scramble','trivia','characters','sequence'].forEach(function(k){
       var tab = document.getElementById('gameTab-'+k);
       var isActive = k===id;
-      if(panel) panel.style.display = (k==='journey' ? (isActive?'block':'none') : (isActive?'block':'none'));
+      var panel = ['trivia','characters','sequence'].includes(k) ? document.getElementById('panel-extra-games') : document.getElementById('panel-'+k);
+      if(panel && !['trivia','characters','sequence'].includes(k)) panel.style.display = isActive ? 'block' : 'none';
       if(tab){
         if(isActive){ tab.style.borderColor='var(--pd-acad-blue)'; tab.style.background='rgba(10,77,155,.04)'; tab.style.borderWidth='2px'; }
         else { tab.style.borderColor='var(--pd-acad-border)'; tab.style.background='var(--pd-acad-card)'; tab.style.borderWidth='1px'; }
       }
     });
+    var extraPanel = document.getElementById('panel-extra-games');
+    if(extraPanel) extraPanel.style.display = ['trivia','characters','sequence'].includes(id) ? 'block' : 'none';
     // journey map and playZone visibility
     var journeyCard = document.querySelector('.journey-map-card');
     var playZone = document.getElementById('playZone');
@@ -1013,6 +1048,7 @@
     if(id==='memory') initMemoryGame();
     if(id==='quiz') initBibleQuiz();
     if(id==='scramble') initScramble();
+    if(['trivia','characters','sequence'].includes(id)) renderExtraGame(id);
   };
 
   // ── Scripture Memory Master ──

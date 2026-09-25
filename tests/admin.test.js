@@ -45,6 +45,17 @@ for (const s of ['view-certificates', 'loadCertificates', 'renderCertificates',
   }
 }
 
+// Admin access must reuse the shared Firebase session; there is intentionally
+// no second credential form or localStorage-based authentication shortcut.
+for (const [label, ok] of [
+  ['admin persistence uses Firebase browserLocalPersistence', html.includes('browserLocalPersistence') && html.includes('setPersistence(auth, browserLocalPersistence)')],
+  ['admin dashboard is gated by the existing Firebase auth state', html.includes('onAuthStateChanged(auth') && html.includes("snap.data().role === 'admin'")],
+  ['admin page does not expose a second sign-in flow', !html.includes('signInWithEmailAndPassword') && !html.includes('id="adminPassword"') && !html.includes('window.adminLogin')]
+]) {
+  if (ok) console.log('PASS  ' + label);
+  else { console.error('FAIL  ' + label); process.exitCode = 1; }
+}
+
 // Facebook drafts are a manual publishing workflow. Keep the visual library,
 // search, caption copy and image hand-off controls from being accidentally
 // reduced to the old 25-row text-only table.

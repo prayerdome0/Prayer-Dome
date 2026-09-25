@@ -889,7 +889,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp, Timestamp, deleteDoc, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     
     // Import devotional system
     import { getDailyDevotional, getNextUpdateTime, formatCountdown } from './devotional-data.js';
@@ -906,6 +906,12 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+    // One durable Firebase session is shared by the member site and Admin.
+    // Set persistence before observing auth so refreshes restore the same user.
+    if (typeof setPersistence === 'function') {
+        setPersistence(auth, browserLocalPersistence)
+            .catch(error => console.warn('Could not enable local Firebase persistence:', error));
+    }
 
     // Hand the Firestore bindings to the shared premium layer (pd-app.js)
     // so live status, notifications, banners, news and stats sync in real time.
