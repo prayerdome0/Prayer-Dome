@@ -126,7 +126,7 @@
     <!-- PD-SEO:END -->
     <link rel="stylesheet" href="/assets/pd-icons.css">
     <script src="/assets/pd-icons.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
@@ -143,7 +143,7 @@
             --shadow-glow: 0 10px 30px rgba(10,77,155,.1); --glass-bg: rgba(15,23,42,.7); --border-color: #334155;
         }
         body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-main); line-height: 1.6; transition: .4s; padding-bottom: 110px; overflow-x: hidden; }
-        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        h1, h2, h3 { font-family: 'Poppins', serif; }
 
         .news-page-head { padding: 34px 20px 8px; text-align: center; }
         .news-page-head h1 { font-size: clamp(1.6rem, 5vw, 2.3rem); font-weight: 800; color: var(--text-main); }
@@ -202,7 +202,7 @@
             text-align: center; padding: 34px 20px 20px; margin-top: 10px;
             border-top: 1px solid var(--border-color); color: var(--text-sub); font-size: .8rem;
         }
-        .pd-page-footer .pd-page-verse { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--text-main); margin-bottom: 10px; }
+        .pd-page-footer .pd-page-verse { font-family: 'Poppins', serif; font-size: 1rem; color: var(--text-main); margin-bottom: 10px; }
         .bottom-ui-system { position: fixed; bottom: 0; left: 0; right: 0; z-index: 800; }
         .nav-bar {
             display: flex; justify-content: space-around; align-items: center;
@@ -319,6 +319,7 @@
 <!-- Article modal -->
 <div class="news-modal-overlay" id="newsModalOverlay">
     <div class="news-modal" role="dialog" aria-modal="true" aria-label="News article">
+        <div class="pd-news-article-progress" id="newsReadingProgress" aria-hidden="true"><span></span></div>
         <button class="news-modal-close" onclick="closeArticle()" aria-label="Close"><i class="pd-i pd-i-x"></i></button>
         <img class="news-modal-img" id="newsModalImg" alt="">
         <div class="news-modal-body">
@@ -327,6 +328,10 @@
             <div class="news-modal-meta" id="newsModalMeta"></div>
             <div class="news-modal-full" id="newsModalBody"></div>
             <div class="news-share-row" id="newsShareRow"></div>
+            <div class="pd-news-related" id="newsRelated" hidden>
+                <h4><i class="pd-i pd-i-newspaper"></i> Related Articles</h4>
+                <div class="pd-news-related-grid" id="newsRelatedGrid"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -450,6 +455,30 @@
         const grid = document.getElementById('newsGrid');
         const hero = document.getElementById('newsHero');
         if (!grid) return;
+
+        // Fast-loading skeleton while a first paint is pending.
+        if (!window.PDApp) {
+            grid.innerHTML = `
+                <article class="pd-news-card" aria-hidden="true">
+                    <div class="pd-skeleton" style="height:170px;border-radius:0"></div>
+                    <div class="pd-news-card-body">
+                        <div class="pd-skeleton" style="height:14px;width:38%"></div>
+                        <div class="pd-skeleton" style="height:20px;width:92%;margin-top:10px"></div>
+                        <div class="pd-skeleton" style="height:20px;width:70%;margin-top:6px"></div>
+                        <div class="pd-skeleton" style="height:12px;width:55%;margin-top:14px"></div>
+                    </div>
+                </article>
+                <article class="pd-news-card" aria-hidden="true">
+                    <div class="pd-skeleton" style="height:170px;border-radius:0"></div>
+                    <div class="pd-news-card-body">
+                        <div class="pd-skeleton" style="height:14px;width:48%"></div>
+                        <div class="pd-skeleton" style="height:20px;width:80%;margin-top:10px"></div>
+                        <div class="pd-skeleton" style="height:20px;width:76%;margin-top:6px"></div>
+                        <div class="pd-skeleton" style="height:12px;width:60%;margin-top:14px"></div>
+                    </div>
+                </article>`;
+            return;
+        }
         const items = getItems();
 
         // Featured hero
@@ -462,7 +491,7 @@
                     <div class="pd-news-hero-body">
                         <span class="pd-news-cat">${esc(featured.category || 'Ministry News')}</span>
                         <h2>${esc(featured.title)}</h2>
-                        <div class="pd-news-meta" style="color: rgba(255,255,255,.85); margin-top:8px;"><i class="pd-i pd-i-clock"></i> ${formatDate(featured.date)} · <i class="pd-i pd-i-user"></i> ${esc(featured.author || 'Prayer Dome')}</div>
+                        <div class="pd-news-meta" style="color: rgba(255,255,255,.85); margin-top:8px;"><i class="pd-i pd-i-clock"></i> ${formatDate(featured.date)} · <i class="pd-i pd-i-user"></i> ${esc(featured.author || 'Prayer Dome')} · <i class="pd-i pd-i-book-open"></i> ${readingMinutes(featured)} min read</div>
                     </div>
                 </a>`;
                 hero.querySelector('[data-open]').addEventListener('click', e => { e.preventDefault(); openArticle(featured.id); });
@@ -484,7 +513,7 @@
                     <span class="pd-news-cat">${esc(n.category || 'Ministry News')}</span>
                     <h3>${esc(n.title)}</h3>
                     <p>${esc((n.summary || '').substring(0, 140))}${(n.summary || '').length > 140 ? '…' : ''}</p>
-                    <div class="pd-news-meta"><i class="pd-i pd-i-clock"></i> ${formatDate(n.date)} · <i class="pd-i pd-i-user"></i> ${esc(n.author || 'Prayer Dome')}</div>
+                    <div class="pd-news-meta"><i class="pd-i pd-i-clock"></i> ${formatDate(n.date)} · <i class="pd-i pd-i-user"></i> ${esc(n.author || 'Prayer Dome')} · <i class="pd-i pd-i-book-open"></i> ${readingMinutes(n)} min</div>
                     <button class="pd-btn pd-btn-dawn" data-open="${esc(n.id)}" style="margin-top:14px; padding:10px 20px; font-size:.78rem; border:none; cursor:pointer;">Read Story <i class="pd-i pd-i-arrow-right"></i></button>
                 </div>
             </article>
@@ -501,6 +530,66 @@
         return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
+    function readingMinutes(n) {
+        const text = ((n && n.body) || '') + ' ' + ((n && n.summary) || '');
+        const words = text.trim().split(/\s+/).filter(Boolean).length;
+        return Math.max(1, Math.round(words / 200));
+    }
+
+    function relatedArticles(current) {
+        if (!current || !window.PDApp) return [];
+        const cat = current.category || 'Ministry News';
+        const others = PDApp.news.list().filter(n => n.id !== current.id);
+        // Same-category stories first, then the newest remaining items.
+        return others
+            .sort((a, b) => {
+                const aCat = (a.category === cat) ? 0 : 1;
+                const bCat = (b.category === cat) ? 0 : 1;
+                return aCat - bCat || new Date(b.date || 0) - new Date(a.date || 0);
+            })
+            .slice(0, 4);
+    }
+
+    function renderRelatedArticles(n) {
+        const related = relatedArticles(n);
+        const wrap = document.getElementById('newsRelated');
+        const grid = document.getElementById('newsRelatedGrid');
+        if (!wrap || !grid) return;
+        if (!related.length) { wrap.hidden = true; return; }
+        wrap.hidden = false;
+        grid.innerHTML = related.map(r => `
+            <a class="pd-news-related-card" href="#" data-open="${esc(r.id)}">
+                <img src="${esc(getNewsImage(r))}" alt="" loading="lazy" onerror="this.src='${NEWS_FALLBACK_IMAGE}'">
+                <div>
+                    <strong>${esc(r.title)}</strong>
+                    <small>${esc(r.category || 'Ministry News')} · ${readingMinutes(r)} min read</small>
+                </div>
+            </a>`).join('');
+        grid.querySelectorAll('[data-open]').forEach(el => {
+            el.addEventListener('click', e => { e.preventDefault(); openArticle(el.getAttribute('data-open')); });
+        });
+    }
+
+    let articleProgressTicking = false;
+    function wireArticleProgress() {
+        const reading = document.getElementById('newsReadingProgress');
+        const modal = document.querySelector('.news-modal');
+        if (!reading || !modal) return;
+        function update() {
+            const bar = reading.querySelector('span');
+            if (!bar) return;
+            const max = (modal.scrollHeight - modal.clientHeight) || 1;
+            const pct = Math.min(1, Math.max(0, modal.scrollTop / max)) * 100;
+            bar.style.width = pct + '%';
+            articleProgressTicking = false;
+        }
+        modal.addEventListener('scroll', function () {
+            if (!articleProgressTicking) { articleProgressTicking = true; requestAnimationFrame(update); }
+        }, { passive: true });
+        modal.scrollTop = 0;
+        update();
+    }
+
     function openArticle(id, options = {}) {
         if (!window.PDApp) return;
         const n = PDApp.news.get(id);
@@ -509,8 +598,10 @@
         document.getElementById('newsModalImg').onerror = function(){ this.src = NEWS_FALLBACK_IMAGE; };
         document.getElementById('newsModalCat').textContent = n.category || 'Ministry News';
         document.getElementById('newsModalTitle').textContent = n.title;
-        document.getElementById('newsModalMeta').innerHTML = `<span><i class="pd-i pd-i-clock"></i> ${formatDate(n.date)}</span><span><i class="pd-i pd-i-user"></i> ${esc(n.author || 'Prayer Dome')}</span>`;
+        document.getElementById('newsModalMeta').innerHTML = `<span><i class="pd-i pd-i-clock"></i> ${formatDate(n.date)}</span><span><i class="pd-i pd-i-user"></i> ${esc(n.author || 'Prayer Dome')}</span><span class="pd-news-readtime"><i class="pd-i pd-i-book-open"></i> ${readingMinutes(n)} min read</span>`;
         document.getElementById('newsModalBody').textContent = n.body || n.summary || '';
+        renderRelatedArticles(n);
+        wireArticleProgress();
         // One branded share row across the whole app — the link resolves to
         // /share/news/<id>, which serves the featured image, title, summary
         // and Prayer Dome branding to WhatsApp, Facebook, X and Telegram.
@@ -554,10 +645,11 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeArticle(); });
 
     window.toggleDarkMode = function() {
-        document.body.classList.toggle('dark-mode');
-        const btn = document.querySelector('.theme-toggle-btn i');
-        if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'pd-i pd-i-sun' : 'pd-i pd-i-moon';
-    };
+    var dark = (window.PDApp && PDApp.theme ? PDApp.theme.isDark() : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
+    document.body.classList.toggle('dark-mode', dark);
+    document.documentElement.classList.toggle('dark-mode', dark);
+    try { var b = document.querySelector('[data-pd-theme-toggle] .pd-i') || document.querySelector('.theme-toggle-btn .pd-i'); if (b) b.className = dark ? 'pd-i pd-i-sun' : 'pd-i pd-i-moon'; } catch (e) {}
+};
 
     function bootstrapNews() {
         renderCats();

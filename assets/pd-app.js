@@ -170,6 +170,36 @@
   };
 
   /* ----------------------------------------------------------- theme ui --- */
+
+  /* ------------------------------------------------------------------ theme
+   * Automatic appearance management. The OS theme (prefers-color-scheme) is
+   * the single source of truth; there is no user-facing toggle. `dark-mode`
+   * is derived from the media query on every page load and re-applied the
+   * moment the device theme changes, so the app is always in step with the
+   * phone. `PDApp.theme` is the public handle pages and tests can read.
+   * ---------------------------------------------------------------------- */
+  var theme = {
+    media: null,
+    ensure: function () {
+      if (!theme.media && window.matchMedia) {
+        try { theme.media = window.matchMedia('(prefers-color-scheme: dark)'); } catch (e) { theme.media = null; }
+      }
+      return theme.media;
+    },
+    scheme: function () {
+      return (theme.ensure() && theme.ensure().matches) ? 'dark' : 'light';
+    },
+    mode: function () {
+      var forced = document.documentElement.getAttribute('data-pd-theme');
+      if (forced === 'dark' || forced === 'light') return forced;
+      return theme.scheme();
+    },
+    isDark: function () { return theme.mode() === 'dark'; },
+    init: function () {
+      if (ui && ui.syncTheme) ui.syncTheme();
+    }
+  };
+
   /* ------------------------------------------------------------- branding
    * Prayer Dome ships its own artwork. Nothing in the app may fall back to a
    * third-party placeholder service, a stock-photo host or a stand-in logo.
@@ -292,15 +322,40 @@
       document.addEventListener('pd:lang', function () { scripture.render($('#pdSplash .pd-splash-verse')); });
     },
     syncTheme: function () {
-      // Keep `dark-mode` mirrored onto <html> so fixed overlays match.
+      // The appearance now follows the device (prefers-color-scheme) with no
+      // manual toggle. The resolved mode drives `dark-mode` on <html> and
+      // <body> so fixed overlays, cached page styles and the brand layer all
+      // stay in step. Detects OS changes instantly — no reload needed.
       var sync = function () {
-        if (document.body.classList.contains('dark-mode')) document.documentElement.classList.add('dark-mode');
-        else document.documentElement.classList.remove('dark-mode');
+        var mode = theme.mode();
+        var dark = mode === 'dark';
+        document.documentElement.classList.toggle('dark-mode', dark);
+        document.body.classList.toggle('dark-mode', dark);
+        // Refresh pages that kept a legacy moon/sun toggle after this deploy
+        // so its icon always reflects the real, system-driven appearance.
+        var legacyToggle = document.querySelector('[data-pd-theme-toggle] .pd-i, .theme-toggle-btn .pd-i');
+        if (legacyToggle) legacyToggle.className = dark ? 'pd-i pd-i-sun' : 'pd-i pd-i-moon';
+        // Keep the legacy localStorage key in step (for older app shells that
+        // still read it) but the media query is the single source of truth.
+        try { localStorage.setItem('pd-theme', dark ? 'dark' : 'light'); } catch (e) {}
       };
       sync();
-      if (window.MutationObserver) {
-        new MutationObserver(sync).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+      if (window.matchMedia) {
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+        try {
+          var onChg = function () { sync(); };
+          if (mq.addEventListener) mq.addEventListener('change', onChg);
+          else if (mq.addListener) mq.addListener(onChg);
+        } catch (e) { /* older WebViews */ }
       }
+      if (window.MutationObserver) {
+        new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['data-pd-theme'] });
+      }
+      // Adapt the theme-colour chrome of the browser UI to match.
+      if (!document.querySelector('meta[name="theme-color"]')) return;
+      var themeMeta = document.querySelector('meta[name="theme-color"]');
+      if (document.body.classList.contains('dark-mode')) themeMeta.setAttribute('content', '#071a33');
+      else themeMeta.setAttribute('content', '#0A4D9B');
     },
     toggleNotifPanel: function (forceOpen) {
       var panel = notifications.panelEl;
@@ -1688,12 +1743,94 @@
     }
   };
 
+  /* -------------------------------------------------------------- founder
+   * The founder's official signature/name/title used on every certificate.
+   * Source of truth: Firestore `settings/founder` (admin-managed). Fallbacks:
+   * localStorage cache → window.PD_FOUNDER (page-injected) → defaults.
+   */
+  var founder = {
+    DOC: 'settings/founder',
+    getLocal: function () {
+      return lsGet('pd_founder', null);
+    },
+    setLocal: function (data) {
+      lsSet('pd_founder', data || null);
+      try {
+        var meta = document.querySelector('meta[name="pd-founder-signature"]');
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.name = 'pd-founder-signature';
+          document.head.appendChild(meta);
+        }
+        meta.content = (data && data.signatureUrl) || '';
+      } catch (e) {}
+      broadcast('founder:update', data);
+      return data;
+    },
+    get: function () {
+      var local = founder.getLocal();
+      if (local && (local.signatureUrl || local.founderName)) return local;
+      var inj = window.PD_FOUNDER;
+      if (inj && (inj.signatureUrl || inj.founderName)) return inj;
+      return { signatureUrl: '', founderName: '', founderTitle: 'Founder' };
+    },
+    refresh: function () {
+      return founder.fetch().then(function (d) {
+        if (d && d.signatureUrl) founder.setLocal(d);
+        return founder.get();
+      });
+    },
+    fetch: function () {
+      if (!fb || !fb.doc || !fb.getDoc) return Promise.resolve(null);
+      try {
+        var ref = fb.doc(fb.db, 'settings', 'founder');
+        return fb.getDoc(ref).then(function (snap) {
+          return (snap && snap.exists && snap.exists()) ? snap.data() : null;
+        }).catch(function () { return null; });
+      } catch (e) { return Promise.resolve(null); }
+    },
+    save: function (data) {
+      founder.setLocal(data);
+      if (fb && fb.doc && fb.setDoc) {
+        try {
+          var ref = fb.doc(fb.db, 'settings', 'founder');
+          fb.setDoc(ref, {
+            founderName: data.founderName || '',
+            founderTitle: data.founderTitle || 'Founder',
+            signatureUrl: data.signatureUrl || '',
+            updatedAt: new Date().toISOString(),
+            updatedBy: (fb.auth && fb.auth.currentUser && fb.auth.currentUser.email) || ''
+          }, { merge: true }).catch(function () {});
+        } catch (e) {}
+      }
+      return data;
+    },
+    loadFounderSignature: function () {
+      // Called by the certificate renderer: resolve the best-known signature
+      // data, refreshing from Firestore when signed in. Never throws.
+      return new Promise(function (resolve) {
+        try {
+          if (fb && fb.auth && fb.auth.currentUser) {
+            founder.fetch().then(function (d) {
+              if (d && d.signatureUrl) founder.setLocal(d);
+              resolve(founder.get());
+            }).catch(function () { resolve(founder.get()); });
+            return;
+          }
+        } catch (e) {}
+        resolve(founder.get());
+      });
+    }
+  };
+
   /* ---------------------------------------------------------------- public */
   window.PDApp = {
     version: VERSION,
     setFirestore: setFirestore,
+    founder: founder,
     store: store,
     ui: ui,
+    theme: theme,
     i18n: i18n,
     geo: geo,
     location: location,

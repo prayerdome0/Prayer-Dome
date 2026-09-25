@@ -244,7 +244,7 @@
     var progress = lessonProgressPercent(p);
     var canTake = completed || progress === 100;
     var q = DATA.quizzes.filter(function (x) { return x.id === lesson.quizId; })[0];
-    var bankSize = (q && q.questions && q.questions.length) || 30;
+    var bankSize = ((DATA.TOPIC_QUESTION_POOL && DATA.TOPIC_QUESTION_POOL[lesson.id]) || ((q && q.questions) || [])).length || 30;
     var remaining = [];
     if (!p.reflected) remaining.push('Read the reflection questions');
     if (!p.prayer) remaining.push('Pray the opening prayer');
@@ -280,7 +280,7 @@
       '<div class="pd-acad-quiz-gate-wrap">' +
         actionsHtml +
         checkListHtml +
-        '<p style="margin-top:14px; font-size:.85rem; color:var(--pd-acad-muted)"><i class="pd-i pd-i-shuffle"></i> Smart question bank: ' + bankSize + ' questions in this lesson pool &mdash; every attempt randomly samples 10. Answer positions are also shuffled so you can\'t memorise them.</p>' +
+        '<p style="margin-top:14px; font-size:.85rem; color:var(--pd-acad-muted)"><i class="pd-i pd-i-shuffle"></i> Topic-only question bank: ' + bankSize + ' questions from this lesson &mdash; every attempt randomly samples 10, and answer positions shuffle so you cannot memorise them.</p>' +
       '</div>';
 
     var manualBtn = $('#manualMarkCompleteBtn');
@@ -317,11 +317,28 @@
      shuffled answers, immediate feedback, end-of-quiz Pass/Fail result, and
      a Review screen listing every question with the correct answer.
      ========================================================================== */
-  var ACTIVE_QUIZ = null; // { lesson, quiz, questions, currentIdx, answers }
+  var ACTIVE_QUIZ = null; // { lesson, quiz, questions, currentIdx, answers, stage }
+
+  /* Build the question set strictly from the topic the learner just studied.
+     No other lesson's questions are ever mixed in. */
+  function topicQuizQuestions(lesson, q, count) {
+    var pool = (DATA.TOPIC_QUESTION_POOL && DATA.TOPIC_QUESTION_POOL[lesson.id]) || [];
+    if (!pool.length) {
+      // Topic data missing — fall back to the quiz's own bank (already lesson-scoped).
+      pool = (q && q.questions) || [];
+    }
+    var list = shuffle(pool).slice(0, Math.min(count || 10, pool.length));
+    return list.map(function (raw, i) {
+      var isTF = raw.length === 4 && raw[1] === 'True' && raw[2] === 'False';
+      var options = isTF
+        ? shuffle([{ t: 'True', correct: raw[3] === 0 }, { t: 'False', correct: raw[3] === 1 }])
+        : shuffle([{ t: raw[1], correct: raw[5] === 0 }, { t: raw[2], correct: raw[5] === 1 }, { t: raw[3], correct: raw[5] === 2 }, { t: raw[4], correct: raw[5] === 3 }]);
+      return { id: i, text: raw[0], tf: isTF, options: options };
+    });
+  }
 
   function openQuizModal(lesson, q, previouslyPassed) {
     if (!q) return;
-    // Mark progress & completed before launching so the gate doesn't block.
     var s = quizState();
     if (s.completedLessons.indexOf(lesson.id) < 0) s.completedLessons.push(lesson.id);
     var lp = lessonProgressStore();
@@ -331,8 +348,12 @@
     saveLessonProgress(lp);
     saveState(s);
 
-    var questions = sampleQuizQuestions(q, 10);
-    ACTIVE_QUIZ = { lesson: lesson, quiz: q, questions: questions, currentIdx: 0, answers: [], score: 0, answered: false, selection: null };
+    // Every question comes from this lesson's topic bank.
+    var questions = topicQuizQuestions(lesson, q, 10);
+    ACTIVE_QUIZ = {
+      lesson: lesson, quiz: q, questions: questions, currentIdx: 0, answers: [],
+      score: 0, answered: false, selection: null, stage: 'question', gradedRecord: null
+    };
     var root = $('#pdLessonModalRoot');
     if (!root) return;
     root.innerHTML = quizModalShell(lesson, q);
@@ -356,7 +377,7 @@
           '<div class="pd-acad-quiz-progress-strip" id="quizProgressStrip">' +
             '<strong id="quizQNum">Question 1 of 10</strong>' +
             '<div class="pd-acad-progress"><span id="quizProgressBar" style="width:10%"></span></div>' +
-            '<small id="quizScoreLive">Score so far: 0</small>' +
+            '<small id="quizScoreLive">Questions drawn from this lesson only</small>' +
           '</div>' +
           '<div id="quizBody"></div>' +
         '</div>' +
@@ -373,25 +394,24 @@
   function renderQuizQuestion() {
     var a = ACTIVE_QUIZ;
     if (!a) return;
-    if (a.currentIdx >= a.questions.length) { return renderQuizResult(); }
-    var qz = a.questions[a.currentIdx];
+    a.stage = 'question';
     a.answered = false; a.selection = null;
     var body = $('#quizBody'); if (!body) return;
-
     var total = a.questions.length;
-    var pct = Math.round(((a.currentIdx) / total) * 100);
+    var qz = a.questions[a.currentIdx];
+    var pct = Math.round((a.currentIdx / total) * 100);
     var qNumEl = $('#quizQNum'); if (qNumEl) qNumEl.innerHTML = 'Question <strong>' + (a.currentIdx + 1) + '</strong> of ' + total;
     var bar = $('#quizProgressBar'); if (bar) bar.style.width = pct + '%';
-    var live = $('#quizScoreLive'); if (live) live.innerHTML = 'Score so far: ' + a.score + ' / ' + (a.currentIdx);
+    var live = $('#quizScoreLive'); if (live) live.textContent = a.currentIdx + ' of ' + total + ' answered — no hints until you submit';
 
     body.innerHTML = '' +
       '<div class="pd-acad-quiz-question" key="' + a.currentIdx + '">' +
         '<span class="pd-acad-quiz-question-label"><i class="pd-i pd-i-circle-question-mark"></i> Question ' + (a.currentIdx + 1) + ' of ' + total + '</span>' +
         '<h4>' + esc(qz.text) + '</h4>' +
       '</div>' +
-      '<div class="pd-acad-quiz-options" id="quizOptions">' +
+      '<div class="pd-acad-quiz-options" id="quizOptions" role="radiogroup" aria-label="Choices">' +
         qz.options.map(function (op, idx) {
-          return '<button class="pd-acad-quiz-option" data-idx="' + idx + '" type="button">' +
+          return '<button class="pd-acad-quiz-option" data-idx="' + idx + '" type="button" role="radio" aria-checked="false">' +
             '<span class="pd-acad-quiz-option-letter">' + String.fromCharCode(65 + idx) + '</span>' +
             '<span class="pd-acad-quiz-option-text">' + esc(op.t) + '</span>' +
           '</button>';
@@ -399,7 +419,7 @@
       '</div>' +
       '<div class="pd-acad-quiz-actions">' +
         '<button class="pd-acad-btn pd-acad-btn-ghost" id="quizCloseBtn2" type="button"><i class="pd-i pd-i-arrow-left"></i> Back to lesson</button>' +
-        '<button class="pd-acad-btn pd-acad-btn-primary" id="quizNextBtn" type="button" disabled>' + (a.currentIdx === total - 1 ? '<i class="pd-i pd-i-flag"></i> See result' : 'Next question <i class="pd-i pd-i-arrow-right"></i>') + '</button>' +
+        '<button class="pd-acad-btn pd-acad-btn-primary" id="quizNextBtn" type="button" disabled>' + (a.currentIdx === total - 1 ? '<i class="pd-i pd-i-flag"></i> Review answers &amp; submit' : 'Next question <i class="pd-i pd-i-arrow-right"></i>') + '</button>' +
       '</div>';
 
     bindQuizQuestion();
@@ -410,37 +430,23 @@
     var opts = $$('#quizOptions .pd-acad-quiz-option');
     opts.forEach(function (btn) {
       btn.addEventListener('click', function () {
-        if (a.answered) return;
+        if (a.stage !== 'question') return;
+        // Selecting an option is NOT submission — it only records the draft.
         a.selection = parseInt(btn.getAttribute('data-idx'), 10);
         a.answered = true;
-        var qz = a.questions[a.currentIdx];
-        var correctIdx = qz.options.findIndex(function (o) { return o.correct; });
-        a.answers[a.currentIdx] = { idx: a.selection, correct: a.selection === correctIdx };
-        opts.forEach(function (b) { b.disabled = true; });
-        if (a.selection === correctIdx) {
-          btn.classList.add('is-correct');
-          btn.querySelector('.pd-acad-option-mark') ? null : (function(){ var m = document.createElement('span'); m.className = 'pd-acad-option-mark'; m.innerHTML = '<i class="pd-i pd-i-check"></i> Correct'; btn.appendChild(m); })();
-          a.score += 1;
-          showQuizFeedback(true, qz);
-          if (window.confetti) confetti({ particleCount: 50, spread: 70, origin: { y: 0.7 } });
-        } else {
-          btn.classList.add('is-wrong');
-          var mark = document.createElement('span'); mark.className = 'pd-acad-option-mark'; mark.innerHTML = '<i class="pd-i pd-i-x"></i> Incorrect'; btn.appendChild(mark);
-          var correctBtn = opts[correctIdx];
-          if (correctBtn) {
-            correctBtn.classList.add('is-correct');
-            var cmark = document.createElement('span'); cmark.className = 'pd-acad-option-mark'; cmark.innerHTML = '<i class="pd-i pd-i-check"></i> Correct answer'; correctBtn.appendChild(cmark);
-          }
-          showQuizFeedback(false, qz, qz.options[correctIdx]);
-        }
-        var live = $('#quizScoreLive'); if (live) live.innerHTML = 'Score so far: ' + a.score + ' / ' + (a.currentIdx + 1);
+        opts.forEach(function (b) { b.classList.remove('is-draft'); b.setAttribute('aria-checked', 'false'); });
+        btn.classList.add('is-draft');
+        btn.setAttribute('aria-checked', 'true');
         var nextBtn = $('#quizNextBtn'); if (nextBtn) nextBtn.disabled = false;
       });
     });
     var nextBtn = $('#quizNextBtn');
     if (nextBtn) nextBtn.addEventListener('click', function () {
+      // The learner may navigate without choosing; unanswered items are
+      // surfaced again in review before submission.
+      if (a.answered) a.answers[a.currentIdx] = a.selection;
       a.currentIdx += 1;
-      if (a.currentIdx >= a.questions.length) return renderQuizResult();
+      if (a.currentIdx >= a.questions.length) return renderQuizReview();
       renderQuizQuestion();
     });
     var closeBtn = $('#quizCloseBtn');
@@ -449,51 +455,109 @@
     if (closeBtn2) closeBtn2.addEventListener('click', closeQuizModal);
   }
 
-  function showQuizFeedback(isCorrect, qz, correctOption) {
-    var body = $('#quizBody');
-    if (!body) return;
-    var fb = document.createElement('div');
-    fb.className = 'pd-acad-quiz-feedback ' + (isCorrect ? 'correct' : 'wrong');
-    if (isCorrect) {
-      fb.innerHTML = '<i class="pd-i pd-i-circle-check"></i><div><strong>Correct!</strong> ' +
-        '<span>' + esc('That is the right answer.') + '</span></div>';
-    } else {
-      fb.innerHTML = '<i class="pd-i pd-i-circle-x"></i><div><strong>Not quite.</strong> ' +
-        '<span>The correct answer is <em>' + esc(correctOption ? correctOption.t : '') + '</em>. ' +
-        'Take a moment to reflect, then continue.</span></div>';
-    }
-    body.appendChild(fb);
-    fb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-
-  function renderQuizResult() {
+  /* ==========================================================================
+     Submission review — shown immediately after the last question. Lists
+     every question with the learner's chosen option and highlights anything
+     left unanswered. Nothing is graded until the learner confirms.
+     ========================================================================== */
+  function renderQuizReview() {
     var a = ACTIVE_QUIZ;
     if (!a) return;
+    a.stage = 'review';
+    var body = $('#quizBody'); if (!body) return;
     var total = a.questions.length;
+    var answered = a.answers.reduce(function (s, x) { return s + (x == null ? 0 : 1); }, 0);
+    var bar = $('#quizProgressBar'); if (bar) bar.style.width = '100%';
+    var qNumEl = $('#quizQNum'); if (qNumEl) qNumEl.innerHTML = 'Submission review';
+    var live = $('#quizScoreLive'); if (live) live.textContent = answered + ' of ' + total + ' answered';
+
+    body.innerHTML = '' +
+      '<div class="pd-acad-quiz-review is-confirm">' +
+        '<div class="pd-acad-quiz-review-head">' +
+          '<h3><i class="pd-i pd-i-list-checks"></i> Review your answers</h3>' +
+          '<div class="pd-acad-quiz-result-meta">' +
+            '<span class="pd-acad-chip"><i class="pd-i pd-i-info"></i> Correct answers appear after you confirm</span>' +
+            '<span class="pd-acad-chip ' + (answered === total ? 'gold' : '') + '">' + answered + ' of ' + total + ' answered</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="pd-acad-quiz-review-list">' +
+          a.questions.map(function (qz, i) {
+            var ans = a.answers[i];
+            var chosen = ans == null ? null : qz.options[ans];
+            return '<div class="pd-acad-quiz-review-item ' + (chosen ? 'is-draft' : 'is-unanswered') + '">' +
+              '<span class="pd-acad-review-status"><i class="pd-i ' + (chosen ? 'pd-i-check' : 'pd-i-x') + '"></i> ' + (chosen ? 'Answered' : 'Unanswered') + '</span>' +
+              '<h5>Q' + (i + 1) + '. ' + esc(qz.text) + '</h5>' +
+              (chosen ? '<div class="pd-acad-review-line">Your answer: <em>' + esc(chosen.t) + '</em></div>' : '<div class="pd-acad-review-line">You did not answer this question.</div>') +
+            '</div>';
+          }).join('') +
+        '</div>' +
+        '<div class="pd-acad-confirm-box">' +
+          '<i class="pd-i pd-i-shield-check"></i>' +
+          '<div><strong>Ready to submit?</strong><span>Once confirmed, your answers are final for this attempt and will be graded immediately.</span></div>' +
+        '</div>' +
+        '<div class="pd-acad-quiz-actions">' +
+          '<button class="pd-acad-btn pd-acad-btn-ghost" id="quizConfirmBackBtn" type="button"><i class="pd-i pd-i-arrow-left"></i> Go back</button>' +
+          '<button class="pd-acad-btn pd-acad-btn-primary" id="quizConfirmSubmitBtn" type="button"><i class="pd-i pd-i-check"></i> Confirm submission</button>' +
+        '</div>' +
+      '</div>';
+
+    var back = $('#quizConfirmBackBtn');
+    if (back) back.addEventListener('click', function () { a.currentIdx = 0; renderQuizQuestion(); });
+    var submit = $('#quizConfirmSubmitBtn');
+    if (submit) submit.addEventListener('click', renderQuizGrading);
+  }
+
+  /* ==========================================================================
+     Grading — the only stage that reveals correct answers and the score.
+     Passing (>= threshold) unlocks the next topic and issues a certificate;
+     failing blocks progression and offers a retake.
+     ========================================================================== */
+  function renderQuizGrading() {
+    var a = ACTIVE_QUIZ;
+    if (!a) return;
+    a.stage = 'grading';
+    var total = a.questions.length;
+    a.score = 0;
+    a.answers.forEach(function (idx, i) {
+      if (idx == null || idx === undefined) return;
+      var qz = a.questions[i];
+      var correctIdx = qz.options.findIndex(function (o) { return o.correct; });
+      if (idx === correctIdx) a.score += 1;
+    });
     var percent = Math.round((a.score / total) * 100);
     var passed = percent >= a.quiz.passingScore;
+
+    // Persist exactly once per attempt. Navigating between the result and the
+    // post-grading review must not mint duplicate certificates.
+    var certificate = null;
+    var record;
+    if (!a.gradedRecord) {
+      record = { score: percent, date: new Date().toISOString(), lessonId: a.lesson.id, total: total, correct: a.score };
+      var s = quizState();
+      if (passed) {
+        s.passedQuizzes[a.quiz.id] = record;
+        if (s.completedLessons.indexOf(a.lesson.id) < 0) s.completedLessons.push(a.lesson.id);
+        certificate = 'PD-' + a.lesson.id.toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
+        s.certificates.push({ id: certificate, lessonId: a.lesson.id, title: a.lesson.title, score: percent, date: record.date, name: memberName() });
+        saveState(s);
+        persistCertificateToFirestore(certificate, a.lesson, percent);
+        unlockNextLesson(a.lesson);
+      } else {
+        saveState(s);
+      }
+      a.gradedRecord = record;
+      a.gradedCertificate = certificate;
+      a.gradedPassed = passed;
+    } else {
+      record = a.gradedRecord;
+      certificate = a.gradedCertificate;
+      passed = a.gradedPassed;
+    }
+
     var body = $('#quizBody'); if (!body) return;
     var bar = $('#quizProgressBar'); if (bar) bar.style.width = '100%';
-
-    // Persist result
-    var s = quizState();
-    var certificate = null;
-    var record = { score: percent, date: new Date().toISOString(), lessonId: a.lesson.id, total: a.questions.length, correct: a.score };
-    if (passed) {
-      s.passedQuizzes[a.quiz.id] = record;
-      if (s.completedLessons.indexOf(a.lesson.id) < 0) s.completedLessons.push(a.lesson.id);
-      certificate = 'PD-' + a.lesson.id.toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
-      s.certificates.push({ id: certificate, lessonId: a.lesson.id, title: a.lesson.title, score: percent, date: record.date, name: memberName() });
-      saveState(s);
-      // Mirror to Firestore if signed in.
-      persistCertificateToFirestore(certificate, a.lesson, percent);
-    } else {
-      // Update previous attempt record if the user has retried.
-      if (s.passedQuizzes[a.quiz.id]) {
-        // Keep existing pass; this retake didn't reach the bar but the earlier pass is still valid.
-      }
-      saveState(s);
-    }
+    var qNumEl = $('#quizQNum'); if (qNumEl) qNumEl.innerHTML = 'Result';
+    var live = $('#quizScoreLive'); if (live) live.textContent = (passed ? 'Passed' : 'Not passed') + ' — ' + a.quiz.passingScore + '% required to pass';
 
     body.innerHTML = '' +
       '<div class="pd-acad-quiz-result ' + (passed ? 'is-pass' : 'is-fail') + '">' +
@@ -502,22 +566,24 @@
         '<div class="pd-acad-result-score">' + percent + '%</div>' +
         '<p>You answered <strong>' + a.score + '</strong> of ' + total + ' questions correctly.</p>' +
         '<div class="pd-acad-result-meta">' +
-          '<span class="pd-acad-chip ' + (passed ? 'gold' : '') + '"><i class="pd-i ' + (passed ? 'pd-i-check' : 'pd-i-rotate-cw') + '"></i> ' + (passed ? 'Status: PASSED' : 'Status: ' + (100 - percent) + '% short of 80%') + '</span>' +
+          '<span class="pd-acad-chip ' + (passed ? 'gold' : '') + '"><i class="pd-i ' + (passed ? 'pd-i-check' : 'pd-i-rotate-cw') + '"></i> ' + (passed ? 'Status: PASSED' : 'Status: FAILED — ' + Math.max(0, a.quiz.passingScore - percent) + '% short of ' + a.quiz.passingScore + '%') + '</span>' +
           '<span class="pd-acad-chip"><i class="pd-i pd-i-clock"></i> ' + a.quiz.passingScore + '% required to pass</span>' +
           (certificate ? '<span class="pd-acad-chip gold"><i class="pd-i pd-i-award"></i> Certificate ' + esc(certificate) + '</span>' : '') +
         '</div>' +
+        (passed && a.lesson.nextLessonId
+          ? '<div class="pd-acad-unlock-banner"><i class="pd-i pd-i-lock-open"></i><div><strong>Next topic unlocked</strong><span>"' + esc(nextLessonTitle(a.lesson)) + '" is now available to you.</span></div></div>'
+          : '') +
         '<div class="pd-acad-quiz-result-actions">' +
           (passed
             ? '<button class="pd-acad-btn pd-acad-btn-primary" id="quizDownloadCertBtn"><i class="pd-i pd-i-download"></i> Download Certificate</button>' +
-              (a.lesson.nextLessonId ? '<a class="pd-acad-btn pd-acad-btn-secondary" id="quizContinueBtn" href="#lesson/' + esc(a.lesson.nextLessonId) + '"><i class="pd-i pd-i-arrow-right"></i> Continue to next lesson</a>' : '') +
-              '<button class="pd-acad-btn pd-acad-btn-ghost" id="quizReviewBtn"><i class="pd-i pd-i-eye"></i> Review answers</button>'
+              (a.lesson.nextLessonId ? '<a class="pd-acad-btn pd-acad-btn-secondary" id="quizContinueBtn" href="#lesson/' + esc(a.lesson.nextLessonId) + '"><i class="pd-i pd-i-arrow-right"></i> Next Topic</a>' : '') +
+              '<button class="pd-acad-btn pd-acad-btn-ghost" id="quizReviewBtn"><i class="pd-i pd-i-eye"></i> Review answers & correct choices</button>'
             : '<button class="pd-acad-btn pd-acad-btn-primary" id="quizRetakeBtn"><i class="pd-i pd-i-rotate-cw"></i> Retake quiz</button>' +
               '<button class="pd-acad-btn pd-acad-btn-secondary" id="quizReviewLessonBtn"><i class="pd-i pd-i-book-open"></i> Review lesson</button>' +
-              '<button class="pd-acad-btn pd-acad-btn-ghost" id="quizReviewBtn"><i class="pd-i pd-i-eye"></i> Review answers</button>') +
+              '<button class="pd-acad-btn pd-acad-btn-ghost" id="quizReviewBtn"><i class="pd-i pd-i-eye"></i> Review answers & correct choices</button>') +
         '</div>' +
       '</div>';
 
-    // Confetti celebration
     if (passed && window.confetti) {
       try {
         confetti({ particleCount: 220, spread: 120, origin: { y: 0.6 } });
@@ -526,7 +592,6 @@
       } catch (e) {}
     }
 
-    // Wire result actions
     var dl = $('#quizDownloadCertBtn');
     if (dl) {
       if (window.PDCertificate && certificate) {
@@ -540,21 +605,44 @@
     var reviewLesson = $('#quizReviewLessonBtn');
     if (reviewLesson) reviewLesson.addEventListener('click', function () { closeQuizModal(); if (a.lesson.id) location.hash = '#lesson/' + a.lesson.id; });
     var review = $('#quizReviewBtn');
-    if (review) review.addEventListener('click', function () { renderQuizReview(); });
+    if (review) review.addEventListener('click', function () { renderQuizGradedReview(); });
     var continueBtn = $('#quizContinueBtn');
     if (continueBtn) continueBtn.addEventListener('click', function () { closeQuizModal(); });
 
-    // Update dashboard widgets so progress reflects the new attempt.
     renderStudentDashboard();
+    renderLessonList($('#lessonList'), a.lesson.id);
   }
 
-  function renderQuizReview() {
+  function nextLessonTitle(lesson) {
+    if (!lesson || !lesson.nextLessonId) return '';
+    var n = DATA.lessons.filter(function (x) { return x.id === lesson.nextLessonId; })[0];
+    return n ? (n.order + '. ' + n.title) : '';
+  }
+
+  function unlockNextLesson(lesson) {
+    if (!lesson || !lesson.nextLessonId) return;
+    var s = quizState();
+    if (!s.unlockedLessons) s.unlockedLessons = [];
+    if (s.unlockedLessons.indexOf(lesson.nextLessonId) < 0) s.unlockedLessons.push(lesson.nextLessonId);
+    saveState(s);
+  }
+
+  /* Post-grading review — same list as the pre-submit review, but now every
+     question shows the chosen answer and the correct answer side by side. */
+  function renderQuizGradedReview() {
     var a = ACTIVE_QUIZ;
     if (!a) return;
+    a.stage = 'graded-review';
     var body = $('#quizBody'); if (!body) return;
     var total = a.questions.length;
-    var correctCount = a.answers.reduce(function (s, x) { return s + (x && x.correct ? 1 : 0); }, 0);
-    var html = '' +
+    var correctCount = 0;
+    a.questions.forEach(function (qz, i) {
+      var ans = a.answers[i];
+      if (ans == null) return;
+      var correctIdx = qz.options.findIndex(function (o) { return o.correct; });
+      if (ans === correctIdx) correctCount += 1;
+    });
+    body.innerHTML = '' +
       '<div class="pd-acad-quiz-review">' +
         '<div class="pd-acad-quiz-review-head">' +
           '<h3><i class="pd-i pd-i-list-checks"></i> Answer review</h3>' +
@@ -564,17 +652,17 @@
         '</div>' +
         '<div class="pd-acad-quiz-review-list">' +
         a.questions.map(function (qz, i) {
-          var ans = a.answers[i] || {};
+          var ans = a.answers[i];
           var correctOption = qz.options.find(function (o) { return o.correct; }) || qz.options[0];
-          var chosenOption = ans.idx != null ? qz.options[ans.idx] : null;
-          var isCorrect = !!ans.correct;
+          var chosenOption = ans == null ? null : qz.options[ans];
+          var isCorrect = ans != null && chosenOption && chosenOption.correct;
           return '<div class="pd-acad-quiz-review-item ' + (isCorrect ? 'is-correct' : 'is-wrong') + '">' +
             '<span class="pd-acad-review-status"><i class="pd-i ' + (isCorrect ? 'pd-i-check' : 'pd-i-x') + '"></i> ' + (isCorrect ? 'Correct' : 'Incorrect') + '</span>' +
             '<h5>Q' + (i + 1) + '. ' + esc(qz.text) + '</h5>' +
             (chosenOption ? '<div class="pd-acad-review-line">Your answer: <em>' + esc(chosenOption.t) + '</em></div>' : '<div class="pd-acad-review-line">You did not answer this question.</div>') +
             (isCorrect ? '' : '<div class="pd-acad-review-line">Correct answer: <strong>' + esc(correctOption.t) + '</strong></div>') +
             '<div class="pd-acad-review-explain"><i class="pd-i pd-i-lightbulb"></i> ' +
-              esc('Revisit the lesson section on ' + esc(a.quiz.track || 'this topic') + ' before retaking — the next attempt draws 10 fresh questions from the full bank.') +
+              esc('Revisit the lesson on this topic before retaking — the next attempt draws 10 fresh questions from the same topic bank.') +
             '</div>' +
           '</div>';
         }).join('') +
@@ -584,8 +672,7 @@
           '<button class="pd-acad-btn pd-acad-btn-primary" id="quizRetake2"><i class="pd-i pd-i-rotate-cw"></i> Retake quiz</button>' +
         '</div>' +
       '</div>';
-    body.innerHTML = html;
-    var back = $('#quizReviewBackBtn'); if (back) back.addEventListener('click', renderQuizResult);
+    var back = $('#quizReviewBackBtn'); if (back) back.addEventListener('click', renderQuizGrading);
     var rt = $('#quizRetake2'); if (rt) rt.addEventListener('click', function () { openQuizModal(a.lesson, a.quiz); });
   }
 
@@ -839,7 +926,7 @@
     var heroStats = '' +
       '<span><i class="pd-i pd-i-clock"></i> ' + esc(l.minutes + ' min') + '</span>' +
       '<span><i class="pd-i pd-i-layers"></i> ' + esc(l.level) + '</span>' +
-      '<span><i class="pd-i pd-i-circle-question-mark"></i> ' + ((q && q.questions) ? q.questions.length : 30) + ' Q pool</span>';
+      '<span><i class="pd-i pd-i-circle-question-mark"></i> ' + (((DATA.TOPIC_QUESTION_POOL && DATA.TOPIC_QUESTION_POOL[l.id]) || ((q && q.questions) || [])).length || 30) + ' Q pool</span>';
 
     var heroBlock = '' +
       '<section class="pd-acad-lesson-hero" aria-label="Lesson hero banner">' +
@@ -984,7 +1071,7 @@
     overlay.className = 'pd-modern-modal';
     overlay.style.position = 'fixed'; overlay.style.inset = '0'; overlay.style.zIndex = '9999'; overlay.style.background = 'rgba(7,36,77,.72)'; overlay.style.display = 'flex'; overlay.style.alignItems = 'center'; overlay.style.justifyContent = 'center'; overlay.style.padding = '20px';
     overlay.innerHTML = '<div style="max-width:820px;max-height:90vh;overflow:auto;background:var(--pd-acad-card);color:var(--pd-acad-ink);border-radius:28px;padding:30px;box-shadow:var(--pd-shadow-lg);border:1px solid var(--pd-acad-border)">' +
-      '<div style="display:flex;justify-content:space-between;gap:16px;align-items:start"><div><span class="pd-acad-chip gold">' + esc(s.category) + '</span><h2 style="font-family:Playfair Display,Georgia,serif;color:var(--pd-acad-blue);margin:12px 0">' + esc(s.title) + '</h2><p style="color:var(--pd-acad-muted)">By ' + esc(s.author) + ' · ' + s.readingTime + ' min read</p></div><button class="pd-acad-btn pd-acad-btn-ghost" data-close aria-label="Close"><i class="pd-i pd-i-x"></i></button></div>' +
+      '<div style="display:flex;justify-content:space-between;gap:16px;align-items:start"><div><span class="pd-acad-chip gold">' + esc(s.category) + '</span><h2 style="font-family:Poppins,Inter,sans-serif;color:var(--pd-acad-blue);margin:12px 0">' + esc(s.title) + '</h2><p style="color:var(--pd-acad-muted)">By ' + esc(s.author) + ' · ' + s.readingTime + ' min read</p></div><button class="pd-acad-btn pd-acad-btn-ghost" data-close aria-label="Close"><i class="pd-i pd-i-x"></i></button></div>' +
       '<img src="' + esc(s.image) + '" style="width:100%;height:280px;object-fit:cover;border-radius:22px;margin:18px 0">' +
       '<div class="pd-acad-story-body">' + s.body.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') + '</div>' +
       '<div class="pd-acad-callout"><strong>Reflection:</strong> ' + esc(s.prompt) + '</div><a class="pd-acad-btn pd-acad-btn-primary" href="/lessons#lesson/' + encodeURIComponent(s.lessonId) + '"><i class="pd-i pd-i-arrow-right"></i> Continue to lesson</a></div>';
@@ -1177,7 +1264,7 @@
     css.textContent = [
       '.pd-course-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; padding: 24px; box-shadow: var(--pd-shadow-sm); cursor: pointer; transition: all 0.2s; }',
       '.pd-course-card:hover { transform: translateY(-4px); border-color: var(--pd-gold); }',
-      '.pd-course-card h3 { font-family: "Playfair Display", serif; font-size: 1.5rem; margin-bottom: 10px; color: var(--pd-blue); }',
+      '.pd-course-card h3 { font-family: "Poppins", sans-serif; font-size: 1.5rem; margin-bottom: 10px; color: var(--pd-blue); }',
       '.pd-course-card p { font-size: 0.88rem; color: var(--text-dim); line-height: 1.5; margin-bottom: 16px; }',
       '.course-progress-bar-wrap { width: 100%; height: 8px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-top: 10px; }',
       '.course-progress-bar { height: 100%; background: var(--pd-blue); transition: width 0.3s; }',

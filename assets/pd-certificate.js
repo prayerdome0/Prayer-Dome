@@ -25,6 +25,7 @@
   var VERSE = '“He does everything blamelessly.” — Mark 7:37';
 
   var logoPromise = null;
+  var sigPromise = null;
 
   function loadedPageLogo() {
     if (typeof document === 'undefined' || typeof document.querySelectorAll !== 'function') return null;
@@ -33,6 +34,22 @@
       if (images[i].complete && images[i].naturalWidth && images[i].naturalHeight) return images[i];
     }
     return null;
+  }
+
+  function loadImage(url) {
+    if (typeof Image === 'undefined') return Promise.resolve(null);
+    return new Promise(function (resolve) {
+      var settled = false;
+      function done(img) { if (!settled) { settled = true; resolve(img); } }
+      var img = new Image();
+      // Cross-origin media service images must be drawn without tainting the
+      // canvas (which would break toDataURL/toBlob on the final certificate).
+      try { img.crossOrigin = 'anonymous'; } catch (e) {}
+      img.onload = function () { done(img); };
+      img.onerror = function () { done(null); };
+      img.src = url;
+      setTimeout(function () { done(null); }, 1800);
+    });
   }
 
   function loadLogo() {
@@ -52,6 +69,60 @@
       });
     }
     return logoPromise;
+  }
+
+  /* ==========================================================================
+     Founder signature — the ministry's "official signature" that every future
+     certificate automatically uses. The signature lives with the founder's
+     name and position in admin's `settings`/`founder` document. Clients cache
+     it locally so certificates still render the founder's mark offline.
+     ========================================================================== */
+  function founderSignatureFromDom() {
+    if (typeof document === 'undefined' || typeof document.querySelector !== 'function') return null;
+    try {
+      // Admin previews embed the current signature as a data URL so the exact
+      // image being saved is what renders.
+      var meta = document.querySelector('meta[name="pd-founder-signature"]');
+      if (meta && meta.content) return meta.content;
+      var img = document.querySelector('img[data-pd-founder-signature]');
+      if (img && img.complete && img.naturalWidth && img.naturalHeight) return img.src;
+    } catch (e) {}
+    return null;
+  }
+
+  function founderSignatureFromStorage() {
+    try {
+      var raw = localStorage.getItem('pd_founder_signature');
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      if (parsed && parsed.signatureUrl) return { url: parsed.signatureUrl, name: parsed.founderName || '', title: parsed.founderTitle || '' };
+      return null;
+    } catch (e) { return null; }
+  }
+
+  function loadFounderSignatureData() {
+    if (!sigPromise) {
+      sigPromise = new Promise(function (resolve) {
+        var settled = false;
+        function done(meta) { if (!settled) { settled = true; resolve(meta); } }
+        try {
+          // Firestore is authoritative when signed in.
+          var pd = window.PDApp;
+          if (pd && pd._fb && pd._fb.auth && pd._fb.auth.currentUser) {
+            pd.loadFounderSignature().then(function (m) { done(m); }).catch(function () { done(null); });
+            setTimeout(function () { done(null); }, 2500);
+            return;
+          }
+        } catch (e) {}
+        done(founderSignatureFromStorage() || { url: founderSignatureFromDom(), name: '', title: '' });
+      });
+    }
+    return sigPromise;
+  }
+
+  function loadFounderSignatureImage(meta) {
+    if (!meta || !meta.url) return Promise.resolve(null);
+    return loadImage(meta.url);
   }
 
   function ellipse(ctx, cx, cy, rx, ry, color) {
@@ -156,7 +227,7 @@
     }
   }
 
-  function draw(ctx, opts, logo) {
+  function draw(ctx, opts, logo, sigMeta, sigImg) {
     var name = String(opts.name || 'Prayer Dome Member');
     var course = String(opts.course || 'Prayer Dome Academy Lesson');
     var score = Math.round(Number(opts.score) || 0);
@@ -239,14 +310,27 @@
     ctx.fillText(VERSE, W / 2, 846);
 
     // signature
-    ctx.fillStyle = NAVY;
-    ctx.font = "italic 600 46px " + SERIF;
-    ctx.fillText('Prayer Dome', 400, 968);
+    var founderName = (sigMeta && sigMeta.name) ? sigMeta.name : '';
+    var founderTitle = (sigMeta && sigMeta.title) ? sigMeta.title : 'FOUNDER';
+    var sigLabel = founderName || 'Prayer Dome';
+    var hasSigImage = sigImg && sigImg.naturalWidth;
+    ctx.textAlign = 'center';
+    if (hasSigImage) {
+      var sw = 250;
+      var sh = (sw * sigImg.naturalHeight) / sigImg.naturalWidth;
+      if (sh > 90) { sh = 90; sw = (sh * sigImg.naturalWidth) / sigImg.naturalHeight; }
+      // Signature image centred on the left signature block (above its rule).
+      ctx.drawImage(sigImg, 400 - sw / 2, 906 - sh, sw, sh);
+    } else {
+      ctx.fillStyle = NAVY;
+      ctx.font = "italic 600 46px " + SERIF;
+      ctx.fillText(sigLabel, 400, 968);
+    }
     ctx.strokeStyle = MUTED; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(240, 1000); ctx.lineTo(560, 1000); ctx.stroke();
     ctx.fillStyle = MUTED;
     ctx.font = "600 21px " + SERIF;
-    spaced(ctx, 'MINISTRY TEAM', 400, 1038, 6);
+    spaced(ctx, founderName ? (founderName.toUpperCase() + (founderTitle ? ' — ' + founderTitle.toUpperCase() : '')) : 'MINISTRY TEAM', 400, 1038, 6);
 
     seal(ctx, 1205, 946);
 
@@ -306,13 +390,20 @@
 
   function render(opts) {
     opts = opts || {};
-    return loadLogo().then(function (logo) {
+    var founderWork = loadFounderSignatureData().then(function (meta) {
+      return loadFounderSignatureImage(meta).then(function (img) {
+        return { meta: meta, img: img };
+      });
+    });
+    return Promise.all([loadLogo(), founderWork]).then(function (res) {
+      var logo = res[0];
+      var founder = res[1] || {};
       var canvas = document.createElement('canvas');
       canvas.width = W;
       canvas.height = H;
       var ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('Canvas is not supported in this browser.');
-      draw(ctx, opts, logo);
+      draw(ctx, opts, logo, founder.meta, founder.img);
       return canvas;
     });
   }

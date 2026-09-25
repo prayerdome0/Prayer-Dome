@@ -655,6 +655,25 @@
     DATA.LESSON_QUESTION_POOL[lesson.id] = unique;
   });
 
+  // Publish the per-lesson topics so the quiz flow can draw questions ONLY
+  // from the topic just studied — the requirement that quizzes never mix
+  // unrelated topics. Each topic carries its curated pool plus the expanded
+  // bank authored above, deduplicated by prompt text.
+  DATA.TOPIC_QUESTION_POOL = {};
+  Object.keys(EXTRA_LESSON_QUESTIONS).forEach(function (lessonId) {
+    var base = (DATA.lessonQuestions && DATA.lessonQuestions[lessonId]) || [];
+    var seen = {};
+    var pool = [];
+    function push(q) {
+      if (!q) return;
+      var key = (q[0] || '').trim().toLowerCase();
+      if (key && !seen[key]) { seen[key] = true; pool.push(q); }
+    }
+    base.forEach(push);
+    (EXTRA_LESSON_QUESTIONS[lessonId] || []).forEach(push);
+    DATA.TOPIC_QUESTION_POOL[lessonId] = pool;
+  });
+
   // Extend each quiz's question list. The existing seeded list is kept as the
   // head of the pool; the bank per track is then added so each quiz has 30
   // question candidates. The renderer will sample 10 per attempt.

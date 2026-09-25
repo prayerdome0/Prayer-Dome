@@ -134,7 +134,7 @@
     
     <link rel="stylesheet" href="/assets/pd-icons.css">
     <script src="/assets/pd-icons.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="/assets/pd-upload.js"></script>
@@ -175,7 +175,7 @@
         }
 
         /* Luxury Font */
-        .luxury-font, h1, h2, h3, .amount-selector .amt-chip, .total-amount { font-family: 'Playfair Display', serif; }
+        .luxury-font, h1, h2, h3, .amount-selector .amt-chip, .total-amount { font-family: 'Poppins', serif; }
 
         /* Header with Logo - Increased Size */
         .give-header {
@@ -223,7 +223,7 @@
             font-size: 1.4rem; 
             font-weight: 900; 
             letter-spacing: 1px;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Poppins', serif;
         }
         .brand-text p { 
             font-size: 0.65rem; 
@@ -494,7 +494,7 @@
             gap: 12px;
             margin-bottom: 25px;
             color: var(--accent-green);
-            font-family: 'Playfair Display', serif;
+            font-family: 'Poppins', serif;
         }
         .conv-grid { 
             display: grid; 
@@ -1014,7 +1014,12 @@
             setTimeout(() => toast.remove(), 3500);
         };
         
-        window.toggleDarkMode = () => document.body.classList.toggle('dark-mode');
+window.toggleDarkMode = function() {
+    var dark = (window.PDApp && PDApp.theme ? PDApp.theme.isDark() : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
+    document.body.classList.toggle('dark-mode', dark);
+    document.documentElement.classList.toggle('dark-mode', dark);
+    try { var b = document.querySelector('[data-pd-theme-toggle] .pd-i') || document.querySelector('.theme-toggle-btn .pd-i'); if (b) b.className = dark ? 'pd-i pd-i-sun' : 'pd-i pd-i-moon'; } catch (e) {}
+};
 
         // ----------------------------------------------------------------
         // Initialize exchange rates on page load

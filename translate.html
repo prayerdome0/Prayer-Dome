@@ -152,7 +152,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="/assets/pd-icons.css">
 <script src="/assets/pd-icons.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
 
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -171,7 +171,7 @@ body {
   font-family:'Inter',sans-serif; background:var(--bg-primary); color:var(--text-main);
   line-height:1.65; padding-bottom:150px; overflow-x:hidden; transition:background .5s, color .5s;
 }
-h1,h2,h3 { font-family:'Playfair Display',serif; }
+h1,h2,h3 { font-family:'Poppins',serif; }
 
 header {
   position:sticky; top:0; z-index:120; display:flex; align-items:center; justify-content:space-between;
@@ -280,7 +280,7 @@ main { max-width:900px; margin:0 auto; padding:0 20px; }
 .verse-card:hover { transform:translateY(-4px); box-shadow:0 20px 44px rgba(15,23,42,.1); }
 .verse-card.reading { border-color:var(--pd-teal,#0d9488); box-shadow:0 0 0 4px rgba(13,148,136,.14); }
 .verse-head { display:flex; align-items:center; gap:10px; margin-bottom:13px; flex-wrap:wrap; }
-.verse-ref { font-family:'Playfair Display',serif; font-size:1.12rem; font-weight:800; }
+.verse-ref { font-family:'Poppins',serif; font-size:1.12rem; font-weight:800; }
 .lang-pill {
   padding:4px 11px; border-radius:50px; font-size:.6rem; font-weight:900; letter-spacing:1px; text-transform:uppercase;
   background:rgba(13,148,136,.11); color:#0f766e;
@@ -443,11 +443,23 @@ body.dark-mode .nav-link.active { color:#5eead4; }
 <script src="/assets/pd-i18n.js" defer></script>
 <script src="/assets/pd-app.js" defer></script>
 <script>
-/* ---------- Theme ---------- */
-if (localStorage.getItem('pd-theme') === 'dark') document.body.classList.add('dark-mode');
+window.toggleDarkMode = function() {
+    var dark = (window.PDApp && PDApp.theme ? PDApp.theme.isDark() : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
+    document.body.classList.toggle('dark-mode', dark);
+    document.documentElement.classList.toggle('dark-mode', dark);
+    try { var b = document.querySelector('[data-pd-theme-toggle] .pd-i') || document.querySelector('.theme-toggle-btn .pd-i'); if (b) b.className = dark ? 'pd-i pd-i-sun' : 'pd-i pd-i-moon'; } catch (e) {}
+};
+/* ---------- Theme — follows the device automatically ---------- */
+(function () {
+  var dark = (window.PDApp && PDApp.theme ? PDApp.theme.isDark() : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
+  document.body.classList.toggle('dark-mode', dark);
+  localStorage.setItem('pd-theme', dark ? 'dark' : 'light');
+})();
 function toggleDarkMode() {
-  document.body.classList.toggle('dark-mode');
-  localStorage.setItem('pd-theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+  var dark = (window.PDApp && PDApp.theme ? PDApp.theme.isDark() : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
+  document.body.classList.toggle('dark-mode', dark);
+  document.documentElement.classList.toggle('dark-mode', dark);
+  localStorage.setItem('pd-theme', dark ? 'dark' : 'light');
 }
 
 function esc(s) { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }

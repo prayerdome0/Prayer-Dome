@@ -126,7 +126,7 @@
     <!-- PD-SEO:END -->
     <link rel="stylesheet" href="/assets/pd-icons.css">
     <script src="/assets/pd-icons.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <style>
@@ -166,7 +166,7 @@
         }
 
         /* Luxury Font */
-        .luxury-font, h1, h2, h3, .stat-number, .current-month, .event-title { font-family: 'Playfair Display', serif; }
+        .luxury-font, h1, h2, h3, .stat-number, .current-month, .event-title { font-family: 'Poppins', serif; }
 
         /* Header with Logo - Increased Size */
         .events-header {
@@ -214,7 +214,7 @@
             font-size: 1.4rem; 
             font-weight: 900; 
             letter-spacing: 1px;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Poppins', serif;
         }
         .brand-text p { 
             font-size: 0.65rem; 
@@ -442,7 +442,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Poppins', serif;
         }
         .events-list {
             max-height: 500px;
@@ -499,7 +499,7 @@
             margin-bottom: 20px;
         }
         .section-header h3 {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Poppins', serif;
             color: var(--accent-green);
         }
 
@@ -537,7 +537,7 @@
             align-items: center;
             margin-bottom: 20px;
         }
-        .event-modal-header h2 { font-family: 'Playfair Display', serif; color: var(--accent-green); }
+        .event-modal-header h2 { font-family: 'Poppins', serif; color: var(--accent-green); }
         .event-modal-close {
             background: none;
             border: none;
@@ -915,7 +915,7 @@
         function closeEventModal() { document.getElementById('eventModal').style.display = 'none'; }
         function showLoginPrompt() { showToast('Please login to RSVP', 'error'); }
         function showToast(message, type = 'success') { const container = document.getElementById('toastContainer'); const toast = document.createElement('div'); toast.className = `toast ${type === 'error' ? 'error' : ''}`; toast.innerHTML = `<i class="pd-i ${type === 'success' ? 'pd-i-circle-check' : 'pd-i-circle-alert'}"></i> ${message}`; container.appendChild(toast); setTimeout(() => toast.remove(), 3500); }
-        function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+        function toggleDarkMode() { var dark = (window.PDApp && PDApp.theme ? PDApp.theme.isDark() : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)); document.body.classList.toggle('dark-mode', dark); document.documentElement.classList.toggle('dark-mode', dark); }
         function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 
         window.loadMyEvents = async function() {

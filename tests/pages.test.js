@@ -61,9 +61,14 @@ d.getElementById('askInput').value='<img src=x onerror=alert(1)> fear';
 w.askAssistant();
 t('no script/img injection from user input', !d.getElementById('results').querySelector('img[onerror]'));
 
-// theme
+// theme — now follows the device automatically (no manual toggle).
+const mql = { matches: true, addEventListener() {}, addListener() {}, removeListener() {} };
+w.matchMedia = () => mql;
 w.toggleDarkMode();
-t('dark mode toggles + persists', d.body.classList.contains('dark-mode') && w.localStorage.getItem('pd-theme')==='dark');
+t('dark-mode device follows the system to dark automatically', d.body.classList.contains('dark-mode') && w.localStorage.getItem('pd-theme')==='dark');
+mql.matches = false;
+w.toggleDarkMode();
+t('light-mode device follows the system to light automatically', !d.body.classList.contains('dark-mode') && w.localStorage.getItem('pd-theme')==='light');
 
 // ---- live.html structural checks (module script can't run in jsdom) ----
 const lhtml=fs.readFileSync(path.join(ROOT,'live.html'),'utf8');

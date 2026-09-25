@@ -108,7 +108,7 @@
     
     <link rel="stylesheet" href="/assets/pd-icons.css">
     <script src="/assets/pd-icons.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     <script src="/assets/pd-upload.js"></script>
@@ -145,7 +145,7 @@
         body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-main); line-height: 1.6; transition: 0.4s; padding-bottom: 140px; overflow-x: hidden;}
 
         /* Luxury Font for Headings */
-        .luxury-font, h1, h2, .founder-name, .devotional-header h2, .section-label, .review-author { font-family: 'Playfair Display', serif; }
+        .luxury-font, h1, h2, .founder-name, .devotional-header h2, .section-label, .review-author { font-family: 'Poppins', serif; }
 
         /* Header */
         header { background: var(--bg-card); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); backdrop-filter: blur(10px); background: var(--nav-bg);}
@@ -159,9 +159,7 @@
         .notification-badge { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         
-        .theme-toggle-btn { background: var(--bg-primary); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 20px; cursor: pointer; transition: 0.2s; }
-        .theme-toggle-btn:hover { transform: scale(1.05); }
-        .location-detective { background: rgba(10,77,155, 0.1); padding: 8px 16px; border-radius: 50px; font-size: 11px; font-weight: 800; color: var(--accent-green); display: flex; align-items: center; gap: 6px; border: 1px solid rgba(10,77,155, 0.2); cursor: pointer; transition: 0.2s; }
+.location-detective { background: rgba(10,77,155, 0.1); padding: 8px 16px; border-radius: 50px; font-size: 11px; font-weight: 800; color: var(--accent-green); display: flex; align-items: center; gap: 6px; border: 1px solid rgba(10,77,155, 0.2); cursor: pointer; transition: 0.2s; }
         .location-detective:hover { background: rgba(10,77,155, 0.2); transform: scale(1.02); }
         .location-detective span { max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -182,7 +180,7 @@
         }
         .notification-panel.open { top: 70px; }
         .notification-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .notification-header h3 { font-size: 1.2rem; font-weight: 800; color: var(--accent-green); font-family: 'Playfair Display', serif; }
+        .notification-header h3 { font-size: 1.2rem; font-weight: 800; color: var(--accent-green); font-family: 'Poppins', serif; }
         .close-notif { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-sub); }
         .delete-all-notif { background: rgba(239,68,68,0.1); border: 1px solid var(--accent-red); color: var(--accent-red); padding: 6px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .delete-all-notif:hover { background: var(--accent-red); color: white; }
@@ -252,7 +250,7 @@
         }
         .hero-brand .hero-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
         .hero-brand .hero-wordmark {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Poppins', serif;
             font-size: clamp(1.6rem, 5vw, 2.4rem);
             font-weight: 700;
             letter-spacing: .14em;
@@ -278,7 +276,7 @@
             letter-spacing: -0.3px;
             position: relative;
             z-index: 2;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Poppins', serif;
             color: rgba(255,255,255,.96);
         }
         .hero p {
@@ -348,21 +346,21 @@
         .founder-card { padding: 35px; display: flex; flex-direction: column; align-items: center; text-align: center; margin-top: -40px; background: var(--glass-bg);}
         .founder-img-wrapper { width: 150px; height: 150px; border-radius: 50%; border: 4px solid var(--accent-gold); padding: 3px; background: var(--bg-primary); margin-bottom: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
         .founder-img-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .founder-name { font-size: 1.6rem; font-weight: 900; color: var(--accent-green); margin-bottom: 5px; font-family: 'Playfair Display', serif; }
+        .founder-name { font-size: 1.6rem; font-weight: 900; color: var(--accent-green); margin-bottom: 5px; font-family: 'Poppins', serif; }
         .founder-title { font-size: 0.8rem; font-weight: 800; color: var(--accent-gold); text-transform: uppercase; letter-spacing: 2px; display: block; margin-bottom: 15px; }
         .founder-bio { color: var(--text-sub); font-size: 0.95rem; line-height: 1.7; max-width: 600px; margin: 0 auto; }
 
         /* Daily Devotional - Enhanced */
         .devotional-container { position: relative; overflow: hidden; padding: 35px; }
         .devotional-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 12px; }
-        .devotional-header h2 { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 12px; color: var(--accent-green); font-family: 'Playfair Display', serif; }
+        .devotional-header h2 { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; gap: 12px; color: var(--accent-green); font-family: 'Poppins', serif; }
         .devotional-header h2 i { font-size: 1.8rem; color: var(--accent-gold); }
         .time-indicator { background: linear-gradient(135deg, #0A4D9B, #0A4D9B); padding: 8px 20px; border-radius: 40px; color: white; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; animation: pulseGlow 2s infinite; box-shadow: 0 4px 15px rgba(10,77,155,0.35); }
         .timezone-info { font-size: 0.7rem; color: var(--accent-gold); margin-top: 5px; }
         @keyframes pulseGlow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.02); } }
         
         .verse-card { background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(212,175,55,0.05)); border-radius: 28px; padding: 35px; margin-bottom: 25px; border-left: 6px solid var(--accent-gold); transition: all 0.5s ease; animation: fadeSlideIn 0.6s ease; position: relative; overflow: hidden; }
-        .verse-card::before { content: '"'; position: absolute; bottom: -20px; right: 20px; font-size: 120px; opacity: 0.1; font-family: 'Playfair Display', serif; color: var(--accent-gold); }
+        .verse-card::before { content: '"'; position: absolute; bottom: -20px; right: 20px; font-size: 120px; opacity: 0.1; font-family: 'Poppins', serif; color: var(--accent-gold); }
         @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         
         .verse-icon { font-size: 2.5rem; color: var(--accent-gold); margin-bottom: 20px; display: inline-block; animation: bounce 2s infinite; }
@@ -396,7 +394,7 @@
         .portal-item:hover span { color: var(--accent-green); transform: translateY(2px); }
 
         /* Branch Grid */
-        .section-label { font-size: 1.4rem; font-weight: 800; margin: 40px 20px 20px; display: flex; align-items: center; gap: 12px; color: var(--text-main); font-family: 'Playfair Display', serif; }
+        .section-label { font-size: 1.4rem; font-weight: 800; margin: 40px 20px 20px; display: flex; align-items: center; gap: 12px; color: var(--text-main); font-family: 'Poppins', serif; }
         .section-label i { color: var(--accent-gold); font-size: 1.6rem; }
         .branch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; padding: 0 20px; }
         .branch-card { background: var(--bg-card); border-radius: 24px; padding: 20px; border: 1px solid var(--border-color); box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease; cursor: pointer; position: relative; }
@@ -419,7 +417,7 @@
         .review-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-glow); border-color: var(--accent-gold); }
         .review-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
         .review-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-gold); }
-        .review-info h4 { font-weight: 800; font-size: 1rem; margin-bottom: 3px; font-family: 'Playfair Display', serif; }
+        .review-info h4 { font-weight: 800; font-size: 1rem; margin-bottom: 3px; font-family: 'Poppins', serif; }
         .review-stars { color: var(--accent-gold); font-size: 0.8rem; letter-spacing: 2px; }
         .review-date { font-size: 0.7rem; color: var(--text-sub); }
         .review-text { font-size: 0.9rem; line-height: 1.6; color: var(--text-main); font-style: italic; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); }
@@ -842,7 +840,7 @@
     <footer>
         <div class="footer-logo">
             <img src="/assets/logo.png" alt="PD">
-            <span style="font-size: 1.5rem; font-weight: 900; color: var(--accent-green); font-family: 'Playfair Display', serif;">PRAYER DOME</span>
+            <span style="font-size: 1.5rem; font-weight: 900; color: var(--accent-green); font-family: 'Poppins', serif;">PRAYER DOME</span>
         </div>
         <p class="copyright">© 2018 PRAYER DOME MINISTRY. ALL RIGHTS RESERVED.</p>
         
@@ -1463,10 +1461,11 @@
     }
 
     window.toggleDarkMode = function() {
-        document.body.classList.toggle('dark-mode');
-        const btn = document.querySelector('.theme-toggle-btn i');
-        if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'pd-i pd-i-sun' : 'pd-i pd-i-moon';
-    };
+    var dark = (window.PDApp && PDApp.theme ? PDApp.theme.isDark() : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
+    document.body.classList.toggle('dark-mode', dark);
+    document.documentElement.classList.toggle('dark-mode', dark);
+    try { var b = document.querySelector('[data-pd-theme-toggle] .pd-i') || document.querySelector('.theme-toggle-btn .pd-i'); if (b) b.className = dark ? 'pd-i pd-i-sun' : 'pd-i pd-i-moon'; } catch (e) {}
+};
 
     // ==================== WEEKLY PRAYER CHALLENGE ====================
     const PDChallenge = {

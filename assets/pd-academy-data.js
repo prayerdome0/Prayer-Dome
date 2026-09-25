@@ -928,7 +928,10 @@
     lessons: lessons,
     stories: stories,
     resources: resources,
-    quizzes: quizzes
+    quizzes: quizzes,
+    // The per-lesson topic questions (kept separate so a quiz can be built
+    // strictly from the topic the learner just studied — never mixed).
+    lessonQuestions: LESSON_QUESTIONS
   };
 
   W.PD_ACADEMY.getTrack = function (id) {

@@ -15,7 +15,7 @@
 <meta property="og:description" content="Create narrated, branded Prayer Dome videos in the browser and publish them to the app library.">
 <meta property="og:image" content="/assets/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/pd-icons.css">
 <script src="/assets/pd-icons.js"></script>
 <link rel="stylesheet" href="/assets/pd-brand.css">
@@ -43,7 +43,7 @@
     color:#fff; position:sticky; top:0; z-index:40; box-shadow:0 6px 24px rgba(8,53,108,.25);
   }
   .std-top img{width:40px;height:40px;object-fit:contain;background:#fff;border-radius:12px;padding:4px;flex:none;}
-  .std-top h1{font-family:'Playfair Display',serif;font-size:1.05rem;margin:0;line-height:1.2;}
+  .std-top h1{font-family:'Poppins',serif;font-size:1.05rem;margin:0;line-height:1.2;}
   .std-top small{display:block;font-weight:500;opacity:.82;font-size:.7rem;letter-spacing:.04em;text-transform:uppercase;}
   .std-top .spacer{flex:1 1 auto;}
   .std-back{
@@ -58,7 +58,7 @@
     box-shadow:0 10px 30px rgba(15,23,42,.06); margin-bottom:16px; min-width:0;
   }
   body.dark-mode .card{background:#111a2e;border-color:rgba(212,175,55,.18);}
-  .card h2{font-family:'Playfair Display',serif;font-size:1.05rem;margin:0 0 4px;display:flex;align-items:center;gap:9px;}
+  .card h2{font-family:'Poppins',serif;font-size:1.05rem;margin:0 0 4px;display:flex;align-items:center;gap:9px;}
   .card h2 .num{
     width:26px;height:26px;flex:none;border-radius:50%;background:#0A4D9B;color:#fff;
     font-family:'Inter',sans-serif;font-size:.78rem;font-weight:800;display:grid;place-items:center;
@@ -555,7 +555,7 @@ window.dispatchEvent(new Event('pd-studio-cloud-ready'));
       ctx.font = '700 ' + (W * 0.022) + 'px Inter, sans-serif';
       ctx.fillText((opts.scripture || 'PRAYER DOME').toUpperCase(), W / 2, H * 0.34);
       ctx.fillStyle = theme.text;
-      ctx.font = '700 ' + (W * 0.062) + 'px "Playfair Display", Georgia, serif';
+      ctx.font = '700 ' + (W * 0.062) + 'px "Poppins", Georgia, serif';
       var tl = wrapText(ctx, opts.title || 'Prayer Dome', maxW);
       tl.slice(0, 3).forEach(function (l, i) { ctx.fillText(l, W / 2, H * 0.45 + i * W * 0.076); });
       ctx.restore();
