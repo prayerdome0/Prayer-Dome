@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson Quiz | Prayer Dome Academy</title>
+  <link rel="icon" type="image/png" href="/assets/logo.png">
+  <meta name="theme-color" content="#0A4D9B">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/pd-icons.css"><script src="/assets/pd-icons.js"></script>
+  <link rel="stylesheet" href="/assets/pd-brand.css">
+  <script src="/translation-data.js"></script>
+  <script src="/assets/pd-phrases.js" defer></script>
+  <script src="/assets/pd-i18n.js" defer></script>
+  <script src="/assets/pd-app.js" defer></script>
+  <script src="/assets/pd-academy-data.js" defer></script>
+  <script src="/assets/pd-academy-questions.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    .quiz-option { display:flex; gap:12px; align-items:center; padding:14px 16px; border:1.5px solid var(--pd-acad-border); border-radius:16px; background:var(--pd-acad-card); cursor:pointer; transition:all .2s; }
+    .quiz-option:hover { border-color: var(--pd-acad-blue); background: var(--pd-acad-soft); transform: translateY(-1px); }
+    .quiz-option.selected { border-color: var(--pd-acad-blue); background: rgba(10,77,155,.07); box-shadow: 0 4px 16px rgba(10,77,155,.1); }
+    .quiz-option.correct { border-color:#16a34a; background:rgba(22,163,74,.08); }
+    .quiz-option.wrong { border-color:#dc2626; background:rgba(220,38,38,.06); }
+    .quiz-option input { accent-color: var(--pd-acad-blue); }
+  </style>
+</head>
+<body class="pd-acad-page">
+<div class="pd-aurora" aria-hidden="true"><span></span></div>
+<aside class="pd-drawer" id="pdDrawer"><nav class="pd-drawer-nav"><a class="pd-drawer-link" href="/"><i class="pd-i pd-i-house"></i> Home</a><a class="pd-drawer-link" href="/lessons"><i class="pd-i pd-i-graduation-cap"></i> Teaching</a><a class="pd-drawer-link" href="/quiz"><i class="pd-i pd-i-star"></i> Quizzes</a></nav></aside>
+<header class="pd-topbar">
+  <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="pd-i pd-i-menu"></i></button>
+  <a href="/" class="pd-topbar-center"><div class="pd-topbar-logo"><img src="/assets/logo.png" alt="PD"></div><div class="pd-topbar-word">PRAYER DOME</div></a>
+  <div class="pd-topbar-right"><select class="pd-lang-select"><option value="en">English</option><option value="tum">Tumbuka</option><option value="ssw">siSwati</option><option value="bem">Bemba</option><option value="nya">Nyanja</option></select><button class="pd-bell-btn" id="pdNotifBell"><i class="pd-i pd-i-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button><button class="theme-toggle-btn" onclick="toggleDarkMode&&toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button></div>
+</header>
+<div style="max-width:1180px; margin:0 auto; padding:12px 18px; display:flex; gap:12px; align-items:center;">
+  <a href="/lessons" style="display:inline-flex; gap:8px; align-items:center; padding:8px 14px; border-radius:999px; border:1px solid var(--pd-acad-border); background:var(--pd-acad-card); color:var(--pd-acad-blue); font-weight:800; text-decoration:none; font-size:.85rem;"><i class="pd-i pd-i-arrow-left"></i> All Lessons</a>
+  <a id="backLesson" href="#" style="display:inline-flex; gap:8px; align-items:center; padding:8px 14px; border-radius:999px; background:var(--pd-acad-blue); color:#fff; font-weight:800; text-decoration:none; font-size:.85rem;"><i class="pd-i pd-i-book-open-text"></i> Back to Lesson</a>
+</div>
+<main class="pd-acad-wrap">
+  <div id="notFound" style="display:none; text-align:center; padding:60px 20px;"><h2 style="color:var(--pd-acad-blue); font-family:Poppins,sans-serif;">Quiz not found</h2><p style="color:var(--pd-acad-muted);">This lesson does not have a quiz yet.</p><a href="/lessons" class="pd-acad-btn pd-acad-btn-primary" style="margin-top:12px;">Browse Lessons</a></div>
+
+  <div id="quizIntro" style="display:none;">
+    <div class="pd-acad-card" style="padding:28px; text-align:center;">
+      <div style="width:72px; height:72px; border-radius:22px; background:linear-gradient(135deg, #07244d, #0A4D9B); display:grid; place-items:center; margin:0 auto 14px; color:#fff; font-size:1.7rem;"><i class="pd-i pd-i-badge-check"></i></div>
+      <span class="pd-acad-chip gold" id="quizTrack"></span>
+      <h1 id="quizTitle" style="font-family:Poppins,sans-serif; color:var(--pd-acad-blue); margin:12px 0 8px; font-size:clamp(1.5rem,4vw,2rem);"></h1>
+      <p id="quizSubtitle" style="color:var(--pd-acad-muted); margin:0;"></p>
+      <div style="display:flex; gap:10px; justify-content:center; margin-top:14px; flex-wrap:wrap;">
+        <span class="pd-acad-chip" id="quizCount"></span><span class="pd-acad-chip" id="quizPass"></span><span class="pd-acad-chip" id="quizTopicOnly" style="background:rgba(22,163,74,.1); color:#166534; border-color:rgba(22,163,74,.2);"><i class="pd-i pd-i-target"></i> Topic-only questions</span>
+      </div>
+      <div style="margin-top:20px; background:var(--pd-acad-soft); border-radius:16px; padding:16px; text-align:left; max-width:560px; margin-left:auto; margin-right:auto;">
+        <strong style="color:var(--pd-acad-blue);"><i class="pd-i pd-i-info"></i> Before you begin</strong>
+        <ul style="margin:8px 0 0 18px; line-height:1.8; font-size:.92rem; color:var(--pd-acad-ink);">
+          <li>Questions are drawn <strong>only</strong> from the lesson you just completed.</li>
+          <li>You need <strong>80% or higher</strong> to pass, unlock your certificate, and open the next lesson.</li>
+          <li>Score below 80%? You can <strong>retake</strong> immediately — a new set of topic questions is generated.</li>
+          <li>Review your answers before confirming submission.</li>
+        </ul>
+      </div>
+      <button class="pd-acad-btn pd-acad-btn-primary pd-acad-btn-lg" id="startQuizBtn" style="margin-top:18px;"><i class="pd-i pd-i-play"></i> Start Quiz</button>
+      <p style="font-size:.8rem; color:var(--pd-acad-muted); margin-top:10px;">Progress saves automatically. You can close and return later.</p>
+    </div>
+  </div>
+
+  <div id="quizActive" style="display:none;">
+    <div style="display:flex; align-items:center; gap:12px; background:var(--pd-acad-card); border:1px solid var(--pd-acad-border); border-radius:16px; padding:12px 16px; margin-bottom:16px;">
+      <span style="font-size:.78rem; font-weight:900; letter-spacing:.6px; text-transform:uppercase; color:var(--pd-gold-deep);" id="quizProgressLabel">Question 1 of 10</span>
+      <div style="flex:1; height:8px; background:var(--pd-acad-soft); border-radius:999px; overflow:hidden;"><div id="quizProgressBar" style="height:100%; width:10%; background:linear-gradient(90deg, var(--pd-blue), var(--pd-gold));"></div></div>
+      <span style="font-size:.78rem; font-weight:800; color:var(--pd-acad-muted);" id="quizProgressPct">10%</span>
+    </div>
+    <div class="pd-acad-card" style="padding:24px;" id="quizCard"></div>
+    <div style="display:flex; gap:12px; justify-content:space-between; margin-top:16px;">
+      <button class="pd-acad-btn pd-acad-btn-ghost" id="prevQBtn" style="border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-arrow-left"></i> Previous</button>
+      <button class="pd-acad-btn pd-acad-btn-primary" id="nextQBtn">Next <i class="pd-i pd-i-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <div id="quizReview" style="display:none;">
+    <div class="pd-acad-card" style="padding:24px;">
+      <h2 style="margin:0 0 8px; font-family:Poppins,sans-serif; color:var(--pd-acad-blue);"><i class="pd-i pd-i-eye"></i> Review Your Answers</h2>
+      <p style="color:var(--pd-acad-muted); margin:0 0 16px;">Check your choices before confirming submission. You can go back to change any answer.</p>
+      <div id="reviewList" style="display:grid; gap:10px;"></div>
+      <div style="display:flex; gap:12px; margin-top:18px; flex-wrap:wrap;">
+        <button class="pd-acad-btn pd-acad-btn-ghost" id="backToQuizBtn" style="border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-arrow-left"></i> Back to Quiz</button>
+        <button class="pd-acad-btn pd-acad-btn-primary" id="confirmSubmitBtn" style="margin-left:auto;"><i class="pd-i pd-i-check"></i> Confirm & Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="quizResult" style="display:none;">
+    <div class="pd-acad-card" style="padding:32px; text-align:center;">
+      <div id="resultIcon" style="width:84px; height:84px; border-radius:28px; display:grid; place-items:center; margin:0 auto 14px; font-size:2rem;"></div>
+      <h2 id="resultTitle" style="margin:0; font-family:Poppins,sans-serif;"></h2>
+      <p id="resultSubtitle" style="color:var(--pd-acad-muted); margin:8px 0 16px;"></p>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:520px; margin:0 auto 16px;">
+        <div style="background:var(--pd-acad-soft); border-radius:16px; padding:14px;"><div style="font-size:1.6rem; font-weight:900; color:var(--pd-acad-blue);" id="resultScore"></div><div style="font-size:.75rem; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:var(--pd-acad-muted);">Score</div></div>
+        <div style="background:rgba(22,163,74,.08); border-radius:16px; padding:14px;"><div style="font-size:1.6rem; font-weight:900; color:#16a34a;" id="resultCorrect"></div><div style="font-size:.75rem; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:#166534;">Correct</div></div>
+        <div style="background:rgba(220,38,38,.06); border-radius:16px; padding:14px;"><div style="font-size:1.6rem; font-weight:900; color:#dc2626;" id="resultWrong"></div><div style="font-size:.75rem; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:#7f1d1d;">Wrong</div></div>
+      </div>
+      <div style="max-width:520px; margin:0 auto; height:10px; background:var(--pd-acad-soft); border-radius:999px; overflow:hidden;"><div id="resultBar" style="height:100%; transition:width .6s;"></div></div>
+      <div style="margin-top:8px; font-size:.85rem; color:var(--pd-acad-muted); font-weight:700;" id="resultPct"></div>
+      <div style="display:flex; gap:12px; justify-content:center; margin-top:18px; flex-wrap:wrap;">
+        <button class="pd-acad-btn pd-acad-btn-ghost" id="retakeBtn" style="border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-rotate-ccw"></i> Retake Quiz</button>
+        <a id="nextLessonLink" href="/lessons" class="pd-acad-btn pd-acad-btn-primary" style="display:none;"><i class="pd-i pd-i-arrow-right"></i> Unlock Next Lesson</a>
+        <a href="/lessons" class="pd-acad-btn pd-acad-btn-ghost" style="border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-layout-dashboard"></i> All Lessons</a>
+      </div>
+      <div style="margin-top:16px;"><button class="pd-acad-btn pd-acad-btn-ghost" id="viewAnswersBtn" style="border:1px dashed var(--pd-acad-border); width:100%; max-width:520px; justify-content:center;"><i class="pd-i pd-i-eye"></i> View correct answers</button></div>
+      <div id="answersDetail" style="display:none; text-align:left; margin-top:14px;"></div>
+    </div>
+  </div>
+</main>
+<footer class="pd-footer"><div class="pd-footer-logo"><img src="/assets/logo.png" alt="PD"><span class="pd-footer-brand">PRAYER DOME</span></div><p class="pd-footer-copy">© 2018 PRAYER DOME MINISTRY. ALL RIGHTS RESERVED.</p></footer>
+<script>
+(function(){
+  function gid(){ var p=new URLSearchParams(location.search); return p.get('id')||p.get('lesson')||p.get('quiz')||'l01'; }
+  function esc(v){ var d=document.createElement('div'); d.textContent=String(v||''); return d.innerHTML; }
+  var lesson=null, questions=[], current=0, answers={}, state='intro';
+  var quizId='';
+  function load(){
+    var id=gid();
+    var data=(window.PD_ACADEMY&&window.PD_ACADEMY.DATA)||{lessons:[]};
+    lesson=data.lessons.find(function(l){return l.id===id;});
+    if(!lesson){ document.getElementById('notFound').style.display='block'; return; }
+    quizId = lesson.quizId || ('quiz-'+lesson.id);
+    document.getElementById('backLesson').href='/lesson.html?id='+encodeURIComponent(lesson.id);
+    document.title=lesson.title+' — Quiz | Prayer Dome';
+    document.getElementById('quizTrack').textContent=lesson.track;
+    document.getElementById('quizTitle').textContent=lesson.title+' Quiz';
+    document.getElementById('quizSubtitle').textContent='10 topic-based questions · '+lesson.scripture;
+    // Build topic-only questions: use TOPIC_QUESTION_POOL for quizId, fallback to lessonQuestions
+    try {
+      var pool = (window.PD_ACADEMY && window.PD_ACADEMY.TOPIC_QUESTION_POOL) || {};
+      var entry = pool[quizId] || pool[lesson.id] || null;
+      if(entry && entry.q && entry.q.length){
+        // sample 10
+        var arr=entry.q.slice();
+        for(var i=arr.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=arr[i]; arr[i]=arr[j]; arr[j]=tmp; }
+        questions = arr.slice(0,10).map(function(q,idx){ return { id: quizId+'-'+idx, text:q.q, options:q.options, correct:q.answer, explain: q.explain || '' }; });
+      } else if(window.PD_ACADEMY && window.PD_ACADEMY.DATA && window.PD_ACADEMY.DATA.questions){
+        // try DATA.questions
+        var allQs = window.PD_ACADEMY.DATA.questions[quizId] || [];
+        if(allQs.length) questions = allQs.slice(0,10);
+      }
+      if(!questions.length && window.PD_ACADEMY && window.PD_ACADEMY.generateAcademyQuiz){
+        questions = window.PD_ACADEMY.generateAcademyQuiz(quizId);
+      }
+      if(!questions.length) questions = [
+        {id:'q1', text:'What is the main focus of this lesson?', options:['A personal preference','A biblical truth to live','A cultural tradition','A suggestion'], correct:1, explain:'This lesson anchors on biblical truth.'},
+        {id:'q2', text:'Which scripture is central to this lesson?', options:[lesson.scripture, 'Genesis 1:1', 'Psalm 23', 'Revelation 21:1'], correct:0, explain:'The lesson is built on '+lesson.scripture},
+        {id:'q3', text:'What response does this teaching invite?', options:['Passive listening','Active obedience','Debate','Ignoring'], correct:1, explain: lesson.action},
+      ];
+      // ensure 10
+      while(questions.length<10){
+        var seed = questions[0];
+        questions.push({id: quizId+'-extra-'+questions.length, text: seed.text, options: seed.options.slice(), correct: seed.correct, explain: seed.explain});
+      }
+      questions = questions.slice(0,10);
+    } catch(e){ console.error(e); questions=[]; }
+    document.getElementById('quizCount').textContent=questions.length+' questions';
+    document.getElementById('quizPass').textContent='Pass: 80%';
+    document.getElementById('quizIntro').style.display='block';
+    // restore previous attempt if any
+    try{
+      var saved = JSON.parse(localStorage.getItem('pd_quiz_'+quizId)||'null');
+      if(saved && saved.answers) answers = saved.answers;
+    }catch(e){}
+  }
+  function saveAnswers(){ try{ localStorage.setItem('pd_quiz_'+quizId, JSON.stringify({answers:answers, at:Date.now()})); }catch(e){} }
+  function renderQ(){
+    var q=questions[current];
+    var card=document.getElementById('quizCard');
+    var opts=q.options.map(function(opt, idx){
+      var sel = answers[q.id]===idx ? ' selected' : '';
+      return '<label class="quiz-option'+sel+'" data-idx="'+idx+'"><input type="radio" name="q'+current+'" value="'+idx+'" '+(answers[q.id]===idx?'checked':'')+'> <span style="flex:1;">'+esc(opt)+'</span><i class="pd-i '+(answers[q.id]===idx ? 'pd-i-circle-check' : 'pd-i-circle')+'" style="color:'+(answers[q.id]===idx ? 'var(--pd-acad-blue)' : 'var(--pd-acad-muted)')+';"></i></label>';
+    }).join('');
+    card.innerHTML='<div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;"><span style="width:36px; height:36px; border-radius:12px; background:var(--pd-acad-soft); display:grid; place-items:center; color:var(--pd-acad-blue); font-weight:900;">'+(current+1)+'</span><span style="font-size:.7rem; font-weight:900; letter-spacing:1.2px; text-transform:uppercase; color:var(--pd-gold-deep);">TOPIC: '+esc(lesson.title)+'</span></div>'
+                  +'<h3 style="margin:0 0 16px; font-family:Poppins,sans-serif; color:var(--pd-acad-blue); font-size:1.15rem; line-height:1.4;">'+esc(q.text)+'</h3>'
+                  +'<div style="display:grid; gap:10px;">'+opts+'</div>'
+                  +'<p style="font-size:.78rem; color:var(--pd-acad-muted); margin:12px 0 0;"><i class="pd-i pd-i-info"></i> This question is only from <strong>'+esc(lesson.title)+'</strong> — the lesson you just completed.</p>';
+    // bind
+    card.querySelectorAll('.quiz-option').forEach(function(el){
+      el.addEventListener('click', function(){
+        var idx=parseInt(el.getAttribute('data-idx'),10);
+        answers[q.id]=idx; saveAnswers(); renderQ(); updateProgress();
+      });
+    });
+    document.getElementById('prevQBtn').disabled=current===0;
+    document.getElementById('prevQBtn').style.opacity=current===0?'0.5':'1';
+    if(current===questions.length-1) document.getElementById('nextQBtn').textContent='Review →';
+    else document.getElementById('nextQBtn').innerHTML='Next <i class="pd-i pd-i-arrow-right"></i>';
+    updateProgress();
+  }
+  function updateProgress(){
+    document.getElementById('quizProgressLabel').textContent='Question '+(current+1)+' of '+questions.length;
+    var pct=Math.round((current+1)/questions.length*100);
+    document.getElementById('quizProgressBar').style.width=pct+'%';
+    document.getElementById('quizProgressPct').textContent=pct+'%';
+  }
+  function showReview(){
+    document.getElementById('quizActive').style.display='none';
+    document.getElementById('quizReview').style.display='block';
+    var list=document.getElementById('reviewList');
+    list.innerHTML=questions.map(function(q,i){
+      var a=answers[q.id];
+      var answered = a!=null;
+      var txt = answered ? q.options[a] : '<em style="color:var(--pd-acad-muted)">Not answered</em>';
+      return '<div style="display:flex; gap:12px; align-items:center; padding:12px 14px; border:1px solid var(--pd-acad-border); border-radius:14px; background:'+(answered?'var(--pd-acad-card)':'rgba(220,38,38,.04)')+';"><span style="width:32px; height:32px; border-radius:10px; background:var(--pd-acad-soft); display:grid; place-items:center; font-weight:900; color:var(--pd-acad-blue); flex-shrink:0;">'+(i+1)+'</span><div style="flex:1; min-width:0;"><div style="font-weight:700; color:var(--pd-acad-blue); overflow-wrap:anywhere;">'+esc(q.text)+'</div><div style="font-size:.85rem; color:var(--pd-acad-ink); margin-top:2px;">Your answer: '+txt+'</div></div><button class="pd-acad-btn pd-acad-btn-ghost" onclick="(function(){current='+i+'; document.getElementById(\'quizReview\').style.display=\'none\'; document.getElementById(\'quizActive\').style.display=\'block\'; renderQ();})()" style="border:1px solid var(--pd-acad-border); padding:6px 10px; font-size:.75rem;">Edit</button></div>';
+    }).join('');
+  }
+  function submit(){
+    var correct=0;
+    questions.forEach(function(q){ if(answers[q.id]===q.correct) correct++; });
+    var total=questions.length, pct=Math.round(correct/total*100), passed=pct>=80;
+    document.getElementById('quizReview').style.display='none';
+    document.getElementById('quizActive').style.display='none';
+    document.getElementById('quizIntro').style.display='none';
+    document.getElementById('quizResult').style.display='block';
+    document.getElementById('resultScore').textContent=correct+'/'+total;
+    document.getElementById('resultCorrect').textContent=correct;
+    document.getElementById('resultWrong').textContent=total-correct;
+    document.getElementById('resultPct').textContent=pct+'%';
+    document.getElementById('resultBar').style.width=pct+'%';
+    document.getElementById('resultBar').style.background = passed ? 'linear-gradient(90deg, #16a34a, #22c55e)' : 'linear-gradient(90deg, #dc2626, #f87171)';
+    if(passed){
+      document.getElementById('resultIcon').style.background='rgba(22,163,74,.12)';
+      document.getElementById('resultIcon').style.color='#16a34a';
+      document.getElementById('resultIcon').innerHTML='<i class="pd-i pd-i-trophy"></i>';
+      document.getElementById('resultTitle').textContent='Excellent — You Passed!';
+      document.getElementById('resultTitle').style.color='#16a34a';
+      document.getElementById('resultSubtitle').textContent='You scored '+pct+'%. Your certificate is ready and the next lesson is unlocked.';
+      document.getElementById('nextLessonLink').style.display='inline-flex';
+      try{ if(window.confetti) confetti({particleCount:120, spread:80, origin:{y:.6}}); }catch(e){}
+      // mark completed, unlock next
+      try{
+        var prog=JSON.parse(localStorage.getItem('pd_academy_progress')||'{}');
+        prog[lesson.id]={score:pct, correct:correct, total:total, passed:true, at:Date.now()};
+        localStorage.setItem('pd_academy_progress', JSON.stringify(prog));
+        var idx=(window.PD_ACADEMY.DATA.lessons.findIndex(function(l){return l.id===lesson.id;}));
+        var next=window.PD_ACADEMY.DATA.lessons[idx+1];
+        if(next){
+          document.getElementById('nextLessonLink').href='/lesson.html?id='+encodeURIComponent(next.id);
+          document.getElementById('nextLessonLink').innerHTML='<i class="pd-i pd-i-arrow-right"></i> Next: '+next.title;
+        }
+        // also save to pd_academy_state used by lessons.html
+        var st=JSON.parse(localStorage.getItem('pd_academy_state')||'{}');
+        st.completed=st.completed||{}; st.completed[lesson.id]=true;
+        if(next){ st.unlocked=st.unlocked||{}; st.unlocked[next.id]=true; }
+        localStorage.setItem('pd_academy_state', JSON.stringify(st));
+      }catch(e){}
+    } else {
+      document.getElementById('resultIcon').style.background='rgba(220,38,38,.08)';
+      document.getElementById('resultIcon').style.color='#dc2626';
+      document.getElementById('resultIcon').innerHTML='<i class="pd-i pd-i-rotate-ccw"></i>';
+      document.getElementById('resultTitle').textContent='Keep Going — Retake Available';
+      document.getElementById('resultTitle').style.color='#dc2626';
+      document.getElementById('resultSubtitle').textContent='You scored '+pct+'%. You need 80% to pass. Review the lesson and try again — a fresh set of topic questions will appear.';
+      document.getElementById('nextLessonLink').style.display='none';
+      try{ var prog2=JSON.parse(localStorage.getItem('pd_academy_progress')||'{}'); prog2[lesson.id]={score:pct, correct:correct, total:total, passed:false, at:Date.now()}; localStorage.setItem('pd_academy_progress', JSON.stringify(prog2)); }catch(e){}
+    }
+    // answers detail
+    var detail=document.getElementById('answersDetail');
+    detail.innerHTML=questions.map(function(q,i){
+      var ok=answers[q.id]===q.correct;
+      var userAns = answers[q.id]!=null ? q.options[answers[q.id]] : 'Not answered';
+      return '<div style="padding:14px; border:1px solid '+(ok?'rgba(22,163,74,.2)':'rgba(220,38,38,.2)')+'; border-radius:14px; margin-bottom:10px; background:'+(ok?'rgba(22,163,74,.04)':'rgba(220,38,38,.04)')+';"><div style="font-weight:800; color:var(--pd-acad-blue);">'+(i+1)+'. '+esc(q.text)+' '+(ok?'<span style="color:#16a34a;"><i class="pd-i pd-i-circle-check"></i> Correct</span>':'<span style="color:#dc2626;"><i class="pd-i pd-i-circle-x"></i> Wrong</span>')+'</div><div style="font-size:.88rem; margin-top:6px;">Your answer: <strong>'+esc(userAns)+'</strong></div><div style="font-size:.88rem; margin-top:4px;">Correct: <strong style="color:#16a34a;">'+esc(q.options[q.correct])+'</strong></div>'+(q.explain?'<div style="font-size:.85rem; color:var(--pd-acad-muted); margin-top:6px;"><i class="pd-i pd-i-lightbulb"></i> '+esc(q.explain)+'</div>':'')+'</div>';
+    }).join('');
+  }
+
+  document.getElementById('startQuizBtn')&&document.getElementById('startQuizBtn').addEventListener('click', function(){
+    document.getElementById('quizIntro').style.display='none';
+    document.getElementById('quizActive').style.display='block';
+    current=0; renderQ();
+  });
+  document.getElementById('nextQBtn')&&document.getElementById('nextQBtn').addEventListener('click', function(){
+    if(current < questions.length-1){ current++; renderQ(); window.scrollTo({top:0, behavior:'smooth'}); }
+    else { showReview(); }
+  });
+  document.getElementById('prevQBtn')&&document.getElementById('prevQBtn').addEventListener('click', function(){ if(current>0){ current--; renderQ(); }});
+  document.getElementById('backToQuizBtn')&&document.getElementById('backToQuizBtn').addEventListener('click', function(){ document.getElementById('quizReview').style.display='none'; document.getElementById('quizActive').style.display='block'; renderQ(); });
+  document.getElementById('confirmSubmitBtn')&&document.getElementById('confirmSubmitBtn').addEventListener('click', submit);
+  document.getElementById('retakeBtn')&&document.getElementById('retakeBtn').addEventListener('click', function(){
+    answers={}; saveAnswers();
+    // reshuffle
+    for(var i=questions.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=questions[i]; questions[i]=questions[j]; questions[j]=t; }
+    document.getElementById('quizResult').style.display='none';
+    document.getElementById('quizActive').style.display='block';
+    current=0; renderQ();
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+  document.getElementById('viewAnswersBtn')&&document.getElementById('viewAnswersBtn').addEventListener('click', function(){ var d=document.getElementById('answersDetail'); d.style.display=d.style.display==='none'?'block':'none'; this.textContent = d.style.display==='none' ? 'View correct answers' : 'Hide answers'; });
+
+  function init(){
+    if(window.PD_ACADEMY&&window.PD_ACADEMY.DATA) load();
+    else window.addEventListener('pd:academy-ready', load);
+    var t=0, iv=setInterval(function(){ if(window.PD_ACADEMY&&window.PD_ACADEMY.DATA&&window.PD_ACADEMY.DATA.lessons.length){ clearInterval(iv); load(); } else if(++t>20) clearInterval(iv); },200);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
+  // expose for tests
+  window.renderQ = renderQ;
+})();
+</script>
+</body>
+</html>

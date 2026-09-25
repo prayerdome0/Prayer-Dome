@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Faith Journey Game | Prayer Dome</title>
+  <link rel="manifest" href="/manifest.json">
   <meta name="description" content="Embark on a spiritual journey of growth, faith, and daily challenges at Prayer Dome.">
   <link rel="icon" type="image/png" href="/assets/logo.png">
   <link rel="apple-touch-icon" href="/assets/logo.png">
@@ -475,8 +476,77 @@
     </div>
   </section>
 
+  <!-- PROFESSIONAL BIBLE GAMES HUB -->
+  <section class="pd-acad-card" style="padding:24px; margin-bottom:20px;">
+    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:16px;">
+      <h2 style="margin:0; font-family:Poppins,sans-serif; color:var(--pd-acad-blue); font-size:1.35rem;"><i class="pd-i pd-i-gamepad-2" style="color:var(--pd-gold);"></i> Professional Bible Games</h2>
+      <span class="pd-acad-chip gold" style="margin-left:auto;"><i class="pd-i pd-i-award"></i> Learn • Play • Grow</span>
+    </div>
+    <p style="color:var(--pd-acad-muted); margin:0 0 18px; line-height:1.6;">Choose a game to strengthen your faith. Every game is crafted for learning — with scripture, reflection, and real spiritual growth.</p>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px;">
+      <button class="pd-acad-card" onclick="switchGame('journey')" id="gameTab-journey" style="text-align:left; padding:18px; border:2px solid var(--pd-acad-blue); background:rgba(10,77,155,.04); cursor:pointer;">
+        <div style="width:44px; height:44px; border-radius:14px; background:linear-gradient(135deg, #07244d, #0A4D9B); display:grid; place-items:center; color:#fff; margin-bottom:10px;"><i class="pd-i pd-i-map-pinned"></i></div>
+        <strong style="color:var(--pd-acad-blue); display:block; margin-bottom:4px;">Faith Journey</strong><small style="color:var(--pd-acad-muted);">Daily situational challenges with XP & badges</small>
+        <div style="margin-top:10px;"><span class="pd-acad-chip gold" style="font-size:.7rem;">Most Popular</span></div>
+      </button>
+      <button class="pd-acad-card" onclick="switchGame('memory')" id="gameTab-memory" style="text-align:left; padding:18px; border:1px solid var(--pd-acad-border); cursor:pointer;">
+        <div style="width:44px; height:44px; border-radius:14px; background:linear-gradient(135deg, #d4af37, #b8941f); display:grid; place-items:center; color:#fff; margin-bottom:10px;"><i class="pd-i pd-i-brain"></i></div>
+        <strong style="color:var(--pd-acad-blue); display:block; margin-bottom:4px;">Scripture Memory</strong><small style="color:var(--pd-acad-muted);">Memorize verses — timed recall & hints</small>
+        <div style="margin-top:10px;"><span class="pd-acad-chip" style="font-size:.7rem;">Memory</span></div>
+      </button>
+      <button class="pd-acad-card" onclick="switchGame('quiz')" id="gameTab-quiz" style="text-align:left; padding:18px; border:1px solid var(--pd-acad-border); cursor:pointer;">
+        <div style="width:44px; height:44px; border-radius:14px; background:linear-gradient(135deg, #16a34a, #15803d); display:grid; place-items:center; color:#fff; margin-bottom:10px;"><i class="pd-i pd-i-badge-check"></i></div>
+        <strong style="color:var(--pd-acad-blue); display:block; margin-bottom:4px;">Bible Challenge</strong><small style="color:var(--pd-acad-muted);">10 topic-based questions • 80% to win</small>
+        <div style="margin-top:10px;"><span class="pd-acad-chip" style="font-size:.7rem;">Quiz • Timed</span></div>
+      </button>
+      <button class="pd-acad-card" onclick="switchGame('scramble')" id="gameTab-scramble" style="text-align:left; padding:18px; border:1px solid var(--pd-acad-border); cursor:pointer;">
+        <div style="width:44px; height:44px; border-radius:14px; background:linear-gradient(135deg, #7c3aed, #5b21b6); display:grid; place-items:center; color:#fff; margin-bottom:10px;"><i class="pd-i pd-i-shuffle"></i></div>
+        <strong style="color:var(--pd-acad-blue); display:block; margin-bottom:4px;">Verse Scramble</strong><small style="color:var(--pd-acad-muted);">Reorder words to reveal the verse</small>
+        <div style="margin-top:10px;"><span class="pd-acad-chip" style="font-size:.7rem;">Puzzle</span></div>
+      </button>
+    </div>
+    <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;"><span class="pd-acad-chip"><i class="pd-i pd-i-info"></i> Progress auto-saves and syncs with Academy</span><span class="pd-acad-chip"><i class="pd-i pd-i-trophy"></i> Earn XP & unlock levels</span></div>
+  </section>
+
+  <!-- GAME PANELS -->
+  <!-- Memory Game Panel -->
+  <section class="pd-acad-card" id="panel-memory" style="display:none; padding:24px; margin-bottom:20px;">
+    <h3 style="margin:0 0 8px; font-family:Poppins,sans-serif; color:var(--pd-acad-blue);"><i class="pd-i pd-i-brain" style="color:var(--pd-gold);"></i> Scripture Memory Master</h3>
+    <p style="color:var(--pd-acad-muted); margin:0 0 16px;">Memorize the verse, then type it from memory. Hints cost points but help you learn.</p>
+    <div id="memoryVerse" style="background:linear-gradient(135deg, rgba(10,77,155,.06), rgba(212,175,55,.06)); border-radius:18px; padding:20px; text-align:center; min-height:120px; display:grid; place-items:center; border:1px solid var(--pd-acad-border);">
+      <div><div style="font-family:Lora,serif; font-size:1.15rem; font-style:italic; color:var(--pd-acad-blue);" id="memoryVerseText">Loading verse…</div><div style="font-size:.8rem; color:var(--pd-gold-deep); font-weight:800; margin-top:8px;" id="memoryVerseRef"></div></div>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; justify-content:center;">
+      <button class="pd-acad-btn pd-acad-btn-primary" id="memoryShowBtn"><i class="pd-i pd-i-eye"></i> Show Verse (5 sec)</button>
+      <button class="pd-acad-btn pd-acad-btn-ghost" id="memoryHintBtn" style="border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-lightbulb"></i> Hint</button>
+      <button class="pd-acad-btn pd-acad-btn-ghost" id="memoryNextBtn" style="border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-arrow-right"></i> Next Verse</button>
+    </div>
+    <div style="margin-top:16px;"><textarea id="memoryInput" placeholder="Type the verse from memory…" style="width:100%; min-height:80px; padding:14px; border-radius:14px; border:1.5px solid var(--pd-acad-border); font-family:Lora,serif;"></textarea>
+    <button class="pd-acad-btn pd-acad-btn-primary" id="memoryCheckBtn" style="margin-top:10px; width:100%; justify-content:center;"><i class="pd-i pd-i-check"></i> Check Answer</button>
+    <div id="memoryFeedback" style="margin-top:12px; padding:12px; border-radius:14px; display:none;"></div></div>
+  </section>
+
+  <!-- Quiz Challenge Panel -->
+  <section class="pd-acad-card" id="panel-quiz" style="display:none; padding:24px; margin-bottom:20px;">
+    <h3 style="margin:0 0 8px; font-family:Poppins,sans-serif; color:var(--pd-acad-blue);"><i class="pd-i pd-i-badge-check" style="color:#16a34a;"></i> Bible Challenge — Topic Quiz</h3>
+    <p style="color:var(--pd-acad-muted); margin:0 0 16px;">10 questions from Prayer Dome Academy. 80% to pass — same standard as Academy certificates.</p>
+    <div id="bibleQuizCard" style="background:var(--pd-acad-card); border:1px solid var(--pd-acad-border); border-radius:18px; padding:18px; min-height:180px;"></div>
+    <div style="display:flex; gap:10px; margin-top:14px;"><button class="pd-acad-btn pd-acad-btn-primary" id="bibleQuizStartBtn" style="flex:1; justify-content:center;"><i class="pd-i pd-i-play"></i> Start Challenge</button><button class="pd-acad-btn pd-acad-btn-ghost" id="bibleQuizNextBtn" style="display:none; flex:1; justify-content:center; border:1px solid var(--pd-acad-border);">Next</button></div>
+    <div id="bibleQuizResult" style="display:none; margin-top:14px; padding:16px; border-radius:14px; text-align:center;"></div>
+  </section>
+
+  <!-- Scramble Panel -->
+  <section class="pd-acad-card" id="panel-scramble" style="display:none; padding:24px; margin-bottom:20px;">
+    <h3 style="margin:0 0 8px; font-family:Poppins,sans-serif; color:var(--pd-acad-blue);"><i class="pd-i pd-i-shuffle" style="color:#7c3aed;"></i> Verse Scramble</h3>
+    <p style="color:var(--pd-acad-muted); margin:0 0 16px;">Tap words in the correct order to reconstruct the verse.</p>
+    <div style="background:var(--pd-acad-soft); border-radius:14px; padding:14px; text-align:center; min-height:60px;" id="scrambleTarget"></div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:14px;" id="scrambleWords"></div>
+    <div style="display:flex; gap:10px; margin-top:14px; justify-content:center;"><button class="pd-acad-btn pd-acad-btn-ghost" id="scrambleResetBtn" style="border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-rotate-ccw"></i> Reset</button><button class="pd-acad-btn pd-acad-btn-primary" id="scrambleCheckBtn"><i class="pd-i pd-i-check"></i> Check Verse</button><button class="pd-acad-btn pd-acad-btn-ghost" id="scrambleNextBtn" style="border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-arrow-right"></i> Next</button></div>
+    <div id="scrambleFeedback" style="margin-top:12px; padding:12px; border-radius:14px; display:none; text-align:center;"></div>
+    <div style="font-size:.8rem; color:var(--pd-acad-muted); margin-top:8px; text-align:center;" id="scrambleRef"></div>
+  </section>
+
   <!-- JOURNEY MAP -->
-  <section class="journey-map-card">
     <div class="journey-map-title">
       <i class="pd-i pd-i-map-pinned"></i> Your Growth Pathway
     </div>
@@ -919,6 +989,209 @@
       `;
     });
   }
+
+  // ── Professional Bible Games Hub ──
+  window.switchGame = function(id){
+    ['journey','memory','quiz','scramble'].forEach(function(k){
+      var panel = document.getElementById('panel-'+k);
+      var tab = document.getElementById('gameTab-'+k);
+      var isActive = k===id;
+      if(panel) panel.style.display = (k==='journey' ? (isActive?'block':'none') : (isActive?'block':'none'));
+      if(tab){
+        if(isActive){ tab.style.borderColor='var(--pd-acad-blue)'; tab.style.background='rgba(10,77,155,.04)'; tab.style.borderWidth='2px'; }
+        else { tab.style.borderColor='var(--pd-acad-border)'; tab.style.background='var(--pd-acad-card)'; tab.style.borderWidth='1px'; }
+      }
+    });
+    // journey map and playZone visibility
+    var journeyCard = document.querySelector('.journey-map-card');
+    var playZone = document.getElementById('playZone');
+    var playPanels = document.querySelector('.play-panels');
+    if(journeyCard) journeyCard.style.display = id==='journey' ? 'block':'none';
+    if(playZone) playZone.style.display = id==='journey' ? 'block':'none';
+    if(playPanels && id!=='journey') playPanels.style.display='none'; else if(playPanels) playPanels.style.display='grid';
+    window.scrollTo({top: document.querySelector('.pd-acad-card').offsetTop - 80, behavior:'smooth'});
+    if(id==='memory') initMemoryGame();
+    if(id==='quiz') initBibleQuiz();
+    if(id==='scramble') initScramble();
+  };
+
+  // ── Scripture Memory Master ──
+  var MEMORY_VERSES = [
+    {text:"For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.", ref:"John 3:16"},
+    {text:"The Lord is my shepherd, I lack nothing.", ref:"Psalm 23:1"},
+    {text:"I can do all this through him who gives me strength.", ref:"Philippians 4:13"},
+    {text:"Trust in the Lord with all your heart and lean not on your own understanding.", ref:"Proverbs 3:5"},
+    {text:"Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.", ref:"Joshua 1:9"},
+    {text:"Your word is a lamp for my feet, a light on my path.", ref:"Psalm 119:105"},
+    {text:"And we know that in all things God works for the good of those who love him.", ref:"Romans 8:28"}
+  ];
+  var memoryIdx=0, memoryHintUsed=0;
+  function initMemoryGame(){
+    memoryIdx = Math.floor(Math.random()*MEMORY_VERSES.length);
+    renderMemory();
+  }
+  function renderMemory(){
+    var v=MEMORY_VERSES[memoryIdx];
+    document.getElementById('memoryVerseText').textContent='"'+v.text+'"';
+    document.getElementById('memoryVerseRef').textContent='— '+v.ref;
+    document.getElementById('memoryVerse').style.filter='blur(0px)';
+    document.getElementById('memoryFeedback').style.display='none';
+    document.getElementById('memoryInput').value='';
+  }
+  document.addEventListener('click', function(e){
+    if(e.target.closest('#memoryShowBtn')){
+      var el=document.getElementById('memoryVerse');
+      el.style.filter='blur(0px)';
+      document.getElementById('memoryVerse').style.opacity='1';
+      setTimeout(function(){ el.style.filter='blur(7px)'; el.style.opacity='0.55'; }, 5000);
+    }
+    if(e.target.closest('#memoryHintBtn')){
+      var v=MEMORY_VERSES[memoryIdx];
+      var inp=document.getElementById('memoryInput');
+      var words=v.text.split(' ');
+      var hint=words.slice(0, 3+memoryHintUsed*2).join(' ');
+      inp.value=hint + ' ...';
+      inp.focus();
+      memoryHintUsed++;
+    }
+    if(e.target.closest('#memoryNextBtn')){ memoryIdx=(memoryIdx+1)%MEMORY_VERSES.length; memoryHintUsed=0; renderMemory(); }
+    if(e.target.closest('#memoryCheckBtn')){
+      var v=MEMORY_VERSES[memoryIdx];
+      var input=document.getElementById('memoryInput').value.trim().toLowerCase().replace(/[^a-z0-9 ]/g,'');
+      var target=v.text.toLowerCase().replace(/[^a-z0-9 ]/g,'');
+      var fb=document.getElementById('memoryFeedback');
+      var wordsInput=input.split(/\s+/).filter(Boolean);
+      var wordsTarget=target.split(/\s+/).filter(Boolean);
+      var correct=wordsTarget.filter(function(w,i){ return wordsInput[i]===w; }).length;
+      var pct=Math.round(correct/wordsTarget.length*100);
+      fb.style.display='block';
+      if(pct>=80){ fb.style.background='rgba(22,163,74,.08)'; fb.style.border='1px solid rgba(22,163,74,.25)'; fb.style.color='#166534'; fb.innerHTML='<strong><i class="pd-i pd-i-circle-check"></i> Excellent! '+pct+'% correct</strong><p style="margin:4px 0 0;">You remembered '+correct+' of '+wordsTarget.length+' words. Keep practicing — memory strengthens faith.</p>'; addXP(30); updateUI(); if(window.confetti) confetti({particleCount:80, spread:70, origin:{y:.7}}); }
+      else { fb.style.background='rgba(220,38,38,.06)'; fb.style.border='1px solid rgba(220,38,38,.18)'; fb.style.color='#7f1d1d'; fb.innerHTML='<strong><i class="pd-i pd-i-rotate-ccw"></i> '+pct+'% — keep going</strong><p style="margin:4px 0 0;">You got '+correct+' of '+wordsTarget.length+' words. Tap Hint and try again.</p>'; }
+    }
+  });
+
+  // ── Bible Challenge Quiz ──
+  var BIBLE_QUIZ_POOL = [
+    {q:"Who led the Israelites out of Egypt?", opts:["Moses","David","Abraham","Noah"], a:0, ref:"Exodus 14"},
+    {q:"How many days did Jesus fast in the wilderness?", opts:["7","30","40","12"], a:2, ref:"Matthew 4:2"},
+    {q:"Which book begins 'In the beginning God created the heavens and the earth'?", opts:["Exodus","Genesis","Psalms","Revelation"], a:1, ref:"Genesis 1:1"},
+    {q:"Who was thrown into the lions' den?", opts:["Joseph","Daniel","Elijah","Paul"], a:1, ref:"Daniel 6"},
+    {q:"What is the greatest commandment?", opts:["Love God and love your neighbor","Keep the Sabbath","Fast weekly","Build temples"], a:0, ref:"Matthew 22:37-39"},
+    {q:"Who betrayed Jesus for thirty pieces of silver?", opts:["Peter","Judas Iscariot","Thomas","John"], a:1, ref:"Matthew 26:15"},
+    {q:"On which day did God rest after creation?", opts:["Sixth","Seventh","First","Fifth"], a:1, ref:"Genesis 2:2"},
+    {q:"Which apostle is called the rock?", opts:["John","Peter","James","Andrew"], a:1, ref:"Matthew 16:18"},
+    {q:"Where was Jesus born?", opts:["Nazareth","Jerusalem","Bethlehem","Galilee"], a:2, ref:"Luke 2:4-7"},
+    {q:"What did Jesus turn water into at Cana?", opts:["Milk","Wine","Oil","Honey"], a:1, ref:"John 2:9"},
+    {q:"Who built the ark?", opts:["Moses","Noah","Abraham","Job"], a:1, ref:"Genesis 6"},
+    {q:"How many books are in the Protestant Bible?", opts:["62","66","70","73"], a:1, ref:"Canon"}
+  ];
+  var bibleQuizQs=[], bibleQuizIdx=0, bibleQuizScore=0, bibleQuizActive=false;
+  function initBibleQuiz(){
+    document.getElementById('bibleQuizCard').innerHTML='<div style="text-align:center; padding:30px 10px;"><i class="pd-i pd-i-trophy" style="font-size:2.4rem; color:var(--pd-gold);"></i><p style="margin:10px 0 0; color:var(--pd-acad-muted);">Tap Start Challenge to begin — 10 questions, 80% to pass.</p></div>';
+    document.getElementById('bibleQuizResult').style.display='none';
+    document.getElementById('bibleQuizStartBtn').style.display='inline-flex';
+    document.getElementById('bibleQuizNextBtn').style.display='none';
+    bibleQuizActive=false;
+  }
+  function renderBibleQ(){
+    var q=bibleQuizQs[bibleQuizIdx];
+    var card=document.getElementById('bibleQuizCard');
+    card.innerHTML='<div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;"><span style="width:32px; height:32px; border-radius:10px; background:var(--pd-acad-soft); display:grid; place-items:center; font-weight:900; color:var(--pd-acad-blue);">'+(bibleQuizIdx+1)+'</span><span style="font-size:.7rem; font-weight:900; letter-spacing:1px; text-transform:uppercase; color:var(--pd-gold-deep);">'+q.ref+'</span><span style="margin-left:auto; font-size:.8rem; color:var(--pd-acad-muted); font-weight:700;">'+(bibleQuizIdx+1)+' / '+bibleQuizQs.length+'</span></div>'
+                 +'<h4 style="margin:0 0 14px; color:var(--pd-acad-blue);">'+q.q+'</h4>'
+                 +'<div style="display:grid; gap:8px;">'+q.opts.map(function(o,i){ return '<button class="situation-option bible-opt" data-i="'+i+'" style="text-align:left;">'+String.fromCharCode(65+i)+'. '+o+'</button>'; }).join('')+'</div>';
+    card.querySelectorAll('.bible-opt').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var chosen=parseInt(btn.getAttribute('data-i'),10);
+        var correct=q.a;
+        card.querySelectorAll('.bible-opt').forEach(function(b,idx){
+          b.disabled=true;
+          if(idx===correct) b.style.borderColor='#16a34a', b.style.background='rgba(22,163,74,.08)', b.style.color='#166534';
+          if(idx===chosen && idx!==correct) b.style.borderColor='#dc2626', b.style.background='rgba(220,38,38,.06)', b.style.color='#7f1d1d';
+        });
+        if(chosen===correct) bibleQuizScore++;
+        document.getElementById('bibleQuizNextBtn').style.display='inline-flex';
+      });
+    });
+  }
+  document.addEventListener('click', function(e){
+    if(e.target.closest('#bibleQuizStartBtn')){
+      bibleQuizQs = (function(arr){ var a=arr.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; })(BIBLE_QUIZ_POOL).slice(0,10);
+      bibleQuizIdx=0; bibleQuizScore=0; bibleQuizActive=true;
+      document.getElementById('bibleQuizStartBtn').style.display='none';
+      document.getElementById('bibleQuizNextBtn').style.display='inline-flex';
+      document.getElementById('bibleQuizNextBtn').textContent='Next';
+      document.getElementById('bibleQuizResult').style.display='none';
+      renderBibleQ();
+    }
+    if(e.target.closest('#bibleQuizNextBtn')){
+      if(bibleQuizIdx < bibleQuizQs.length-1){ bibleQuizIdx++; renderBibleQ(); if(bibleQuizIdx===bibleQuizQs.length-1) e.target.textContent='Finish'; }
+      else {
+        var pct=Math.round(bibleQuizScore/bibleQuizQs.length*100);
+        var passed=pct>=80;
+        var res=document.getElementById('bibleQuizResult');
+        res.style.display='block';
+        res.style.background=passed?'rgba(22,163,74,.08)':'rgba(220,38,38,.06)';
+        res.style.border=passed?'1px solid rgba(22,163,74,.25)':'1px solid rgba(220,38,38,.18)';
+        res.style.color=passed?'#166534':'#7f1d1d';
+        res.innerHTML='<div style="font-size:2rem; margin-bottom:6px;"><i class="pd-i '+(passed?'pd-i-trophy':'pd-i-book-open-text')+'" style="font-size:2rem; color:'+(passed?'var(--pd-gold)':'var(--pd-blue)')+';"></i></div><strong>'+(passed?'Champion!':'Keep Studying!')+' '+bibleQuizScore+'/'+bibleQuizQs.length+' ('+pct+'%)</strong><p style="margin:6px 0 0;">'+(passed?'You passed the Bible Challenge — certificate unlocked!':'You need 80% to pass. Replay with a fresh set of questions.')+'</p>';
+        document.getElementById('bibleQuizCard').innerHTML='<div style="text-align:center; padding:18px;"><p style="color:var(--pd-acad-muted);">'+(passed?'Excellent work!':'Review your lessons and try again.')+'</p></div>';
+        document.getElementById('bibleQuizNextBtn').style.display='none';
+        document.getElementById('bibleQuizStartBtn').style.display='inline-flex';
+        document.getElementById('bibleQuizStartBtn').textContent='Play Again';
+        if(passed){ addXP(50); updateUI(); if(window.confetti) confetti({particleCount:120, spread:90, origin:{y:.6}}); }
+      }
+    }
+  });
+
+  // ── Verse Scramble ──
+  var SCRAMBLE_VERSES = [
+    {text:"The Lord is my shepherd I shall not want", ref:"Psalm 23:1"},
+    {text:"Trust in the Lord with all your heart", ref:"Proverbs 3:5"},
+    {text:"For God so loved the world", ref:"John 3:16"},
+    {text:"Be still and know that I am God", ref:"Psalm 46:10"},
+    {text:"I can do all things through Christ", ref:"Philippians 4:13"},
+    {text:"Love is patient love is kind", ref:"1 Corinthians 13:4"}
+  ];
+  var scrambleIdx=0, scrambleOrder=[], scramblePicked=[];
+  function initScramble(){
+    scrambleIdx=Math.floor(Math.random()*SCRAMBLE_VERSES.length);
+    renderScramble();
+  }
+  function renderScramble(){
+    var v=SCRAMBLE_VERSES[scrambleIdx];
+    var words=v.text.split(' ');
+    scrambleOrder = (function(a){ var arr=a.slice(); for(var i=arr.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=arr[i]; arr[i]=arr[j]; arr[j]=t; } return arr; })(words);
+    scramblePicked=[];
+    document.getElementById('scrambleRef').textContent='— '+v.ref;
+    document.getElementById('scrambleTarget').innerHTML='<span style="color:var(--pd-acad-muted); font-style:italic;">Tap words below to build the verse here…</span>';
+    document.getElementById('scrambleWords').innerHTML=scrambleOrder.map(function(w,i){ return '<button class="pd-acad-chip" data-widx="'+i+'" style="cursor:pointer; padding:10px 14px; border-radius:999px; background:var(--pd-acad-card); border:1.5px solid var(--pd-acad-border); font-weight:700;">'+w+'</button>'; }).join('');
+    document.getElementById('scrambleFeedback').style.display='none';
+    document.getElementById('scrambleWords').querySelectorAll('[data-widx]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var idx=parseInt(btn.getAttribute('data-widx'),10);
+        if(btn.disabled) return;
+        btn.disabled=true; btn.style.opacity='0.45'; btn.style.textDecoration='line-through';
+        scramblePicked.push(scrambleOrder[idx]);
+        updateScrambleTarget();
+      });
+    });
+  }
+  function updateScrambleTarget(){
+    var el=document.getElementById('scrambleTarget');
+    if(scramblePicked.length===0) el.innerHTML='<span style="color:var(--pd-acad-muted); font-style:italic;">Tap words below to build the verse here…</span>';
+    else el.innerHTML='<span style="font-family:Lora,serif; font-size:1.05rem; color:var(--pd-acad-blue);">'+scramblePicked.join(' ')+'</span>';
+  }
+  document.addEventListener('click', function(e){
+    if(e.target.closest('#scrambleResetBtn')) renderScramble();
+    if(e.target.closest('#scrambleNextBtn')){ scrambleIdx=(scrambleIdx+1)%SCRAMBLE_VERSES.length; renderScramble(); }
+    if(e.target.closest('#scrambleCheckBtn')){
+      var v=SCRAMBLE_VERSES[scrambleIdx];
+      var fb=document.getElementById('scrambleFeedback');
+      fb.style.display='block';
+      if(scramblePicked.join(' ')===v.text){ fb.style.background='rgba(22,163,74,.08)'; fb.style.border='1px solid rgba(22,163,74,.25)'; fb.style.color='#166534'; fb.innerHTML='<strong><i class="pd-i pd-i-circle-check"></i> Perfect!</strong> You restored the verse correctly.'; addXP(25); updateUI(); if(window.confetti) confetti({particleCount:60, spread:60, origin:{y:.7}}); }
+      else { fb.style.background='rgba(220,38,38,.06)'; fb.style.border='1px solid rgba(220,38,38,.18)'; fb.style.color='#7f1d1d'; fb.innerHTML='<strong>Not quite</strong> — expected: <em>'+v.text+'</em><br>Your order: <em>'+scramblePicked.join(' ')+'</em>'; }
+    }
+  });
 
   document.addEventListener('DOMContentLoaded', () => {
     loadLocalState();

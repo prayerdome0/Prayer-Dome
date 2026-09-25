@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson Audio | Prayer Dome Academy</title>
+  <link rel="icon" type="image/png" href="/assets/logo.png">
+  <meta name="theme-color" content="#0A4D9B">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/pd-icons.css"><script src="/assets/pd-icons.js"></script>
+  <link rel="stylesheet" href="/assets/pd-brand.css">
+  <script src="/translation-data.js"></script>
+  <script src="/assets/pd-phrases.js" defer></script>
+  <script src="/assets/pd-i18n.js" defer></script>
+  <script src="/assets/pd-app.js" defer></script>
+  <script src="/assets/pd-academy-data.js" defer></script>
+  <script src="/assets/pd-academy-questions.js" defer></script>
+</head>
+<body class="pd-acad-page">
+<div class="pd-aurora" aria-hidden="true"><span></span></div>
+<aside class="pd-drawer" id="pdDrawer"><nav class="pd-drawer-nav"><a class="pd-drawer-link" href="/"><i class="pd-i pd-i-house"></i> Home</a><a class="pd-drawer-link" href="/lessons"><i class="pd-i pd-i-graduation-cap"></i> Teaching</a><a class="pd-drawer-link" href="/quiz"><i class="pd-i pd-i-star"></i> Quizzes</a></nav></aside>
+<header class="pd-topbar">
+  <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="pd-i pd-i-menu"></i></button>
+  <a href="/" class="pd-topbar-center"><div class="pd-topbar-logo"><img src="/assets/logo.png" alt="PD"></div><div class="pd-topbar-word">PRAYER DOME</div></a>
+  <div class="pd-topbar-right"><select class="pd-lang-select"><option value="en">English</option><option value="tum">Tumbuka</option><option value="ssw">siSwati</option><option value="bem">Bemba</option><option value="nya">Nyanja</option></select><button class="pd-bell-btn" id="pdNotifBell"><i class="pd-i pd-i-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button><button class="theme-toggle-btn" onclick="toggleDarkMode&&toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button></div>
+</header>
+<div style="max-width:1180px; margin:0 auto; padding:12px 18px; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+  <a href="/lessons" style="display:inline-flex; gap:8px; align-items:center; padding:8px 14px; border-radius:999px; border:1px solid var(--pd-acad-border); background:var(--pd-acad-card); color:var(--pd-acad-blue); font-weight:800; text-decoration:none; font-size:.85rem;"><i class="pd-i pd-i-arrow-left"></i> All Lessons</a>
+  <a id="backLesson" href="#" style="display:inline-flex; gap:8px; align-items:center; padding:8px 14px; border-radius:999px; background:var(--pd-acad-blue); color:#fff; font-weight:800; text-decoration:none; font-size:.85rem;"><i class="pd-i pd-i-book-open-text"></i> Back to Lesson</a>
+</div>
+<main class="pd-acad-wrap">
+  <div id="notFound" style="display:none; text-align:center; padding:60px 20px;"><h2 style="color:var(--pd-acad-blue); font-family:Poppins,sans-serif;">Audio not found</h2><a href="/lessons" class="pd-acad-btn pd-acad-btn-primary" style="margin-top:12px;">Browse Lessons</a></div>
+  <div id="audioContainer" style="display:none;">
+    <div class="pd-acad-lesson-hero" style="min-height:220px;">
+      <img class="pd-acad-lesson-hero-img" id="heroImg" alt=""><div class="pd-acad-lesson-hero-body"><div style="flex:1; min-width:260px;"><span class="pd-acad-chip gold" id="heroTrack"></span><h2 id="audioTitle" style="font-family:Poppins,sans-serif; margin:10px 0 6px; font-size:clamp(1.5rem,4vw,2rem);"></h2><p id="audioSubtitle" style="opacity:.9;"></p></div></div>
+    </div>
+    <div class="pd-acad-card" style="margin-top:18px; padding:24px; text-align:center;">
+      <div style="width:92px; height:92px; border-radius:28px; background:linear-gradient(135deg, #07244d, #0A4D9B); display:grid; place-items:center; margin:0 auto 14px; color:#fff; font-size:2rem;"><i class="pd-i pd-i-headphones"></i></div>
+      <h3 style="margin:0; font-family:Poppins,sans-serif; color:var(--pd-acad-blue);">Listen to this lesson</h3>
+      <p style="color:var(--pd-acad-muted); font-size:.92rem; margin:6px 0 16px;">Professional narration with scripture, examples, and reflection. Perfect for your commute or quiet time.</p>
+      <audio id="audioPlayer" controls preload="metadata" style="width:100%; max-width:520px; border-radius:14px;"></audio>
+      <div style="display:flex; gap:10px; justify-content:center; margin-top:14px; flex-wrap:wrap;">
+        <button class="pd-acad-btn pd-acad-btn-primary" id="playBtn"><i class="pd-i pd-i-circle-play"></i> Play Lesson</button>
+        <button class="pd-acad-btn pd-acad-btn-ghost" id="pauseBtn" style="border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-pause"></i> Pause</button>
+        <button class="pd-acad-btn pd-acad-btn-ghost" id="speedBtn" style="border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-gauge"></i> 1×</button>
+      </div>
+      <div style="margin-top:14px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+        <span class="pd-acad-chip" id="audioDuration"><i class="pd-i pd-i-clock"></i> -- min</span><span class="pd-acad-chip" id="audioScripture"></span>
+      </div>
+      <div class="pd-acad-progress" style="margin-top:16px; height:8px; background:var(--pd-acad-soft); border-radius:999px; overflow:hidden;"><div id="audioProgress" style="height:100%; width:0; background:linear-gradient(90deg, var(--pd-blue), var(--pd-gold)); transition:width .2s;"></div></div>
+      <p style="font-size:.8rem; color:var(--pd-acad-muted); margin:8px 0 0;" id="audioStatus">Ready to play — progress saves automatically.</p>
+    </div>
+    <div id="transcript" class="pd-acad-card" style="margin-top:18px; padding:24px;"></div>
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:18px;">
+      <a id="pdfFromAudio" href="#" class="pd-acad-btn pd-acad-btn-ghost" style="flex:1; justify-content:center; border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-file-text"></i> Study PDF</a>
+      <a id="quizFromAudio" href="#" class="pd-acad-btn pd-acad-btn-primary" style="flex:1; justify-content:center;"><i class="pd-i pd-i-badge-check"></i> Take Quiz</a>
+    </div>
+  </div>
+</main>
+<footer class="pd-footer"><div class="pd-footer-logo"><img src="/assets/logo.png" alt="PD"><span class="pd-footer-brand">PRAYER DOME</span></div><p class="pd-footer-copy">© 2018 PRAYER DOME MINISTRY. ALL RIGHTS RESERVED.</p></footer>
+<script>
+(function(){
+  var synth = window.speechSynthesis, utter=null, speaking=false;
+  function gid(){ var p=new URLSearchParams(location.search); return p.get('id')||p.get('lesson')||'l01'; }
+  function esc(v){ var d=document.createElement('div'); d.textContent=String(v||''); return d.innerHTML; }
+  function bank(){ return ['/assets/hero-worship.jpg','/assets/sermons/sermon-david.jpg','/assets/sermons/sermon-prayer.jpg'][0]; }
+  function render(){
+    var id=gid();
+    var data=(window.PD_ACADEMY&&window.PD_ACADEMY.DATA)||{lessons:[]};
+    var lesson=data.lessons.find(function(l){return l.id===id;});
+    if(!lesson){ document.getElementById('notFound').style.display='block'; return; }
+    document.getElementById('audioContainer').style.display='block';
+    document.getElementById('backLesson').href='/lesson.html?id='+encodeURIComponent(lesson.id);
+    document.getElementById('pdfFromAudio').href='/lesson-pdf.html?id='+encodeURIComponent(lesson.id);
+    document.getElementById('quizFromAudio').href='/lesson-quiz.html?id='+encodeURIComponent(lesson.id);
+    document.title=lesson.title+' — Audio | Prayer Dome';
+    document.getElementById('heroTrack').textContent=lesson.track;
+    document.getElementById('audioTitle').textContent=lesson.title;
+    document.getElementById('audioSubtitle').textContent=lesson.scripture+' · '+lesson.minutes+' min listen';
+    document.getElementById('heroImg').src=bank();
+    document.getElementById('audioScripture').textContent=lesson.scripture;
+    document.getElementById('audioDuration').innerHTML='<i class="pd-i pd-i-clock"></i> '+lesson.minutes+' min';
+    // transcript
+    var tr='<h3 style="margin:0 0 12px; color:var(--pd-acad-blue); font-family:Poppins,sans-serif;"><i class="pd-i pd-i-scroll-text"></i> Lesson Transcript</h3>';
+    tr+='<p style="margin:0 0 10px; font-style:italic; color:var(--pd-acad-muted);">Prayer: '+esc(lesson.openingPrayer)+'</p>';
+    lesson.sections.forEach(function(s){ tr+='<h4 style="margin:18px 0 8px; color:var(--pd-acad-blue);">'+esc(s.heading)+'</h4><p style="margin:0; line-height:1.85;">'+esc(s.body)+'</p>'; });
+    tr+='<div style="margin-top:16px; padding:14px; background:var(--pd-acad-soft); border-radius:14px;"><strong>Reflection:</strong><ol style="margin:8px 0 0 18px;">'+lesson.reflection.map(function(q){return '<li>'+esc(q)+'</li>';}).join('')+'</ol></div>';
+    document.getElementById('transcript').innerHTML=tr;
+    // Text-to-speech audio generation
+    var fullText = lesson.title + '. ' + lesson.subtitle + '. ' + lesson.sections.map(function(s){return s.heading+'. '+s.body;}).join(' ') + ' Reflection. ' + lesson.reflection.join(' ') + ' Action: ' + lesson.action;
+    var player = document.getElementById('audioPlayer');
+    // Use Web Speech API for narration; also provide a placeholder audio source for controls
+    // Create a silent placeholder so controls show; real audio is TTS
+    try {
+      // No actual file — use TTS. Show status.
+      player.removeAttribute('src');
+    } catch(e){}
+    var playBtn=document.getElementById('playBtn'), pauseBtn=document.getElementById('pauseBtn'), speedBtn=document.getElementById('speedBtn');
+    var rate=1;
+    function speak(){
+      if(!synth) { document.getElementById('audioStatus').textContent='Audio playback not supported in this browser — read the transcript below.'; return; }
+      if(speaking && synth.paused){ synth.resume(); document.getElementById('audioStatus').textContent='Playing…'; return; }
+      if(speaking && synth.speaking){ return; }
+      utter = new SpeechSynthesisUtterance(fullText);
+      utter.rate = rate; utter.pitch=1; utter.lang='en-ZM';
+      utter.onstart=function(){ speaking=true; document.getElementById('audioStatus').textContent='Playing — '+lesson.title; document.getElementById('audioProgress').style.width='35%'; };
+      utter.onend=function(){ speaking=false; document.getElementById('audioStatus').textContent='Finished. Well done! Now take the quiz.'; document.getElementById('audioProgress').style.width='100%'; try{ var s=JSON.parse(localStorage.getItem('pd_academy_lesson_progress')||'{}'); s[lesson.id]=s[lesson.id]||{}; s[lesson.id].listened=true; localStorage.setItem('pd_academy_lesson_progress', JSON.stringify(s));}catch(e){} };
+      utter.onerror=function(){ speaking=false; document.getElementById('audioStatus').textContent='Playback paused.'; };
+      synth.speak(utter);
+    }
+    playBtn.onclick=speak;
+    pauseBtn.onclick=function(){ if(synth){ if(synth.speaking && !synth.paused) synth.pause(); document.getElementById('audioStatus').textContent='Paused.'; } };
+    speedBtn.onclick=function(){ rate = rate>=1.5 ? 0.8 : rate>=1 ? 1.5 : 1; speedBtn.innerHTML='<i class="pd-i pd-i-gauge"></i> '+rate+'×'; if(utter) utter.rate=rate; };
+    // Auto-save progress when page viewed
+    try{ var s=JSON.parse(localStorage.getItem('pd_academy_lesson_progress')||'{}'); s[lesson.id]=s[lesson.id]||{}; s[lesson.id].openedAudio=true; localStorage.setItem('pd_academy_lesson_progress', JSON.stringify(s)); }catch(e){}
+  }
+  function init(){ if(window.PD_ACADEMY&&window.PD_ACADEMY.DATA) render(); else window.addEventListener('pd:academy-ready', render); var t=0, iv=setInterval(function(){ if(window.PD_ACADEMY&&window.PD_ACADEMY.DATA&&window.PD_ACADEMY.DATA.lessons.length){ clearInterval(iv); render(); } else if(++t>20) clearInterval(iv); },200); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+</body>
+</html>

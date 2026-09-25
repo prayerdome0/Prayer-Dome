@@ -3,7 +3,7 @@
 // shade) even when the app is closed — see /assets/pd-verse-data.js.
 try { importScripts('/assets/pd-verse-data.js'); } catch (e) { /* verses unavailable offline */ }
 // Bump CACHE_NAME whenever the precache list changes.
-const CACHE_NAME = 'prayer-dome-v19';
+const CACHE_NAME = 'prayer-dome-v20';
 
 // Shell assets worth having available offline.
 const PRECACHE = [
@@ -41,6 +41,11 @@ const PRECACHE = [
     '/news.html',
     '/radio.html',
     '/lessons.html',
+    '/lesson.html',
+    '/lesson-pdf.html',
+    '/lesson-audio.html',
+    '/lesson-quiz.html',
+    '/game.html',
     '/stories.html',
     '/resources.html',
     '/resource-view.html',

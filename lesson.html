@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson | Prayer Dome Academy</title>
+  <meta name="description" content="Study a dedicated Prayer Dome lesson page with detailed teaching, scripture, and examples.">
+  <link rel="canonical" href="https://prayerdome.net/lesson">
+  <meta name="theme-color" content="#0A4D9B">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="/assets/logo.png">
+  <link rel="apple-touch-icon" href="/assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/pd-icons.css">
+  <script src="/assets/pd-icons.js"></script>
+  <link rel="stylesheet" href="/assets/pd-brand.css">
+  <script src="/assets/pd-motion.js" defer></script>
+  <script src="/assets/pd-content-data.js" defer></script>
+  <script src="/assets/pd-academy-data.js" defer></script>
+  <script src="/assets/pd-academy-questions.js" defer></script>
+  <script src="/translation-data.js"></script>
+  <script src="/assets/pd-verse-data.js" defer></script>
+  <script src="/assets/pd-verse-alerts.js" defer></script>
+  <script src="/assets/pd-phrases.js" defer></script>
+  <script src="/assets/pd-i18n.js" defer></script>
+  <script src="/assets/pd-app.js" defer></script>
+  <script src="/assets/pd-certificate.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    .lesson-topbar { max-width: 1180px; margin: 0 auto; padding: 12px 18px; display:flex; align-items:center; gap:12px; }
+    .lesson-back { display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:999px; border:1px solid var(--pd-acad-border); background:var(--pd-acad-card); color:var(--pd-acad-blue); font-weight:800; text-decoration:none; font-size:.85rem; }
+    .lesson-back:hover { background: var(--pd-acad-soft); }
+  </style>
+</head>
+<body class="pd-acad-page">
+<div class="pd-aurora" aria-hidden="true"><span></span></div>
+
+<aside class="pd-drawer" id="pdDrawer" aria-label="Main menu">
+  <nav class="pd-drawer-nav">
+    <a class="pd-drawer-link" href="/"><i class="pd-i pd-i-house"></i> Home</a>
+    <a class="pd-drawer-link" href="/lessons"><i class="pd-i pd-i-graduation-cap"></i> Teaching</a>
+    <a class="pd-drawer-link" href="/stories"><i class="pd-i pd-i-book-open-text"></i> Stories</a>
+    <a class="pd-drawer-link" href="/quiz"><i class="pd-i pd-i-star"></i> Quizzes</a>
+    <a class="pd-drawer-link" href="/resources"><i class="pd-i pd-i-folder-open"></i> Resources</a>
+    <a class="pd-drawer-link" href="/sermons"><i class="pd-i pd-i-mic"></i> Sermons</a>
+    <a class="pd-drawer-link" href="/prayer"><i class="pd-i pd-i-hands-praying"></i> Prayer Wall</a>
+    <a class="pd-drawer-link" href="/account"><i class="pd-i pd-i-circle-user"></i> Account</a>
+  </nav>
+</aside>
+<header class="pd-topbar">
+  <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="pd-i pd-i-menu"></i></button>
+  <a href="/" class="pd-topbar-center">
+    <div class="pd-topbar-logo"><img src="/assets/logo.png" alt="PD Logo"></div>
+    <div class="pd-topbar-word">PRAYER DOME</div>
+  </a>
+  <div class="pd-topbar-right">
+    <select class="pd-lang-select" aria-label="Language">
+      <option value="en">English</option>
+      <option value="tum">Tumbuka</option>
+      <option value="ssw">siSwati</option>
+      <option value="bem">Bemba</option>
+      <option value="nya">Nyanja</option>
+    </select>
+    <button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="pd-i pd-i-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>
+    <button class="theme-toggle-btn" onclick="toggleDarkMode && toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>
+  </div>
+</header>
+
+<div class="lesson-topbar">
+  <a class="lesson-back" href="/lessons"><i class="pd-i pd-i-arrow-left"></i> All Lessons</a>
+  <span style="margin-left:auto; font-size:.78rem; color:var(--pd-acad-muted); font-weight:700;" id="lessonBreadcrumb">Academy / Lesson</span>
+</div>
+
+<main class="pd-acad-wrap" id="lessonMain">
+  <div id="lessonNotFound" style="display:none; text-align:center; padding:60px 20px;">
+    <i class="pd-i pd-i-circle-alert" style="font-size:3rem; color:var(--pd-gold);"></i>
+    <h2 style="font-family:Poppins,sans-serif; margin:12px 0 8px; color:var(--pd-acad-blue);">Lesson not found</h2>
+    <p style="color:var(--pd-acad-muted);">The lesson you are looking for does not exist or has been moved.</p>
+    <a href="/lessons" class="pd-acad-btn pd-acad-btn-primary" style="margin-top:16px;"><i class="pd-i pd-i-graduation-cap"></i> Browse Lessons</a>
+  </div>
+
+  <div id="lessonContainer" style="display:none;">
+    <!-- Hero -->
+    <div class="pd-acad-lesson-hero" id="lessonHero" style="min-height:260px;">
+      <img class="pd-acad-lesson-hero-img" id="lessonHeroImg" alt="" loading="lazy">
+      <div class="pd-acad-lesson-hero-body">
+        <div style="flex:1; min-width:260px;">
+          <div class="pd-acad-lesson-hero-meta" id="lessonMeta"></div>
+          <h2 id="lessonTitle"></h2>
+          <p class="subtitle" id="lessonSubtitle"></p>
+          <div class="pd-acad-lesson-hero-stats" id="lessonStats"></div>
+        </div>
+      </div>
+    </div>
+    <div class="pd-acad-lesson-progress" id="lessonProgress" style="background:var(--pd-acad-card); border:1px solid var(--pd-acad-border); border-radius:16px; margin:-14px 0 20px; padding:14px 18px;">
+      <div style="display:flex; align-items:center; gap:12px; width:100%;">
+        <span class="pd-acad-lesson-progress-label" id="progressLabel">Page 1 of 7</span>
+        <div class="pd-acad-lesson-progress-bar"><span id="progressBar" style="width:14%"></span></div>
+        <span style="font-size:.78rem; color:var(--pd-acad-muted); font-weight:700;" id="progressPct">14%</span>
+      </div>
+    </div>
+
+    <!-- Page content -->
+    <article class="pd-acad-reader" id="lessonPage" style="min-height:320px;"></article>
+
+    <!-- Navigation -->
+    <div style="display:flex; gap:12px; justify-content:space-between; align-items:center; margin-top:18px; flex-wrap:wrap;">
+      <button class="pd-acad-btn pd-acad-btn-ghost" id="prevPageBtn" style="border:1px solid var(--pd-acad-border); color:var(--pd-acad-ink);"><i class="pd-i pd-i-arrow-left"></i> Previous</button>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <span id="pageIndicator" style="font-size:.85rem; color:var(--pd-acad-muted); font-weight:700;"></span>
+      </div>
+      <button class="pd-acad-btn pd-acad-btn-primary" id="nextPageBtn">Next <i class="pd-i pd-i-arrow-right"></i></button>
+    </div>
+
+    <!-- Dedicated section links -->
+    <div class="pd-acad-card" style="margin-top:22px; display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px;">
+      <a class="pd-acad-btn pd-acad-btn-ghost" id="pdfLink" href="#" style="justify-content:center; border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-file-text"></i> Study PDF</a>
+      <a class="pd-acad-btn pd-acad-btn-ghost" id="audioLink" href="#" style="justify-content:center; border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-headphones"></i> Audio</a>
+      <a class="pd-acad-btn pd-acad-btn-primary" id="quizLink" href="#" style="justify-content:center;"><i class="pd-i pd-i-badge-check"></i> Take Quiz</a>
+    </div>
+
+    <!-- Objectives + Reflection preview (always visible) -->
+    <div id="lessonExtras" style="margin-top:18px;"></div>
+  </div>
+</main>
+
+<footer class="pd-footer">
+  <div class="pd-footer-logo"><img src="/assets/logo.png" alt="Prayer Dome"><span class="pd-footer-brand">PRAYER DOME</span></div>
+  <div class="pd-footer-nav">
+    <a href="/">Home</a><a href="/lessons">Teaching</a><a href="/quiz">Quiz</a><a href="/prayer">Prayer</a><a href="/account">Account</a>
+  </div>
+  <p class="pd-footer-copy">© 2018 PRAYER DOME MINISTRY. ALL RIGHTS RESERVED. · A House of Prayer for All Nations</p>
+</footer>
+
+<script>
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function esc(v){ var d=document.createElement('div'); d.textContent=v==null?'':String(v); return d.innerHTML; }
+  function getId(){
+    try {
+      var p = new URLSearchParams(location.search);
+      var q = p.get('id') || p.get('lesson') || p.get('lessonId');
+      if(q) return q;
+      var h = location.hash || '';
+      var m = h.match(/lesson\/([^?&]+)/);
+      if(m) return decodeURIComponent(m[1]);
+      // support /lesson/l01 style via pathname
+      var path = location.pathname.split('/');
+      var last = path[path.length-1];
+      if(last && last.startsWith('l') && last.length===3) return last;
+    } catch(e){}
+    return null;
+  }
+  function lessonHeroImage(lesson){
+    var bank = ['/assets/hero-worship.jpg','/assets/sermons/sermon-david.jpg','/assets/sermons/sermon-abundant.jpg','/assets/sermons/sermon-daniel.jpg','/assets/sermons/sermon-esther.jpg','/assets/sermons/sermon-prayer.jpg','/assets/sermons/sermon-prodigal.jpg','/assets/sermons/sermon-samaritan.jpg','/assets/sermons/sermon-storm.jpg','/assets/ai/topic-family.jpg','/assets/ai/topic-fear.jpg','/assets/ai/topic-healing.jpg'];
+    var idx=0; try{ var s=String(lesson.id||lesson.order||'lesson'); for(var i=0;i<s.length;i++) idx=(idx*31+s.charCodeAt(i))>>>0; idx=idx%bank.length; }catch(e){ idx=0; }
+    return bank[idx];
+  }
+  function buildPages(lesson){
+    var pages=[];
+    // Page 1: Welcome, objectives, opening prayer
+    pages.push({
+      title: 'Welcome & Objectives',
+      kicker: 'Page 1 · Start Here',
+      icon: 'pd-i-flag',
+      html: '<div class="pd-acad-callout"><strong><i class="pd-i pd-i-target"></i> Learning Objectives</strong><ul style="margin:8px 0 0 18px;">'+ lesson.objectives.map(function(o){ return '<li>'+esc(o)+'</li>'; }).join('') +'</ul></div>'
+           + '<div style="margin-top:16px; padding:16px; background:var(--pd-acad-soft); border-radius:16px; border-left:4px solid var(--pd-gold);"><strong><i class="pd-i pd-i-hands-praying"></i> Opening Prayer</strong><p style="margin:8px 0 0; font-style:italic; line-height:1.8;">'+esc(lesson.openingPrayer)+'</p></div>'
+           + '<p style="margin-top:16px; line-height:1.8;">'+esc(lesson.summary)+'</p>'
+           + '<div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;"><span class="pd-acad-chip"><i class="pd-i pd-i-book"></i> '+esc(lesson.scripture)+'</span><span class="pd-acad-chip gold">'+esc(lesson.track)+' · '+esc(lesson.level)+'</span><span class="pd-acad-chip">'+lesson.minutes+' min</span></div>'
+    });
+    // Pages 2-6: Sections (5 sections)
+    lesson.sections.forEach(function(sec, idx){
+      // enrich with scripture refs and examples injected for depth
+      var scriptureRef = lesson.scripture || 'Scripture';
+      var extra = '';
+      if(idx===0) extra = '<div class="pd-acad-callout"><strong><i class="pd-i pd-i-book"></i> Scripture Focus</strong><p style="margin:6px 0 0;">'+esc(lesson.scripture)+' — read this passage aloud before continuing. Let the Word shape your understanding.</p></div>';
+      if(idx===1) extra = '<div style="margin-top:12px; padding:14px; background:rgba(10,77,155,.06); border-radius:14px;"><strong><i class="pd-i pd-i-lightbulb"></i> Example</strong><p style="margin:6px 0 0; line-height:1.7;">Consider how early believers in Acts applied this truth daily — not as theory but as a pattern for prayer, fellowship, and witness.</p></div>';
+      if(idx===2) extra = '<div style="margin-top:12px; padding:14px; background:rgba(212,175,55,.08); border-radius:14px;"><strong><i class="pd-i pd-i-quote"></i> Real Explanation</strong><p style="margin:6px 0 0; line-height:1.7;">This is not abstract theology. If this teaching does not change how you pray, speak, and serve this week, return and re-read until it does.</p></div>';
+      pages.push({
+        title: sec.heading,
+        kicker: 'Page '+(idx+2)+' · '+lesson.title,
+        icon: idx===1 ? 'pd-i-book' : idx===2 ? 'pd-i-lightbulb' : idx===3 ? 'pd-i-earth' : 'pd-i-hand-heart',
+        html: extra + '<p style="margin-top:14px; line-height:1.85; font-size:1.02rem;">'+esc(sec.body)+'</p>'
+             + '<div style="margin-top:14px; padding:12px 14px; background:var(--pd-acad-soft); border-radius:12px; font-size:.9rem; color:var(--pd-acad-muted);"><i class="pd-i pd-i-info"></i> Scripture reference: <strong style="color:var(--pd-acad-blue);">'+esc(scriptureRef)+'</strong> — look it up in your Bible as you study.</div>'
+      });
+    });
+    // Page 7: Reflection & Application
+    pages.push({
+      title: 'Reflection & Application',
+      kicker: 'Page 7 · Respond',
+      icon: 'pd-i-message-circle-more',
+      html: '<h4 style="color:var(--pd-acad-blue); margin:0 0 10px;"><i class="pd-i pd-i-circle-question-mark"></i> Reflection Questions</h4><ol style="margin:0 0 16px 18px; line-height:1.8;">'+ lesson.reflection.map(function(q){ return '<li>'+esc(q)+'</li>'; }).join('') +'</ol>'
+           + '<div class="pd-acad-callout"><strong><i class="pd-i pd-i-check"></i> Your Next Step</strong><p style="margin:6px 0 0;">'+esc(lesson.action)+'</p></div>'
+           + '<div style="margin-top:14px; padding:14px; background:rgba(212,175,55,.1); border-radius:14px; border:1px solid rgba(212,175,55,.3);"><strong><i class="pd-i pd-i-award"></i> Ready for your certificate?</strong><p style="margin:6px 0 0; font-size:.9rem;">Complete this lesson, then take the topic quiz. Score 80% or higher to unlock your certificate and the next lesson.</p></div>'
+    });
+    return pages;
+  }
+
+  function render(){
+    var id = getId() || 'l01';
+    var data = (window.PD_ACADEMY && window.PD_ACADEMY.DATA) || { lessons:[] };
+    var lesson = null;
+    for(var i=0;i<data.lessons.length;i++){ if(data.lessons[i].id===id){ lesson=data.lessons[i]; break; } }
+    if(!lesson){ $('lessonNotFound').style.display='block'; return; }
+    $('lessonContainer').style.display='block';
+    // hero
+    $('lessonHeroImg').src = lessonHeroImage(lesson);
+    $('lessonHeroImg').alt = lesson.title;
+    $('lessonTitle').textContent = lesson.title;
+    $('lessonSubtitle').textContent = lesson.subtitle || lesson.summary;
+    $('lessonBreadcrumb').textContent = lesson.track + ' / ' + lesson.title;
+    document.title = lesson.title + ' | Prayer Dome Academy';
+    var meta = $('lessonMeta');
+    meta.innerHTML = '<span class="pd-acad-chip gold"><i class="pd-i '+esc(lesson.icon)+'"></i> '+esc(lesson.track)+'</span>'
+                   + '<span class="pd-acad-chip"><i class="pd-i pd-i-book"></i> '+esc(lesson.scripture)+'</span>'
+                   + '<span class="pd-acad-chip">'+esc(lesson.level)+'</span>';
+    $('lessonStats').innerHTML = '<span><i class="pd-i pd-i-clock"></i> '+lesson.minutes+' min</span><span><i class="pd-i pd-i-layers"></i> 7 pages</span><span><i class="pd-i pd-i-award"></i> Certificate on 80%</span>';
+    // dedicated links
+    $('pdfLink').href = '/lesson-pdf.html?id='+encodeURIComponent(lesson.id);
+    $('audioLink').href = '/lesson-audio.html?id='+encodeURIComponent(lesson.id);
+    $('quizLink').href = '/lesson-quiz.html?id='+encodeURIComponent(lesson.id);
+    // pages
+    var pages = buildPages(lesson);
+    var current = 0;
+    try {
+      var sp = new URLSearchParams(location.search);
+      var pg = parseInt(sp.get('page')||'1',10);
+      if(pg>=1 && pg<=pages.length) current=pg-1;
+    } catch(e){}
+    function update(){
+      var p = pages[current];
+      $('lessonPage').innerHTML = '<div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;"><span style="width:36px; height:36px; border-radius:12px; display:grid; place-items:center; background:var(--pd-acad-soft); color:var(--pd-acad-blue);"><i class="pd-i '+p.icon+'"></i></span><span style="font-size:.7rem; font-weight:900; letter-spacing:1.2px; text-transform:uppercase; color:var(--pd-gold-deep);">'+esc(p.kicker)+'</span></div>'
+                                + '<h2 style="font-family:Poppins,sans-serif; font-size:clamp(1.4rem,3vw,1.9rem); color:var(--pd-acad-blue); margin:0 0 12px; line-height:1.15;">'+esc(p.title)+'</h2>'
+                                + '<div style="line-height:1.85; color:var(--pd-acad-ink);">'+p.html+'</div>';
+      $('progressLabel').textContent = 'Page '+(current+1)+' of '+pages.length;
+      $('progressBar').style.width = Math.round((current+1)/pages.length*100)+'%';
+      $('progressPct').textContent = Math.round((current+1)/pages.length*100)+'%';
+      $('pageIndicator').textContent = (current+1)+' / '+pages.length;
+      $('prevPageBtn').disabled = current===0;
+      $('prevPageBtn').style.opacity = current===0 ? '0.5' : '1';
+      if(current===pages.length-1){
+        $('nextPageBtn').innerHTML = '<i class="pd-i pd-i-badge-check"></i> Start Quiz';
+        $('nextPageBtn').onclick = function(){ location.href='/lesson-quiz.html?id='+encodeURIComponent(lesson.id); };
+        $('nextPageBtn').classList.add('pd-acad-btn-primary');
+      } else {
+        $('nextPageBtn').innerHTML = 'Next <i class="pd-i pd-i-arrow-right"></i>';
+        $('nextPageBtn').onclick = function(){ current++; update(); window.scrollTo({top:0, behavior:'smooth'}); history.replaceState(null,'','?id='+encodeURIComponent(lesson.id)+'&page='+(current+1)); };
+      }
+      // save progress
+      try {
+        var store = JSON.parse(localStorage.getItem('pd_academy_lesson_progress')||'{}');
+        store[lesson.id] = store[lesson.id]||{};
+        store[lesson.id].lastPage = current+1;
+        store[lesson.id].scrolled = current>=2;
+        if(current===pages.length-1) store[lesson.id].readAt = new Date().toISOString();
+        localStorage.setItem('pd_academy_lesson_progress', JSON.stringify(store));
+      } catch(e){}
+    }
+    $('prevPageBtn').onclick = function(){ if(current>0){ current--; update(); window.scrollTo({top:0, behavior:'smooth'}); history.replaceState(null,'','?id='+encodeURIComponent(lesson.id)+'&page='+(current+1)); } };
+    update();
+    // extras
+    $('lessonExtras').innerHTML = '<div class="pd-acad-card" style="padding:20px; display:flex; gap:14px; flex-wrap:wrap; align-items:center; justify-content:space-between;"><div><strong style="color:var(--pd-acad-blue);"><i class="pd-i pd-i-info"></i> Need the full lesson overview?</strong><p style="margin:4px 0 0; color:var(--pd-acad-muted); font-size:.9rem;">Return to the lesson library to see all tracks and your progress.</p></div><a class="pd-acad-btn pd-acad-btn-primary" href="/lessons"><i class="pd-i pd-i-arrow-left"></i> Back to Lessons</a></div>';
+  }
+
+  function init(){
+    if(window.PD_ACADEMY && window.PD_ACADEMY.DATA) render();
+    else window.addEventListener('pd:academy-ready', render);
+    // fallback wait for data
+    var tries=0; var timer=setInterval(function(){
+      if(window.PD_ACADEMY && window.PD_ACADEMY.DATA && window.PD_ACADEMY.DATA.lessons.length){ clearInterval(timer); render(); }
+      else if(++tries>20) clearInterval(timer);
+    }, 200);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+</body>
+</html>

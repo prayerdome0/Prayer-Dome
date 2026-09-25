@@ -220,7 +220,8 @@
         </div>
         <label class="fl" for="vBackdrops">Backdrop image URLs (optional, one per line — they rotate between scenes)</label>
         <textarea id="vBackdrops" rows="3" placeholder="https://res.cloudinary.com/prayerdome/image/upload/…"></textarea>
-        <label class="switch"><input type="checkbox" id="vWatermark" checked> Show the Prayer Dome logo &amp; name on every frame</label>
+        <!-- Watermark removed per branding guidelines — official logo only in approved areas -->
+        <div class="muted" style="font-size:.8rem;color:var(--text-sub);padding:8px 0;"><i class="pd-i pd-i-info"></i> Logo appears only in approved branding areas — no watermark on video frames.</div>
         <label class="switch"><input type="checkbox" id="vDisclose" checked> Add an “AI-assisted” badge to the closing frame</label>
       </div>
 
@@ -585,6 +586,7 @@ window.dispatchEvent(new Event('pd-studio-cloud-ready'));
   }
 
   function drawWatermark(ctx, W, H, opts) {
+    return; // Watermark removed — branding guidelines: logo only in approved areas
     if (!opts.watermark) return;
     ctx.save();
     ctx.globalAlpha = 0.92;
@@ -626,7 +628,7 @@ window.dispatchEvent(new Event('pd-studio-cloud-ready'));
       kind: 'title', theme: $('vTheme').value, progress: 0.5,
       title: $('vTitle').value || 'Prayer Dome',
       scripture: $('vScripture').value,
-      watermark: $('vWatermark').checked, image: backdrop(backdropList()[0])
+      watermark: false, image: backdrop(backdropList()[0])
     });
   }
 
@@ -644,7 +646,7 @@ window.dispatchEvent(new Event('pd-studio-cloud-ready'));
     var theme = $('vTheme').value;
     var title = $('vTitle').value || 'Prayer Dome';
     var scripture = $('vScripture').value;
-    var watermark = $('vWatermark').checked;
+    var watermark = false; // watermark removed
     var disclose = $('vDisclose').checked;
     var total = timeline.reduce(function (s, x) { return s + x.seconds; }, 0);
 
@@ -980,7 +982,8 @@ window.dispatchEvent(new Event('pd-studio-cloud-ready'));
     $(id).addEventListener('input', function () { refreshScenes(); paintIdle(); });
     $(id).addEventListener('change', function () { refreshScenes(); paintIdle(); });
   });
-  $('vWatermark').addEventListener('change', paintIdle);
+  // watermark toggle removed — branding guidelines
+  try { const w=$('vWatermark'); if(w) w.remove(); } catch(e){}
 
   $('btnOutline').addEventListener('click', function () {
     var topic = ($('vTitle').value || 'God\u2019s faithfulness').trim();

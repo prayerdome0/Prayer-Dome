@@ -200,6 +200,26 @@
       "destination": "/news.html"
     },
     {
+      "source": "/lesson",
+      "destination": "/lesson.html"
+    },
+    {
+      "source": "/lesson/:id",
+      "destination": "/lesson.html?id=:id"
+    },
+    {
+      "source": "/lesson-pdf",
+      "destination": "/lesson-pdf.html"
+    },
+    {
+      "source": "/lesson-audio",
+      "destination": "/lesson-audio.html"
+    },
+    {
+      "source": "/lesson-quiz",
+      "destination": "/lesson-quiz.html"
+    },
+    {
       "source": "/radio",
       "destination": "/radio.html"
     }

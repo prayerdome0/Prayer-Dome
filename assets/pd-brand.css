@@ -2558,3 +2558,268 @@ body.dark-mode .pd-acad-icon:not(.gold){color:#93c5fd;}
 .pd-share-tg{background:#229ed9;}
 .pd-share-copy{background:linear-gradient(120deg,var(--pd-gold,#d4af37),#b8941f);color:#20180a;}
 @media (max-width:420px){ .pd-share-btn{flex:1 1 46%;justify-content:center;padding:11px 10px;} }
+
+/* ==========================================================================
+   FINAL UPGRADE — 2026 Premium Redesign, Overflow Guard & Mobile-First
+   ========================================================================== */
+
+/* --- 1. Universal overflow & word-wrap guard --------------------------------
+   No text, title, or card may ever overflow or cause horizontal scrolling.
+   Every element is constrained to the viewport with proper wrapping. --------- */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+*, *::before, *::after {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6, p, span, a, li, td, th, div, button, label, strong, em {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+  overflow-wrap: anywhere;
+}
+img, video, canvas, svg, iframe {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Cards, grids, and layout containers must never force horizontal scroll */
+.pd-acad-card, .pd-acad-card h3, .pd-acad-lesson-link strong, .pd-acad-reader h2,
+.branch-card, .content-card, .glass-card, .portal-item, .game-stat-card,
+.pd-news-card, .review-card, .kpi-card, .panel-card, .pd-card {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
+}
+/* Long titles (e.g. "Understanding Salvation") automatically wrap */
+.pd-acad-card h3, .pd-acad-lesson-link strong, .pd-acad-reader h2,
+.game-hero h1, .pd-acad-hero h1, .section-label {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  line-height: 1.25;
+}
+/* Grids collapse gracefully on narrow viewports */
+.pd-acad-grid, .portal-grid, .branch-grid, .game-stats-row, .reviews-grid,
+.kpi-grid, .gallery-grid, .performance-grid {
+  min-width: 0;
+}
+.pd-acad-grid-3, .pd-acad-grid-4, .portal-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+@media (max-width: 900px) {
+  .pd-acad-grid-3, .pd-acad-grid-4 { grid-template-columns: 1fr; }
+  .portal-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .game-stats-row { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .pd-acad-grid-3, .pd-acad-grid-4 { grid-template-columns: 1fr; }
+  .portal-grid { grid-template-columns: repeat(3, 1fr); }
+  .game-stats-row { grid-template-columns: 1fr; }
+  .pd-acad-hero, .game-hero { padding: 28px 18px; }
+  .pd-acad-hero h1, .game-hero h1 { font-size: clamp(1.6rem, 6vw, 2.2rem) !important; }
+  .pd-acad-reader { padding: 20px 16px; }
+  .branch-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 380px) {
+  .portal-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Tables must scroll within their container, never the page */
+.table-responsive, .pd-scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  display: block;
+}
+table { min-width: 600px; }
+@media (max-width: 720px) {
+  table { min-width: 520px; }
+}
+
+/* Ensure no element can create horizontal scroll via fixed width or margin */
+.pd-acad-wrap, .game-wrap, .main-container, .content-area {
+  max-width: 100%;
+  overflow-x: hidden;
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+}
+
+/* --- 2. Premium Modern Redesign (2026) --------------------------------------
+   Professional, clean, Christian-focused, mobile-first.
+   Keeps PrayerDome brand colors (#0A4D9B, #d4af37) while elevating
+   cards, typography, navigation, and learning experiences. ------------------ */
+:root {
+  --pd-radius-card: 22px;
+  --pd-radius-pill: 999px;
+  --pd-shadow-premium: 0 8px 32px rgba(7,36,77,.08), 0 2px 8px rgba(7,36,77,.06);
+  --pd-shadow-premium-lg: 0 16px 48px rgba(7,36,77,.12), 0 4px 16px rgba(7,36,77,.08);
+  --pd-border-premium: rgba(15,23,42,.06);
+}
+/* Modern typography refinements */
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+}
+h1, h2, h3, h4, .pd-acad-hero h1, .pd-acad-reader h2, .section-label {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+.pd-acad-card, .pd-card, .glass-card, .content-card, .branch-card,
+.game-stat-card, .journey-map-card, .challenge-panel, .sidebar-card {
+  background: #fff;
+  border: 1px solid var(--pd-border-premium);
+  border-radius: var(--pd-radius-card);
+  box-shadow: var(--pd-shadow-premium);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+body.dark-mode .pd-acad-card,
+body.dark-mode .pd-card,
+body.dark-mode .glass-card,
+body.dark-mode .content-card,
+body.dark-mode .branch-card,
+body.dark-mode .game-stat-card,
+body.dark-mode .journey-map-card,
+body.dark-mode .challenge-panel,
+body.dark-mode .sidebar-card {
+  background: rgba(15,23,42,.85);
+  border-color: rgba(255,255,255,.08);
+}
+.pd-acad-card:hover, .pd-card:hover, .glass-card:hover, .content-card:hover,
+.branch-card:hover, .game-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--pd-shadow-premium-lg);
+  border-color: rgba(10,77,155,.12);
+}
+/* Premium gold accent line on cards */
+.pd-acad-card::before, .pd-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--pd-blue), var(--pd-gold));
+  opacity: 0;
+  transition: opacity 0.35s;
+}
+.pd-acad-card:hover::before, .pd-card:hover::before { opacity: 1; }
+
+/* Enhanced topbar (consistent across all pages) */
+.pd-topbar {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255,255,255,.92) !important;
+  border-bottom: 1px solid rgba(10,77,155,.08);
+  box-shadow: 0 1px 3px rgba(7,36,77,.04), 0 4px 12px rgba(7,36,77,.04);
+}
+body.dark-mode .pd-topbar {
+  background: rgba(10,20,38,.94) !important;
+  border-bottom-color: rgba(255,255,255,.06);
+}
+
+/* Consistent footer */
+.pd-footer {
+  background: linear-gradient(135deg, #07244d 0%, #0A4D9B 100%);
+  color: #fff;
+  padding: 40px 20px 30px;
+  text-align: center;
+  margin-top: 60px;
+  border-radius: 32px 32px 0 0;
+}
+.pd-footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.pd-footer-logo img {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #fff;
+  padding: 6px;
+}
+.pd-footer-brand {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: .12em;
+}
+.pd-footer-nav {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+.pd-footer-nav a {
+  color: rgba(255,255,255,.85);
+  text-decoration: none;
+  font-size: .85rem;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+.pd-footer-nav a:hover { color: var(--pd-gold-soft); }
+.pd-footer-copy {
+  font-size: .75rem;
+  color: rgba(255,255,255,.6);
+  margin-top: 20px;
+  letter-spacing: .5px;
+}
+
+/* Remove watermark / background branding marks */
+.pd-watermark, .watermark, .brand-watermark,
+[style*="watermark"], [class*="watermark"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+/* Keep only official logo in approved areas */
+.pd-topbar-logo, .hero-logo, .pd-splash-logo, .pd-footer-logo img,
+.sidebar-logo, .logo-ring, .pd-drawer-head img {
+  /* approved branding areas - keep visible */
+}
+
+/* Premium button refinements */
+.pd-btn, .pd-acad-btn, .btn-modern, .btn-primary {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border-radius: 999px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.pd-btn:hover, .pd-acad-btn:hover { transform: translateY(-2px); }
+
+/* Smooth animations, Christian-focused subtlety */
+@media (prefers-reduced-motion: no-preference) {
+  .pd-acad-card { animation: cardEnter 0.6s ease both; }
+  @keyframes cardEnter {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Ensure responsive text scaling */
+@media (max-width: 360px) {
+  html { font-size: 14px; }
+}
+@media (min-width: 1200px) {
+  html { font-size: 16px; }
+}
