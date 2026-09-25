@@ -125,7 +125,8 @@
     </script>
     <!-- PD-SEO:END -->
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/pd-icons.css">
+    <script src="/assets/pd-icons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -528,7 +529,7 @@
         .badge-spotlight { margin-top: 22px; background: linear-gradient(135deg, #1a2e1f, #0f172a); color: white; border-radius: 24px; padding: 22px; text-align: center; border: 2px solid var(--accent-gold); box-shadow: 0 15px 35px -10px rgba(212,175,55,0.35); position: relative; overflow: hidden; }
         .badge-spotlight::after { content: ''; position: absolute; top: 0; left: -80%; width: 50%; height: 100%; background: linear-gradient(105deg, transparent, rgba(212,175,55,0.25), transparent); transform: skewX(-20deg); animation: badgeSheen 4s ease infinite; }
         @keyframes badgeSheen { 0%, 60% { left: -80%; } 100% { left: 140%; } }
-        .badge-icon { font-size: 2.4rem; display: block; margin-bottom: 8px; filter: drop-shadow(0 4px 8px rgba(212,175,55,0.5)); }
+        .badge-icon { font-size: 2.4rem; display: block; margin-bottom: 8px; color: var(--accent-gold); filter: drop-shadow(0 4px 8px rgba(212,175,55,0.5)); }
         .badge-label { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 800; color: var(--accent-gold); letter-spacing: 0.5px; }
         .badge-sub { font-size: 0.68rem; opacity: 0.75; margin-top: 4px; letter-spacing: 1.5px; text-transform: uppercase; }
     </style>
@@ -552,32 +553,32 @@
 <div class="header">
     <img src="/assets/logo.png" alt="Logo" class="header-logo">
     <h1>PRAYER DOME</h1>
-    <p><i class="fas fa-id-card"></i> Church Membership Management System</p>
+    <p><i class="pd-i pd-i-id-card"></i> Church Membership Management System</p>
 </div>
 
 <div class="main-container">
     <!-- Tab Navigation -->
     <div class="tab-container">
-        <button class="tab-btn active" onclick="switchMainTab('membership')"><i class="fas fa-id-card"></i> Membership</button>
-        <button class="tab-btn" onclick="switchMainTab('benefits')"><i class="fas fa-gift"></i> Benefits</button>
-        <button class="tab-btn" onclick="switchMainTab('notices')"><i class="fas fa-bullhorn"></i> Notices</button>
-        <button class="tab-btn" onclick="switchMainTab('care')"><i class="fas fa-hand-holding-heart"></i> Care</button>
-        <button class="tab-btn" onclick="switchMainTab('card')"><i class="fas fa-credit-card"></i> My ID Card</button>
+        <button class="tab-btn active" onclick="switchMainTab('membership')"><i class="pd-i pd-i-id-card"></i> Membership</button>
+        <button class="tab-btn" onclick="switchMainTab('benefits')"><i class="pd-i pd-i-gift"></i> Benefits</button>
+        <button class="tab-btn" onclick="switchMainTab('notices')"><i class="pd-i pd-i-megaphone"></i> Notices</button>
+        <button class="tab-btn" onclick="switchMainTab('care')"><i class="pd-i pd-i-hand-heart"></i> Care</button>
+        <button class="tab-btn" onclick="switchMainTab('card')"><i class="pd-i pd-i-credit-card"></i> My ID Card</button>
     </div>
 
     <!-- MY MEMBERSHIP INFORMATION (EDIT FULL MEMBERSHIP PROFILE) -->
     <div id="myMembershipContainer" class="card" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 25px; gap: 15px; border-bottom: 2px solid var(--border-color); padding-bottom: 18px;">
             <div>
-                <h2 class="form-title" style="margin: 0;"><i class="fas fa-user-edit"></i> My Membership Information</h2>
+                <h2 class="form-title" style="margin: 0;"><i class="pd-i pd-i-user-pen"></i> My Membership Information</h2>
                 <p class="form-subtitle" style="margin: 4px 0 0;">Review and update everything in your membership profile</p>
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <button class="btn btn-secondary" style="width: auto; padding: 10px 18px;" onclick="switchMainTab('card')">
-                    <i class="fas fa-id-card"></i> View My ID Card
+                    <i class="pd-i pd-i-id-card"></i> View My ID Card
                 </button>
                 <button class="btn-back" style="width: auto; padding: 10px 18px; margin: 0; background: var(--accent-gold); color: #000; font-weight: bold;" onclick="startRegisteringSomeoneElse()">
-                    <i class="fas fa-user-plus"></i> Register Another Person
+                    <i class="pd-i pd-i-user-plus"></i> Register Another Person
                 </button>
             </div>
         </div>
@@ -586,7 +587,7 @@
             <div style="display: flex; align-items: center; gap: 18px;">
                 <div style="position: relative;">
                     <img id="editPhotoPreview" src="/assets/avatar-default.svg" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent-gold); cursor: pointer;" onclick="triggerEditPhotoFileInput()">
-                    <div style="position: absolute; bottom: 0; right: 0; background: var(--accent-gold); color: #000; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer;" onclick="triggerEditPhotoFileInput()"><i class="fas fa-camera"></i></div>
+                    <div style="position: absolute; bottom: 0; right: 0; background: var(--accent-gold); color: #000; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer;" onclick="triggerEditPhotoFileInput()"><i class="pd-i pd-i-camera"></i></div>
                 </div>
                 <div>
                     <h3 id="editMemberNameHeader" style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.4rem;">MEMBER NAME</h3>
@@ -594,23 +595,23 @@
                 </div>
             </div>
             <div style="text-align: right;">
-                <span id="editStatusBadgeHeader" class="status-badge status-approved" style="margin: 0;"><i class="fas fa-check-circle"></i> ACTIVE MEMBER</span>
-                <p id="editBranchHeader" style="margin: 8px 0 0; font-size: 0.9rem; color: var(--text-sub);"><i class="fas fa-church"></i> Global</p>
+                <span id="editStatusBadgeHeader" class="status-badge status-approved" style="margin: 0;"><i class="pd-i pd-i-circle-check"></i> ACTIVE MEMBER</span>
+                <p id="editBranchHeader" style="margin: 8px 0 0; font-size: 0.9rem; color: var(--text-sub);"><i class="pd-i pd-i-church"></i> Global</p>
             </div>
         </div>
 
         <div style="background: var(--bg-primary); border: 1px dashed var(--border-color); border-radius: 18px; padding: 18px; margin-bottom: 25px;">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                 <div>
-                    <h4 style="margin: 0 0 5px; color: var(--accent-gold); font-size: 0.95rem;"><i class="fas fa-cloud-upload-alt"></i> Membership Files & Photos</h4>
+                    <h4 style="margin: 0 0 5px; color: var(--accent-gold); font-size: 0.95rem;"><i class="pd-i pd-i-cloud-upload"></i> Membership Files & Photos</h4>
                     <p style="margin: 0; font-size: 0.8rem; color: var(--text-sub);">Upload files directly from your device to Cloudinary (No popup required)</p>
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <button type="button" class="btn btn-secondary btn-sm" onclick="triggerEditPhotoFileInput()">
-                        <i class="fas fa-camera"></i> Change Profile Photo
+                        <i class="pd-i pd-i-camera"></i> Change Profile Photo
                     </button>
                     <button type="button" class="btn btn-secondary btn-sm" style="background: var(--bg-primary); border: 1px solid var(--accent-gold);" onclick="triggerEditDocFileInput()">
-                        <i class="fas fa-file-upload"></i> Upload Supporting Doc / ID
+                        <i class="pd-i pd-i-file-up"></i> Upload Supporting Doc / ID
                     </button>
                 </div>
             </div>
@@ -620,53 +621,53 @@
         </div>
 
         <form id="editMembershipForm">
-            <div class="section-h"><i class="fas fa-user-circle"></i> Personal Details</div>
+            <div class="section-h"><i class="pd-i pd-i-circle-user"></i> Personal Details</div>
             <div class="form-grid">
-                <div class="form-group"><label><i class="fas fa-signature"></i> Full Name *</label><input type="text" id="editFullName" required placeholder="e.g., John Doe"></div>
-                <div class="form-group"><label><i class="fas fa-calendar-alt"></i> Date of Birth *</label><input type="date" id="editDob" required></div>
-                <div class="form-group"><label><i class="fas fa-venus-mars"></i> Gender</label><select id="editGender"><option value="Male">Male</option><option value="Female">Female</option></select></div>
-                <div class="form-group"><label><i class="fas fa-id-card"></i> Identity No (NID/Passport) *</label><input type="text" id="editIdNo" required placeholder="National ID or Passport Number"></div>
-                <div class="form-group"><label><i class="fas fa-phone-alt"></i> Phone Number</label><input type="tel" id="editPhone" placeholder="+268... (optional)"></div>
-                <div class="form-group"><label><i class="fas fa-envelope"></i> Email</label><input type="email" id="editEmail" placeholder="Email (optional)"></div>
+                <div class="form-group"><label><i class="pd-i pd-i-signature"></i> Full Name *</label><input type="text" id="editFullName" required placeholder="e.g., John Doe"></div>
+                <div class="form-group"><label><i class="pd-i pd-i-calendar-days"></i> Date of Birth *</label><input type="date" id="editDob" required></div>
+                <div class="form-group"><label><i class="pd-i pd-i-venus-and-mars"></i> Gender</label><select id="editGender"><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                <div class="form-group"><label><i class="pd-i pd-i-id-card"></i> Identity No (NID/Passport) *</label><input type="text" id="editIdNo" required placeholder="National ID or Passport Number"></div>
+                <div class="form-group"><label><i class="pd-i pd-i-phone"></i> Phone Number</label><input type="tel" id="editPhone" placeholder="+268... (optional)"></div>
+                <div class="form-group"><label><i class="pd-i pd-i-mail"></i> Email</label><input type="email" id="editEmail" placeholder="Email (optional)"></div>
             </div>
 
-            <div class="section-h"><i class="fas fa-briefcase"></i> Status & Occupation</div>
+            <div class="section-h"><i class="pd-i pd-i-briefcase"></i> Status & Occupation</div>
             <div class="form-grid">
-                <div class="form-group"><label><i class="fas fa-heart"></i> Marital Status</label><select id="editMarital"><option value="Single">Single</option><option value="Married">Married</option><option value="Divorced">Divorced</option><option value="Widowed">Widowed</option></select></div>
-                <div class="form-group"><label><i class="fas fa-child"></i> Number of Dependants</label><input type="number" id="editDependants" value="0"></div>
-                <div class="form-group"><label><i class="fas fa-briefcase"></i> Occupation</label><input type="text" id="editJob" placeholder="e.g., Teacher, Business"></div>
-                <div class="form-group"><label><i class="fas fa-church"></i> Current Branch</label><select id="editBranch"><option value="Zambia - Chama">🇿🇲 Zambia - Chama</option><option value="Eswatini - Manzini">🇸🇿 Eswatini - Manzini</option><option value="Ireland - Cork">🇮🇪 Ireland - Cork</option><option value="Online Global">🌍 Online Global</option></select></div>
+                <div class="form-group"><label><i class="pd-i pd-i-heart"></i> Marital Status</label><select id="editMarital"><option value="Single">Single</option><option value="Married">Married</option><option value="Divorced">Divorced</option><option value="Widowed">Widowed</option></select></div>
+                <div class="form-group"><label><i class="pd-i pd-i-baby"></i> Number of Dependants</label><input type="number" id="editDependants" value="0"></div>
+                <div class="form-group"><label><i class="pd-i pd-i-briefcase"></i> Occupation</label><input type="text" id="editJob" placeholder="e.g., Teacher, Business"></div>
+                <div class="form-group"><label><i class="pd-i pd-i-church"></i> Current Branch</label><select id="editBranch"><option value="Zambia - Chama">Zambia - Chama</option><option value="Eswatini - Manzini">Eswatini - Manzini</option><option value="Ireland - Cork">Ireland - Cork</option><option value="Online Global">Online Global</option></select></div>
             </div>
 
-            <div class="section-h"><i class="fas fa-pray"></i> Spiritual History</div>
+            <div class="section-h"><i class="pd-i pd-i-hands-praying"></i> Spiritual History</div>
             <div class="form-grid">
-                <div class="form-group"><label><i class="fas fa-cross"></i> Born Again?</label><select id="editBornAgain"><option value="Yes">Yes</option><option value="No">No</option></select></div>
-                <div class="form-group"><label><i class="fas fa-calendar-day"></i> Date Born Again</label><input type="date" id="editBornDate"></div>
-                <div class="form-group"><label><i class="fas fa-water"></i> Water Baptised?</label><select id="editWaterBapt"><option value="Yes">Yes</option><option value="No">No</option></select></div>
-                <div class="form-group"><label><i class="fas fa-calendar-day"></i> Date of Baptism</label><input type="date" id="editBaptDate"></div>
+                <div class="form-group"><label><i class="pd-i pd-i-latin-cross"></i> Born Again?</label><select id="editBornAgain"><option value="Yes">Yes</option><option value="No">No</option></select></div>
+                <div class="form-group"><label><i class="pd-i pd-i-calendar"></i> Date Born Again</label><input type="date" id="editBornDate"></div>
+                <div class="form-group"><label><i class="pd-i pd-i-waves-horizontal"></i> Water Baptised?</label><select id="editWaterBapt"><option value="Yes">Yes</option><option value="No">No</option></select></div>
+                <div class="form-group"><label><i class="pd-i pd-i-calendar"></i> Date of Baptism</label><input type="date" id="editBaptDate"></div>
             </div>
             
             <div class="checkbox-group">
-                <label class="checkbox-item"><input type="checkbox" id="editHolySpirit"> <i class="fas fa-dove"></i> Baptised with Holy Spirit?</label>
-                <label class="checkbox-item"><input type="checkbox" id="editTongues"> <i class="fas fa-microphone-alt"></i> Speak in Tongues?</label>
-                <label class="checkbox-item"><input type="checkbox" id="editGifts"> <i class="fas fa-gift"></i> Discovered Spiritual Gifts?</label>
+                <label class="checkbox-item"><input type="checkbox" id="editHolySpirit"> <i class="pd-i pd-i-bird"></i> Baptised with Holy Spirit?</label>
+                <label class="checkbox-item"><input type="checkbox" id="editTongues"> <i class="pd-i pd-i-mic"></i> Speak in Tongues?</label>
+                <label class="checkbox-item"><input type="checkbox" id="editGifts"> <i class="pd-i pd-i-gift"></i> Discovered Spiritual Gifts?</label>
             </div>
             <textarea id="editGiftNames" placeholder="If yes, name your spiritual gifts..." rows="2"></textarea>
 
-            <div class="section-h"><i class="fas fa-hands-helping"></i> Ministry Choice</div>
+            <div class="section-h"><i class="pd-i pd-i-hand-helping"></i> Ministry Choice</div>
             <div class="checkbox-group">
-                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Usher"> 🚪 Usher</label>
-                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Instruments"> 🎵 Instruments</label>
-                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Praise"> 🎤 Praise & Worship</label>
-                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Compassionate"> ❤️ Compassionate</label>
-                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Intercessor"> 🙏 Intercessor</label>
-                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Preaching"> 📖 Preaching</label>
+                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Usher"> <i class="pd-i pd-i-door-open" aria-hidden="true"></i> Usher</label>
+                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Instruments"> <i class="pd-i pd-i-music" aria-hidden="true"></i> Instruments</label>
+                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Praise"> <i class="pd-i pd-i-mic-vocal" aria-hidden="true"></i> Praise & Worship</label>
+                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Compassionate"> <i class="pd-i pd-i-heart" aria-hidden="true"></i> Compassionate</label>
+                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Intercessor"> <i class="pd-i pd-i-hands-praying" aria-hidden="true"></i> Intercessor</label>
+                <label class="checkbox-item"><input type="checkbox" name="editMin" value="Preaching"> <i class="pd-i pd-i-book-open" aria-hidden="true"></i> Preaching</label>
             </div>
 
-            <div class="section-h"><i class="fas fa-pen-alt"></i> Personal Testimony / Bio</div>
+            <div class="section-h"><i class="pd-i pd-i-pen-line"></i> Personal Testimony / Bio</div>
             <textarea id="editBio" placeholder="Share your testimony, personal notes, or prayer requests..." rows="3"></textarea>
 
-            <div class="section-h"><i class="fas fa-pen-fancy"></i> Signature</div>
+            <div class="section-h"><i class="pd-i pd-i-signature"></i> Signature</div>
             <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start;">
                 <div style="flex: 1; min-width: 200px;">
                     <label style="font-size: 0.8rem; font-weight: bold; color: var(--text-sub); display: block; margin-bottom: 6px;">CURRENT SIGNATURE ON FILE</label>
@@ -675,16 +676,16 @@
                 <div style="flex: 2; min-width: 250px;">
                     <label style="font-size: 0.8rem; font-weight: bold; color: var(--text-sub); display: block; margin-bottom: 6px;">DRAW NEW SIGNATURE (OPTIONAL)</label>
                     <canvas id="edit-sig-pad" class="sig-canvas" style="height: 100px;"></canvas>
-                    <button type="button" onclick="clearEditSig()" style="font-size: 11px; background:none; border:none; color:var(--accent-red); cursor:pointer; margin-top: 8px;"><i class="fas fa-eraser"></i> Clear New Signature</button>
+                    <button type="button" onclick="clearEditSig()" style="font-size: 11px; background:none; border:none; color:var(--accent-red); cursor:pointer; margin-top: 8px;"><i class="pd-i pd-i-eraser"></i> Clear New Signature</button>
                 </div>
             </div>
 
             <div style="margin-top: 35px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
                 <button type="button" class="btn btn-primary" id="updateMemberBtn" onclick="updateMembershipInformation()">
-                    <i class="fas fa-save"></i> SAVE & UPDATE MEMBERSHIP INFORMATION
+                    <i class="pd-i pd-i-save"></i> SAVE & UPDATE MEMBERSHIP INFORMATION
                 </button>
                 <button type="button" class="btn btn-secondary" onclick="switchMainTab('card')">
-                    <i class="fas fa-credit-card"></i> GO TO MY ID CARD
+                    <i class="pd-i pd-i-credit-card"></i> GO TO MY ID CARD
                 </button>
             </div>
         </form>
@@ -694,7 +695,7 @@
     <div id="step1Container" class="card">
         <div id="backToMyMemBanner" style="display: none; margin-bottom: 20px;">
             <button class="btn btn-secondary" style="width: 100%; background: var(--card-gradient); border: 1px solid var(--accent-gold);" onclick="openUpdateMembershipView()">
-                <i class="fas fa-user-check"></i> Return to My Membership Information
+                <i class="pd-i pd-i-user-check"></i> Return to My Membership Information
             </button>
         </div>
         <div class="step-indicator">
@@ -712,19 +713,19 @@
             </div>
         </div>
         
-        <h2 class="form-title" style="text-align: center;"><i class="fas fa-id-card"></i> Welcome to Membership Portal</h2>
+        <h2 class="form-title" style="text-align: center;"><i class="pd-i pd-i-id-card"></i> Welcome to Membership Portal</h2>
         <p class="form-subtitle" style="text-align: center;">Are you an existing member or a new member?</p>
         
         <div class="selection-container">
             <div class="selection-card existing" onclick="selectMemberCategory('existing')">
-                <i class="fas fa-id-card"></i>
+                <i class="pd-i pd-i-id-card"></i>
                 <h3>Existing Member</h3>
-                <p><i class="fas fa-check-circle"></i> I already have a Membership ID</p>
+                <p><i class="pd-i pd-i-circle-check"></i> I already have a Membership ID</p>
             </div>
             <div class="selection-card new" onclick="selectMemberCategory('new')">
-                <i class="fas fa-user-plus"></i>
+                <i class="pd-i pd-i-user-plus"></i>
                 <h3>New Member</h3>
-                <p><i class="fas fa-star"></i> I want to become a member</p>
+                <p><i class="pd-i pd-i-star"></i> I want to become a member</p>
             </div>
         </div>
     </div>
@@ -733,7 +734,7 @@
     <div id="step2ExistingContainer" style="display: none;" class="card">
         <div class="step-indicator">
             <div class="step completed" id="step1Indicator2">
-                <div class="step-number"><i class="fas fa-check"></i></div>
+                <div class="step-number"><i class="pd-i pd-i-check"></i></div>
                 <div class="step-text">Member Type</div>
             </div>
             <div class="step active" id="step2Indicator2">
@@ -747,21 +748,21 @@
         </div>
         
         <button class="btn-back" style="width: auto; padding: 10px 25px; margin-bottom: 25px;" onclick="goBackToStep1()">
-            <i class="fas fa-arrow-left"></i> Back
+            <i class="pd-i pd-i-arrow-left"></i> Back
         </button>
         
         <div style="text-align: center; padding: 20px;">
-            <i class="fas fa-id-card" style="font-size: 5rem; color: var(--accent-gold); margin-bottom: 20px;"></i>
+            <i class="pd-i pd-i-id-card" style="font-size: 5rem; color: var(--accent-gold); margin-bottom: 20px;"></i>
             <h3 style="margin-bottom: 15px; font-family: 'Playfair Display', serif;">Retrieve Your Membership</h3>
             <p style="color: var(--text-sub); margin-bottom: 30px;">Enter your Membership ID to link this account to your existing membership.</p>
             
             <div class="form-group">
-                <label><i class="fas fa-qrcode"></i> Membership ID</label>
+                <label><i class="pd-i pd-i-qr-code"></i> Membership ID</label>
                 <input type="text" id="retrieveMemberId" placeholder="e.g., PD20250001" style="text-align: center; font-size: 1.2rem; letter-spacing: 1px;">
             </div>
             
             <button class="btn btn-retrieve" onclick="retrieveMembership()">
-                <i class="fas fa-search"></i> RETRIEVE MY MEMBERSHIP
+                <i class="pd-i pd-i-search"></i> RETRIEVE MY MEMBERSHIP
             </button>
             
             <div id="retrievedMemberInfo" style="margin-top: 30px; display: none; background: var(--bg-primary); border-radius: 24px; padding: 25px; border: 2px solid var(--accent-gold);">
@@ -770,11 +771,11 @@
                     <div style="flex: 1;">
                         <h4 id="retrievedName" style="color: var(--accent-green); font-family: 'Playfair Display', serif; font-size: 1.2rem;">-</h4>
                         <p id="retrievedId" style="font-family: monospace; color: var(--accent-gold); font-size: 1rem;">-</p>
-                        <p id="retrievedBranch" style="font-size: 0.85rem;"><i class="fas fa-church"></i> -</p>
+                        <p id="retrievedBranch" style="font-size: 0.85rem;"><i class="pd-i pd-i-church"></i> -</p>
                     </div>
                 </div>
                 <button class="btn btn-primary" style="margin-top: 25px;" onclick="linkMembershipToAccount()">
-                    <i class="fas fa-link"></i> LINK TO MY ACCOUNT
+                    <i class="pd-i pd-i-link"></i> LINK TO MY ACCOUNT
                 </button>
             </div>
         </div>
@@ -784,7 +785,7 @@
     <div id="step2NewContainer" style="display: none;" class="card">
         <div class="step-indicator">
             <div class="step completed" id="step1IndicatorNew">
-                <div class="step-number"><i class="fas fa-check"></i></div>
+                <div class="step-number"><i class="pd-i pd-i-check"></i></div>
                 <div class="step-text">Member Type</div>
             </div>
             <div class="step active" id="step2IndicatorNew">
@@ -798,22 +799,22 @@
         </div>
         
         <button class="btn-back" style="width: auto; padding: 10px 25px; margin-bottom: 25px;" onclick="goBackToStep1()">
-            <i class="fas fa-arrow-left"></i> Back
+            <i class="pd-i pd-i-arrow-left"></i> Back
         </button>
         
-        <h2 class="form-title" style="text-align: center;"><i class="fas fa-users"></i> Who are you registering?</h2>
+        <h2 class="form-title" style="text-align: center;"><i class="pd-i pd-i-users"></i> Who are you registering?</h2>
         <p class="form-subtitle" style="text-align: center;">Select who this membership is for</p>
         
         <div class="sub-selection-container">
             <div class="sub-selection-card" onclick="selectRegistrationType('myself')">
-                <i class="fas fa-user myself"></i>
+                <i class="pd-i pd-i-user myself"></i>
                 <h3>Myself</h3>
-                <p><i class="fas fa-check-circle"></i> Register as yourself</p>
+                <p><i class="pd-i pd-i-circle-check"></i> Register as yourself</p>
             </div>
             <div class="sub-selection-card" onclick="selectRegistrationType('someone')">
-                <i class="fas fa-users someone"></i>
+                <i class="pd-i pd-i-users someone"></i>
                 <h3>Someone Else</h3>
-                <p><i class="fas fa-hand-holding-heart"></i> Register for family/friend (Pending Admin Approval)</p>
+                <p><i class="pd-i pd-i-hand-heart"></i> Register for family/friend (Pending Admin Approval)</p>
             </div>
         </div>
     </div>
@@ -822,11 +823,11 @@
     <div id="step3Container" style="display: none;" class="card">
         <div class="step-indicator">
             <div class="step completed" id="step1IndicatorForm">
-                <div class="step-number"><i class="fas fa-check"></i></div>
+                <div class="step-number"><i class="pd-i pd-i-check"></i></div>
                 <div class="step-text">Member Type</div>
             </div>
             <div class="step completed" id="step2IndicatorForm">
-                <div class="step-number"><i class="fas fa-check"></i></div>
+                <div class="step-number"><i class="pd-i pd-i-check"></i></div>
                 <div class="step-text">Who?</div>
             </div>
             <div class="step active" id="step3IndicatorForm">
@@ -836,89 +837,89 @@
         </div>
         
         <button class="btn-back" style="width: auto; padding: 10px 25px; margin-bottom: 25px;" onclick="goBackToStep2()">
-            <i class="fas fa-arrow-left"></i> Back
+            <i class="pd-i pd-i-arrow-left"></i> Back
         </button>
         
-        <h2 class="form-title" id="formTitle"><i class="fas fa-user-plus"></i> New Member Registration</h2>
+        <h2 class="form-title" id="formTitle"><i class="pd-i pd-i-user-plus"></i> New Member Registration</h2>
         <p class="form-subtitle" id="formSubtitle">Please fill in all required information</p>
         
         <div class="photo-upload-area">
             <div class="photo-preview" onclick="triggerRegPhotoFileInput()">
                 <img id="photoPreview" src="/assets/avatar-default.svg" alt="Profile Photo">
-                <div class="photo-overlay"><i class="fas fa-camera"></i> Change Photo</div>
+                <div class="photo-overlay"><i class="pd-i pd-i-camera"></i> Change Photo</div>
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
                 <button type="button" class="upload-btn-small" onclick="triggerRegPhotoFileInput()">
-                    <i class="fas fa-camera"></i> Upload Photo (From File)
+                    <i class="pd-i pd-i-camera"></i> Upload Photo (From File)
                 </button>
                 <button type="button" class="upload-btn-small" style="background: var(--bg-primary); border: 1px solid var(--accent-gold);" onclick="triggerRegDocFileInput()">
-                    <i class="fas fa-file-upload"></i> Upload Supporting Doc / ID (Optional)
+                    <i class="pd-i pd-i-file-up"></i> Upload Supporting Doc / ID (Optional)
                 </button>
             </div>
             <input type="file" id="regPhotoFileInput" accept="image/*" style="display: none;" onchange="handleDirectFileUpload(event, 'register_photo')">
             <input type="file" id="regDocFileInput" accept="*/*" style="display: none;" onchange="handleDirectFileUpload(event, 'register_doc')">
             <div id="regUploadedDocsList" style="margin-top: 8px; font-size: 0.85rem; width: 100%;"></div>
             <input type="hidden" id="uploadedPhotoUrl">
-            <p style="font-size: 0.75rem; color: var(--text-sub);"><i class="fas fa-info-circle"></i> Upload files directly from your device to Cloudinary without popups</p>
+            <p style="font-size: 0.75rem; color: var(--text-sub);"><i class="pd-i pd-i-info"></i> Upload files directly from your device to Cloudinary without popups</p>
         </div>
         
         <form id="mForm">
-            <div class="section-h"><i class="fas fa-user-circle"></i> Personal Details</div>
+            <div class="section-h"><i class="pd-i pd-i-circle-user"></i> Personal Details</div>
             <div class="form-grid">
-                <div class="form-group"><label><i class="fas fa-signature"></i> Full Name *</label><input type="text" id="fullName" required placeholder="e.g., John Doe"></div>
-                <div class="form-group"><label><i class="fas fa-calendar-alt"></i> Date of Birth *</label><input type="date" id="dob" required></div>
-                <div class="form-group"><label><i class="fas fa-venus-mars"></i> Gender</label><select id="gender"><option value="Male">Male</option><option value="Female">Female</option></select></div>
-                <div class="form-group"><label><i class="fas fa-id-card"></i> Identity No (NID/Passport) *</label><input type="text" id="idNo" required placeholder="National ID or Passport Number"></div>
-                <div class="form-group"><label><i class="fas fa-phone-alt"></i> Phone Number</label><input type="tel" id="phone" placeholder="+268... (optional)"></div>
-                <div class="form-group"><label><i class="fas fa-envelope"></i> Email</label><input type="email" id="email" placeholder="Email (optional)"></div>
+                <div class="form-group"><label><i class="pd-i pd-i-signature"></i> Full Name *</label><input type="text" id="fullName" required placeholder="e.g., John Doe"></div>
+                <div class="form-group"><label><i class="pd-i pd-i-calendar-days"></i> Date of Birth *</label><input type="date" id="dob" required></div>
+                <div class="form-group"><label><i class="pd-i pd-i-venus-and-mars"></i> Gender</label><select id="gender"><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                <div class="form-group"><label><i class="pd-i pd-i-id-card"></i> Identity No (NID/Passport) *</label><input type="text" id="idNo" required placeholder="National ID or Passport Number"></div>
+                <div class="form-group"><label><i class="pd-i pd-i-phone"></i> Phone Number</label><input type="tel" id="phone" placeholder="+268... (optional)"></div>
+                <div class="form-group"><label><i class="pd-i pd-i-mail"></i> Email</label><input type="email" id="email" placeholder="Email (optional)"></div>
             </div>
 
-            <div class="section-h"><i class="fas fa-briefcase"></i> Status & Occupation</div>
+            <div class="section-h"><i class="pd-i pd-i-briefcase"></i> Status & Occupation</div>
             <div class="form-grid">
-                <div class="form-group"><label><i class="fas fa-heart"></i> Marital Status</label><select id="marital"><option value="Single">Single</option><option value="Married">Married</option><option value="Divorced">Divorced</option><option value="Widowed">Widowed</option></select></div>
-                <div class="form-group"><label><i class="fas fa-child"></i> Number of Dependants</label><input type="number" id="dependants" value="0"></div>
-                <div class="form-group"><label><i class="fas fa-briefcase"></i> Occupation</label><input type="text" id="job" placeholder="e.g., Teacher, Business"></div>
-                <div class="form-group"><label><i class="fas fa-church"></i> Current Branch</label><select id="branch"><option value="Zambia - Chama">🇿🇲 Zambia - Chama</option><option value="Eswatini - Manzini">🇸🇿 Eswatini - Manzini</option><option value="Ireland - Cork">🇮🇪 Ireland - Cork</option><option value="Online Global">🌍 Online Global</option></select></div>
+                <div class="form-group"><label><i class="pd-i pd-i-heart"></i> Marital Status</label><select id="marital"><option value="Single">Single</option><option value="Married">Married</option><option value="Divorced">Divorced</option><option value="Widowed">Widowed</option></select></div>
+                <div class="form-group"><label><i class="pd-i pd-i-baby"></i> Number of Dependants</label><input type="number" id="dependants" value="0"></div>
+                <div class="form-group"><label><i class="pd-i pd-i-briefcase"></i> Occupation</label><input type="text" id="job" placeholder="e.g., Teacher, Business"></div>
+                <div class="form-group"><label><i class="pd-i pd-i-church"></i> Current Branch</label><select id="branch"><option value="Zambia - Chama">Zambia - Chama</option><option value="Eswatini - Manzini">Eswatini - Manzini</option><option value="Ireland - Cork">Ireland - Cork</option><option value="Online Global">Online Global</option></select></div>
             </div>
 
-            <div class="section-h"><i class="fas fa-pray"></i> Spiritual History</div>
+            <div class="section-h"><i class="pd-i pd-i-hands-praying"></i> Spiritual History</div>
             <div class="form-grid">
-                <div class="form-group"><label><i class="fas fa-cross"></i> Born Again?</label><select id="bornAgain"><option value="Yes">Yes</option><option value="No">No</option></select></div>
-                <div class="form-group"><label><i class="fas fa-calendar-day"></i> Date Born Again</label><input type="date" id="bornDate"></div>
-                <div class="form-group"><label><i class="fas fa-water"></i> Water Baptised?</label><select id="waterBapt"><option value="Yes">Yes</option><option value="No">No</option></select></div>
-                <div class="form-group"><label><i class="fas fa-calendar-day"></i> Date of Baptism</label><input type="date" id="baptDate"></div>
+                <div class="form-group"><label><i class="pd-i pd-i-latin-cross"></i> Born Again?</label><select id="bornAgain"><option value="Yes">Yes</option><option value="No">No</option></select></div>
+                <div class="form-group"><label><i class="pd-i pd-i-calendar"></i> Date Born Again</label><input type="date" id="bornDate"></div>
+                <div class="form-group"><label><i class="pd-i pd-i-waves-horizontal"></i> Water Baptised?</label><select id="waterBapt"><option value="Yes">Yes</option><option value="No">No</option></select></div>
+                <div class="form-group"><label><i class="pd-i pd-i-calendar"></i> Date of Baptism</label><input type="date" id="baptDate"></div>
             </div>
             
             <div class="checkbox-group">
-                <label class="checkbox-item"><input type="checkbox" id="holySpirit"> <i class="fas fa-dove"></i> Baptised with Holy Spirit?</label>
-                <label class="checkbox-item"><input type="checkbox" id="tongues"> <i class="fas fa-microphone-alt"></i> Speak in Tongues?</label>
-                <label class="checkbox-item"><input type="checkbox" id="gifts"> <i class="fas fa-gift"></i> Discovered Spiritual Gifts?</label>
+                <label class="checkbox-item"><input type="checkbox" id="holySpirit"> <i class="pd-i pd-i-bird"></i> Baptised with Holy Spirit?</label>
+                <label class="checkbox-item"><input type="checkbox" id="tongues"> <i class="pd-i pd-i-mic"></i> Speak in Tongues?</label>
+                <label class="checkbox-item"><input type="checkbox" id="gifts"> <i class="pd-i pd-i-gift"></i> Discovered Spiritual Gifts?</label>
             </div>
             <textarea id="giftNames" placeholder="If yes, name your spiritual gifts..." rows="2"></textarea>
 
-            <div class="section-h"><i class="fas fa-hands-helping"></i> Ministry Choice</div>
+            <div class="section-h"><i class="pd-i pd-i-hand-helping"></i> Ministry Choice</div>
             <div class="checkbox-group">
-                <label class="checkbox-item"><input type="checkbox" name="min" value="Usher"> 🚪 Usher</label>
-                <label class="checkbox-item"><input type="checkbox" name="min" value="Instruments"> 🎵 Instruments</label>
-                <label class="checkbox-item"><input type="checkbox" name="min" value="Praise"> 🎤 Praise & Worship</label>
-                <label class="checkbox-item"><input type="checkbox" name="min" value="Compassionate"> ❤️ Compassionate</label>
-                <label class="checkbox-item"><input type="checkbox" name="min" value="Intercessor"> 🙏 Intercessor</label>
-                <label class="checkbox-item"><input type="checkbox" name="min" value="Preaching"> 📖 Preaching</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Usher"> <i class="pd-i pd-i-door-open" aria-hidden="true"></i> Usher</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Instruments"> <i class="pd-i pd-i-music" aria-hidden="true"></i> Instruments</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Praise"> <i class="pd-i pd-i-mic-vocal" aria-hidden="true"></i> Praise & Worship</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Compassionate"> <i class="pd-i pd-i-heart" aria-hidden="true"></i> Compassionate</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Intercessor"> <i class="pd-i pd-i-hands-praying" aria-hidden="true"></i> Intercessor</label>
+                <label class="checkbox-item"><input type="checkbox" name="min" value="Preaching"> <i class="pd-i pd-i-book-open" aria-hidden="true"></i> Preaching</label>
             </div>
 
-            <div class="section-h"><i class="fas fa-handshake"></i> Commitment</div>
+            <div class="section-h"><i class="pd-i pd-i-handshake"></i> Commitment</div>
             <label class="checkbox-item" style="font-weight: bold;">
-                <input type="checkbox" id="titheCommit" required> <i class="fas fa-check-circle"></i> I commit to give offerings and tithes to the church
+                <input type="checkbox" id="titheCommit" required> <i class="pd-i pd-i-circle-check"></i> I commit to give offerings and tithes to the church
             </label>
 
-            <div class="section-h"><i class="fas fa-pen-fancy"></i> Signature</div>
-            <p style="font-size: 0.75rem; margin-bottom: 12px;"><i class="fas fa-info-circle"></i> Sign in the box below to confirm your agreement.</p>
+            <div class="section-h"><i class="pd-i pd-i-signature"></i> Signature</div>
+            <p style="font-size: 0.75rem; margin-bottom: 12px;"><i class="pd-i pd-i-info"></i> Sign in the box below to confirm your agreement.</p>
             <canvas id="sig-pad" class="sig-canvas"></canvas>
-            <button type="button" onclick="clearSig()" style="font-size: 11px; background:none; border:none; color:var(--accent-red); cursor:pointer; margin-top: 8px;"><i class="fas fa-eraser"></i> Clear Signature</button>
+            <button type="button" onclick="clearSig()" style="font-size: 11px; background:none; border:none; color:var(--accent-red); cursor:pointer; margin-top: 8px;"><i class="pd-i pd-i-eraser"></i> Clear Signature</button>
 
             <div style="margin-top: 35px;">
                 <button type="button" class="btn btn-primary" id="submitBtn" onclick="registerNewMember()">
-                    <i class="fas fa-save"></i> REGISTER MEMBERSHIP
+                    <i class="pd-i pd-i-save"></i> REGISTER MEMBERSHIP
                 </button>
             </div>
         </form>
@@ -926,16 +927,16 @@
 
     <!-- BENEFITS SECTION -->
     <div id="benefitsSection" style="display: none;">
-        <h2 class="form-title" style="text-align: center;"><i class="fas fa-gift"></i> Member Benefits</h2>
-        <div class="benefit-card"><div class="benefit-icon"><i class="fas fa-id-card"></i></div><div><b>Digital Identity</b><p>Verification across all global branches instantly.</p></div></div>
-        <div class="benefit-card"><div class="benefit-icon"><i class="fas fa-hand-holding-heart"></i></div><div><b>Welfare Support</b><p>Priority access to community support and educational funds.</p></div></div>
-        <div class="benefit-card"><div class="benefit-icon"><i class="fas fa-shield-alt"></i></div><div><b>Pastoral Covering</b><p>Direct priority line for counseling and family deliverance.</p></div></div>
-        <div class="benefit-card"><div class="benefit-icon"><i class="fas fa-certificate"></i></div><div><b>Leadership Training</b><p>Access to accredited spiritual growth and leadership courses.</p></div></div>
+        <h2 class="form-title" style="text-align: center;"><i class="pd-i pd-i-gift"></i> Member Benefits</h2>
+        <div class="benefit-card"><div class="benefit-icon"><i class="pd-i pd-i-id-card"></i></div><div><b>Digital Identity</b><p>Verification across all global branches instantly.</p></div></div>
+        <div class="benefit-card"><div class="benefit-icon"><i class="pd-i pd-i-hand-heart"></i></div><div><b>Welfare Support</b><p>Priority access to community support and educational funds.</p></div></div>
+        <div class="benefit-card"><div class="benefit-icon"><i class="pd-i pd-i-shield"></i></div><div><b>Pastoral Covering</b><p>Direct priority line for counseling and family deliverance.</p></div></div>
+        <div class="benefit-card"><div class="benefit-icon"><i class="pd-i pd-i-badge-check"></i></div><div><b>Leadership Training</b><p>Access to accredited spiritual growth and leadership courses.</p></div></div>
     </div>
 
     <!-- NOTICES SECTION (Admin-managed announcements) -->
     <div id="announcementsSection" style="display: none;">
-        <h2 class="form-title" style="text-align: center;"><i class="fas fa-bullhorn"></i> Church Notices</h2>
+        <h2 class="form-title" style="text-align: center;"><i class="pd-i pd-i-megaphone"></i> Church Notices</h2>
         <p class="form-subtitle" style="text-align: center; margin-bottom: 25px;">Official announcements from the Prayer Dome administration</p>
         <div id="announcementsList">
             <div class="card" style="text-align: center; padding: 40px;">
@@ -947,40 +948,40 @@
 
     <!-- CARE SECTION (Pastoral care & welfare requests, managed by admin) -->
     <div id="careSection" style="display: none;">
-        <h2 class="form-title" style="text-align: center;"><i class="fas fa-hand-holding-heart"></i> Member Care & Welfare</h2>
+        <h2 class="form-title" style="text-align: center;"><i class="pd-i pd-i-hand-heart"></i> Member Care & Welfare</h2>
         <p class="form-subtitle" style="text-align: center; margin-bottom: 25px;">Request pastoral care, counseling or welfare support — our team responds from the admin desk</p>
 
         <div class="care-form-card">
-            <h3 style="margin-bottom: 15px; font-family: 'Playfair Display', serif;"><i class="fas fa-plus-circle" style="color: var(--accent-green);"></i> New Care Request</h3>
+            <h3 style="margin-bottom: 15px; font-family: 'Playfair Display', serif;"><i class="pd-i pd-i-circle-plus" style="color: var(--accent-green);"></i> New Care Request</h3>
             <div class="care-type-grid" id="careTypeGrid">
-                <div class="care-type selected" data-type="Pastoral Counseling" onclick="selectCareType(this)"><i class="fas fa-praying-hands"></i> Pastoral Counseling</div>
-                <div class="care-type" data-type="Welfare Support" onclick="selectCareType(this)"><i class="fas fa-hand-holding-heart"></i> Welfare Support</div>
-                <div class="care-type" data-type="Home / Hospital Visit" onclick="selectCareType(this)"><i class="fas fa-hospital-user"></i> Home / Hospital Visit</div>
-                <div class="care-type" data-type="Prayer & Follow-up" onclick="selectCareType(this)"><i class="fas fa-pray"></i> Prayer & Follow-up</div>
-                <div class="care-type" data-type="Other" onclick="selectCareType(this)"><i class="fas fa-comment-dots"></i> Other</div>
+                <div class="care-type selected" data-type="Pastoral Counseling" onclick="selectCareType(this)"><i class="pd-i pd-i-hands-praying"></i> Pastoral Counseling</div>
+                <div class="care-type" data-type="Welfare Support" onclick="selectCareType(this)"><i class="pd-i pd-i-hand-heart"></i> Welfare Support</div>
+                <div class="care-type" data-type="Home / Hospital Visit" onclick="selectCareType(this)"><i class="pd-i pd-i-hospital"></i> Home / Hospital Visit</div>
+                <div class="care-type" data-type="Prayer & Follow-up" onclick="selectCareType(this)"><i class="pd-i pd-i-hands-praying"></i> Prayer & Follow-up</div>
+                <div class="care-type" data-type="Other" onclick="selectCareType(this)"><i class="pd-i pd-i-message-circle-more"></i> Other</div>
             </div>
             <div class="form-group">
-                <label><i class="fas fa-heading"></i> Subject *</label>
+                <label><i class="pd-i pd-i-heading"></i> Subject *</label>
                 <input type="text" id="careSubject" placeholder="e.g., Need counseling for my family" maxlength="100">
             </div>
             <div class="form-group">
-                <label><i class="fas fa-align-left"></i> Describe your request *</label>
+                <label><i class="pd-i pd-i-text-align-start"></i> Describe your request *</label>
                 <textarea id="careMessage" rows="4" placeholder="Share as much detail as you are comfortable with. This is only visible to church administration." maxlength="1000"></textarea>
             </div>
             <div class="form-group">
-                <label><i class="fas fa-phone-alt"></i> Callback Phone (optional)</label>
+                <label><i class="pd-i pd-i-phone"></i> Callback Phone (optional)</label>
                 <input type="tel" id="carePhone" placeholder="Number our team can call you back on">
             </div>
-            <p style="font-size: 0.7rem; color: var(--text-sub); margin-bottom: 15px;"><i class="fas fa-lock"></i> Confidential — visible only to Prayer Dome administrators.</p>
+            <p style="font-size: 0.7rem; color: var(--text-sub); margin-bottom: 15px;"><i class="pd-i pd-i-lock"></i> Confidential — visible only to Prayer Dome administrators.</p>
             <button type="button" class="btn btn-primary" id="careSubmitBtn" onclick="submitCareRequest()">
-                <i class="fas fa-paper-plane"></i> SUBMIT REQUEST
+                <i class="pd-i pd-i-send"></i> SUBMIT REQUEST
             </button>
         </div>
 
-        <h3 style="margin: 10px 0 15px; font-family: 'Playfair Display', serif;"><i class="fas fa-history" style="color: var(--accent-green);"></i> My Care Requests</h3>
+        <h3 style="margin: 10px 0 15px; font-family: 'Playfair Display', serif;"><i class="pd-i pd-i-rotate-ccw-clock" style="color: var(--accent-green);"></i> My Care Requests</h3>
         <div id="myCareRequestsList">
             <div class="card" style="text-align: center; padding: 30px; color: var(--text-sub);">
-                <i class="fas fa-inbox" style="font-size: 2rem; opacity: 0.4; margin-bottom: 10px;"></i>
+                <i class="pd-i pd-i-inbox" style="font-size: 2rem; opacity: 0.4; margin-bottom: 10px;"></i>
                 <p>You have not submitted any care requests yet.</p>
             </div>
         </div>
@@ -1008,29 +1009,29 @@
                 <div class="card-id-num" id="idNumber">No Membership</div>
 
                 <div class="card-data-grid">
-                    <div class="data-box"><label><i class="fas fa-church"></i> Branch</label><span id="idBranch">---</span></div>
-                    <div class="data-box"><label><i class="fas fa-user-tag"></i> Position</label><span id="idRole">MEMBER</span></div>
-                    <div class="data-box"><label><i class="fas fa-heart"></i> Marital</label><span id="idMarital">---</span></div>
-                    <div class="data-box"><label><i class="fas fa-calendar"></i> Registered</label><span id="idDate">--/--/----</span></div>
+                    <div class="data-box"><label><i class="pd-i pd-i-church"></i> Branch</label><span id="idBranch">---</span></div>
+                    <div class="data-box"><label><i class="pd-i pd-i-tag"></i> Position</label><span id="idRole">MEMBER</span></div>
+                    <div class="data-box"><label><i class="pd-i pd-i-heart"></i> Marital</label><span id="idMarital">---</span></div>
+                    <div class="data-box"><label><i class="pd-i pd-i-calendar"></i> Registered</label><span id="idDate">--/--/----</span></div>
                 </div>
 
                 <div class="card-barcode-wrap">
                     <svg id="barcodeImg"></svg>
                 </div>
                 
-                <div id="statusBadge" class="status-badge status-pending"><i class="fas fa-clock"></i> NO MEMBERSHIP</div>
+                <div id="statusBadge" class="status-badge status-pending"><i class="pd-i pd-i-clock"></i> NO MEMBERSHIP</div>
             </div>
         </div>
         <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 25px;">
             <button class="btn btn-primary" style="width: auto; padding: 14px 28px;" onclick="downloadID()">
-                <i class="fas fa-file-pdf"></i> DOWNLOAD ID CARD (PDF)
+                <i class="pd-i pd-i-file-text"></i> DOWNLOAD ID CARD (PDF)
             </button>
             <button class="btn btn-secondary" style="width: auto; padding: 14px 28px;" onclick="openUpdateMembershipView()">
-                <i class="fas fa-edit"></i> UPDATE MEMBERSHIP INFO
+                <i class="pd-i pd-i-square-pen"></i> UPDATE MEMBERSHIP INFO
             </button>
         </div>
         <div class="badge-spotlight" id="badgeSpotlight" style="display: none;">
-            <span class="badge-icon" id="badgeIcon">🏅</span>
+            <span class="badge-icon" id="badgeIcon"><i class="pd-i pd-i-medal" aria-hidden="true"></i></span>
             <div class="badge-label" id="badgeLabel">STAR MEMBER</div>
             <div class="badge-sub">Recognition awarded by Prayer Dome Administration</div>
         </div>
@@ -1070,13 +1071,13 @@
 
     // Recognition badges that admins can award to members (shown on the portal)
     const MEMBER_BADGES = {
-        star: { icon: '⭐', label: 'Star Member' },
-        prayerwarrior: { icon: '🙏', label: 'Prayer Warrior' },
-        compassion: { icon: '❤️', label: 'Compassion Award' },
-        worship: { icon: '🎵', label: 'Worship Excellence' },
-        leadership: { icon: '👑', label: 'Leadership Excellence' },
-        faithful: { icon: '🕊️', label: 'Faithful Servant' },
-        volunteer: { icon: '🤝', label: 'Volunteer of the Month' }
+        star: { icon: 'pd-i-star', label: 'Star Member' },
+        prayerwarrior: { icon: 'pd-i-hands-praying', label: 'Prayer Warrior' },
+        compassion: { icon: 'pd-i-heart', label: 'Compassion Award' },
+        worship: { icon: 'pd-i-music', label: 'Worship Excellence' },
+        leadership: { icon: 'pd-i-crown', label: 'Leadership Excellence' },
+        faithful: { icon: 'pd-i-bird', label: 'Faithful Servant' },
+        volunteer: { icon: 'pd-i-handshake', label: 'Volunteer of the Month' }
     };
 
     function escapeHtmlPortal(str) {
@@ -1111,22 +1112,22 @@
                 if (!annList) return;
                 if (items.length === 0) {
                     annList.innerHTML = `<div class="card" style="text-align: center; padding: 40px; color: var(--text-sub);">
-                        <i class="fas fa-bullhorn" style="font-size: 2rem; opacity: 0.4; margin-bottom: 10px;"></i>
+                        <i class="pd-i pd-i-megaphone" style="font-size: 2rem; opacity: 0.4; margin-bottom: 10px;"></i>
                         <p>No notices posted yet. Check back soon!</p></div>`;
                     return;
                 }
                 annList.innerHTML = items.map(a => {
                     const cat = a.category === 'urgent' ? 'urgent' : a.category === 'event' ? 'event' : 'general';
-                    const catLabel = cat === 'urgent' ? '⚠️ Urgent' : cat === 'event' ? '📅 Event' : '📢 General';
+                    const catLabel = cat === 'urgent' ? '<i class="pd-i pd-i-triangle-alert" aria-hidden="true"></i> Urgent' : cat === 'event' ? '<i class="pd-i pd-i-calendar" aria-hidden="true"></i> Event' : '<i class="pd-i pd-i-megaphone" aria-hidden="true"></i> General';
                     const date = a.createdAt ? moment(a.createdAt.toDate()).format('MMMM D, YYYY • h:mm A') : '';
                     return `<div class="notice-card cat-${cat}">
                         <div class="notice-head">
                             <span class="notice-cat">${catLabel}</span>
-                            ${a.pinned ? '<span class="pinned-tag"><i class="fas fa-thumbtack"></i> PINNED</span>' : ''}
+                            ${a.pinned ? '<span class="pinned-tag"><i class="pd-i pd-i-pin"></i> PINNED</span>' : ''}
                         </div>
                         <div class="notice-title">${escapeHtmlPortal(a.title || '')}</div>
                         <div class="notice-body">${escapeHtmlPortal(a.body || '')}</div>
-                        <div class="notice-date"><i class="far fa-clock"></i> ${date}${a.createdBy ? ` &nbsp;•&nbsp; <i class="fas fa-user-shield"></i> ${escapeHtmlPortal(String(a.createdBy).split('@')[0])}` : ''}</div>
+                        <div class="notice-date"><i class="pd-i pd-i-clock"></i> ${date}${a.createdBy ? ` &nbsp;•&nbsp; <i class="pd-i pd-i-shield-user"></i> ${escapeHtmlPortal(String(a.createdBy).split('@')[0])}` : ''}</div>
                     </div>`;
                 }).join('');
             }, (err) => {
@@ -1145,26 +1146,26 @@
                 if (!careList) return;
                 if (items.length === 0) {
                     careList.innerHTML = `<div class="card" style="text-align:center;padding:30px;color:var(--text-sub);">
-                        <i class="fas fa-inbox" style="font-size:2rem;opacity:0.4;margin-bottom:10px;"></i>
+                        <i class="pd-i pd-i-inbox" style="font-size:2rem;opacity:0.4;margin-bottom:10px;"></i>
                         <p>You have not submitted any care requests yet.</p></div>`;
                     return;
                 }
                 careList.innerHTML = items.map(r => {
                     const st = r.status === 'resolved' ? 'resolved' : r.status === 'in-progress' ? 'in-progress' : 'pending';
-                    const stLabel = st === 'resolved' ? '<i class="fas fa-check-circle"></i> Resolved' : st === 'in-progress' ? '<i class="fas fa-spinner"></i> In Progress' : '<i class="fas fa-clock"></i> Pending';
+                    const stLabel = st === 'resolved' ? '<i class="pd-i pd-i-circle-check"></i> Resolved' : st === 'in-progress' ? '<i class="pd-i pd-i-circle-dot-dashed"></i> In Progress' : '<i class="pd-i pd-i-clock"></i> Pending';
                     const date = r.createdAt ? moment(r.createdAt.toDate()).format('MMM D, YYYY h:mm A') : '';
                     return `<div class="req-card">
                         <div class="req-head">
-                            <span class="req-type"><i class="fas fa-hand-holding-heart"></i> ${escapeHtmlPortal(r.type || 'Request')}</span>
+                            <span class="req-type"><i class="pd-i pd-i-hand-heart"></i> ${escapeHtmlPortal(r.type || 'Request')}</span>
                             <span class="care-status care-status-${st}">${stLabel}</span>
                         </div>
                         <div class="req-subject">${escapeHtmlPortal(r.subject || '')}</div>
                         <div class="req-message">${escapeHtmlPortal(r.message || '')}</div>
                         <div class="req-meta">
-                            <span><i class="far fa-clock"></i> ${date}</span>
-                            ${r.phone ? `<span><i class="fas fa-phone-alt"></i> ${escapeHtmlPortal(r.phone)}</span>` : ''}
+                            <span><i class="pd-i pd-i-clock"></i> ${date}</span>
+                            ${r.phone ? `<span><i class="pd-i pd-i-phone"></i> ${escapeHtmlPortal(r.phone)}</span>` : ''}
                         </div>
-                        ${r.adminNotes ? `<div class="req-admin-note"><i class="fas fa-reply"></i> <strong>Response from admin:</strong> ${escapeHtmlPortal(r.adminNotes)}</div>` : ''}
+                        ${r.adminNotes ? `<div class="req-admin-note"><i class="pd-i pd-i-reply"></i> <strong>Response from admin:</strong> ${escapeHtmlPortal(r.adminNotes)}</div>` : ''}
                     </div>`;
                 }).join('');
             }, (err) => console.error("Care requests listener error:", err));
@@ -1203,7 +1204,7 @@
             document.getElementById('careSubject').value = '';
             document.getElementById('careMessage').value = '';
             document.getElementById('carePhone').value = '';
-            showToast("✅ Request submitted! Our team will follow up with you soon.", "success");
+            showToast("Request submitted! Our team will follow up with you soon.", "success");
             confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 } });
         } catch (e) {
             console.error("Care request error:", e);
@@ -1300,10 +1301,10 @@
         const formSubtitle = document.getElementById('formSubtitle');
         
         if (type === 'myself') {
-            formTitle.innerHTML = '<i class="fas fa-user"></i> Registering Myself';
+            formTitle.innerHTML = '<i class="pd-i pd-i-user"></i> Registering Myself';
             formSubtitle.innerHTML = 'You are registering yourself as a new church member. Awaiting admin approval.';
         } else {
-            formTitle.innerHTML = '<i class="fas fa-users"></i> Registering Someone Else';
+            formTitle.innerHTML = '<i class="pd-i pd-i-users"></i> Registering Someone Else';
             formSubtitle.innerHTML = 'You are registering another person as a church member. They will receive a Membership ID after admin approval.';
         }
         
@@ -1417,10 +1418,10 @@
         }
         c.innerHTML = docsArray.map((d, i) => `
             <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,0.06);border-radius:10px;margin-top:6px;">
-                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;"><i class="fas fa-file-alt"></i> ${escapeHtmlPortal(d.name || 'Document')}</span>
+                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;"><i class="pd-i pd-i-file-text"></i> ${escapeHtmlPortal(d.name || 'Document')}</span>
                 <div style="display:flex;gap:8px;">
-                    <a href="${d.url}" target="_blank" style="color:var(--accent-blue);font-size:0.8rem;"><i class="fas fa-external-link-alt"></i> View</a>
-                    <button type="button" onclick="removeUploadedDoc(${i}, '${type}')" style="background:none;border:none;color:var(--accent-red);cursor:pointer;"><i class="fas fa-trash"></i></button>
+                    <a href="${d.url}" target="_blank" style="color:var(--accent-blue);font-size:0.8rem;"><i class="pd-i pd-i-external-link"></i> View</a>
+                    <button type="button" onclick="removeUploadedDoc(${i}, '${type}')" style="background:none;border:none;color:var(--accent-red);cursor:pointer;" aria-label="Remove document"><i class="pd-i pd-i-trash"></i></button>
                 </div>
             </div>
         `).join('');
@@ -1492,14 +1493,14 @@
         const idHeader = document.getElementById('editMemberIdHeader');
         if (idHeader) idHeader.innerText = data.membershipId ? `ID: ${data.membershipId}` : 'ID: Pending';
 
-        const statusText = data.status === 'approved' ? '<i class="fas fa-check-circle"></i> ACTIVE MEMBER' : '<i class="fas fa-clock"></i> PENDING APPROVAL';
+        const statusText = data.status === 'approved' ? '<i class="pd-i pd-i-circle-check"></i> ACTIVE MEMBER' : '<i class="pd-i pd-i-clock"></i> PENDING APPROVAL';
         const statusClass = data.status === 'approved' ? 'status-badge status-approved' : 'status-badge status-pending';
         
         const sh = document.getElementById('editStatusBadgeHeader');
         if (sh) { sh.innerHTML = statusText; sh.className = statusClass; }
 
         const bh = document.getElementById('editBranchHeader');
-        if (bh) bh.innerHTML = `<i class="fas fa-church"></i> ${escapeHtmlPortal(data.branch || 'Global')}`;
+        if (bh) bh.innerHTML = `<i class="pd-i pd-i-church"></i> ${escapeHtmlPortal(data.branch || 'Global')}`;
 
         uploadedEditPhotoUrl = data.photoUrl || data.photoURL || null;
         const p1 = document.getElementById('editPhotoPreview');
@@ -1591,7 +1592,7 @@
             renderCard(currentMemberData);
 
             hideLoading();
-            showToast("✅ Membership information updated successfully!", "success");
+            showToast("Membership information updated successfully!", "success");
             confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
             
             switchMainTab('card');
@@ -1765,10 +1766,10 @@
                 
                 currentMemberData = memberData;
                 renderCard(memberData);
-                showToast(`✅ Registration submitted! Your Membership ID: ${newMemberId}. Awaiting admin approval.`, "success");
+                showToast(`Registration submitted! Your Membership ID: ${newMemberId}. Awaiting admin approval.`, "success");
             } else {
                 // For someone else, don't update current user's membership
-                showToast(`✅ ${memberData.fullName} has been registered! Membership ID: ${newMemberId}. Awaiting admin approval.`, "success");
+                showToast(`${memberData.fullName} has been registered! Membership ID: ${newMemberId}. Awaiting admin approval.`, "success");
             }
             
             confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
@@ -1834,7 +1835,7 @@
             document.getElementById('retrievedPhoto').src = memberData.photoUrl || "/assets/avatar-default.svg";
             document.getElementById('retrievedName').innerText = memberData.fullName;
             document.getElementById('retrievedId').innerText = memberData.membershipId;
-            document.getElementById('retrievedBranch').innerHTML = `<i class="fas fa-church"></i> ${memberData.branch || "Global"}`;
+            document.getElementById('retrievedBranch').innerHTML = `<i class="pd-i pd-i-church"></i> ${memberData.branch || "Global"}`;
             document.getElementById('retrievedMemberInfo').style.display = 'block';
             
             showToast("Membership found! Click 'Link to My Account' to connect.", "success");
@@ -1893,7 +1894,7 @@
             
             currentMemberData = newMemberData;
             renderCard(newMemberData);
-            showToast(`✅ Membership linked! Welcome ${retrievedMembershipData.fullName}!`, "success");
+            showToast(`Membership linked! Welcome ${retrievedMembershipData.fullName}!`, "success");
             confetti({ particleCount: 200, spread: 100 });
             
             document.getElementById('retrievedMemberInfo').style.display = 'none';
@@ -1919,7 +1920,7 @@
             if (idNumber) idNumber.innerText = data.membershipId;
             const statusBadge = document.getElementById('statusBadge');
             if (statusBadge) {
-                statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> ACTIVE MEMBER';
+                statusBadge.innerHTML = '<i class="pd-i pd-i-circle-check"></i> ACTIVE MEMBER';
                 statusBadge.className = 'status-badge status-approved';
             }
             try {
@@ -1930,7 +1931,7 @@
             if (idNumber) idNumber.innerText = data.membershipId;
             const statusBadge = document.getElementById('statusBadge');
             if (statusBadge) {
-                statusBadge.innerHTML = '<i class="fas fa-clock"></i> PENDING APPROVAL';
+                statusBadge.innerHTML = '<i class="pd-i pd-i-clock"></i> PENDING APPROVAL';
                 statusBadge.className = 'status-badge status-pending';
             }
         } else {
@@ -1938,7 +1939,7 @@
             if (idNumber) idNumber.innerText = 'No Membership';
             const statusBadge = document.getElementById('statusBadge');
             if (statusBadge) {
-                statusBadge.innerHTML = '<i class="fas fa-clock"></i> NO MEMBERSHIP';
+                statusBadge.innerHTML = '<i class="pd-i pd-i-clock"></i> NO MEMBERSHIP';
                 statusBadge.className = 'status-badge status-pending';
             }
         }
@@ -1963,7 +1964,7 @@
         if (spotlight) {
             const badge = data.badge ? MEMBER_BADGES[data.badge] : null;
             if (badge && data.status === 'approved') {
-                document.getElementById('badgeIcon').innerText = badge.icon;
+                document.getElementById('badgeIcon').innerHTML = '<i class="pd-i ' + badge.icon + '" aria-hidden="true"></i>';
                 document.getElementById('badgeLabel').innerText = badge.label.toUpperCase();
                 spotlight.style.display = 'block';
             } else {
@@ -2027,7 +2028,11 @@
             return;
         }
         showLoading("Generating ID Card PDF...");
-        html2canvas(element, { useCORS: true, scale: 3, backgroundColor: null }).then(canvas => {
+        html2canvas(element, {
+            useCORS: true, scale: 3, backgroundColor: null,
+            // Canvas capture cannot paint CSS-mask icons; inline them as images in the clone.
+            onclone: (doc) => { if (window.PDIcons) PDIcons.inline(doc.getElementById(element.id) || doc.body); }
+        }).then(canvas => {
             const imgData = canvas.toDataURL("image/png");
             const jsPDFClass = window.jspdf ? window.jspdf.jsPDF : (window.jsPDF || null);
             if (!jsPDFClass) {
@@ -2051,7 +2056,7 @@
             const fileName = `PrayerDome-ID-${currentMemberData?.membershipId || 'Card'}-${moment().format('YYYYMMDD-HHmmss')}.pdf`;
             pdf.save(fileName);
             hideLoading();
-            showToast("✅ ID Card downloaded as PDF!", "success");
+            showToast("ID Card downloaded as PDF!", "success");
         }).catch(err => {
             console.error("Download error:", err);
             hideLoading();
@@ -2077,7 +2082,7 @@
         
         const toast = document.createElement('div');
         toast.className = `toast-notification ${type === 'error' ? 'error' : type === 'info' ? 'info' : ''}`;
-        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i> ${message}`;
+        toast.innerHTML = `<i class="pd-i ${type === 'success' ? 'pd-i-circle-check' : type === 'error' ? 'pd-i-circle-alert' : 'pd-i-info'}"></i> ${message}`;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 5000);
     }

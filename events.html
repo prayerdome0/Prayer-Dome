@@ -124,7 +124,8 @@
 }
     </script>
     <!-- PD-SEO:END -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/pd-icons.css">
+    <script src="/assets/pd-icons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -595,6 +596,10 @@
             .main-container { padding: 20px; }
             .action-bar { justify-content: center; }
         }
+        /* Dark mode: brand blue (#0A4D9B) is about 2:1 on navy, so headings and icons use the
+           light brand tint (#93c5fd) and controls without a colour get readable text. */
+        body.dark-mode .calendar-nav button:not(:hover) { color: #e2e8f0; }
+        body.dark-mode .section-header h3 { color: #93c5fd; }
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
@@ -618,7 +623,7 @@
             </div>
         </div>
         <div class="header-actions">
-            <a href="index.html" class="back-btn"><i class="fas fa-home"></i> Home</a>
+            <a href="index.html" class="back-btn"><i class="pd-i pd-i-house"></i> Home</a>
         </div>
     </header>
 
@@ -626,7 +631,7 @@
         <!-- Add Event Button Bar - Below Header -->
         <div class="action-bar">
             <button class="add-event-btn" onclick="showAddEventModal()">
-                <i class="fas fa-plus-circle"></i> Create New Event
+                <i class="pd-i pd-i-circle-plus"></i> Create New Event
             </button>
         </div>
 
@@ -644,8 +649,8 @@
             <div class="calendar-container">
                 <div class="calendar-header">
                     <div class="calendar-nav">
-                        <button onclick="prevMonth()"><i class="fas fa-chevron-left"></i></button>
-                        <button onclick="nextMonth()"><i class="fas fa-chevron-right"></i></button>
+                        <button onclick="prevMonth()" aria-label="Previous month"><i class="pd-i pd-i-chevron-left"></i></button>
+                        <button onclick="nextMonth()" aria-label="Next month"><i class="pd-i pd-i-chevron-right"></i></button>
                     </div>
                     <div class="current-month" id="currentMonth"></div>
                     <button class="btn-outline" onclick="goToToday()" style="padding: 6px 12px;">Today</button>
@@ -657,7 +662,7 @@
             <!-- Events List -->
             <div class="events-list-container">
                 <div class="events-list-header">
-                    <h3><i class="fas fa-calendar-day"></i> <span id="selectedDateTitle">Today's Events</span></h3>
+                    <h3><i class="pd-i pd-i-calendar"></i> <span id="selectedDateTitle">Today's Events</span></h3>
                 </div>
                 <div class="events-list" id="eventsList"><div class="spinner"></div></div>
             </div>
@@ -666,7 +671,7 @@
         <!-- My RSVPs Section -->
         <div class="my-events-section">
             <div class="section-header">
-                <h3><i class="fas fa-calendar-check"></i> My Events</h3>
+                <h3><i class="pd-i pd-i-calendar-check"></i> My Events</h3>
                 <button class="btn btn-outline btn-small" onclick="loadMyEvents()">Refresh</button>
             </div>
             <div id="myEventsList" class="events-list"><div class="spinner"></div></div>
@@ -678,7 +683,7 @@
         <div class="event-modal-content">
             <div class="event-modal-header">
                 <h2 id="modalTitle">Event Title</h2>
-                <button class="event-modal-close" onclick="closeEventModal()"><i class="fas fa-times"></i></button>
+                <button class="event-modal-close" onclick="closeEventModal()" aria-label="Close"><i class="pd-i pd-i-x"></i></button>
             </div>
             <div id="modalContent"></div>
             <div class="rsvp-buttons" id="rsvpButtons"></div>
@@ -689,8 +694,8 @@
     <div id="addEventModal" class="event-modal" style="display: none;">
         <div class="event-modal-content">
             <div class="event-modal-header">
-                <h2><i class="fas fa-plus-circle"></i> Add New Event</h2>
-                <button class="event-modal-close" onclick="closeAddEventModal()"><i class="fas fa-times"></i></button>
+                <h2><i class="pd-i pd-i-circle-plus"></i> Add New Event</h2>
+                <button class="event-modal-close" onclick="closeAddEventModal()" aria-label="Close"><i class="pd-i pd-i-x"></i></button>
             </div>
             <form id="eventForm" onsubmit="event.preventDefault(); addEvent()">
                 <div class="form-group"><label>Event Title *</label><input type="text" id="eventTitle" required placeholder="e.g., Sunday Service"></div>
@@ -801,10 +806,10 @@
             const dayEvents = events.filter(e => e.dateObj.toDateString() === date.toDateString());
             document.getElementById('selectedDateTitle').textContent = moment(date).format('MMMM D, YYYY');
             if (dayEvents.length === 0) {
-                eventsList.innerHTML = `<div style="text-align: center; padding: 40px;"><i class="fas fa-calendar-day" style="font-size: 48px; opacity: 0.3;"></i><p>No events scheduled</p><button class="btn btn-primary btn-small" style="margin-top: 15px;" onclick="showAddEventModal()">Add Event</button></div>`;
+                eventsList.innerHTML = `<div style="text-align: center; padding: 40px;"><i class="pd-i pd-i-calendar" style="font-size: 48px; opacity: 0.3;"></i><p>No events scheduled</p><button class="btn btn-primary btn-small" style="margin-top: 15px;" onclick="showAddEventModal()">Add Event</button></div>`;
                 return;
             }
-            eventsList.innerHTML = dayEvents.map(event => `<div class="event-item" onclick="showEventDetails('${event.id}')"><div class="event-time"><i class="far fa-clock"></i> ${moment(event.dateObj).format('h:mm A')} (${event.duration || 60} min)</div><div class="event-title">${escapeHtml(event.title)}</div><div class="event-location"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(event.location)}</div><span class="event-category" style="background: ${getCategoryColor(event.category)}20; color: ${getCategoryColor(event.category)};">${event.category}</span></div>`).join('');
+            eventsList.innerHTML = dayEvents.map(event => `<div class="event-item" onclick="showEventDetails('${event.id}')"><div class="event-time"><i class="pd-i pd-i-clock"></i> ${moment(event.dateObj).format('h:mm A')} (${event.duration || 60} min)</div><div class="event-title">${escapeHtml(event.title)}</div><div class="event-location"><i class="pd-i pd-i-map-pin"></i> ${escapeHtml(event.location)}</div><span class="event-category" style="background: ${getCategoryColor(event.category)}20; color: ${getCategoryColor(event.category)};">${event.category}</span></div>`).join('');
         }
 
         function getCategoryColor(category) {
@@ -820,17 +825,17 @@
             const modal = document.getElementById('eventModal');
             document.getElementById('modalTitle').textContent = event.title;
             document.getElementById('modalContent').innerHTML = `
-                <div class="event-detail"><div class="event-detail-label"><i class="far fa-calendar-alt"></i> Date & Time</div><p>${moment(event.dateObj).format('dddd, MMMM D, YYYY')} at ${moment(event.dateObj).format('h:mm A')}</p><p>Duration: ${event.duration || 60} minutes</p></div>
-                <div class="event-detail"><div class="event-detail-label"><i class="fas fa-map-marker-alt"></i> Location</div><p>${escapeHtml(event.location)}</p></div>
-                <div class="event-detail"><div class="event-detail-label"><i class="fas fa-user"></i> Speaker/Host</div><p>${escapeHtml(event.speaker || 'Prayer Dome Team')}</p></div>
-                <div class="event-detail"><div class="event-detail-label"><i class="fas fa-info-circle"></i> Description</div><p>${escapeHtml(event.description || 'No description provided.')}</p></div>
-                <div class="event-detail"><div class="event-detail-label"><i class="fas fa-users"></i> Attendees</div><p>${event.attendeeCount || 0} attending${event.maxAttendees > 0 ? ` / ${event.maxAttendees} maximum` : ''}</p></div>`;
+                <div class="event-detail"><div class="event-detail-label"><i class="pd-i pd-i-calendar-days"></i> Date & Time</div><p>${moment(event.dateObj).format('dddd, MMMM D, YYYY')} at ${moment(event.dateObj).format('h:mm A')}</p><p>Duration: ${event.duration || 60} minutes</p></div>
+                <div class="event-detail"><div class="event-detail-label"><i class="pd-i pd-i-map-pin"></i> Location</div><p>${escapeHtml(event.location)}</p></div>
+                <div class="event-detail"><div class="event-detail-label"><i class="pd-i pd-i-user"></i> Speaker/Host</div><p>${escapeHtml(event.speaker || 'Prayer Dome Team')}</p></div>
+                <div class="event-detail"><div class="event-detail-label"><i class="pd-i pd-i-info"></i> Description</div><p>${escapeHtml(event.description || 'No description provided.')}</p></div>
+                <div class="event-detail"><div class="event-detail-label"><i class="pd-i pd-i-users"></i> Attendees</div><p>${event.attendeeCount || 0} attending${event.maxAttendees > 0 ? ` / ${event.maxAttendees} maximum` : ''}</p></div>`;
             const rsvpButtons = document.getElementById('rsvpButtons');
             if (currentUser) {
-                if (isAttending) rsvpButtons.innerHTML = `<button class="btn btn-danger" style="flex:1;" onclick="cancelRSVP('${event.id}')"><i class="fas fa-times"></i> Cancel RSVP</button><button class="btn btn-outline" style="flex:1;" onclick="addToCalendar('${event.id}')"><i class="fas fa-calendar-plus"></i> Add to Calendar</button>`;
-                else if (isFull) rsvpButtons.innerHTML = `<button class="btn btn-outline" style="flex:1;" disabled><i class="fas fa-ban"></i> Event Full</button><button class="btn btn-outline" style="flex:1;" onclick="addToCalendar('${event.id}')"><i class="fas fa-calendar-plus"></i> Add to Calendar</button>`;
-                else rsvpButtons.innerHTML = `<button class="btn btn-primary" style="flex:1;" onclick="rsvpToEvent('${event.id}')"><i class="fas fa-check"></i> RSVP Now</button><button class="btn btn-outline" style="flex:1;" onclick="addToCalendar('${event.id}')"><i class="fas fa-calendar-plus"></i> Add to Calendar</button>`;
-            } else rsvpButtons.innerHTML = `<button class="btn btn-primary" style="flex:1;" onclick="showLoginPrompt()"><i class="fas fa-sign-in-alt"></i> Login to RSVP</button><button class="btn btn-outline" style="flex:1;" onclick="addToCalendar('${event.id}')"><i class="fas fa-calendar-plus"></i> Add to Calendar</button>`;
+                if (isAttending) rsvpButtons.innerHTML = `<button class="btn btn-danger" style="flex:1;" onclick="cancelRSVP('${event.id}')"><i class="pd-i pd-i-x"></i> Cancel RSVP</button><button class="btn btn-outline" style="flex:1;" onclick="addToCalendar('${event.id}')"><i class="pd-i pd-i-calendar-plus"></i> Add to Calendar</button>`;
+                else if (isFull) rsvpButtons.innerHTML = `<button class="btn btn-outline" style="flex:1;" disabled><i class="pd-i pd-i-ban"></i> Event Full</button><button class="btn btn-outline" style="flex:1;" onclick="addToCalendar('${event.id}')"><i class="pd-i pd-i-calendar-plus"></i> Add to Calendar</button>`;
+                else rsvpButtons.innerHTML = `<button class="btn btn-primary" style="flex:1;" onclick="rsvpToEvent('${event.id}')"><i class="pd-i pd-i-check"></i> RSVP Now</button><button class="btn btn-outline" style="flex:1;" onclick="addToCalendar('${event.id}')"><i class="pd-i pd-i-calendar-plus"></i> Add to Calendar</button>`;
+            } else rsvpButtons.innerHTML = `<button class="btn btn-primary" style="flex:1;" onclick="showLoginPrompt()"><i class="pd-i pd-i-log-in"></i> Login to RSVP</button><button class="btn btn-outline" style="flex:1;" onclick="addToCalendar('${event.id}')"><i class="pd-i pd-i-calendar-plus"></i> Add to Calendar</button>`;
             modal.style.display = 'flex';
         };
         
@@ -847,7 +852,7 @@
                 if (event.maxAttendees > 0 && (event.attendeeCount || 0) >= event.maxAttendees) { showToast('Event is full!', 'error'); return; }
                 await updateDoc(eventRef, { attendees: [...attendees, currentUser.uid], attendeeCount: (event.attendeeCount || 0) + 1, rsvpTimestamps: { ...(event.rsvpTimestamps || {}), [currentUser.uid]: Timestamp.now() } });
                 await setDoc(doc(db, "userEvents", `${currentUser.uid}_${eventId}`), { userId: currentUser.uid, eventId: eventId, eventTitle: event.title, eventDate: event.date, rsvpedAt: Timestamp.now(), attended: false });
-                showToast(`✅ Successfully RSVPed for ${event.title}!`, 'success');
+                showToast(`Successfully RSVPed for ${event.title}!`, 'success');
                 confetti({ particleCount: 80, spread: 60 });
                 loadEvents();
                 closeEventModal();
@@ -887,7 +892,7 @@
                     imageUrl = await getDownloadURL(storageRef);
                 }
                 await addDoc(collection(db, "events"), { title, date: Timestamp.fromDate(new Date(dateTime)), duration, location, category, speaker: speaker || 'Prayer Dome Team', description: description || '', maxAttendees: maxAttendees || 0, imageUrl, attendees: [], attendeeCount: 0, createdBy: currentUser.uid, createdByEmail: currentUser.email, createdAt: Timestamp.now(), status: 'published' });
-                showToast('✅ Event created!', 'success');
+                showToast('Event created!', 'success');
                 closeAddEventModal();
                 loadEvents();
             } catch (error) { showToast('Error: ' + error.message, 'error'); }
@@ -909,22 +914,22 @@
         function closeAddEventModal() { document.getElementById('addEventModal').style.display = 'none'; document.getElementById('eventForm').reset(); }
         function closeEventModal() { document.getElementById('eventModal').style.display = 'none'; }
         function showLoginPrompt() { showToast('Please login to RSVP', 'error'); }
-        function showToast(message, type = 'success') { const container = document.getElementById('toastContainer'); const toast = document.createElement('div'); toast.className = `toast ${type === 'error' ? 'error' : ''}`; toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`; container.appendChild(toast); setTimeout(() => toast.remove(), 3500); }
+        function showToast(message, type = 'success') { const container = document.getElementById('toastContainer'); const toast = document.createElement('div'); toast.className = `toast ${type === 'error' ? 'error' : ''}`; toast.innerHTML = `<i class="pd-i ${type === 'success' ? 'pd-i-circle-check' : 'pd-i-circle-alert'}"></i> ${message}`; container.appendChild(toast); setTimeout(() => toast.remove(), 3500); }
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
         function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
 
         window.loadMyEvents = async function() {
-            if (!currentUser) { document.getElementById('myEventsList').innerHTML = `<div style="text-align:center; padding:40px;"><i class="fas fa-lock" style="font-size:48px; opacity:0.3;"></i><p>Login to see your events</p></div>`; return; }
+            if (!currentUser) { document.getElementById('myEventsList').innerHTML = `<div style="text-align:center; padding:40px;"><i class="pd-i pd-i-lock" style="font-size:48px; opacity:0.3;"></i><p>Login to see your events</p></div>`; return; }
             try {
                 const snapshot = await getDocs(query(collection(db, "userEvents"), where("userId", "==", currentUser.uid), orderBy("rsvpedAt", "desc")));
-                if (snapshot.empty) { document.getElementById('myEventsList').innerHTML = `<div style="text-align:center; padding:40px;"><i class="fas fa-calendar-alt" style="font-size:48px; opacity:0.3;"></i><p>No RSVPs yet</p><button class="btn btn-primary" onclick="document.querySelector('.calendar-container').scrollIntoView()">Browse Events</button></div>`; return; }
+                if (snapshot.empty) { document.getElementById('myEventsList').innerHTML = `<div style="text-align:center; padding:40px;"><i class="pd-i pd-i-calendar-days" style="font-size:48px; opacity:0.3;"></i><p>No RSVPs yet</p><button class="btn btn-primary" onclick="document.querySelector('.calendar-container').scrollIntoView()">Browse Events</button></div>`; return; }
                 const myEvents = [];
                 for (const docSnap of snapshot.docs) {
                     const data = docSnap.data();
                     const eventDoc = await getDoc(doc(db, "events", data.eventId));
                     if (eventDoc.exists()) myEvents.push({ id: data.eventId, ...eventDoc.data(), rsvpedAt: data.rsvpedAt });
                 }
-                document.getElementById('myEventsList').innerHTML = myEvents.map(event => `<div class="event-item" onclick="showEventDetails('${event.id}')"><div class="event-time"><i class="far fa-clock"></i> ${moment(event.date.toDate()).format('dddd, MMMM D, YYYY • h:mm A')}</div><div class="event-title">${escapeHtml(event.title)}</div><div class="event-location"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(event.location)}</div><div style="display:flex; justify-content:space-between; margin-top:8px;"><span class="event-category">${event.category}</span><span style="font-size:11px; color:var(--accent-green);"><i class="fas fa-check-circle"></i> RSVPed ${moment(event.rsvpedAt?.toDate()).fromNow()}</span></div></div>`).join('');
+                document.getElementById('myEventsList').innerHTML = myEvents.map(event => `<div class="event-item" onclick="showEventDetails('${event.id}')"><div class="event-time"><i class="pd-i pd-i-clock"></i> ${moment(event.date.toDate()).format('dddd, MMMM D, YYYY • h:mm A')}</div><div class="event-title">${escapeHtml(event.title)}</div><div class="event-location"><i class="pd-i pd-i-map-pin"></i> ${escapeHtml(event.location)}</div><div style="display:flex; justify-content:space-between; margin-top:8px;"><span class="event-category">${event.category}</span><span style="font-size:11px; color:var(--accent-green);"><i class="pd-i pd-i-circle-check"></i> RSVPed ${moment(event.rsvpedAt?.toDate()).fromNow()}</span></div></div>`).join('');
             } catch (error) { console.error('Error loading my events:', error); document.getElementById('myEventsList').innerHTML = '<div style="text-align:center; padding:40px;">Error loading events</div>'; }
         };
 

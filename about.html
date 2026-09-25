@@ -125,7 +125,8 @@
     </script>
     <!-- PD-SEO:END -->
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/pd-icons.css">
+    <script src="/assets/pd-icons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
@@ -501,7 +502,6 @@
             color: var(--accent-green);
             flex-shrink: 0;
         }
-        .branch-flag { font-size: 1.8rem; }
         .branch-services { margin-top: 15px; }
         .branch-service-grid {
             display: grid;
@@ -792,6 +792,12 @@
                 transition-duration: 0.01ms !important;
             }
         }
+        /* Dark mode: brand blue (#0A4D9B) is about 2:1 on navy, so headings and icons use the
+           light brand tint (#93c5fd) and controls without a colour get readable text. */
+        body.dark-mode .card-title,
+        body.dark-mode .branch-icon,
+        body.dark-mode .branch-contact i,
+        body.dark-mode .branch-contact a { color: #93c5fd; }
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
@@ -815,15 +821,15 @@
             </div>
         </div>
         <div class="header-actions">
-            <a href="index.html" class="back-btn"><i class="fas fa-home"></i> <span>Home</span></a>
-            <button class="theme-btn" onclick="toggleDarkMode()" aria-label="Toggle dark mode"><i class="fas fa-moon"></i></button>
+            <a href="index.html" class="back-btn"><i class="pd-i pd-i-house"></i> <span>Home</span></a>
+            <button class="theme-btn" onclick="toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>
         </div>
     </header>
 
     <div class="main-container">
         <!-- Hero Section -->
         <div class="about-hero">
-            <h1><i class="fas fa-church"></i> About Prayer Dome</h1>
+            <h1><i class="pd-i pd-i-church"></i> About Prayer Dome</h1>
             <p>A House of Prayer for All Nations — Matthew 21:13</p>
         </div>
 
@@ -838,7 +844,7 @@
             </div>
             <div class="founder-info">
                 <h2>Pastor Seedwell K. Masuku</h2>
-                <h3><i class="fas fa-crown"></i> Founder & President</h3>
+                <h3><i class="pd-i pd-i-crown"></i> Founder & President</h3>
                 <p>Called by God to raise an army of intercessors globally. Pastor Seedwell leads Prayer Dome with a mandate to demonstrate the raw power of the Holy Spirit, bringing healing, deliverance, and prophetic direction to the nations. His vision is to see lives transformed through the power of prayer and the Word of God.</p>
                 <div class="founder-signature">"A House of Prayer for All Nations"</div>
             </div>
@@ -846,7 +852,7 @@
 
         <!-- About Content -->
         <div class="content-card">
-            <h2 class="card-title"><i class="fas fa-heart"></i> Who We Are</h2>
+            <h2 class="card-title"><i class="pd-i pd-i-heart"></i> Who We Are</h2>
             <div class="card-text">
                 <p>Prayer Dome is a Christ-centered ministry committed to preaching the Gospel of Jesus Christ, transforming lives through prayer, and raising believers who walk in faith, holiness, and the power of the Holy Spirit. Founded by Pastor Seedwell Masuku, the ministry was established with a vision to reach nations, plant churches, and bring people closer to God through sincere worship, biblical teaching, and compassionate service.</p>
                 <p>At Prayer Dome, we believe that prayer is the foundation of spiritual growth and breakthrough. We are passionate about creating an atmosphere where people can encounter God, grow spiritually, and discover their purpose in Christ. Through regular prayer gatherings, worship services, Bible studies, evangelism, and discipleship programs, we aim to strengthen individuals, families, and communities.</p>
@@ -877,45 +883,45 @@
 
         <!-- What We Do -->
         <div class="content-card">
-            <h2 class="card-title"><i class="fas fa-hands-helping"></i> What We Do</h2>
+            <h2 class="card-title"><i class="pd-i pd-i-hand-helping"></i> What We Do</h2>
             <div class="services-grid">
                 <div class="service-item">
-                    <div class="service-icon"><i class="fas fa-praying-hands"></i></div>
+                    <div class="service-icon"><i class="pd-i pd-i-hands-praying"></i></div>
                     <h4>Prayer & Intercession</h4>
                     <p>Regular prayer gatherings and intercessory meetings</p>
                 </div>
                 <div class="service-item">
-                    <div class="service-icon"><i class="fas fa-church"></i></div>
+                    <div class="service-icon"><i class="pd-i pd-i-church"></i></div>
                     <h4>Sunday Worship Services</h4>
                     <p>Powerful worship and Word-filled services</p>
                 </div>
                 <div class="service-item">
-                    <div class="service-icon"><i class="fas fa-bible"></i></div>
+                    <div class="service-icon"><i class="pd-i pd-i-book"></i></div>
                     <h4>Bible Teaching</h4>
                     <p>In-depth Bible study and discipleship programs</p>
                 </div>
                 <div class="service-item">
-                    <div class="service-icon"><i class="fas fa-users"></i></div>
+                    <div class="service-icon"><i class="pd-i pd-i-users"></i></div>
                     <h4>Youth & Women Programs</h4>
                     <p>Empowerment and leadership development</p>
                 </div>
                 <div class="service-item">
-                    <div class="service-icon"><i class="fas fa-globe"></i></div>
+                    <div class="service-icon"><i class="pd-i pd-i-globe"></i></div>
                     <h4>Evangelism & Church Planting</h4>
                     <p>Spreading the Gospel and planting churches</p>
                 </div>
                 <div class="service-item">
-                    <div class="service-icon"><i class="fas fa-music"></i></div>
+                    <div class="service-icon"><i class="pd-i pd-i-music"></i></div>
                     <h4>Music & Worship Ministry</h4>
                     <p>Developing worshippers and musicians</p>
                 </div>
                 <div class="service-item">
-                    <div class="service-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                    <div class="service-icon"><i class="pd-i pd-i-hand-heart"></i></div>
                     <h4>Community Outreach</h4>
                     <p>Compassionate ministry to the needy</p>
                 </div>
                 <div class="service-item">
-                    <div class="service-icon"><i class="fas fa-chalkboard-user"></i></div>
+                    <div class="service-icon"><i class="pd-i pd-i-presentation"></i></div>
                     <h4>Leadership Development</h4>
                     <p>Spiritual mentorship and training</p>
                 </div>
@@ -924,8 +930,7 @@
                 <div class="service-item feature-card zambia-branch">
                     <div class="branch-header-row">
                         <div class="branch-icon">
-                            <span class="branch-flag">🇿🇲</span>
-                            <i class="fas fa-map-marker-alt"></i>
+                            <i class="pd-i pd-i-map-pin"></i>
                         </div>
                         <div>
                             <h3>Prayer Dome Zambia Branch</h3>
@@ -933,8 +938,8 @@
                         </div>
                     </div>
                     <div class="branch-contact">
-                        <span><i class="fas fa-envelope"></i> info@prayerdome.net</span>
-                        <span><i class="fas fa-globe"></i> prayerdome.net</span>
+                        <span><i class="pd-i pd-i-mail"></i> info@prayerdome.net</span>
+                        <span><i class="pd-i pd-i-globe"></i> prayerdome.net</span>
                     </div>
                     <div class="branch-services">
                         <p class="branch-note">
@@ -942,42 +947,42 @@
                         </p>
                         <div class="branch-service-grid">
                             <div class="branch-service-card">
-                                <div class="branch-service-icon"><i class="fas fa-moon"></i></div>
+                                <div class="branch-service-icon"><i class="pd-i pd-i-moon"></i></div>
                                 <div class="branch-service-info">
                                     <span class="branch-svc-name">Daily Night Service</span>
                                     <span class="branch-svc-time">Every night — 8:00 PM CAT</span>
                                 </div>
                             </div>
                             <div class="branch-service-card">
-                                <div class="branch-service-icon"><i class="fas fa-sun"></i></div>
+                                <div class="branch-service-icon"><i class="pd-i pd-i-sun"></i></div>
                                 <div class="branch-service-info">
                                     <span class="branch-svc-name">Morning Devotion</span>
                                     <span class="branch-svc-time">Daily — 6:00 AM CAT</span>
                                 </div>
                             </div>
                             <div class="branch-service-card">
-                                <div class="branch-service-icon"><i class="fas fa-users"></i></div>
+                                <div class="branch-service-icon"><i class="pd-i pd-i-users"></i></div>
                                 <div class="branch-service-info">
                                     <span class="branch-svc-name">Youth & Young Adults</span>
                                     <span class="branch-svc-time">Wednesday & Friday</span>
                                 </div>
                             </div>
                             <div class="branch-service-card">
-                                <div class="branch-service-icon"><i class="fas fa-hands-praying"></i></div>
+                                <div class="branch-service-icon"><i class="pd-i pd-i-hands-praying"></i></div>
                                 <div class="branch-service-info">
                                     <span class="branch-svc-name">Corporate Prayer</span>
                                     <span class="branch-svc-time">Saturday — 5:00 PM CAT</span>
                                 </div>
                             </div>
                             <div class="branch-service-card">
-                                <div class="branch-service-icon"><i class="fas fa-microphone-alt"></i></div>
+                                <div class="branch-service-icon"><i class="pd-i pd-i-mic"></i></div>
                                 <div class="branch-service-info">
                                     <span class="branch-svc-name">Teaching & Discipleship</span>
                                     <span class="branch-svc-time">Sunday — 10:00 AM CAT</span>
                                 </div>
                             </div>
                             <div class="branch-service-card">
-                                <div class="branch-service-icon"><i class="fas fa-bible"></i></div>
+                                <div class="branch-service-icon"><i class="pd-i pd-i-book"></i></div>
                                 <div class="branch-service-info">
                                     <span class="branch-svc-name">Bible Study Groups</span>
                                     <span class="branch-svc-time">Tuesday &amp; Thursday</span>
@@ -990,7 +995,7 @@
                 <!-- Teaching Documents -->
                 <div class="service-item feature-card teaching-docs-section">
                     <div class="teaching-header">
-                        <div class="teaching-icon"><i class="fas fa-file-pdf"></i></div>
+                        <div class="teaching-icon"><i class="pd-i pd-i-file-text"></i></div>
                         <div>
                             <h3>Prayer Dome Zambia Teaching Library</h3>
                             <p class="branch-lead">5 Teaching Documents — Pastor Zacheus Simbaya</p>
@@ -999,49 +1004,49 @@
                     </div>
                     <div class="teaching-docs-grid">
                         <div class="teaching-doc-card">
-                            <div class="teaching-doc-icon"><i class="fas fa-file-pdf"></i></div>
+                            <div class="teaching-doc-icon"><i class="pd-i pd-i-file-text"></i></div>
                             <div class="teaching-doc-info">
                                 <span class="teaching-doc-title">Foundations of Faith</span>
                                 <span class="teaching-doc-desc">Core biblical teaching series</span>
                                 <span class="teaching-doc-size">PDF &mdash; 24 pages</span>
                             </div>
-                            <span class="teaching-doc-status"><i class="fas fa-lock"></i> Coming Soon</span>
+                            <span class="teaching-doc-status"><i class="pd-i pd-i-lock"></i> Coming Soon</span>
                         </div>
                         <div class="teaching-doc-card">
-                            <div class="teaching-doc-icon"><i class="fas fa-file-pdf"></i></div>
+                            <div class="teaching-doc-icon"><i class="pd-i pd-i-file-text"></i></div>
                             <div class="teaching-doc-info">
                                 <span class="teaching-doc-title">The Power of Night Prayer</span>
                                 <span class="teaching-doc-desc">A guide to nighttime intercession</span>
                                 <span class="teaching-doc-size">PDF &mdash; 18 pages</span>
                             </div>
-                            <span class="teaching-doc-status"><i class="fas fa-lock"></i> Coming Soon</span>
+                            <span class="teaching-doc-status"><i class="pd-i pd-i-lock"></i> Coming Soon</span>
                         </div>
                         <div class="teaching-doc-card">
-                            <div class="teaching-doc-icon"><i class="fas fa-file-pdf"></i></div>
+                            <div class="teaching-doc-icon"><i class="pd-i pd-i-file-text"></i></div>
                             <div class="teaching-doc-info">
                                 <span class="teaching-doc-title">Prayer Changes Everything</span>
                                 <span class="teaching-doc-desc">How to pray and see results</span>
                                 <span class="teaching-doc-size">PDF &mdash; 22 pages</span>
                             </div>
-                            <span class="teaching-doc-status"><i class="fas fa-lock"></i> Coming Soon</span>
+                            <span class="teaching-doc-status"><i class="pd-i pd-i-lock"></i> Coming Soon</span>
                         </div>
                         <div class="teaching-doc-card">
-                            <div class="teaching-doc-icon"><i class="fas fa-file-pdf"></i></div>
+                            <div class="teaching-doc-icon"><i class="pd-i pd-i-file-text"></i></div>
                             <div class="teaching-doc-info">
                                 <span class="teaching-doc-title">Holy Spirit &amp; Gifts</span>
                                 <span class="teaching-doc-desc">Understanding spiritual gifts</span>
                                 <span class="teaching-doc-size">PDF &mdash; 20 pages</span>
                             </div>
-                            <span class="teaching-doc-status"><i class="fas fa-lock"></i> Coming Soon</span>
+                            <span class="teaching-doc-status"><i class="pd-i pd-i-lock"></i> Coming Soon</span>
                         </div>
                         <div class="teaching-doc-card">
-                            <div class="teaching-doc-icon"><i class="fas fa-file-pdf"></i></div>
+                            <div class="teaching-doc-icon"><i class="pd-i pd-i-file-text"></i></div>
                             <div class="teaching-doc-info">
                                 <span class="teaching-doc-title">Praise &amp; Worship</span>
                                 <span class="teaching-doc-desc">The heart of gathered worship</span>
                                 <span class="teaching-doc-size">PDF &mdash; 15 pages</span>
                             </div>
-                            <span class="teaching-doc-status"><i class="fas fa-lock"></i> Coming Soon</span>
+                            <span class="teaching-doc-status"><i class="pd-i pd-i-lock"></i> Coming Soon</span>
                         </div>
                     </div>
                     <p class="teaching-foot">
@@ -1055,13 +1060,13 @@
         <!-- Mission & Vision -->
         <div class="split-grid">
             <div class="content-card">
-                <h2 class="card-title"><i class="fas fa-bullseye"></i> Our Mission</h2>
+                <h2 class="card-title"><i class="pd-i pd-i-target"></i> Our Mission</h2>
                 <div class="card-text">
                     <p>To spread the Gospel of Jesus Christ, raise faithful disciples, and transform lives through prayer, worship, teaching, and compassionate service.</p>
                 </div>
             </div>
             <div class="content-card">
-                <h2 class="card-title"><i class="fas fa-eye"></i> Our Vision</h2>
+                <h2 class="card-title"><i class="pd-i pd-i-eye"></i> Our Vision</h2>
                 <div class="card-text">
                     <p>To build a strong and spiritually mature generation that reflects the character of Christ and impacts communities and nations through the power of God.</p>
                 </div>
@@ -1070,45 +1075,45 @@
 
         <!-- Core Values -->
         <div class="content-card">
-            <h2 class="card-title"><i class="fas fa-gem"></i> Our Core Values</h2>
+            <h2 class="card-title"><i class="pd-i pd-i-gem"></i> Our Core Values</h2>
             <div class="values-grid">
                 <div class="value-item">
-                    <div class="value-icon"><i class="fas fa-cross"></i></div>
+                    <div class="value-icon"><i class="pd-i pd-i-latin-cross"></i></div>
                     <div class="value-title">Faith in God</div>
                     <div class="value-desc">Trusting God in all circumstances</div>
                 </div>
                 <div class="value-item">
-                    <div class="value-icon"><i class="fas fa-pray"></i></div>
+                    <div class="value-icon"><i class="pd-i pd-i-hands-praying"></i></div>
                     <div class="value-title">Prayer & Worship</div>
                     <div class="value-desc">Prioritizing God's presence</div>
                 </div>
                 <div class="value-item">
-                    <div class="value-icon"><i class="fas fa-star-of-life"></i></div>
+                    <div class="value-icon"><i class="pd-i pd-i-sparkles"></i></div>
                     <div class="value-title">Holiness & Integrity</div>
                     <div class="value-desc">Living blamelessly before God</div>
                 </div>
                 <div class="value-item">
-                    <div class="value-icon"><i class="fas fa-heart"></i></div>
+                    <div class="value-icon"><i class="pd-i pd-i-heart"></i></div>
                     <div class="value-title">Love & Compassion</div>
                     <div class="value-desc">Showing God's love to all</div>
                 </div>
                 <div class="value-item">
-                    <div class="value-icon"><i class="fas fa-handshake"></i></div>
+                    <div class="value-icon"><i class="pd-i pd-i-handshake"></i></div>
                     <div class="value-title">Unity & Service</div>
                     <div class="value-desc">Working together for the Kingdom</div>
                 </div>
                 <div class="value-item">
-                    <div class="value-icon"><i class="fas fa-bible"></i></div>
+                    <div class="value-icon"><i class="pd-i pd-i-book"></i></div>
                     <div class="value-title">Biblical Truth</div>
                     <div class="value-desc">Standing on God's Word</div>
                 </div>
                 <div class="value-item">
-                    <div class="value-icon"><i class="fas fa-chalkboard-user"></i></div>
+                    <div class="value-icon"><i class="pd-i pd-i-presentation"></i></div>
                     <div class="value-title">Leadership & Discipleship</div>
                     <div class="value-desc">Raising the next generation</div>
                 </div>
                 <div class="value-item">
-                    <div class="value-icon"><i class="fas fa-dove"></i></div>
+                    <div class="value-icon"><i class="pd-i pd-i-bird"></i></div>
                     <div class="value-title">Holy Spirit Power</div>
                     <div class="value-desc">Walking in supernatural grace</div>
                 </div>
@@ -1117,7 +1122,7 @@
 
         <!-- Welcome Message -->
         <div class="content-card welcome-card">
-            <h2 class="card-title"><i class="fas fa-door-open"></i> Welcome to Prayer Dome</h2>
+            <h2 class="card-title"><i class="pd-i pd-i-door-open"></i> Welcome to Prayer Dome</h2>
             <div class="card-text">
                 <p>Prayer Dome welcomes people from all backgrounds to experience God's presence, grow in faith, and become part of a loving spiritual family committed to advancing the Kingdom of God.</p>
                 <p class="welcome-verse">"Come and hear, all you who fear God; let me tell you what he has done for me." — Psalm 66:16</p>
@@ -1146,7 +1151,7 @@
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
             const btn = document.querySelector('.theme-btn i');
-            if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
+            if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'pd-i pd-i-sun' : 'pd-i pd-i-moon';
         }
 
         window.toggleDarkMode = toggleDarkMode;

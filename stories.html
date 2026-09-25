@@ -134,7 +134,8 @@
   <link rel="apple-touch-icon" href="/assets/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/assets/pd-icons.css">
+  <script src="/assets/pd-icons.js"></script>
   <link rel="stylesheet" href="/assets/pd-brand.css">
   <script src="/assets/pd-motion.js" defer></script><script src="/assets/pd-content-data.js" defer></script>
   <script src="/assets/pd-academy-data.js" defer></script><script src="/translation-data.js"></script>
@@ -146,31 +147,31 @@
 </head>
 <body class="pd-acad-page">
 <div class="pd-aurora" aria-hidden="true"><span></span></div>
-<aside class="pd-drawer" id="pdDrawer" aria-label="Main menu"><nav class="pd-drawer-nav"><a class="pd-drawer-link" href="/"><i class="fas fa-home"></i> Home</a><a class="pd-drawer-link" href="/lessons"><i class="fas fa-graduation-cap"></i> Teaching</a><a class="pd-drawer-link" href="/stories"><i class="fas fa-book-open-reader"></i> Stories</a><a class="pd-drawer-link" href="/quiz"><i class="fas fa-star"></i> Quizzes</a><a class="pd-drawer-link" href="/resources"><i class="fas fa-folder-open"></i> Resources</a><a class="pd-drawer-link" href="/testimony"><i class="fas fa-star-of-life"></i> Share Testimony</a></nav></aside>
+<aside class="pd-drawer" id="pdDrawer" aria-label="Main menu"><nav class="pd-drawer-nav"><a class="pd-drawer-link" href="/"><i class="pd-i pd-i-house"></i> Home</a><a class="pd-drawer-link" href="/lessons"><i class="pd-i pd-i-graduation-cap"></i> Teaching</a><a class="pd-drawer-link" href="/stories"><i class="pd-i pd-i-book-open-text"></i> Stories</a><a class="pd-drawer-link" href="/quiz"><i class="pd-i pd-i-star"></i> Quizzes</a><a class="pd-drawer-link" href="/resources"><i class="pd-i pd-i-folder-open"></i> Resources</a><a class="pd-drawer-link" href="/testimony"><i class="pd-i pd-i-sparkles"></i> Share Testimony</a></nav></aside>
 <header class="pd-topbar">
-  <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+  <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="pd-i pd-i-menu"></i></button>
   <a href="/" class="pd-topbar-center">
     <div class="pd-topbar-logo"><img src="/assets/logo.png" alt="PD Logo"></div>
     <div class="pd-topbar-word">PRAYER DOME</div>
   </a>
   <div class="pd-topbar-right">
     <select class="pd-lang-select" aria-label="Language">
-      <option value="en">🇬🇧 English</option>
-      <option value="tum">🇲🇼 Tumbuka</option>
-      <option value="ssw">🇸🇿 siSwati</option>
-      <option value="bem">🇿🇲 Bemba</option>
-      <option value="nya">🇲🇼 Nyanja</option>
+      <option value="en">English</option>
+      <option value="tum">Tumbuka</option>
+      <option value="ssw">siSwati</option>
+      <option value="bem">Bemba</option>
+      <option value="nya">Nyanja</option>
     </select>
-    <button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="fas fa-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>
-    <button class="theme-toggle-btn" onclick="toggleDarkMode && toggleDarkMode()"><i class="fas fa-moon"></i></button>
+    <button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="pd-i pd-i-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>
+    <button class="theme-toggle-btn" onclick="toggleDarkMode && toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>
   </div>
 </header>
 <main class="pd-acad-wrap" data-page="stories">
   <section class="pd-acad-hero">
-    <span class="pd-acad-eyebrow"><i class="fas fa-book-open-reader"></i> Faith Stories</span>
+    <span class="pd-acad-eyebrow"><i class="pd-i pd-i-book-open-text"></i> Faith Stories</span>
     <h1 data-pd-t="portal.stories">Stories that encourage, instruct and point people to Jesus.</h1>
     <p>Every story is written for reflection and spiritual growth: easy to read, beautiful to browse, and connected to a lesson so inspiration becomes discipleship.</p>
-    <div class="pd-acad-hero-actions"><a class="pd-acad-btn pd-acad-btn-primary" href="#storyGrid"><i class="fas fa-book"></i> Browse Stories</a><a class="pd-acad-btn pd-acad-btn-secondary" href="/testimony"><i class="fas fa-pen"></i> Share Your Story</a></div>
+    <div class="pd-acad-hero-actions"><a class="pd-acad-btn pd-acad-btn-primary" href="#storyGrid"><i class="pd-i pd-i-book"></i> Browse Stories</a><a class="pd-acad-btn pd-acad-btn-secondary" href="/testimony"><i class="pd-i pd-i-pen"></i> Share Your Story</a></div>
   </section>
   <section class="pd-acad-grid pd-acad-grid-4 pd-acad-stats"><div class="pd-acad-stat"><strong data-acad-story-count>0</strong><span>Inspiring stories</span></div><div class="pd-acad-stat"><strong data-acad-lesson-count>0</strong><span>Linked lessons</span></div><div class="pd-acad-stat"><strong>5 min</strong><span>Average read</span></div><div class="pd-acad-stat"><strong data-acad-progress>0%</strong><span>Learning progress</span></div></section>
   <div class="pd-acad-section-head"><div><h2>Read and reflect</h2><p>Search by topic or choose a category. Stories open in a focused reader and link to the related teaching.</p></div></div>

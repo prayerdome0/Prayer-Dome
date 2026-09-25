@@ -63,8 +63,8 @@ messaging.onBackgroundMessage((payload) => {
 
     if (isVerse) {
         notificationOptions.actions = [
-            { action: 'read', title: '📖 Read in Bible' },
-            { action: 'pray', title: '🙏 Pray now' }
+            { action: 'read', title: 'Read in Bible' },
+            { action: 'pray', title: 'Pray now' }
         ];
     }
 

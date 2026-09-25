@@ -1,0 +1,13 @@
+<!--
+  Prayer Dome custom icon: hands-praying
+  Lucide has no praying-hands glyph, so this one is drawn to Lucide's icon spec
+  (24x24 grid, 2px stroke, round caps and joins, no fill, 2px padding) to match
+  the rest of the set. Used for Prayer Requests, the Prayer Wall and "Amen" reactions.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 2.5v11" />
+  <path d="M12 2.5c-1.9.8-3.5 3.1-4 5.9L7.3 12 4 16l3 5" />
+  <path d="M12 2.5c1.9.8 3.5 3.1 4 5.9l.7 3.6L20 16l-3 5" />
+  <path d="M7.3 12c1.5 0 2.9.6 3.6 1.9" />
+  <path d="M16.7 12c-1.5 0-2.9.6-3.6 1.9" />
+</svg>

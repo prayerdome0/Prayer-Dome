@@ -10,7 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@500;700;800;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/assets/pd-icons.css">
+  <script src="/assets/pd-icons.js"></script>
   <link rel="stylesheet" href="/assets/pd-brand.css">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   
@@ -163,6 +164,7 @@
       border-radius: 50%;
       background: white;
       border: 4px solid #cbd5e1;
+      color: var(--pd-blue);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -409,65 +411,65 @@
 
 <aside class="pd-drawer" id="pdDrawer" aria-label="Main menu">
   <nav class="pd-drawer-nav">
-    <a class="pd-drawer-link" href="/"><i class="fas fa-home"></i> Home</a>
-    <a class="pd-drawer-link" href="/lessons"><i class="fas fa-graduation-cap"></i> Teaching</a>
-    <a class="pd-drawer-link" href="/stories"><i class="fas fa-book-open-reader"></i> Stories</a>
-    <a class="pd-drawer-link" href="/quiz"><i class="fas fa-star"></i> Quizzes</a>
-    <a class="pd-drawer-link" href="/game.html"><i class="fas fa-gamepad"></i> Faith Journey</a>
-    <a class="pd-drawer-link" href="/resources"><i class="fas fa-folder-open"></i> Resources</a>
-    <a class="pd-drawer-link" href="/sermons"><i class="fas fa-microphone-lines"></i> Sermons</a>
-    <a class="pd-drawer-link" href="/prayer"><i class="fas fa-hands-praying"></i> Prayer Wall</a>
-    <a class="pd-drawer-link" href="/account"><i class="fas fa-user-circle"></i> Account</a>
+    <a class="pd-drawer-link" href="/"><i class="pd-i pd-i-house"></i> Home</a>
+    <a class="pd-drawer-link" href="/lessons"><i class="pd-i pd-i-graduation-cap"></i> Teaching</a>
+    <a class="pd-drawer-link" href="/stories"><i class="pd-i pd-i-book-open-text"></i> Stories</a>
+    <a class="pd-drawer-link" href="/quiz"><i class="pd-i pd-i-star"></i> Quizzes</a>
+    <a class="pd-drawer-link" href="/game.html"><i class="pd-i pd-i-gamepad-2"></i> Faith Journey</a>
+    <a class="pd-drawer-link" href="/resources"><i class="pd-i pd-i-folder-open"></i> Resources</a>
+    <a class="pd-drawer-link" href="/sermons"><i class="pd-i pd-i-mic"></i> Sermons</a>
+    <a class="pd-drawer-link" href="/prayer"><i class="pd-i pd-i-hands-praying"></i> Prayer Wall</a>
+    <a class="pd-drawer-link" href="/account"><i class="pd-i pd-i-circle-user"></i> Account</a>
   </nav>
 </aside>
 <header class="pd-topbar">
-  <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+  <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="pd-i pd-i-menu"></i></button>
   <a href="/" class="pd-topbar-center">
     <div class="pd-topbar-logo"><img src="/assets/logo.png" alt="PD Logo"></div>
     <div class="pd-topbar-word">PRAYER DOME</div>
   </a>
   <div class="pd-topbar-right">
     <select class="pd-lang-select" aria-label="Language">
-      <option value="en">🇬🇧 English</option>
-      <option value="tum">🇲🇼 Tumbuka</option>
-      <option value="ssw">🇸🇿 siSwati</option>
-      <option value="bem">🇿🇲 Bemba</option>
-      <option value="nya">🇲🇼 Nyanja</option>
+      <option value="en">English</option>
+      <option value="tum">Tumbuka</option>
+      <option value="ssw">siSwati</option>
+      <option value="bem">Bemba</option>
+      <option value="nya">Nyanja</option>
     </select>
-    <button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="fas fa-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>
+    <button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="pd-i pd-i-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>
   </div>
 </header>
 
 <main class="game-wrap">
   <section class="game-hero">
-    <span class="pd-acad-eyebrow"><i class="fas fa-gamepad"></i> PRAYERDOME FAITH JOURNEY</span>
+    <span class="pd-acad-eyebrow"><i class="pd-i pd-i-gamepad-2"></i> PRAYERDOME FAITH JOURNEY</span>
     <h1>Your Spiritual Growth Journey</h1>
     <p>Travel through different spiritual stages, solve daily situational challenges, earn Faith Points (XP), collect beautiful badges, and maintain your streak!</p>
     <div>
-      <button class="pd-acad-btn pd-acad-btn-primary" onclick="scrollPlay()"><i class="fas fa-play"></i> Play Today's Challenge</button>
-      <button class="pd-acad-btn pd-acad-btn-secondary" onclick="scrollMystery()"><i class="fas fa-gift"></i> Mystery Challenge</button>
+      <button class="pd-acad-btn pd-acad-btn-primary" onclick="scrollPlay()"><i class="pd-i pd-i-play"></i> Play Today's Challenge</button>
+      <button class="pd-acad-btn pd-acad-btn-secondary" onclick="scrollMystery()"><i class="pd-i pd-i-gift"></i> Mystery Challenge</button>
     </div>
   </section>
 
   <!-- STATS -->
   <section class="game-stats-row">
     <div class="game-stat-card">
-      <i class="fas fa-star"></i>
+      <i class="pd-i pd-i-star"></i>
       <span class="val" id="xpVal">120</span>
       <span class="lbl">Faith Points (XP)</span>
     </div>
     <div class="game-stat-card">
-      <i class="fas fa-trophy"></i>
+      <i class="pd-i pd-i-trophy"></i>
       <span class="val" id="levelVal">1</span>
       <span class="lbl">Current Level</span>
     </div>
     <div class="game-stat-card">
-      <i class="fas fa-fire"></i>
+      <i class="pd-i pd-i-flame"></i>
       <span class="val" id="streakVal">1</span>
       <span class="lbl">Daily Streak</span>
     </div>
     <div class="game-stat-card">
-      <i class="fas fa-medal"></i>
+      <i class="pd-i pd-i-medal"></i>
       <span class="val" id="badgesVal">1</span>
       <span class="lbl">Badges Earned</span>
     </div>
@@ -476,7 +478,7 @@
   <!-- JOURNEY MAP -->
   <section class="journey-map-card">
     <div class="journey-map-title">
-      <i class="fas fa-map-location-dot"></i> Your Growth Pathway
+      <i class="pd-i pd-i-map-pinned"></i> Your Growth Pathway
     </div>
     <div class="journey-path" id="journeyPath">
       <!-- Generated dynamically -->
@@ -488,7 +490,7 @@
     <!-- CHALLENGE ZONE -->
     <section class="challenge-panel" id="playZone">
       <div class="challenge-title">
-        <i class="fas fa-bolt-lightning"></i> <span id="challengeHeadline">Situation Challenge</span>
+        <i class="pd-i pd-i-zap"></i> <span id="challengeHeadline">Situation Challenge</span>
       </div>
       <div class="situation-card">
         <div class="situation-text" id="challengeText">Loading next challenge...</div>
@@ -500,8 +502,8 @@
         </div>
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:0.85rem; color:var(--text-sub); font-weight:700;"><i class="fas fa-award"></i> Reward: <strong style="color:var(--pd-gold);">+50 XP</strong></span>
-        <button class="pd-acad-btn pd-acad-btn-secondary" id="nextChallengeBtn" onclick="nextSituation()" style="display:none;">Next Challenge <i class="fas fa-arrow-right"></i></button>
+        <span style="font-size:0.85rem; color:var(--text-sub); font-weight:700;"><i class="pd-i pd-i-award"></i> Reward: <strong style="color:var(--pd-gold);">+50 XP</strong></span>
+        <button class="pd-acad-btn pd-acad-btn-secondary" id="nextChallengeBtn" onclick="nextSituation()" style="display:none;">Next Challenge <i class="pd-i pd-i-arrow-right"></i></button>
       </div>
     </section>
 
@@ -509,9 +511,9 @@
     <div>
       <!-- MYSTERY CHALLENGE BOX -->
       <div class="sidebar-card">
-        <div class="sidebar-title"><i class="fas fa-dice"></i> Daily Mystery Box</div>
+        <div class="sidebar-title"><i class="pd-i pd-i-dices"></i> Daily Mystery Box</div>
         <div class="mystery-box">
-          <i class="fas fa-box-open"></i>
+          <i class="pd-i pd-i-package-open"></i>
           <p style="font-size:0.88rem; font-weight:600; margin-bottom:14px;">A random daily spiritual test awaits!</p>
           <button class="pd-acad-btn pd-acad-btn-primary btn-block" onclick="startMysteryChallenge()">PLAY MYSTERY</button>
         </div>
@@ -519,7 +521,7 @@
 
       <!-- BADGES -->
       <div class="sidebar-card">
-        <div class="sidebar-title"><i class="fas fa-award"></i> Achievement Badges</div>
+        <div class="sidebar-title"><i class="pd-i pd-i-award"></i> Achievement Badges</div>
         <div class="badge-grid" id="badgeGrid">
           <!-- Dynamically populated -->
         </div>
@@ -527,7 +529,7 @@
 
       <!-- LEADERBOARD -->
       <div class="sidebar-card">
-        <div class="sidebar-title"><i class="fas fa-ranking-star"></i> Community Leaders</div>
+        <div class="sidebar-title"><i class="pd-i pd-i-trophy"></i> Community Leaders</div>
         <div id="leaderboardList">
           <!-- Dynamically populated -->
         </div>
@@ -565,22 +567,22 @@
   };
 
   const STAGES = [
-    { label: "Beginner", icon: "🌱", key: "start" },
-    { label: "Prayer", icon: "🙏", key: "prayer" },
-    { label: "The Word", icon: "📖", key: "word" },
-    { label: "Love", icon: "❤️", key: "love" },
-    { label: "Forgiveness", icon: "🤝", key: "forgiveness" },
-    { label: "Faith", icon: "🕊️", key: "faith" },
-    { label: "Service", icon: "⭐", key: "service" },
-    { label: "Growth", icon: "👑", key: "growth" }
+    { label: "Beginner", icon: "pd-i-sprout", key: "start" },
+    { label: "Prayer", icon: "pd-i-hands-praying", key: "prayer" },
+    { label: "The Word", icon: "pd-i-book-open", key: "word" },
+    { label: "Love", icon: "pd-i-heart", key: "love" },
+    { label: "Forgiveness", icon: "pd-i-handshake", key: "forgiveness" },
+    { label: "Faith", icon: "pd-i-bird", key: "faith" },
+    { label: "Service", icon: "pd-i-star", key: "service" },
+    { label: "Growth", icon: "pd-i-crown", key: "growth" }
   ];
 
   const BADGE_DEFS = [
-    { id: 'first-step', name: "First Step", icon: "🌱", desc: "Completed first activity" },
-    { id: 'word-seeker', name: "Word Seeker", icon: "📖", desc: "Completed 10 Bible activities" },
-    { id: 'prayer-warrior', name: "Prayer Warrior", icon: "🙏", desc: "Completed 20 prayer challenges" },
-    { id: 'streak-builder', name: "Streak Builder", icon: "🔥", desc: "Maintained a 7-day streak" },
-    { id: 'faith-champion', name: "Journey Champion", icon: "🏆", desc: "Unlocked all spiritual stages" }
+    { id: 'first-step', name: "First Step", icon: "pd-i-footprints", desc: "Completed first activity" },
+    { id: 'word-seeker', name: "Word Seeker", icon: "pd-i-book-open", desc: "Completed 10 Bible activities" },
+    { id: 'prayer-warrior', name: "Prayer Warrior", icon: "pd-i-hands-praying", desc: "Completed 20 prayer challenges" },
+    { id: 'streak-builder', name: "Streak Builder", icon: "pd-i-flame", desc: "Maintained a 7-day streak" },
+    { id: 'faith-champion', name: "Journey Champion", icon: "pd-i-trophy", desc: "Unlocked all spiritual stages" }
   ];
 
   const SITUATIONS = [
@@ -659,7 +661,7 @@
       const step = document.createElement('div');
       step.className = `journey-step ${active ? 'active' : ''} ${completed ? 'completed' : ''}`;
       step.innerHTML = `
-        <div class="journey-step-circle">${s.icon}</div>
+        <div class="journey-step-circle"><i class="pd-i ${s.icon}" aria-hidden="true"></i></div>
         <div class="journey-step-label">${s.label}</div>
       `;
       path.appendChild(step);
@@ -672,7 +674,7 @@
       const unlocked = gameData.badges.includes(b.id);
       return `
         <div class="badge-item ${unlocked ? 'unlocked' : ''}" title="${b.desc}">
-          <i>${b.icon}</i>
+          <i class="pd-i ${b.icon}" aria-hidden="true"></i>
           <span>${b.name}</span>
         </div>
       `;
@@ -707,7 +709,7 @@
     });
 
     const expBox = document.getElementById('explanationBox');
-    expBox.innerHTML = `<strong>${opt.correct ? '✓ Correct Decision!' : '✗ Let\'s Reflect'}</strong><p style="margin-top:6px;">${opt.exp}</p>`;
+    expBox.innerHTML = `<strong>${opt.correct ? '<i class="pd-i pd-i-circle-check" aria-hidden="true"></i> Correct Decision!' : '<i class="pd-i pd-i-circle-x" aria-hidden="true"></i> Let\'s Reflect'}</strong><p style="margin-top:6px;">${opt.exp}</p>`;
     expBox.style.display = 'block';
 
     if (opt.xp > 0) {
@@ -734,7 +736,7 @@
     if (newLvl > gameData.level) {
       gameData.level = newLvl;
       confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
-      alert(`🎉 LEVEL UP! You reached Level ${gameData.level}!`);
+      alert(`LEVEL UP! You reached Level ${gameData.level}!`);
     }
     updateUI();
   }
@@ -743,7 +745,7 @@
     if (!gameData.badges.includes(id)) {
       gameData.badges.push(id);
       updateUI();
-      alert(`🎖️ BADGE UNLOCKED: ${BADGE_DEFS.find(b => b.id === id).name}!`);
+      alert(`BADGE UNLOCKED: ${BADGE_DEFS.find(b => b.id === id).name}!`);
     }
   }
 
@@ -751,7 +753,7 @@
     const types = ["Bible Challenge", "Memory Challenge", "Word Scramble", "Situation Challenge", "30-Second Challenge"];
     const chosenType = types[Math.floor(Math.random() * types.length)];
     
-    document.getElementById('challengeHeadline').textContent = `🎁 Mystery: ${chosenType}`;
+    document.getElementById('challengeHeadline').textContent = `Mystery: ${chosenType}`;
     
     let text = "";
     let options = [];
@@ -827,7 +829,7 @@
     });
 
     const expBox = document.getElementById('explanationBox');
-    expBox.innerHTML = `<strong>${correct ? '✓ Completed!' : '✗ Let\'s Try Again'}</strong><p style="margin-top:6px;">${exp}</p>`;
+    expBox.innerHTML = `<strong>${correct ? '<i class="pd-i pd-i-circle-check" aria-hidden="true"></i> Completed!' : '<i class="pd-i pd-i-circle-x" aria-hidden="true"></i> Let\'s Try Again'}</strong><p style="margin-top:6px;">${exp}</p>`;
     expBox.style.display = 'block';
 
     if (correct && xp > 0) {

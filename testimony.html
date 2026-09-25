@@ -124,7 +124,8 @@
 }
     </script>
     <!-- PD-SEO:END -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/assets/pd-icons.css">
+  <script src="/assets/pd-icons.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="/assets/pd-upload.js"></script>
@@ -470,13 +471,13 @@
       opacity: .85;
     }
     .testimony-card::after {
-      content: '\f10d';
-      font-family: 'Font Awesome 6 Free';
-      font-weight: 900;
+      content: '';
       position: absolute;
       top: 18px; right: 22px;
-      font-size: 2.2rem;
-      color: var(--accent-gold);
+      width: 2.2rem; height: 2.2rem;
+      background-color: var(--accent-gold);
+      -webkit-mask: var(--pd-icon-quote) center / contain no-repeat;
+      mask: var(--pd-icon-quote) center / contain no-repeat;
       opacity: .16;
       pointer-events: none;
     }
@@ -769,6 +770,10 @@
       .filter-bar { justify-content: center; }
       .brand-text p { display: none; }
     }
+        /* Dark mode: brand blue (#0A4D9B) is about 2:1 on navy, so headings and icons use the
+           light brand tint (#93c5fd) and controls without a colour get readable text. */
+        body.dark-mode .filter-chip:not(.active) { color: #e2e8f0; }
+        body.dark-mode .form-title { color: #93c5fd; }
   </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
@@ -793,8 +798,8 @@
       </div>
     </div>
     <div class="header-actions">
-      <a href="index.html" class="back-btn"><i class="fas fa-home"></i> Home</a>
-      <button class="theme-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+      <a href="index.html" class="back-btn"><i class="pd-i pd-i-house"></i> Home</a>
+      <button class="theme-btn" onclick="toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>
     </div>
   </header>
 
@@ -804,12 +809,12 @@
       <img src="/assets/testimonies/hero-praise.jpg" alt="Praise and worship" class="t-hero-bg">
       <div class="t-hero-tint"></div>
       <div class="t-hero-content">
-        <span class="t-hero-eyebrow"><i class="fas fa-fire"></i> &nbsp;REVIVAL STORIES</span>
+        <span class="t-hero-eyebrow"><i class="pd-i pd-i-flame"></i> &nbsp;REVIVAL STORIES</span>
         <h1 class="t-hero-title">Testimonies of His Faithfulness</h1>
         <p class="t-hero-sub">Every story is a seed of faith. Read how God is moving in the lives of His people — and share what He has done for you.</p>
         <div class="t-hero-actions">
-          <button class="t-hero-btn t-hero-btn-primary" onclick="scrollToForm()"><i class="fas fa-pen-fancy"></i> Share Your Story</button>
-          <button class="t-hero-btn t-hero-btn-ghost" onclick="scrollToGrid()"><i class="fas fa-arrow-down"></i> Read Stories</button>
+          <button class="t-hero-btn t-hero-btn-primary" onclick="scrollToForm()"><i class="pd-i pd-i-pen-line"></i> Share Your Story</button>
+          <button class="t-hero-btn t-hero-btn-ghost" onclick="scrollToGrid()"><i class="pd-i pd-i-arrow-down"></i> Read Stories</button>
         </div>
       </div>
     </section>
@@ -818,78 +823,78 @@
     <div class="stats-banner">
       <div class="stat-item">
         <div class="stat-number" id="totalTestimonies">0</div>
-        <div class="stat-label"><i class="fas fa-star"></i> TOTAL STORIES</div>
+        <div class="stat-label"><i class="pd-i pd-i-star"></i> TOTAL STORIES</div>
       </div>
       <div class="stat-item">
         <div class="stat-number" id="totalLikes">0</div>
-        <div class="stat-label"><i class="fas fa-heart"></i> PRAYERS</div>
+        <div class="stat-label"><i class="pd-i pd-i-heart"></i> PRAYERS</div>
       </div>
       <div class="stat-item">
         <div class="stat-number" id="thisMonth">0</div>
-        <div class="stat-label"><i class="fas fa-calendar-alt"></i> THIS MONTH</div>
+        <div class="stat-label"><i class="pd-i pd-i-calendar-days"></i> THIS MONTH</div>
       </div>
-      <button class="share-btn" onclick="scrollToForm()"><i class="fas fa-pen-fancy"></i> Share Your Story</button>
+      <button class="share-btn" onclick="scrollToForm()"><i class="pd-i pd-i-pen-line"></i> Share Your Story</button>
     </div>
 
     <!-- Share Testimony Form -->
     <div class="testimony-form-card" id="testimonyForm">
       <div class="form-title">
-        <i class="fas fa-praying-hands"></i>
+        <i class="pd-i pd-i-hands-praying"></i>
         <span>Share What God Has Done</span>
       </div>
       <form id="testimonyFormElement" onsubmit="event.preventDefault(); submitTestimony();">
         <div class="form-group">
-          <label><i class="fas fa-user"></i> Your Name</label>
+          <label><i class="pd-i pd-i-user"></i> Your Name</label>
           <input type="text" id="authorName" placeholder="e.g., Sarah M. or Anonymous" value="Anonymous">
         </div>
         <div class="form-group">
-          <label><i class="fas fa-tag"></i> Category</label>
+          <label><i class="pd-i pd-i-tag"></i> Category</label>
           <select id="testimonyCategory">
-            <option value="Healing">🩺 Healing & Health</option>
-            <option value="Provision">💰 Provision / Breakthrough</option>
-            <option value="Protection">🛡️ Protection & Safety</option>
-            <option value="Family">👨‍👩‍👧 Family & Relationships</option>
-            <option value="Deliverance">🙌 Deliverance</option>
-            <option value="Miracle">✨ Miracle</option>
-            <option value="Thanksgiving">🎉 Thanksgiving / Praise</option>
+            <option value="Healing">Healing & Health</option>
+            <option value="Provision">Provision / Breakthrough</option>
+            <option value="Protection">Protection & Safety</option>
+            <option value="Family">Family & Relationships</option>
+            <option value="Deliverance">Deliverance</option>
+            <option value="Miracle">Miracle</option>
+            <option value="Thanksgiving">Thanksgiving / Praise</option>
           </select>
         </div>
         <div class="form-group">
-          <label><i class="fas fa-quote-left"></i> Your Testimony *</label>
+          <label><i class="pd-i pd-i-quote"></i> Your Testimony *</label>
           <textarea id="testimonyContent" placeholder="I want to praise God because..." rows="4" maxlength="2000" required></textarea>
           <div class="char-count"><span id="charCount">0</span>/2000 characters</div>
         </div>
         <div class="form-group">
-          <label><i class="fas fa-calendar"></i> When did this happen? (Optional)</label>
+          <label><i class="pd-i pd-i-calendar"></i> When did this happen? (Optional)</label>
           <input type="text" id="testimonyDate" placeholder="e.g., Last week, December 2024">
         </div>
         <div class="upload-area" onclick="uploadTestimonyImage()">
-          <i class="fas fa-camera" style="font-size: 28px; color: var(--accent-gold); margin-bottom: 8px;"></i>
+          <i class="pd-i pd-i-camera" style="font-size: 28px; color: var(--accent-gold); margin-bottom: 8px;"></i>
           <p style="font-weight: 600;">Attach a Photo (Optional)</p>
           <p style="font-size: 0.7rem; color: var(--text-sub);">Add a picture to your testimony</p>
         </div>
         <div id="imagePreview"></div>
         <input type="hidden" id="photoUrl">
-        <button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-paper-plane"></i> Share Testimony</button>
+        <button type="submit" class="btn-submit" id="submitBtn"><i class="pd-i pd-i-send"></i> Share Testimony</button>
       </form>
     </div>
 
     <!-- Filter Bar -->
     <div class="filter-bar" id="filterBar">
-      <button class="filter-chip active" data-filter="all" onclick="filterTestimonies('all')"><i class="fas fa-globe"></i> All</button>
-      <button class="filter-chip" data-filter="Healing" onclick="filterTestimonies('Healing')"><i class="fas fa-heartbeat"></i> Healing</button>
-      <button class="filter-chip" data-filter="Provision" onclick="filterTestimonies('Provision')"><i class="fas fa-money-bill-wave"></i> Provision</button>
-      <button class="filter-chip" data-filter="Protection" onclick="filterTestimonies('Protection')"><i class="fas fa-shield-alt"></i> Protection</button>
-      <button class="filter-chip" data-filter="Family" onclick="filterTestimonies('Family')"><i class="fas fa-users"></i> Family</button>
-      <button class="filter-chip" data-filter="Deliverance" onclick="filterTestimonies('Deliverance')"><i class="fas fa-dove"></i> Deliverance</button>
-      <button class="filter-chip" data-filter="Miracle" onclick="filterTestimonies('Miracle')"><i class="fas fa-star"></i> Miracle</button>
-      <button class="filter-chip" data-filter="Thanksgiving" onclick="filterTestimonies('Thanksgiving')"><i class="fas fa-hands-clapping"></i> Thanksgiving</button>
+      <button class="filter-chip active" data-filter="all" onclick="filterTestimonies('all')"><i class="pd-i pd-i-globe"></i> All</button>
+      <button class="filter-chip" data-filter="Healing" onclick="filterTestimonies('Healing')"><i class="pd-i pd-i-heart-pulse"></i> Healing</button>
+      <button class="filter-chip" data-filter="Provision" onclick="filterTestimonies('Provision')"><i class="pd-i pd-i-banknote"></i> Provision</button>
+      <button class="filter-chip" data-filter="Protection" onclick="filterTestimonies('Protection')"><i class="pd-i pd-i-shield"></i> Protection</button>
+      <button class="filter-chip" data-filter="Family" onclick="filterTestimonies('Family')"><i class="pd-i pd-i-users"></i> Family</button>
+      <button class="filter-chip" data-filter="Deliverance" onclick="filterTestimonies('Deliverance')"><i class="pd-i pd-i-bird"></i> Deliverance</button>
+      <button class="filter-chip" data-filter="Miracle" onclick="filterTestimonies('Miracle')"><i class="pd-i pd-i-sparkles"></i> Miracle</button>
+      <button class="filter-chip" data-filter="Thanksgiving" onclick="filterTestimonies('Thanksgiving')"><i class="pd-i pd-i-party-popper"></i> Thanksgiving</button>
     </div>
 
     <!-- Testimonies Grid -->
     <div id="testimoniesGrid" class="testimonies-grid">
       <div class="empty-state">
-        <i class="fas fa-star-of-life"></i>
+        <i class="pd-i pd-i-sparkles"></i>
         <h3>No testimonies yet</h3>
         <p>Be the first to share what God has done in your life!</p>
         <button class="btn-submit" style="margin-top: 20px; width: auto; padding: 12px 30px;" onclick="scrollToForm()">Share Your Testimony</button>
@@ -932,13 +937,13 @@
     const SITE_ORIGIN = 'https://prayerdome.net';
     const TESTIMONY_FALLBACK_IMAGE = '/assets/testimonies/hero-praise.jpg';
 
-    // Emojis for reactions
-    const emojis = [
-        { code: '🙏', name: 'pray', icon: '🙏' },
-        { code: '❤️', name: 'love', icon: '❤️' },
-        { code: '🔥', name: 'fire', icon: '🔥' },
-        { code: '✝️', name: 'cross', icon: '✝️' },
-        { code: '🕊️', name: 'peace', icon: '🕊️' }
+    // Reactions: stored in Firestore under `reactions.<name>`; shown as Lucide icons.
+    const REACTIONS = [
+        { name: 'pray', icon: 'pd-i-hands-praying', label: 'Praying' },
+        { name: 'love', icon: 'pd-i-heart', label: 'Love' },
+        { name: 'fire', icon: 'pd-i-flame', label: 'On fire' },
+        { name: 'cross', icon: 'pd-i-latin-cross', label: 'Amen' },
+        { name: 'peace', icon: 'pd-i-bird', label: 'Peace' }
     ];
 
     function testimonyShareUrl(id) {
@@ -1058,7 +1063,7 @@
             document.getElementById('imagePreview').innerHTML = '';
             uploadedPhotoUrl = null;
             
-            showToast('🎉 Testimony shared! Thank you for glorifying God!', 'success');
+            showToast('Testimony shared! Thank you for glorifying God!', 'success');
             confetti({ particleCount: 150, spread: 100 });
             
             loadTestimonies();
@@ -1084,7 +1089,7 @@
         document.getElementById('imagePreview').innerHTML = `
             <div style="position:relative; margin-top: 15px;">
                 <img src="${url}" style="width:100%; height:150px; object-fit:cover; border-radius:16px;">
-                <button onclick="removeImage()" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer;"><i class="fas fa-times"></i></button>
+                <button onclick="removeImage()" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer;" aria-label="Remove image"><i class="pd-i pd-i-x"></i></button>
             </div>
         `;
         showToast("Image added!", "success");
@@ -1096,7 +1101,7 @@
     };
 
     // Toggle reaction
-    window.toggleReaction = async (testimonyId, reactionName, emojiCode) => {
+    window.toggleReaction = async (testimonyId, reactionName) => {
         if (!currentUser) {
             showToast('Sign in to react', 'info');
             return;
@@ -1140,7 +1145,7 @@
         await updateDoc(testimonyRef, {
             comments: arrayUnion(newComment)
         });
-        showToast('💬 Comment added!', 'success');
+        showToast('Comment added!', 'success');
         loadTestimonies();
     };
     
@@ -1166,7 +1171,7 @@
                     likedBy: arrayUnion(currentUser.uid),
                     likes: increment(1)
                 });
-                showToast('🙏 Prayer counted!', 'success');
+                showToast('Prayer counted!', 'success');
                 confetti({ particleCount: 30, spread: 40 });
             }
             loadTestimonies();
@@ -1236,7 +1241,7 @@
         if (filtered.length === 0) {
             grid.innerHTML = `
                 <div class="empty-state" style="grid-column: 1/-1;">
-                    <i class="fas fa-feather-alt"></i>
+                    <i class="pd-i pd-i-feather"></i>
                     <h3>No testimonies in this category yet</h3>
                     <p>Be the first to share your story!</p>
                     <button class="btn-submit" style="margin-top: 20px; width: auto; padding: 12px 30px;" onclick="scrollToForm()">Share Your Story</button>
@@ -1245,9 +1250,9 @@
             return;
         }
         
-        const categoryEmojis = {
-            Healing: '🩺', Provision: '💰', Protection: '🛡️', Family: '👨‍👩‍👧',
-            Deliverance: '🙌', Miracle: '✨', Thanksgiving: '🎉'
+        const categoryIcons = {
+            Healing: 'pd-i-heart-pulse', Provision: 'pd-i-banknote', Protection: 'pd-i-shield', Family: 'pd-i-users',
+            Deliverance: 'pd-i-bird', Miracle: 'pd-i-sparkles', Thanksgiving: 'pd-i-party-popper'
         };
         
         grid.innerHTML = filtered.map((testimony, idx) => {
@@ -1262,11 +1267,11 @@
                             <div class="author-avatar">${(testimony.author || 'A').charAt(0).toUpperCase()}</div>
                             <div class="author-info">
                                 <h4>${escapeHtml(testimony.author)}</h4>
-                                <div class="testimony-date"><i class="far fa-clock"></i> ${formatDate(testimony.timestamp)}</div>
+                                <div class="testimony-date"><i class="pd-i pd-i-clock"></i> ${formatDate(testimony.timestamp)}</div>
                             </div>
                         </div>
                         <div class="testimony-category">
-                            ${categoryEmojis[testimony.category] || '✨'} ${testimony.category}
+                            <i class="pd-i ${categoryIcons[testimony.category] || 'pd-i-sparkles'}" aria-hidden="true"></i> ${testimony.category}
                         </div>
                     </div>
                     
@@ -1278,9 +1283,9 @@
                     
                     <!-- Emoji Reactions -->
                     <div class="reactions">
-                        ${emojis.map(emoji => `
-                            <button class="reaction-btn ${reactions[emoji.name]?.includes(currentUser?.uid) ? 'active' : ''}" onclick="toggleReaction('${testimony.id}', '${emoji.name}', '${emoji.code}')">
-                                ${emoji.code} <span class="reaction-count">${reactions[emoji.name]?.length || 0}</span>
+                        ${REACTIONS.map(r => `
+                            <button class="reaction-btn ${reactions[r.name]?.includes(currentUser?.uid) ? 'active' : ''}" onclick="toggleReaction('${testimony.id}', '${r.name}')" aria-label="${r.label}" title="${r.label}">
+                                <i class="pd-i ${r.icon}" aria-hidden="true"></i> <span class="reaction-count">${reactions[r.name]?.length || 0}</span>
                             </button>
                         `).join('')}
                     </div>
@@ -1300,16 +1305,16 @@
                         ${comments.length > 2 ? `<div style="text-align: center; margin-top: 8px;"><button class="filter-chip" style="padding: 4px 12px; font-size: 0.7rem;" onclick="showAllComments('${testimony.id}')">View all ${comments.length} comments</button></div>` : ''}
                         <div class="add-comment">
                             <input type="text" id="comment-${testimony.id}" placeholder="Write a message of encouragement..." onkeypress="if(event.key==='Enter') addComment('${testimony.id}')">
-                            <button onclick="addComment('${testimony.id}')"><i class="fas fa-paper-plane"></i></button>
+                            <button onclick="addComment('${testimony.id}')" aria-label="Post comment"><i class="pd-i pd-i-send"></i></button>
                         </div>
                     </div>
                     
                     <div class="testimony-actions">
                         <button class="action-btn ${isLiked ? 'prayed' : ''}" onclick="likeTestimony('${testimony.id}')">
-                            <i class="fas fa-pray"></i> <span>${testimony.likes || 0}</span> Prayed
+                            <i class="pd-i pd-i-hands-praying"></i> <span>${testimony.likes || 0}</span> Prayed
                         </button>
                         <button class="action-btn" onclick="shareTestimony('${testimony.id}')">
-                            <i class="fas fa-share-alt"></i> Share
+                            <i class="pd-i pd-i-share-2"></i> Share
                         </button>
                     </div>
                 </div>
@@ -1338,7 +1343,7 @@
         modal.style.display = 'flex';
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 500px;">
-                <h3 style="color: var(--accent-green); margin-bottom: 20px;"><i class="fas fa-comments"></i> All Comments</h3>
+                <h3 style="color: var(--accent-green); margin-bottom: 20px;"><i class="pd-i pd-i-messages-square"></i> All Comments</h3>
                 <div style="max-height: 400px; overflow-y: auto;">
                     ${commentsHtml || '<p>No comments yet</p>'}
                 </div>
@@ -1371,12 +1376,12 @@
             return;
         }
         const url = `https://prayerdome.net/share/testimony/${encodeURIComponent(id)}`;
-        const shareText = `✨ PRAYER DOME TESTIMONY ✨\n\n"${excerpt}"\n\n- ${testimony.author}\n\n${url}`;
+        const shareText = `PRAYER DOME TESTIMONY\n\n"${excerpt}"\n\n- ${testimony.author}\n\n${url}`;
         if (navigator.share) {
             navigator.share({ title: 'Prayer Dome Testimony', text: shareText, url });
         } else {
             navigator.clipboard.writeText(shareText);
-            showToast('📋 Testimony link copied!', 'success');
+            showToast('Testimony link copied!', 'success');
         }
     }
 
@@ -1394,7 +1399,7 @@
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
         toast.className = `toast ${type === 'error' ? 'error' : ''}`;
-        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+        toast.innerHTML = `<i class="pd-i ${type === 'success' ? 'pd-i-circle-check' : 'pd-i-circle-alert'}"></i> ${message}`;
         container.appendChild(toast);
         setTimeout(() => toast.remove(), 3500);
     }
@@ -1402,7 +1407,7 @@
     function toggleDarkMode() {
         document.body.classList.toggle('dark-mode');
         const btn = document.querySelector('.theme-btn i');
-        if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
+        if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'pd-i pd-i-sun' : 'pd-i pd-i-moon';
     }
 
     function initCharCounter() {

@@ -125,7 +125,8 @@
     </script>
     <!-- PD-SEO:END -->
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/pd-icons.css">
+    <script src="/assets/pd-icons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -323,7 +324,7 @@
 
     <!-- SECURITY: NUMPAD PIN WALL -->
     <div id="secureOverlay">
-        <div class="secure-icon" id="js-secure-icon"><i class="fas fa-fingerprint"></i></div>
+        <div class="secure-icon" id="js-secure-icon"><i class="pd-i pd-i-fingerprint-pattern"></i></div>
         <h2 id="js-secure-title" style="font-size: 2rem; font-weight: 900;">Secure Access</h2>
         <p id="js-secure-sub" style="opacity:0.6; font-size:0.9rem; margin-top:10px; text-align:center;">Please authenticate to continue</p>
         
@@ -335,9 +336,9 @@
             <div class="n-key" onclick="tapPin(1)">1</div><div class="n-key" onclick="tapPin(2)">2</div><div class="n-key" onclick="tapPin(3)">3</div>
             <div class="n-key" onclick="tapPin(4)">4</div><div class="n-key" onclick="tapPin(5)">5</div><div class="n-key" onclick="tapPin(6)">6</div>
             <div class="n-key" onclick="tapPin(7)">7</div><div class="n-key" onclick="tapPin(8)">8</div><div class="n-key" onclick="tapPin(9)">9</div>
-            <div class="n-key" style="background:transparent;" onclick="cancelSecure()"><i class="fas fa-times"></i></div>
+            <div class="n-key" style="background:transparent;" onclick="cancelSecure()"><i class="pd-i pd-i-x"></i></div>
             <div class="n-key" onclick="tapPin(0)">0</div>
-            <div class="n-key" style="background:transparent; color: var(--pd-red);" onclick="clearPin()"><i class="fas fa-backspace"></i></div>
+            <div class="n-key" style="background:transparent; color: var(--pd-red);" onclick="clearPin()"><i class="pd-i pd-i-delete"></i></div>
         </div>
     </div>
 
@@ -350,7 +351,7 @@
                 <span>SUPPORT & FINANCE</span>
             </div>
         </a>
-        <i class="fas fa-shield-halved" style="color: var(--pd-gold); font-size: 24px;"></i>
+        <i class="pd-i pd-i-shield" style="color: var(--pd-gold); font-size: 24px;"></i>
     </header>
 
     <!-- SUPPORT HERO BANNER -->
@@ -358,7 +359,7 @@
         <img src="/assets/support/hero-support.jpg" alt="Kingdom support and provision" class="sp-hero-bg">
         <div class="sp-hero-tint"></div>
         <div class="sp-hero-content">
-            <span class="sp-hero-eyebrow"><i class="fas fa-hands-helping"></i>&nbsp; KINGDOM SUPPORT &amp; FINANCE</span>
+            <span class="sp-hero-eyebrow"><i class="pd-i pd-i-hand-helping"></i>&nbsp; KINGDOM SUPPORT &amp; FINANCE</span>
             <h1 class="sp-hero-title">Seed Today. <span>Harvest Tomorrow.</span></h1>
             <p class="sp-hero-sub">The Prayer Dome community supports its members with education, business seeding and compassion cover — empowering every household to walk in provision.</p>
             <div class="sp-hero-stats">
@@ -487,8 +488,8 @@
         <!-- ========================================== -->
         <div id="view-myplans" class="view-section">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h2 style="font-weight: 900;"><i class="fas fa-list-alt" style="color:var(--pd-green);"></i> Active Enrollments</h2>
-                <button class="btn-main btn-gold" style="width: auto; padding: 10px 20px; font-size: 0.8rem;" onclick="loadMyPlans()"><i class="fas fa-sync-alt"></i> Refresh</button>
+                <h2 style="font-weight: 900;"><i class="pd-i pd-i-list" style="color:var(--pd-green);"></i> Active Enrollments</h2>
+                <button class="btn-main btn-gold" style="width: auto; padding: 10px 20px; font-size: 0.8rem;" onclick="loadMyPlans()"><i class="pd-i pd-i-refresh-cw"></i> Refresh</button>
             </div>
             <div id="myPlansList">
                 <!-- Injected via JS -->
@@ -506,31 +507,31 @@
                 <div style="font-size: 12px; opacity: 0.8; margin-bottom: 25px;">Available for Withdrawals & Contributions</div>
                 
                 <div style="display:flex; gap:15px;">
-                    <button class="btn-main btn-gold" style="flex:1;" onclick="document.getElementById('modalDeposit').style.display='flex'"><i class="fas fa-plus"></i> DEPOSIT</button>
-                    <button class="btn-main btn-green" style="flex:1; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.3);" onclick="pinChallenge('withdraw_req')"><i class="fas fa-arrow-up"></i> WITHDRAW</button>
+                    <button class="btn-main btn-gold" style="flex:1;" onclick="document.getElementById('modalDeposit').style.display='flex'"><i class="pd-i pd-i-plus"></i> DEPOSIT</button>
+                    <button class="btn-main btn-green" style="flex:1; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.3);" onclick="pinChallenge('withdraw_req')"><i class="pd-i pd-i-arrow-up"></i> WITHDRAW</button>
                 </div>
             </div>
 
             <!-- SENSITIVE MOMO NUMBERS REVEAL -->
             <div class="secret-reveal" id="momoRevealSection">
-                <i class="fas fa-lock-open" style="font-size: 2rem; color: var(--pd-gold); margin-bottom: 10px;"></i>
+                <i class="pd-i pd-i-lock-open" style="font-size: 2rem; color: var(--pd-gold); margin-bottom: 10px;"></i>
                 <h3 style="font-weight:900; font-size: 1.4rem;">Official Payment Channels</h3>
                 <p style="font-size: 0.85rem; color: var(--text-sub); margin-top: 5px;">Verify PIN to reveal Mobile Money details.</p>
                 
                 <div id="revealTarget" class="blur-text" style="margin-top: 25px;">
                     <div style="background: var(--bg-base); padding: 25px; border-radius: 20px; text-align: left; border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
-                        <p style="font-size: 0.75rem; font-weight: 900; color: var(--pd-green); text-transform: uppercase; margin-bottom: 5px;"><i class="fas fa-mobile-alt"></i> Eswatini / Zambia MoMo</p>
+                        <p style="font-size: 0.75rem; font-weight: 900; color: var(--pd-green); text-transform: uppercase; margin-bottom: 5px;"><i class="pd-i pd-i-smartphone"></i> Eswatini / Zambia MoMo</p>
                         <p style="font-size: 2rem; font-weight: 900; letter-spacing: 2px; color: var(--text-main); margin: 5px 0;">+268 7658 1804</p>
                         <p style="font-size: 0.9rem; color: var(--text-sub); font-weight:600;">Account Name: <span style="color: var(--text-main);">PRAYER DOME GROUP</span></p>
-                        <button class="btn-main btn-green" style="padding: 12px; font-size: 0.85rem; margin-top:20px;" onclick="copyToClipboard('+26876581804')"><i class="fas fa-copy"></i> COPY NUMBER</button>
+                        <button class="btn-main btn-green" style="padding: 12px; font-size: 0.85rem; margin-top:20px;" onclick="copyToClipboard('+26876581804')"><i class="pd-i pd-i-copy"></i> COPY NUMBER</button>
                     </div>
                 </div>
 
-                <button class="btn-main btn-gold" id="btnReveal" style="width: auto; padding: 15px 40px; margin: 20px auto 0;" onclick="pinChallenge('reveal')"><i class="fas fa-eye"></i> REVEAL NUMBERS</button>
+                <button class="btn-main btn-gold" id="btnReveal" style="width: auto; padding: 15px 40px; margin: 20px auto 0;" onclick="pinChallenge('reveal')"><i class="pd-i pd-i-eye"></i> REVEAL NUMBERS</button>
             </div>
 
             <!-- TRANSACTION HISTORY -->
-            <h3 style="margin: 40px 0 20px; font-weight: 900; font-size: 1.4rem;"><i class="fas fa-history" style="color:var(--pd-gold);"></i> Transaction Ledger</h3>
+            <h3 style="margin: 40px 0 20px; font-weight: 900; font-size: 1.4rem;"><i class="pd-i pd-i-rotate-ccw-clock" style="color:var(--pd-gold);"></i> Transaction Ledger</h3>
             <div id="txHistoryList" style="background: var(--bg-card); border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden;">
                 <!-- Injected via JS -->
             </div>
@@ -588,7 +589,7 @@
     <!-- DEPOSIT MODAL -->
     <div class="modal" id="modalDeposit">
         <div class="modal-body">
-            <h2 style="color: var(--pd-green); font-weight: 900; margin-bottom: 10px;"><i class="fas fa-plus-circle"></i> Add Funds</h2>
+            <h2 style="color: var(--pd-green); font-weight: 900; margin-bottom: 10px;"><i class="pd-i pd-i-circle-plus"></i> Add Funds</h2>
             <p style="font-size: 0.9rem; color: var(--text-sub); margin-bottom: 25px;">Send funds to the MoMo number, then upload the screenshot here.</p>
             
             <div class="form-group">
@@ -597,7 +598,7 @@
             </div>
             
             <div class="doc-upload-zone" onclick="triggerCloudinary('deposit', 'receipt')">
-                <i class="fas fa-file-invoice-dollar" style="font-size: 1.8rem; color: var(--pd-gold);"></i>
+                <i class="pd-i pd-i-receipt-text" style="font-size: 1.8rem; color: var(--pd-gold);"></i>
                 <div style="text-align: left;">
                     <div style="font-weight: 800; font-size: 0.95rem;">Payment Receipt</div>
                     <div class="doc-status" id="stat_receipt">Waiting for upload...</div>
@@ -612,7 +613,7 @@
     <!-- WITHDRAW MODAL -->
     <div class="modal" id="modalWithdraw">
         <div class="modal-body">
-            <h2 style="color: var(--pd-red); font-weight: 900; margin-bottom: 10px;"><i class="fas fa-arrow-up"></i> Request Withdrawal</h2>
+            <h2 style="color: var(--pd-red); font-weight: 900; margin-bottom: 10px;"><i class="pd-i pd-i-arrow-up"></i> Request Withdrawal</h2>
             <p style="font-size: 0.9rem; color: var(--text-sub); margin-bottom: 25px;">Funds will be sent to your provided Mobile Money number. Minimum $10 equivalent.</p>
             
             <div class="form-group">
@@ -678,7 +679,7 @@
             const b = document.getElementById('toastBox');
             const t = document.createElement('div');
             t.className = `toast ${type === 'error' ? 'error' : ''}`;
-            t.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> <span>${msg}</span>`;
+            t.innerHTML = `<i class="pd-i ${type === 'error' ? 'pd-i-circle-alert' : 'pd-i-circle-check'}"></i> <span>${msg}</span>`;
             b.appendChild(t);
             setTimeout(() => { t.style.animation = 'slideIn 0.3s ease reverse forwards'; setTimeout(() => t.remove(), 300); }, 3500);
         };
@@ -776,12 +777,12 @@
 
         function successAnimate(msg) {
             document.getElementById('js-secure-title').innerText = msg;
-            document.getElementById('js-secure-icon').innerHTML = '<i class="fas fa-shield-check" style="color:var(--pd-green)"></i>';
+            document.getElementById('js-secure-icon').innerHTML = '<i class="pd-i pd-i-shield-check" style="color:var(--pd-green)"></i>';
             document.getElementById('js-secure-icon').style.boxShadow = '0 0 30px rgba(59,130,246,0.4)';
             
             setTimeout(() => {
                 document.getElementById('secureOverlay').style.display = 'none';
-                document.getElementById('js-secure-icon').innerHTML = '<i class="fas fa-fingerprint"></i>';
+                document.getElementById('js-secure-icon').innerHTML = '<i class="pd-i pd-i-fingerprint-pattern"></i>';
                 document.getElementById('js-secure-icon').style.boxShadow = '0 0 30px rgba(212,175,55,0.2)';
                 finalizeAccess();
             }, 800);
@@ -881,7 +882,7 @@ window.loadMyPlans = async () => {
         
         if(snap.empty) {
             list.innerHTML = `<div style="text-align:center; padding:60px 20px; background: var(--bg-card); border-radius: 30px; border: 1px dashed var(--border);">
-                <i class="fas fa-box-open" style="font-size: 50px; color:var(--border); margin-bottom:15px;"></i>
+                <i class="pd-i pd-i-package-open" style="font-size: 50px; color:var(--border); margin-bottom:15px;"></i>
                 <h3 style="font-weight: 800; color: var(--text-main);">No Active Portfolios</h3>
                 <p style="font-size:0.9rem; color:var(--text-sub); margin-top: 5px;">Enroll in a program from the Global Vision tab.</p>
             </div>`;
@@ -901,7 +902,7 @@ window.loadMyPlans = async () => {
             const daysActive = moment().diff(createdAt, 'days');
             const progress = Math.min((daysActive / 365) * 100, 100);
             
-            let maturityText = progress >= 100 ? `<span style="color: var(--pd-green);"><i class="fas fa-check-circle"></i> MATURED</span>` : `Matures in ${365 - daysActive} days`;
+            let maturityText = progress >= 100 ? `<span style="color: var(--pd-green);"><i class="pd-i pd-i-circle-check"></i> MATURED</span>` : `Matures in ${365 - daysActive} days`;
             
             // Determine theme color
             let themeColor = 'var(--pd-green)';
@@ -932,7 +933,7 @@ window.loadMyPlans = async () => {
                     </div>
                     
                     <button class="btn-main" style="background: ${themeColor}; color: white; margin-top:20px;" onclick="openClaimForm('${data.id}', '${data.planType}')">
-                        <i class="fas fa-file-signature"></i> FILE A SUPPORT CLAIM
+                        <i class="pd-i pd-i-file-pen-line"></i> FILE A SUPPORT CLAIM
                     </button>
                 </div>
             `;
@@ -941,7 +942,7 @@ window.loadMyPlans = async () => {
     } catch(e) { 
         console.error(e);
         list.innerHTML = `<div style="text-align:center; padding:60px 20px; color: var(--pd-red);">
-            <i class="fas fa-exclamation-triangle" style="font-size: 40px; margin-bottom: 15px;"></i>
+            <i class="pd-i pd-i-triangle-alert" style="font-size: 40px; margin-bottom: 15px;"></i>
             <p>Error loading plans: ${e.message}</p>
         </div>`;
     }
@@ -963,8 +964,8 @@ window.loadMyPlans = async () => {
                     <div class="form-group"><label>Student ID Number</label><input type="text" id="clStudentId" placeholder="ID Number"></div>
                 `;
                 requiredDocs =[
-                    { key: 'acceptance', label: 'Acceptance Letter / Proof of Enrollment', icon: 'fa-envelope-open-text' },
-                    { key: 'results', label: 'Latest Academic Results', icon: 'fa-chart-bar' }
+                    { key: 'acceptance', label: 'Acceptance Letter / Proof of Enrollment', icon: 'pd-i-mail-open' },
+                    { key: 'results', label: 'Latest Academic Results', icon: 'pd-i-chart-bar' }
                 ];
             } else if (planType === 'Business') {
                 formFields = `
@@ -972,8 +973,8 @@ window.loadMyPlans = async () => {
                     <div class="form-group"><label>Registration Number (if applicable)</label><input type="text" id="clBizReg" placeholder="Registration No."></div>
                 `;
                 requiredDocs =[
-                    { key: 'bizplan', label: 'Business Plan / Proposal', icon: 'fa-file-invoice' },
-                    { key: 'identity', label: 'National ID Copy', icon: 'fa-id-card' }
+                    { key: 'bizplan', label: 'Business Plan / Proposal', icon: 'pd-i-file-text' },
+                    { key: 'identity', label: 'National ID Copy', icon: 'pd-i-id-card' }
                 ];
             } else if (planType === 'Funeral') {
                 formFields = `
@@ -981,13 +982,13 @@ window.loadMyPlans = async () => {
                     <div class="form-group"><label>Date of Passing</label><input type="date" id="clDecDate"></div>
                 `;
                 requiredDocs =[
-                    { key: 'deathcert', label: 'Official Death Certificate', icon: 'fa-file-medical-alt' },
-                    { key: 'identity', label: 'Your ID Copy', icon: 'fa-id-card' }
+                    { key: 'deathcert', label: 'Official Death Certificate', icon: 'pd-i-file-heart' },
+                    { key: 'identity', label: 'Your ID Copy', icon: 'pd-i-id-card' }
                 ];
             }
 
             modalBody.innerHTML = `
-                <h2 style="color: var(--pd-gold); font-weight: 900; margin-bottom: 5px;"><i class="fas fa-file-invoice"></i> ${planType} Claim</h2>
+                <h2 style="color: var(--pd-gold); font-weight: 900; margin-bottom: 5px;"><i class="pd-i pd-i-file-text"></i> ${planType} Claim</h2>
                 <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 25px;">Please provide the specific details and official documents required for this program.</p>
                 
                 <div class="form-group">
@@ -1001,7 +1002,7 @@ window.loadMyPlans = async () => {
                 
                 ${requiredDocs.map(doc => `
                     <div class="doc-upload-zone" onclick="triggerCloudinary('claim', '${doc.key}')">
-                        <i class="fas ${doc.icon}" style="font-size: 1.5rem; color: var(--pd-navy);"></i>
+                        <i class="pd-i ${doc.icon}" style="font-size: 1.5rem; color: var(--pd-navy);"></i>
                         <div style="flex: 1; text-align: left;">
                             <div style="font-weight: 800; font-size: 0.85rem;">${doc.label}</div>
                             <div class="doc-status" id="stat_${doc.key}">Tap to upload PDF/Image</div>
@@ -1030,12 +1031,12 @@ window.loadMyPlans = async () => {
 
             if(context === 'deposit') {
                 claimDocs['receipt'] = url;
-                document.getElementById('stat_receipt').innerText = "✅ Attached";
+                document.getElementById('stat_receipt').innerHTML = '<i class="pd-i pd-i-circle-check" aria-hidden="true"></i> Attached';
                 document.getElementById('stat_receipt').classList.add('success');
                 toast('Payment receipt attached!');
             } else if (context === 'claim') {
                 claimDocs[docKey] = url;
-                document.getElementById(`stat_${docKey}`).innerText = "✅ Attached";
+                document.getElementById(`stat_${docKey}`).innerHTML = '<i class="pd-i pd-i-circle-check" aria-hidden="true"></i> Attached';
                 document.getElementById(`stat_${docKey}`).classList.add('success');
                 toast('Document attached successfully!');
             }
@@ -1153,7 +1154,7 @@ window.loadWalletData = async () => {
 
         const list = document.getElementById('txHistoryList');
         if(history.length === 0) {
-            list.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-sub); font-weight:600;"><i class="fas fa-receipt" style="font-size:40px; opacity:0.3; margin-bottom:10px; display:block;"></i>No transactions yet.</div>';
+            list.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-sub); font-weight:600;"><i class="pd-i pd-i-receipt" style="font-size:40px; opacity:0.3; margin-bottom:10px; display:block;"></i>No transactions yet.</div>';
             return;
         }
 
@@ -1161,18 +1162,18 @@ window.loadWalletData = async () => {
             let icon = '';
             let iconClass = '';
             if(t.type === 'Deposit') {
-                icon = '<i class="fas fa-arrow-down"></i>';
+                icon = '<i class="pd-i pd-i-arrow-down"></i>';
                 iconClass = 'dep';
             } else if(t.type === 'Withdrawal') {
-                icon = '<i class="fas fa-arrow-up"></i>';
+                icon = '<i class="pd-i pd-i-arrow-up"></i>';
                 iconClass = 'wth';
             } else {
-                icon = '<i class="fas fa-file-invoice-dollar"></i>';
+                icon = '<i class="pd-i pd-i-receipt-text"></i>';
                 iconClass = 'dep';
             }
             
             const statColor = t.stat === 'approved' ? '#3b82f6' : (t.stat === 'rejected' ? '#ef4444' : '#f59e0b');
-            const statText = t.stat === 'approved' ? '✓ Approved' : (t.stat === 'rejected' ? '✗ Rejected' : '⏳ Pending');
+            const statText = t.stat === 'approved' ? '<i class="pd-i pd-i-circle-check" aria-hidden="true"></i> Approved' : (t.stat === 'rejected' ? '<i class="pd-i pd-i-circle-x" aria-hidden="true"></i> Rejected' : '<i class="pd-i pd-i-hourglass" aria-hidden="true"></i> Pending');
 
             return `
                 <div class="tx-item">

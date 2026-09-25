@@ -125,7 +125,8 @@
     </script>
     <!-- PD-SEO:END -->
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/pd-icons.css">
+    <script src="/assets/pd-icons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -269,7 +270,7 @@
         .prayer-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-glow); border-color: var(--accent-gold);}
         .prayer-card.answered { border: 2px solid var(--accent-gold); background: linear-gradient(135deg, rgba(212,175,55,0.05), var(--bg-card)); }
         .prayer-card.highlighted-prayer { border: 2px solid var(--accent-gold); box-shadow: 0 0 0 3px rgba(212,175,55,.25), var(--shadow-glow); background: linear-gradient(160deg, rgba(212,175,55,.07), var(--bg-card) 45%); }
-        .prayer-card.highlighted-prayer::before { content: '⭐'; position: absolute; top: -14px; right: 18px; font-size: 1.5rem; filter: drop-shadow(0 3px 6px rgba(0,0,0,.25)); }
+        .prayer-card.highlighted-prayer::before { content: ''; position: absolute; top: -14px; right: 18px; width: 1.6rem; height: 1.6rem; background-color: var(--accent-gold); -webkit-mask: var(--pd-icon-star-fill) center / contain no-repeat; mask: var(--pd-icon-star-fill) center / contain no-repeat; filter: drop-shadow(0 3px 6px rgba(0,0,0,.25)); }
 
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
@@ -540,7 +541,7 @@
         <div><h2 style="font-size: 1.1rem; font-weight: 900;">PRAYER DOME</h2></div>
     </a>
     <div class="header-right">
-        <button class="theme-toggle-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+        <button class="theme-toggle-btn" onclick="toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>
     </div>
 </header>
 
@@ -549,31 +550,31 @@
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-number" id="statActive">0</div>
-            <div class="stat-label"><i class="fas fa-pray"></i> ACTIVE PRAYERS</div>
+            <div class="stat-label"><i class="pd-i pd-i-hands-praying"></i> ACTIVE PRAYERS</div>
         </div>
         <div class="stat-card">
             <div class="stat-number" id="statPrayed">0</div>
-            <div class="stat-label"><i class="fas fa-hands-praying"></i> PRAYERS OFFERED</div>
+            <div class="stat-label"><i class="pd-i pd-i-hands-praying"></i> PRAYERS OFFERED</div>
         </div>
         <div class="stat-card">
             <div class="stat-number" id="statAnswered" style="color: var(--accent-gold);">0</div>
-            <div class="stat-label"><i class="fas fa-star-of-life"></i> ANSWERED</div>
+            <div class="stat-label"><i class="pd-i pd-i-sparkles"></i> ANSWERED</div>
         </div>
     </div>
 
     <!-- Filter Bar -->
     <div class="filter-bar">
         <div class="filter-buttons">
-            <button class="filter-btn active" data-filter="all" onclick="filterPrayers('all')"><i class="fas fa-globe"></i> All</button>
-            <button class="filter-btn" data-filter="Sickness" onclick="filterPrayers('Sickness')"><i class="fas fa-thermometer-half"></i> Sickness</button>
-            <button class="filter-btn" data-filter="Healing" onclick="filterPrayers('Healing')"><i class="fas fa-heartbeat"></i> Healing</button>
-            <button class="filter-btn" data-filter="Provision" onclick="filterPrayers('Provision')"><i class="fas fa-money-bill-wave"></i> Provision</button>
-            <button class="filter-btn" data-filter="Family" onclick="filterPrayers('Family')"><i class="fas fa-users"></i> Family</button>
-            <button class="filter-btn" data-filter="Protection" onclick="filterPrayers('Protection')"><i class="fas fa-shield-alt"></i> Protection</button>
-            <button class="filter-btn" data-filter="Thanksgiving" onclick="filterPrayers('Thanksgiving')"><i class="fas fa-hands-clapping"></i> Thanksgiving</button>
+            <button class="filter-btn active" data-filter="all" onclick="filterPrayers('all')"><i class="pd-i pd-i-globe"></i> All</button>
+            <button class="filter-btn" data-filter="Sickness" onclick="filterPrayers('Sickness')"><i class="pd-i pd-i-thermometer"></i> Sickness</button>
+            <button class="filter-btn" data-filter="Healing" onclick="filterPrayers('Healing')"><i class="pd-i pd-i-heart-pulse"></i> Healing</button>
+            <button class="filter-btn" data-filter="Provision" onclick="filterPrayers('Provision')"><i class="pd-i pd-i-banknote"></i> Provision</button>
+            <button class="filter-btn" data-filter="Family" onclick="filterPrayers('Family')"><i class="pd-i pd-i-users"></i> Family</button>
+            <button class="filter-btn" data-filter="Protection" onclick="filterPrayers('Protection')"><i class="pd-i pd-i-shield"></i> Protection</button>
+            <button class="filter-btn" data-filter="Thanksgiving" onclick="filterPrayers('Thanksgiving')"><i class="pd-i pd-i-party-popper"></i> Thanksgiving</button>
         </div>
         <button class="submit-btn" onclick="openSubmitModal()">
-            <i class="fas fa-pen-fancy"></i> Submit Prayer
+            <i class="pd-i pd-i-pen-line"></i> Submit Prayer
         </button>
     </div>
 
@@ -586,40 +587,40 @@
 <!-- Submit Prayer Modal -->
 <div class="modal" id="submitModal">
     <div class="modal-content">
-        <h2 style="color: var(--accent-green); margin-bottom: 5px; font-family: 'Playfair Display', serif;"><i class="fas fa-praying-hands"></i> Submit Prayer Request</h2>
+        <h2 style="color: var(--accent-green); margin-bottom: 5px; font-family: 'Playfair Display', serif;"><i class="pd-i pd-i-hands-praying"></i> Submit Prayer Request</h2>
         <p style="color: var(--text-sub); margin-bottom: 20px;">Share your burden, and our global community will intercede with you.</p>
         
         <div class="form-group">
-            <label><i class="fas fa-user"></i> Your Name</label>
+            <label><i class="pd-i pd-i-user"></i> Your Name</label>
             <input type="text" id="pName" placeholder="Your name (or leave as Anonymous)">
         </div>
         
         <div class="form-group">
-            <label><i class="fas fa-tag"></i> Category</label>
+            <label><i class="pd-i pd-i-tag"></i> Category</label>
             <select id="pCategory">
-                <option value="Sickness">🤒 Sickness</option>
-                <option value="Healing">🩺 Healing & Health</option>
-                <option value="Provision">💰 Provision & Finances</option>
-                <option value="Protection">🛡️ Protection & Safety</option>
-                <option value="Family">👨‍👩‍👧 Family & Relationships</option>
-                <option value="Thanksgiving">🎉 Thanksgiving / Praise</option>
+                <option value="Sickness">Sickness</option>
+                <option value="Healing">Healing & Health</option>
+                <option value="Provision">Provision & Finances</option>
+                <option value="Protection">Protection & Safety</option>
+                <option value="Family">Family & Relationships</option>
+                <option value="Thanksgiving">Thanksgiving / Praise</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label><i class="fas fa-quote-left"></i> Your Prayer Request *</label>
+            <label><i class="pd-i pd-i-quote"></i> Your Prayer Request *</label>
             <textarea id="pText" rows="4" placeholder="Lord, I pray for..." required></textarea>
         </div>
 
         <div class="upload-area" onclick="uploadPrayerImage()">
-            <i class="fas fa-camera" style="font-size: 28px; color: var(--accent-gold); margin-bottom: 10px;"></i>
+            <i class="pd-i pd-i-camera" style="font-size: 28px; color: var(--accent-gold); margin-bottom: 10px;"></i>
             <p style="font-weight: 700;">Attach a Photo (Optional)</p>
             <p style="font-size: 0.75rem; color: var(--text-sub);">Add a picture to personalize your request</p>
         </div>
         <div id="pImagePreview"></div>
 
         <button class="btn-modern" onclick="submitPrayer()" id="submitBtn">
-            <i class="fas fa-paper-plane"></i> Post Prayer Request
+            <i class="pd-i pd-i-send"></i> Post Prayer Request
         </button>
         <button class="btn-modern" style="background: transparent; color: var(--text-main); border: 2px solid var(--border-color); margin-top: 12px;" onclick="closeModal('submitModal')">
             Cancel
@@ -630,7 +631,7 @@
 <!-- Login Modal -->
 <div class="modal" id="loginModal">
     <div class="modal-content" style="max-width: 400px; text-align: center;">
-        <i class="fas fa-lock" style="font-size: 48px; color: var(--accent-gold); margin-bottom: 20px;"></i>
+        <i class="pd-i pd-i-lock" style="font-size: 48px; color: var(--accent-gold); margin-bottom: 20px;"></i>
         <h2 style="margin-bottom: 10px; font-family: 'Playfair Display', serif;">Sign In Required</h2>
         <p style="color: var(--text-sub); margin-bottom: 25px;">Please sign in to submit or interact with prayers.</p>
         
@@ -680,23 +681,30 @@
     let currentFilter = 'all';
     let uploadedImageUrl = null;
 
-    // Emoji reactions
-    const emojis = [
-        { code: '🙏', name: 'praying', icon: '🙏' },
-        { code: '❤️', name: 'love', icon: '❤️' },
-        { code: '🔥', name: 'fire', icon: '🔥' },
-        { code: '✝️', name: 'cross', icon: '✝️' },
-        { code: '🕊️', name: 'peace', icon: '🕊️' }
+    // Reactions: stored in Firestore under `reactions.<name>`; shown as Lucide icons.
+    const REACTIONS = [
+        { name: 'praying', icon: 'pd-i-hands-praying', label: 'Praying' },
+        { name: 'love', icon: 'pd-i-heart', label: 'Love' },
+        { name: 'fire', icon: 'pd-i-flame', label: 'On fire' },
+        { name: 'cross', icon: 'pd-i-latin-cross', label: 'Amen' },
+        { name: 'peace', icon: 'pd-i-bird', label: 'Peace' }
+    ];
+
+    const QUICK_REPLIES = [
+        { icon: 'pd-i-hands-praying', text: 'Praying for you' },
+        { icon: 'pd-i-biceps-flexed', text: 'Standing with you' },
+        { icon: 'pd-i-sparkles', text: 'God is faithful' },
+        { icon: 'pd-i-bird', text: 'Peace be with you' }
     ];
 
     const categoryStyles = {
-        Sickness: { bg: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', icon: '🤒' },
-        Healing: { bg: 'rgba(59,130,246, 0.1)', color: '#3b82f6', icon: '🩺' },
-        Provision: { bg: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', icon: '💰' },
-        Protection: { bg: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', icon: '🛡️' },
-        Family: { bg: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6', icon: '👨‍👩‍👧' },
-        Thanksgiving: { bg: 'rgba(212, 175, 55, 0.1)', color: '#d4af37', icon: '🎉' },
-        General: { bg: 'rgba(100, 116, 139, 0.1)', color: '#64748b', icon: '📝' }
+        Sickness: { bg: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', icon: 'pd-i-thermometer' },
+        Healing: { bg: 'rgba(59,130,246, 0.1)', color: '#3b82f6', icon: 'pd-i-heart-pulse' },
+        Provision: { bg: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', icon: 'pd-i-banknote' },
+        Protection: { bg: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', icon: 'pd-i-shield' },
+        Family: { bg: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6', icon: 'pd-i-users' },
+        Thanksgiving: { bg: 'rgba(212, 175, 55, 0.1)', color: '#d4af37', icon: 'pd-i-party-popper' },
+        General: { bg: 'rgba(100, 116, 139, 0.1)', color: '#64748b', icon: 'pd-i-hands-praying' }
     };
 
     // Auth
@@ -708,7 +716,7 @@
             greeting.className = 'user-greeting';
             greeting.style.fontSize = '0.8rem';
             greeting.style.fontWeight = '600';
-            greeting.innerHTML = `<i class="fas fa-user-circle"></i> ${user.displayName?.split(' ')[0] || 'Member'}`;
+            greeting.innerHTML = `<i class="pd-i pd-i-circle-user"></i> ${user.displayName?.split(' ')[0] || 'Member'}`;
             headerBtn.parentElement.insertBefore(greeting, headerBtn);
         }
         renderPrayers();
@@ -782,7 +790,7 @@
         allPrayers.forEach(p => {
             if (followed.includes(p.id) && p.answered) {
                 saveFollowedPrayers(followed.filter(id => id !== p.id));
-                showToast('✨ Answered: "' + (p.text || '').substring(0, 60) + '"', 'success');
+                showToast('Answered: "' + (p.text || '').substring(0, 60) + '"', 'success');
             }
         });
     }
@@ -794,7 +802,7 @@
             filtered = filtered.filter(p => p.category === currentFilter);
         }
         if (filtered.length === 0) {
-            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px;"><i class="fas fa-praying-hands" style="font-size: 60px; opacity: 0.3;"></i><h3 style="margin-top: 20px;">No prayers in this category</h3><p style="color: var(--text-sub);">Be the first to submit a prayer request!</p></div>`;
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px;"><i class="pd-i pd-i-hands-praying" style="font-size: 60px; opacity: 0.3;"></i><h3 style="margin-top: 20px;">No prayers in this category</h3><p style="color: var(--text-sub);">Be the first to submit a prayer request!</p></div>`;
             return;
         }
         grid.innerHTML = filtered.map((p, index) => {
@@ -812,31 +820,31 @@
             
             return `
                 <div class="prayer-card ${p.answered ? 'answered' : ''} ${highlighted ? 'highlighted-prayer' : ''}" style="animation-delay: ${index * 0.05}s">
-                    ${highlighted ? `<div style="display:flex; align-items:center; gap:8px; background: linear-gradient(135deg, rgba(212,175,55,.18), rgba(212,175,55,.05)); border: 1px solid rgba(212,175,55,.45); color: #a67c00; font-size:.68rem; font-weight:900; letter-spacing:1.2px; text-transform:uppercase; padding:7px 14px; border-radius:30px; margin-bottom:14px; width:fit-content;"><i class="fas fa-star"></i> Highlighted by the ministry</div>` : ''}
+                    ${highlighted ? `<div style="display:flex; align-items:center; gap:8px; background: linear-gradient(135deg, rgba(212,175,55,.18), rgba(212,175,55,.05)); border: 1px solid rgba(212,175,55,.45); color: #a67c00; font-size:.68rem; font-weight:900; letter-spacing:1.2px; text-transform:uppercase; padding:7px 14px; border-radius:30px; margin-bottom:14px; width:fit-content;"><i class="pd-i pd-i-star"></i> Highlighted by the ministry</div>` : ''}
                     <div class="prayer-header">
                         <div class="prayer-user">
                             <div class="prayer-avatar">${initial}</div>
                             <div class="prayer-meta">
                                 <h4>${escapeHtml(nameStr)}</h4>
-                                <p><i class="far fa-clock"></i> ${dateStr}</p>
+                                <p><i class="pd-i pd-i-clock"></i> ${dateStr}</p>
                             </div>
                         </div>
                         <div>
-                            <span class="category-badge" style="background: ${style.bg}; color: ${style.color};">${style.icon} ${p.category || 'General'}</span>
-                            ${p.answered ? `<span class="category-badge" style="background: var(--accent-gold); color: white; margin-top: 5px; display: inline-block;"><i class="fas fa-check-circle"></i> Answered</span>` : ''}
-                            ${pendingApproval && isOwner ? `<span class="category-badge" style="background: rgba(212,175,55,.15); color: #a67c00; margin-top: 5px; display: inline-block; border:1px solid rgba(212,175,55,.4);"><i class="fas fa-hourglass-half"></i> Awaiting approval</span>` : ''}
+                            <span class="category-badge" style="background: ${style.bg}; color: ${style.color};"><i class="pd-i ${style.icon}" aria-hidden="true"></i> ${p.category || 'General'}</span>
+                            ${p.answered ? `<span class="category-badge" style="background: var(--accent-gold); color: white; margin-top: 5px; display: inline-block;"><i class="pd-i pd-i-circle-check"></i> Answered</span>` : ''}
+                            ${pendingApproval && isOwner ? `<span class="category-badge" style="background: rgba(212,175,55,.15); color: #a67c00; margin-top: 5px; display: inline-block; border:1px solid rgba(212,175,55,.4);"><i class="pd-i pd-i-hourglass"></i> Awaiting approval</span>` : ''}
                         </div>
                     </div>
                     
-                    <div class="prayer-text"><i class="fas fa-quote-left" style="color: var(--accent-gold); opacity: 0.5; margin-right: 5px;"></i> ${escapeHtml(p.text)}</div>
+                    <div class="prayer-text"><i class="pd-i pd-i-quote" style="color: var(--accent-gold); opacity: 0.5; margin-right: 5px;"></i> ${escapeHtml(p.text)}</div>
                     
                     ${p.imageUrl ? `<img src="${p.imageUrl}" class="prayer-image" loading="lazy">` : ''}
                     
                     <!-- Emoji Reactions -->
                     <div class="reactions">
-                        ${emojis.map(emoji => `
-                            <button class="reaction-btn ${reactions[emoji.name]?.includes(currentUser?.uid) ? 'active' : ''}" onclick="toggleReaction('${p.id}', '${emoji.name}', '${emoji.code}')">
-                                ${emoji.code} <span class="reaction-count">${reactions[emoji.name]?.length || 0}</span>
+                        ${REACTIONS.map(r => `
+                            <button class="reaction-btn ${reactions[r.name]?.includes(currentUser?.uid) ? 'active' : ''}" onclick="toggleReaction('${p.id}', '${r.name}')" aria-label="${r.label}" title="${r.label}">
+                                <i class="pd-i ${r.icon}" aria-hidden="true"></i> <span class="reaction-count">${reactions[r.name]?.length || 0}</span>
                             </button>
                         `).join('')}
                     </div>
@@ -856,29 +864,29 @@
                         ${comments.length > 3 ? `<div style="text-align: center; margin-top: 8px;"><button class="filter-btn" style="padding: 4px 12px; font-size: 0.7rem;" onclick="loadMoreComments('${p.id}')">View all ${comments.length} comments</button></div>` : ''}
                         <div class="add-comment">
                             <input type="text" id="comment-${p.id}" placeholder="Leave an encouragement..." onkeypress="if(event.key==='Enter') addComment('${p.id}')">
-                            <button onclick="addComment('${p.id}')"><i class="fas fa-paper-plane"></i></button>
+                            <button onclick="addComment('${p.id}')" aria-label="Post comment"><i class="pd-i pd-i-send"></i></button>
                         </div>
                         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
-                            ${['🙏 Praying for you', '💪 Standing with you', '✨ God is faithful', '🕊️ Peace be with you'].map(c => `<button class="filter-btn" style="padding:3px 10px; font-size:.62rem;" onclick="document.getElementById('comment-${p.id}').value='${c}'; document.getElementById('comment-${p.id}').focus();">${c}</button>`).join('')}
+                            ${QUICK_REPLIES.map(q => `<button class="filter-btn" style="padding:3px 10px; font-size:.62rem;" onclick="document.getElementById('comment-${p.id}').value='${q.text}'; document.getElementById('comment-${p.id}').focus();"><i class="pd-i ${q.icon}" aria-hidden="true"></i> ${q.text}</button>`).join('')}
                         </div>
                     </div>
                     
                     <div class="prayer-actions">
                         <button class="action-btn ${hasPrayed ? 'prayed' : ''}" onclick="togglePray('${p.id}', this)" ${p.answered ? 'disabled' : ''}>
-                            <i class="fas fa-hands-praying"></i> <span>${p.prayedCount || 0}</span> Praying For You
+                            <i class="pd-i pd-i-hands-praying"></i> <span>${p.prayedCount || 0}</span> Praying For You
                         </button>
                         <button class="action-btn ${followed ? 'prayed' : ''}" style="${followed ? 'color: var(--accent-gold);' : ''}" onclick="followPrayer('${p.id}')" title="Get updates on this prayer">
-                            <i class="fas ${followed ? 'fa-bell' : 'fa-bell'}" style="color: var(--accent-gold);"></i> <span>${followed ? 'Following ✓' : 'Follow'}</span>
+                            <i class="pd-i ${followed ? 'pd-i-bell-ring' : 'pd-i-bell'}" style="color: var(--accent-gold);"></i> <span>${followed ? 'Following' : 'Follow'}</span>
                         </button>
                         <button class="action-btn" onclick="sharePrayer('${escapeHtml(p.text).replace(/'/g, "\\'")}')">
-                            <i class="fas fa-share-alt"></i> Share
+                            <i class="pd-i pd-i-share-2"></i> Share
                         </button>
                         ${isOwner && !p.answered ? `
                             <button class="action-btn" style="color: var(--accent-gold);" onclick="markAnswered('${p.id}')" title="Mark Answered">
-                                <i class="fas fa-check-double"></i> Answer
+                                <i class="pd-i pd-i-check-check"></i> Answer
                             </button>
                             <button class="action-btn" style="color: var(--accent-red);" onclick="deletePrayer('${p.id}')" title="Delete">
-                                <i class="fas fa-trash"></i> Delete
+                                <i class="pd-i pd-i-trash"></i> Delete
                             </button>
                         ` : ''}
                     </div>
@@ -888,7 +896,7 @@
     }
     
     // Toggle Reaction (Emoji)
-    window.toggleReaction = async (prayerId, reactionName, emojiCode) => {
+    window.toggleReaction = async (prayerId, reactionName) => {
         if (!currentUser) {
             showToast('Sign in to react', 'info');
             openLoginModal();
@@ -933,7 +941,7 @@
         await updateDoc(prayerRef, {
             comments: arrayUnion(newComment)
         });
-        showToast('💬 Comment added!', 'success');
+        showToast('Comment added!', 'success');
     };
 
     window.loadMoreComments = async (prayerId) => {
@@ -957,7 +965,7 @@
         modal.style.display = 'flex';
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 500px;">
-                <h3 style="color: var(--accent-green); margin-bottom: 20px;"><i class="fas fa-comments"></i> All Comments</h3>
+                <h3 style="color: var(--accent-green); margin-bottom: 20px;"><i class="pd-i pd-i-messages-square"></i> All Comments</h3>
                 <div style="max-height: 400px; overflow-y: auto;">
                     ${commentsHtml || '<p>No comments yet</p>'}
                 </div>
@@ -994,7 +1002,7 @@
         document.getElementById('pImagePreview').innerHTML = `
             <div style="position:relative; margin-top: 15px; border-radius: 16px; overflow:hidden;">
                 <img src="${uploadedImageUrl}" style="width:100%; height: 140px; object-fit:cover;">
-                <button onclick="removeImage(event)" style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:28px; height:28px; cursor:pointer;"><i class="fas fa-times"></i></button>
+                <button onclick="removeImage(event)" style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:28px; height:28px; cursor:pointer;" aria-label="Remove image"><i class="pd-i pd-i-x"></i></button>
             </div>
         `;
         showToast('Image attached!', 'success');
@@ -1013,7 +1021,7 @@
         if (!text) return showToast('Please write your prayer request', 'error');
 
         const btn = document.getElementById('submitBtn');
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        btn.innerHTML = '<i class="pd-i pd-i-loader-circle pd-i-spin"></i> Submitting...';
         btn.disabled = true;
 
         try {
@@ -1036,7 +1044,7 @@
             closeModal('submitModal');
             document.getElementById('pText').value = '';
             uploadedImageUrl = null;
-            showToast('🙏 Prayer Request Submitted!', 'success');
+            showToast('Prayer Request Submitted!', 'success');
             confetti({ particleCount: 100, spread: 70 });
         } catch(e) {
             showToast(e.message, 'error');
@@ -1062,7 +1070,7 @@
             await updateDoc(pRef, { prayedBy: arrayRemove(currentUser.uid), prayedCount: increment(-1) });
         } else {
             await updateDoc(pRef, { prayedBy: arrayUnion(currentUser.uid), prayedCount: increment(1) });
-            showToast('🙏 You prayed for them!', 'success');
+            showToast('You prayed for them!', 'success');
         }
     };
 
@@ -1074,7 +1082,7 @@
         } else {
             list.push(id);
             saveFollowedPrayers(list);
-            showToast('🔔 Following — you will be notified when this prayer is answered', 'success');
+            showToast('Following — you will be notified when this prayer is answered', 'success');
         }
         renderPrayers();
     };
@@ -1095,10 +1103,10 @@
                         source: 'prayer-wall'
                     });
                     if (window.PDApp) PDApp.stats.bump('testimonies', 1);
-                    showToast('✨ Testimony shared!', 'success');
+                    showToast('Testimony shared!', 'success');
                 } catch (e) { console.error(e); }
             }
-            showToast('✨ Marked as answered!', 'success');
+            showToast('Marked as answered!', 'success');
             confetti({ particleCount: 150, spread: 100 });
         }
     };
@@ -1130,7 +1138,7 @@
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
         toast.className = `toast ${type === 'error' ? 'error' : ''}`;
-        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
+        toast.innerHTML = `<i class="pd-i ${type === 'success' ? 'pd-i-circle-check' : 'pd-i-circle-alert'}"></i> ${msg}`;
         container.appendChild(toast);
         setTimeout(() => toast.remove(), 3500);
     };

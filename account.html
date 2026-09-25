@@ -125,7 +125,8 @@
     </script>
     <!-- PD-SEO:END -->
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/pd-icons.css">
+    <script src="/assets/pd-icons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="/assets/pd-upload.js"></script>
@@ -567,6 +568,11 @@
             .brand-text h1 { font-size: 1rem; }
             .brand-text p { display: none; }
         }
+        /* Dark mode: brand blue (#0A4D9B) is about 2:1 on navy, so headings and icons use the
+           light brand tint (#93c5fd) and controls without a colour get readable text. */
+        /* The Google button stays white in dark mode, so its label and mark stay dark. */
+        body.dark-mode .btn-google { color: #1f2937; }
+        body.dark-mode .btn-google:hover { background: #f1f5f9; }
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
@@ -593,7 +599,7 @@
                 <p>A HOUSE OF PRAYER FOR ALL NATIONS</p>
             </div>
         </a>
-        <button class="theme-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+        <button class="theme-btn" onclick="toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>
     </header>
 
     <div class="container">
@@ -604,19 +610,19 @@
 
         <!-- LOGIN SCREEN -->
         <div id="loginForm" class="auth-card">
-            <h2 style="margin-bottom: 10px; text-align: center; font-family: 'Playfair Display', serif;"><i class="fas fa-sign-in-alt"></i> Welcome Back</h2>
+            <h2 style="margin-bottom: 10px; text-align: center; font-family: 'Playfair Display', serif;"><i class="pd-i pd-i-log-in"></i> Welcome Back</h2>
             <p style="text-align: center; color: var(--text-sub); margin-bottom: 30px;">Sign in to continue your spiritual journey</p>
             <form onsubmit="handleLogin(event)">
                 <div class="form-group">
-                    <label><i class="fas fa-envelope"></i> Email Address</label>
+                    <label><i class="pd-i pd-i-mail"></i> Email Address</label>
                     <input type="email" id="lEmail" required placeholder="your@email.com">
                 </div>
                 <div class="form-group password-wrapper">
-                    <label><i class="fas fa-lock"></i> Password</label>
+                    <label><i class="pd-i pd-i-lock"></i> Password</label>
                     <input type="password" id="lPass" required placeholder="Enter your password">
-                    <button type="button" class="toggle-password" onclick="togglePassword('lPass', this)"><i class="fas fa-eye"></i></button>
+                    <button type="button" class="toggle-password" onclick="togglePassword('lPass', this)" aria-label="Show password"><i class="pd-i pd-i-eye"></i></button>
                 </div>
-                <button type="submit" class="btn btn-primary">Sign In <i class="fas fa-arrow-right"></i></button>
+                <button type="submit" class="btn btn-primary">Sign In <i class="pd-i pd-i-arrow-right"></i></button>
             </form>
             <div style="text-align: center; margin: 20px 0;">
                 <a href="#" onclick="openResetModal()" style="color: var(--accent-green); font-size: 0.85rem; text-decoration: none; font-weight: 600;">Forgot Password?</a>
@@ -624,26 +630,26 @@
             <div style="text-align: center; margin: 25px 0; color: var(--text-sub); font-size: 0.8rem; position: relative;">
                 <span style="background: var(--bg-card); padding: 0 15px;">OR CONTINUE WITH</span>
             </div>
-            <button class="btn btn-google" onclick="handleGoogle()"><i class="fab fa-google"></i> Sign in with Google</button>
+            <button class="btn btn-google" onclick="handleGoogle()"><i class="pd-i pd-i-brand-google"></i> Sign in with Google</button>
         </div>
 
         <!-- REGISTRATION SCREEN -->
         <div id="registerForm" class="auth-card" style="display: none;">
-            <h2 style="margin-bottom: 10px; text-align: center; font-family: 'Playfair Display', serif;"><i class="fas fa-user-plus"></i> Join the Family</h2>
+            <h2 style="margin-bottom: 10px; text-align: center; font-family: 'Playfair Display', serif;"><i class="pd-i pd-i-user-plus"></i> Join the Family</h2>
             <p style="text-align: center; color: var(--text-sub); margin-bottom: 25px;">Create your account to access all features</p>
             
             <div style="text-align: center; margin-bottom: 20px;">
                 <div class="avatar-frame"><img id="regPreview" src="/assets/avatar-default.svg"></div>
-                <button type="button" onclick="uploadPhoto('register')" class="btn btn-outline" style="width: auto; padding: 8px 20px; margin-top: 10px;"><i class="fas fa-camera"></i> Upload Photo</button>
+                <button type="button" onclick="uploadPhoto('register')" class="btn btn-outline" style="width: auto; padding: 8px 20px; margin-top: 10px;"><i class="pd-i pd-i-camera"></i> Upload Photo</button>
                 <input type="hidden" id="uploadedPhoto">
             </div>
 
             <form onsubmit="handleRegister(event)">
                 <div class="form-grid">
-                    <div class="form-group full-width"><label><i class="fas fa-user"></i> Full Name *</label><input type="text" id="rName" required placeholder="John Doe"></div>
-                    <div class="form-group"><label><i class="fas fa-envelope"></i> Email Address *</label><input type="email" id="rEmail" required placeholder="your@email.com"></div>
+                    <div class="form-group full-width"><label><i class="pd-i pd-i-user"></i> Full Name *</label><input type="text" id="rName" required placeholder="John Doe"></div>
+                    <div class="form-group"><label><i class="pd-i pd-i-mail"></i> Email Address *</label><input type="email" id="rEmail" required placeholder="your@email.com"></div>
                     <div class="form-group">
-                        <label><i class="fas fa-phone-alt"></i> Phone Number *</label>
+                        <label><i class="pd-i pd-i-phone"></i> Phone Number *</label>
                         <div class="phone-wrapper">
                             <select id="rCountryCode" class="country-code">
                                 <option value="+1">+1 (USA)</option>
@@ -659,18 +665,18 @@
                             <input type="tel" id="rPhone" class="phone-number" placeholder="71234567" required>
                         </div>
                     </div>
-                    <div class="form-group"><label><i class="fas fa-calendar-alt"></i> Date of Birth *</label><input type="date" id="rDob" onchange="checkAge(this.value)" required><p id="ageWarn" class="age-warning">⚠️ Must be 13+ years old</p></div>
-                    <div class="form-group"><label><i class="fas fa-venus-mars"></i> Gender</label><select id="rGender"><option>Male</option><option>Female</option><option>Prefer not to say</option></select></div>
-                    <div class="form-group"><label><i class="fas fa-church"></i> Your Branch</label><select id="rBranch"><option>Chama, Zambia</option><option>Manzini, Eswatini</option><option>Cork, Ireland</option><option>Online Global</option></select></div>
-                    <div class="form-group"><label><i class="fas fa-hands-helping"></i> Ministry Interest</label><select id="rMinistry"><option>Worship</option><option>Intercessor</option><option>Usher</option><option>Outreach</option><option>Children</option><option>Technical</option></select></div>
-                    <div class="form-group password-wrapper"><label><i class="fas fa-lock"></i> Password *</label><input type="password" id="rPass" minlength="6" required placeholder="Min. 6 characters"><button type="button" class="toggle-password" onclick="togglePassword('rPass', this)"><i class="fas fa-eye"></i></button></div>
-                    <div class="form-group password-wrapper"><label><i class="fas fa-lock"></i> Confirm Password *</label><input type="password" id="rConfirm" required><button type="button" class="toggle-password" onclick="togglePassword('rConfirm', this)"><i class="fas fa-eye"></i></button></div>
+                    <div class="form-group"><label><i class="pd-i pd-i-calendar-days"></i> Date of Birth *</label><input type="date" id="rDob" onchange="checkAge(this.value)" required><p id="ageWarn" class="age-warning"><i class="pd-i pd-i-triangle-alert" aria-hidden="true"></i> Must be 13+ years old</p></div>
+                    <div class="form-group"><label><i class="pd-i pd-i-venus-and-mars"></i> Gender</label><select id="rGender"><option>Male</option><option>Female</option><option>Prefer not to say</option></select></div>
+                    <div class="form-group"><label><i class="pd-i pd-i-church"></i> Your Branch</label><select id="rBranch"><option>Chama, Zambia</option><option>Manzini, Eswatini</option><option>Cork, Ireland</option><option>Online Global</option></select></div>
+                    <div class="form-group"><label><i class="pd-i pd-i-hand-helping"></i> Ministry Interest</label><select id="rMinistry"><option>Worship</option><option>Intercessor</option><option>Usher</option><option>Outreach</option><option>Children</option><option>Technical</option></select></div>
+                    <div class="form-group password-wrapper"><label><i class="pd-i pd-i-lock"></i> Password *</label><input type="password" id="rPass" minlength="6" required placeholder="Min. 6 characters"><button type="button" class="toggle-password" onclick="togglePassword('rPass', this)" aria-label="Show password"><i class="pd-i pd-i-eye"></i></button></div>
+                    <div class="form-group password-wrapper"><label><i class="pd-i pd-i-lock"></i> Confirm Password *</label><input type="password" id="rConfirm" required><button type="button" class="toggle-password" onclick="togglePassword('rConfirm', this)" aria-label="Show password"><i class="pd-i pd-i-eye"></i></button></div>
                 </div>
-                <div class="form-group full-width"><label><i class="fas fa-share-alt"></i> How did you hear about us?</label><select id="rReferral"><option>Social Media</option><option>Friend/Family</option><option>Radio/TV</option><option>Church Event</option><option>Online Search</option></select></div>
-                <button type="submit" id="regBtn" class="btn btn-primary">Create Account <i class="fas fa-user-plus"></i></button>
+                <div class="form-group full-width"><label><i class="pd-i pd-i-share-2"></i> How did you hear about us?</label><select id="rReferral"><option>Social Media</option><option>Friend/Family</option><option>Radio/TV</option><option>Church Event</option><option>Online Search</option></select></div>
+                <button type="submit" id="regBtn" class="btn btn-primary">Create Account <i class="pd-i pd-i-user-plus"></i></button>
             </form>
             <div style="text-align: center; margin: 25px 0; color: var(--text-sub); font-size: 0.8rem;">OR REGISTER WITH</div>
-            <button class="btn btn-google" onclick="handleGoogle()"><i class="fab fa-google"></i> Continue with Google</button>
+            <button class="btn btn-google" onclick="handleGoogle()"><i class="pd-i pd-i-brand-google"></i> Continue with Google</button>
         </div>
 
         <!-- PROFILE SECTION -->
@@ -679,14 +685,14 @@
                 <div class="profile-hero">
                     <div class="avatar-frame" onclick="changeProfilePhoto()">
                         <img id="pPhoto" src="/assets/avatar-default.svg">
-                        <div class="camera-overlay"><i class="fas fa-camera"></i></div>
+                        <div class="camera-overlay"><i class="pd-i pd-i-camera"></i></div>
                     </div>
                     <h2 id="pNameDisplay" style="font-family: 'Playfair Display', serif;">User Name</h2>
                     <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
                         <p id="pRoleDisplay" style="color: var(--accent-gold); font-weight: 800;"></p>
-                        <span id="emailVerifiedBadge" class="verification-badge unverified" onclick="verifyEmail()"><i class="fas fa-envelope"></i> <span id="emailStatusText">Verify Email</span></span>
+                        <span id="emailVerifiedBadge" class="verification-badge unverified" onclick="verifyEmail()"><i class="pd-i pd-i-mail"></i> <span id="emailStatusText">Verify Email</span></span>
                     </div>
-                    <div class="membership-badge"><i class="fas fa-id-card"></i> <span id="pIdDisplay">Not Assigned</span></div>
+                    <div class="membership-badge"><i class="pd-i pd-i-id-card"></i> <span id="pIdDisplay">Not Assigned</span></div>
                 </div>
                 <div class="profile-stat-grid">
                     <div class="stat-item"><div class="stat-number" id="pPrayers">0</div><div class="stat-label">PRAYERS</div></div>
@@ -695,10 +701,10 @@
                     <div class="stat-item"><div class="stat-number" id="pLevel">1</div><div class="stat-label">QUIZ LEVEL</div></div>
                 </div>
                 <div class="spiritual-card">
-                    <div class="spiritual-header"><strong><i class="fas fa-seedling"></i> Spiritual Growth</strong><span id="spiritualLevel">Seeker</span></div>
+                    <div class="spiritual-header"><strong><i class="pd-i pd-i-sprout"></i> Spiritual Growth</strong><span id="spiritualLevel">Seeker</span></div>
                     <div class="progress-bar"><div class="progress-fill" id="spiritualProgress" style="width: 0%"></div></div>
                     <div style="display: flex; justify-content: space-between; font-size: 0.7rem; margin-top: 8px;">
-                        <span>🌱 Seeker</span><span>📖 Disciple</span><span>🔥 Warrior</span><span>👑 Leader</span>
+                        <span><i class="pd-i pd-i-sprout" aria-hidden="true"></i> Seeker</span><span><i class="pd-i pd-i-book-open" aria-hidden="true"></i> Disciple</span><span><i class="pd-i pd-i-flame" aria-hidden="true"></i> Warrior</span><span><i class="pd-i pd-i-crown" aria-hidden="true"></i> Leader</span>
                     </div>
                 </div>
                 <div style="background: var(--bg-primary); border-radius: 20px; padding: 20px; margin: 15px 0;"><p id="pBioDisplay">No bio added yet.</p></div>
@@ -707,26 +713,26 @@
                 <!-- MY CERTIFICATES -->
                 <div class="certificates-block" style="background: var(--bg-primary); border-radius: 20px; padding: 20px; margin: 15px 0; border: 1px solid rgba(212,175,55,.35);">
                     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 4px;">
-                        <h3 style="margin: 0; font-family: 'Playfair Display', serif; color: var(--accent-gold);"><i class="fas fa-award"></i> My Certificates</h3>
+                        <h3 style="margin: 0; font-family: 'Playfair Display', serif; color: var(--accent-gold);"><i class="pd-i pd-i-award"></i> My Certificates</h3>
                         <span style="font-size: .72rem; color: var(--text-sub);">Earn them by passing Academy quizzes with 80% or higher.</span>
                     </div>
                     <p style="font-size: .78rem; color: var(--text-sub); margin: 2px 0 14px;">Download or print your certificates anytime — the ministry team can see that you earned them.</p>
                     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 14px;">
-                        <i class="fas fa-id-card" style="color: var(--accent-gold);"></i>
+                        <i class="pd-i pd-i-id-card" style="color: var(--accent-gold);"></i>
                         <div style="flex:1; min-width: 180px;">
                             <div style="font-size: .8rem; font-weight: 700; color: var(--text-main);">Certificates are issued to <span id="certProfileName" style="color: var(--accent-gold);">your profile name</span></div>
                             <div style="font-size: .72rem; color: var(--text-sub); margin-top: 2px;">Your name comes straight from your profile — update it below and future certificates use it automatically.</div>
                         </div>
-                        <button class="btn btn-outline" style="width: auto;" onclick="openEditProfile()"><i class="fas fa-user-pen"></i> Edit Name</button>
+                        <button class="btn btn-outline" style="width: auto;" onclick="openEditProfile()"><i class="pd-i pd-i-user-pen"></i> Edit Name</button>
                     </div>
                     <div id="myCertificatesList" class="certificates-list">
-                        <div class="certificates-empty" style="text-align:center; padding: 18px; color: var(--text-sub);"><i class="fas fa-spinner fa-spin"></i> Loading your certificates…</div>
+                        <div class="certificates-empty" style="text-align:center; padding: 18px; color: var(--text-sub);"><i class="pd-i pd-i-loader-circle pd-i-spin"></i> Loading your certificates…</div>
                     </div>
                 </div>
 
                 <!-- NOTIFICATION & DAILY VERSE SETTINGS -->
                 <div class="settings-block" style="background: var(--bg-primary); border-radius: 20px; padding: 20px; margin: 15px 0; border: 1px solid rgba(10,77,155,.2);">
-                    <h3 style="margin: 0 0 4px; font-family: 'Playfair Display', serif; color: var(--accent-green);"><i class="fas fa-sliders"></i> Notification Settings</h3>
+                    <h3 style="margin: 0 0 4px; font-family: 'Playfair Display', serif; color: var(--accent-green);"><i class="pd-i pd-i-sliders-horizontal"></i> Notification Settings</h3>
                     <p style="font-size: .78rem; color: var(--text-sub); margin: 0 0 16px;">Choose what Prayer Dome sends to your device. You are always in control.</p>
 
                     <div id="notifPermissionRow" style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; background: var(--bg-card); border:1px solid var(--border-color); border-radius:14px; padding:12px 14px; margin-bottom:14px;">
@@ -734,7 +740,7 @@
                             <strong style="font-size:.88rem;">Device notifications</strong><br>
                             <small id="notifPermissionState" style="font-size:.72rem; color: var(--text-sub);">Checking…</small>
                         </div>
-                        <button class="btn btn-outline" style="width:auto;" id="notifPermissionBtn" onclick="requestAppNotifications()"><i class="fas fa-bell"></i> Allow Notifications</button>
+                        <button class="btn btn-outline" style="width:auto;" id="notifPermissionBtn" onclick="requestAppNotifications()"><i class="pd-i pd-i-bell"></i> Allow Notifications</button>
                     </div>
 
                     <!-- Daily Bible verse scheduler renders here -->
@@ -748,17 +754,17 @@
                 <!-- Admin Dashboard Access -->
                 <div id="adminDashboardCard" class="admin-access-card" style="display: none;">
                     <div class="admin-access-head">
-                        <i class="fas fa-shield-alt"></i>
+                        <i class="pd-i pd-i-shield"></i>
                         <span>Leadership Access</span>
                     </div>
                     <p class="admin-access-sub">You are signed in with an administrator role. Manage the Prayer Dome platform below.</p>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <a href="admin.html" class="btn btn-primary admin-access-btn"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</a>
-                        <a href="finance.html" class="btn btn-outline admin-access-btn"><i class="fas fa-chart-line"></i> Finance Portal</a>
+                        <a href="admin.html" class="btn btn-primary admin-access-btn"><i class="pd-i pd-i-layout-dashboard"></i> Admin Dashboard</a>
+                        <a href="finance.html" class="btn btn-outline admin-access-btn"><i class="pd-i pd-i-chart-line"></i> Finance Portal</a>
                     </div>
                 </div>
                 <button onclick="showDeleteAccountModal()" class="btn btn-outline delete-account-btn" style="width: 100%; margin-top: 15px;">
-                    <i class="fas fa-trash-alt"></i> Delete Account
+                    <i class="pd-i pd-i-trash"></i> Delete Account
                 </button>
             </div>
             <div id="profileEdit" style="display: none;">
@@ -794,11 +800,11 @@
                 <div class="form-group">
                     <label>Ministry Involvement</label>
                     <div style="display: flex; flex-wrap: wrap; gap: 8px;" id="ministryCheckboxes">
-                        <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" value="Worship"> 🎵 Worship</label>
-                        <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" value="Intercessor"> 🙏 Intercessor</label>
-                        <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" value="Usher"> 🚪 Usher</label>
-                        <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" value="Outreach"> 🤝 Outreach</label>
-                        <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" value="Children"> 👶 Children's Ministry</label>
+                        <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" value="Worship"> <i class="pd-i pd-i-music" aria-hidden="true"></i> Worship</label>
+                        <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" value="Intercessor"> <i class="pd-i pd-i-hands-praying" aria-hidden="true"></i> Intercessor</label>
+                        <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" value="Usher"> <i class="pd-i pd-i-door-open" aria-hidden="true"></i> Usher</label>
+                        <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" value="Outreach"> <i class="pd-i pd-i-handshake" aria-hidden="true"></i> Outreach</label>
+                        <label style="display: flex; align-items: center; gap: 6px;"><input type="checkbox" value="Children"> <i class="pd-i pd-i-baby" aria-hidden="true"></i> Children's Ministry</label>
                     </div>
                 </div>
                 <div style="display: flex; gap: 12px;">
@@ -815,7 +821,7 @@
     <div id="resetModal" class="modern-modal">
         <div class="modern-modal-content">
             <div class="modal-icon">
-                <i class="fas fa-key"></i>
+                <i class="pd-i pd-i-key-round"></i>
             </div>
             <h2 style="font-family: 'Playfair Display', serif; margin-bottom: 10px;">Reset Password</h2>
             <p style="color: var(--text-sub); margin-bottom: 20px;">Enter your email address and we'll send you a link to reset your password.</p>
@@ -823,8 +829,8 @@
                 <input type="email" id="resetEmail" placeholder="your@email.com" style="text-align: center;">
             </div>
             <div class="spam-tip">
-                <i class="fas fa-envelope-open-text"></i>
-                <strong>📧 What to expect:</strong><br>
+                <i class="pd-i pd-i-mail-open"></i>
+                <strong><i class="pd-i pd-i-mail" aria-hidden="true"></i> What to expect:</strong><br>
                 • Check your inbox for a password reset link<br>
                 • Also check your <strong>Spam/Junk folder</strong><br>
                 • The link expires in 1 hour
@@ -838,13 +844,13 @@
     <div id="emailVerifyModal" class="modern-modal">
         <div class="modern-modal-content">
             <div class="modal-icon">
-                <i class="fas fa-envelope"></i>
+                <i class="pd-i pd-i-mail"></i>
             </div>
             <h2 style="font-family: 'Playfair Display', serif;">Verify Your Email</h2>
             <p>We've sent a verification email to <strong id="verifyEmailAddress"></strong></p>
             <div class="spam-tip">
-                <i class="fas fa-envelope-open-text"></i>
-                <strong>📧 Didn't receive the email?</strong><br>
+                <i class="pd-i pd-i-mail-open"></i>
+                <strong><i class="pd-i pd-i-mail" aria-hidden="true"></i> Didn't receive the email?</strong><br>
                 • Check your <strong>Spam/Junk folder</strong><br>
                 • Add <strong>noreply@prayerdome.net</strong> to your contacts<br>
                 • Wait a few minutes and check again
@@ -858,7 +864,7 @@
     <div id="deleteAccountModal" class="modern-modal">
         <div class="modern-modal-content">
             <div class="modal-icon">
-                <i class="fas fa-exclamation-triangle" style="color: var(--accent-red);"></i>
+                <i class="pd-i pd-i-triangle-alert" style="color: var(--accent-red);"></i>
             </div>
             <h2 style="font-family: 'Playfair Display', serif;">Delete Account</h2>
             <p>Are you sure you want to permanently delete your account?</p>
@@ -945,7 +951,7 @@
             const container = document.getElementById('toastContainer');
             const t = document.createElement('div');
             t.className = `toast ${type === 'error' ? 'error' : ''}`;
-            t.innerHTML = `<i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${msg}`;
+            t.innerHTML = `<i class="pd-i ${type === 'error' ? 'pd-i-circle-alert' : 'pd-i-circle-check'}"></i> ${msg}`;
             container.appendChild(t);
             setTimeout(() => t.remove(), 4000);
         };
@@ -968,10 +974,10 @@
             const input = document.getElementById(inputId);
             if (input.type === "password") {
                 input.type = "text";
-                button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                button.innerHTML = '<i class="pd-i pd-i-eye-off"></i>';
             } else {
                 input.type = "password";
-                button.innerHTML = '<i class="fas fa-eye"></i>';
+                button.innerHTML = '<i class="pd-i pd-i-eye"></i>';
             }
         };
 
@@ -999,7 +1005,7 @@
                 await sendPasswordResetEmail(auth, email);
                 closeModal('resetModal');
                 document.getElementById('resetEmail').value = '';
-                showToast("✅ Password reset email sent! Check your inbox.", "success");
+                showToast("Password reset email sent! Check your inbox.", "success");
                 confetti({ particleCount: 100, spread: 70 });
             } catch (e) {
                 if (e.code === 'auth/user-not-found') {
@@ -1110,7 +1116,7 @@
                             emailVerified: true,
                             emailVerifiedAt: serverTimestamp()
                         });
-                        showToast("✅ Email verified successfully!", "success");
+                        showToast("Email verified successfully!", "success");
                         confetti({ particleCount: 150, spread: 100 });
                         updateVerificationStatus();
                         window.history.replaceState({}, document.title, window.location.pathname);
@@ -1298,10 +1304,10 @@
                 
                 const prayers = data.prayerCount || 0;
                 let level = "Seeker", progress = 0;
-                if (prayers < 10) { level = "🌱 Seeker"; progress = (prayers / 10) * 25; }
-                else if (prayers < 50) { level = "📖 Disciple"; progress = 25 + ((prayers - 10) / 40) * 25; }
-                else if (prayers < 200) { level = "🔥 Warrior"; progress = 50 + ((prayers - 50) / 150) * 25; }
-                else { level = "👑 Leader"; progress = 75 + Math.min((prayers - 200) / 300, 1) * 25; }
+                if (prayers < 10) { level = '<i class="pd-i pd-i-sprout" aria-hidden="true"></i> Seeker'; progress = (prayers / 10) * 25; }
+                else if (prayers < 50) { level = '<i class="pd-i pd-i-book-open" aria-hidden="true"></i> Disciple'; progress = 25 + ((prayers - 10) / 40) * 25; }
+                else if (prayers < 200) { level = '<i class="pd-i pd-i-flame" aria-hidden="true"></i> Warrior'; progress = 50 + ((prayers - 50) / 150) * 25; }
+                else { level = '<i class="pd-i pd-i-crown" aria-hidden="true"></i> Leader'; progress = 75 + Math.min((prayers - 200) / 300, 1) * 25; }
                 document.getElementById('spiritualLevel').innerHTML = level;
                 document.getElementById('spiritualProgress').style.width = `${progress}%`;
                 
@@ -1368,7 +1374,7 @@
 
         function renderMyCertificateCards(listEl, certs) {
             if (!certs.length) {
-                listEl.innerHTML = '<div class="certificates-empty" style="text-align:center; padding: 18px; color: var(--text-sub);"><i class="fas fa-award"></i> No certificates yet. Pass an Academy quiz with 80% or higher to earn your first one — visit the <a href="/quiz.html" style="color: var(--accent-gold);">Quiz Centre</a>.</div>';
+                listEl.innerHTML = '<div class="certificates-empty" style="text-align:center; padding: 18px; color: var(--text-sub);"><i class="pd-i pd-i-award"></i> No certificates yet. Pass an Academy quiz with 80% or higher to earn your first one — visit the <a href="/quiz.html" style="color: var(--accent-gold);">Quiz Centre</a>.</div>';
                 return;
             }
             const certName = (window.PD_PROFILE && window.PD_PROFILE.fullName) || (auth.currentUser && (auth.currentUser.displayName || (auth.currentUser.email || '').split('@')[0])) || 'Prayer Dome Member';
@@ -1380,15 +1386,15 @@
                     ? parsedDate.toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
                 const certDate = parsedDate && !Number.isNaN(parsedDate.getTime()) ? parsedDate.toISOString() : '';
                 return `<div class="cert-card" style="display:flex; gap:14px; align-items:center; flex-wrap:wrap; background: var(--bg-secondary, rgba(10,77,155,.04)); border:1px solid rgba(212,175,55,.3); border-radius:16px; padding:14px; margin-bottom:10px;">
-                    <div style="width:46px; height:46px; border-radius:14px; background: linear-gradient(135deg, #0A4D9B, #0a3d7a); display:flex; align-items:center; justify-content:center; color:#f6df8a; font-size:1.25rem; flex-shrink:0;"><i class="fas fa-certificate"></i></div>
+                    <div style="width:46px; height:46px; border-radius:14px; background: linear-gradient(135deg, #0A4D9B, #0a3d7a); display:flex; align-items:center; justify-content:center; color:#f6df8a; font-size:1.25rem; flex-shrink:0;"><i class="pd-i pd-i-badge-check"></i></div>
                     <div style="flex:1; min-width:180px;">
                         <h4 style="margin:0 0 2px; font-size:.95rem; color: var(--text-main);">${escapeHtml(c.course || c.title || 'Prayer Dome Academy')}</h4>
                         <p style="margin:0; font-size:.75rem; color: var(--text-sub);">Score ${Math.round(c.score || 0)}% · Issued ${date}</p>
                         <p style="margin:2px 0 0; font-size:.68rem; color: var(--accent-gold); font-family:monospace;">${escapeHtml(c.id || '')}</p>
                     </div>
                     <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <button class="btn btn-primary btn-sm cert-download-btn" data-cert-id="${escapeHtml(c.id || '')}" data-cert-course="${escapeHtml(c.course || c.title || 'Prayer Dome Academy Lesson')}" data-cert-score="${Math.round(c.score || 0)}" data-cert-date="${escapeHtml(certDate)}" data-cert-name="${escapeHtml(name)}"><i class="fas fa-download"></i> Download</button>
-                        <button class="btn btn-outline btn-sm cert-print-btn" data-cert-id="${escapeHtml(c.id || '')}" data-cert-course="${escapeHtml(c.course || c.title || 'Prayer Dome Academy Lesson')}" data-cert-score="${Math.round(c.score || 0)}" data-cert-date="${escapeHtml(certDate)}" data-cert-name="${escapeHtml(name)}"><i class="fas fa-print"></i> Print</button>
+                        <button class="btn btn-primary btn-sm cert-download-btn" data-cert-id="${escapeHtml(c.id || '')}" data-cert-course="${escapeHtml(c.course || c.title || 'Prayer Dome Academy Lesson')}" data-cert-score="${Math.round(c.score || 0)}" data-cert-date="${escapeHtml(certDate)}" data-cert-name="${escapeHtml(name)}"><i class="pd-i pd-i-download"></i> Download</button>
+                        <button class="btn btn-outline btn-sm cert-print-btn" data-cert-id="${escapeHtml(c.id || '')}" data-cert-course="${escapeHtml(c.course || c.title || 'Prayer Dome Academy Lesson')}" data-cert-score="${Math.round(c.score || 0)}" data-cert-date="${escapeHtml(certDate)}" data-cert-name="${escapeHtml(name)}"><i class="pd-i pd-i-printer"></i> Print</button>
                     </div>
                 </div>`;
             }).join('');
@@ -1587,12 +1593,12 @@
             const perm = (typeof Notification !== 'undefined') ? Notification.permission : 'unsupported';
             if (perm === 'granted') {
                 state.textContent = 'On — verses, live alerts and prayer updates reach your device.';
-                btn.innerHTML = '<i class="fas fa-check"></i> Allowed';
+                btn.innerHTML = '<i class="pd-i pd-i-check"></i> Allowed';
                 btn.disabled = true;
                 btn.style.opacity = '.7';
             } else if (perm === 'denied') {
                 state.textContent = 'Blocked. Open your browser or phone settings for Prayer Dome to turn notifications back on.';
-                btn.innerHTML = '<i class="fas fa-triangle-exclamation"></i> Blocked';
+                btn.innerHTML = '<i class="pd-i pd-i-triangle-alert"></i> Blocked';
                 btn.disabled = true;
                 btn.style.opacity = '.7';
             } else if (perm === 'unsupported') {
@@ -1600,7 +1606,7 @@
                 btn.style.display = 'none';
             } else {
                 state.textContent = 'Off — turn on to receive daily verses and live service alerts.';
-                btn.innerHTML = '<i class="fas fa-bell"></i> Allow Notifications';
+                btn.innerHTML = '<i class="pd-i pd-i-bell"></i> Allow Notifications';
                 btn.disabled = false;
                 btn.style.opacity = '1';
             }
@@ -1611,7 +1617,7 @@
                 ? await PDApp.notifications.requestPermission()
                 : await Notification.requestPermission();
             refreshNotifPermissionUI();
-            if (perm === 'granted' && window.PDApp) PDApp.toast('Notifications are on 🙏', 'success');
+            if (perm === 'granted' && window.PDApp) PDApp.toast('Notifications are on', 'success');
         };
 
         refreshNotifPermissionUI();

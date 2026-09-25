@@ -36,7 +36,7 @@ function serializeRadio(item) {
     name: item.name || '',
     tagline: item.tagline || '',
     streamUrl: item.streamUrl || '',
-    icon: item.icon || 'fa-tower-broadcast'
+    icon: item.icon || 'pd-i-radio'
   };
 }
 

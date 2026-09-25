@@ -545,6 +545,8 @@ body.dark-mode .pd-topbar {
   flex-shrink: 0;
 }
 .pd-menu-btn:hover { transform: rotate(90deg) scale(1.05); border-color: var(--pd-amber); }
+/* Explicit surface: some pages never define a dark --bg-card. */
+body.dark-mode .pd-menu-btn, body.dark-mode .pd-bell-btn { background: rgba(255,255,255,.06); color: #93c5fd; }
 .pd-topbar-center {
   display: flex; align-items: center; gap: 10px;
   text-decoration: none; color: inherit; min-width: 0;
@@ -637,7 +639,14 @@ body.dark-mode .pd-drawer-head .pd-drawer-title { color: #f8fafc; }
 .pd-drawer-link:hover { background: rgba(10,77,155,.07); transform: translateX(4px); }
 body.dark-mode .pd-drawer-link { color: #e2e8f0; }
 body.dark-mode .pd-drawer-link:hover { background: rgba(255,255,255,.06); }
+/* Brand blue is too dim on the navy drawer: lift the icon tile for dark mode. */
+body.dark-mode .pd-drawer-link i {
+  background: linear-gradient(135deg, rgba(147,197,253,.14), rgba(212,175,55,.12));
+  color: #93c5fd;
+}
+body.dark-mode .pd-drawer-close { background: rgba(255,255,255,.08); color: #e2e8f0; }
 .pd-drawer-link.pd-drawer-live i { background: rgba(220,38,38,.12); color: #dc2626; }
+body.dark-mode .pd-drawer-link.pd-drawer-live i { background: rgba(248,113,113,.14); color: #f87171; }
 .pd-drawer-link.pd-drawer-live::after {
   content: 'LIVE'; font-size: .55rem; letter-spacing: 1px; font-weight: 900;
   color: #dc2626; background: rgba(220,38,38,.12); padding: 3px 8px; border-radius: 8px;
@@ -1209,6 +1218,10 @@ body.dark-mode .pd-notif-head-actions button { background: rgba(255,255,255,.08)
   background: linear-gradient(135deg, rgba(10,77,155,.12), rgba(212,175,55,.14));
   color: var(--pd-blue); display: inline-flex; align-items: center; justify-content: center;
 }
+body.dark-mode .pd-notif-icon {
+  background: linear-gradient(135deg, rgba(147,197,253,.14), rgba(212,175,55,.12));
+  color: #93c5fd;
+}
 .pd-notif-body { flex: 1; min-width: 0; }
 .pd-notif-title { font-weight: 800; font-size: .88rem; color: var(--text-main, #0f172a); }
 .pd-notif-msg { font-size: .78rem; color: var(--text-sub, #64748b); margin-top: 3px; line-height: 1.45; }
@@ -1239,7 +1252,11 @@ body.dark-mode .pd-notif-head-actions button { background: rgba(255,255,255,.08)
 
 /* --- Gospel radio ---------------------------------------------------------- */
 .pd-radio-playing { outline: 2px solid var(--pd-gold); outline-offset: 2px; }
-.pd-radio-playing::before { content: '♪ '; }
+.pd-radio-playing::before {
+  content: ''; display: inline-block; width: 1em; height: 1em; margin-right: .35em; vertical-align: -.125em;
+  background-color: currentColor;
+  -webkit-mask: var(--pd-icon-music) center / contain no-repeat; mask: var(--pd-icon-music) center / contain no-repeat;
+}
 #pdRadioNow {
   display: none; align-items: center; gap: 9px;
   position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%); z-index: 1200;
@@ -2279,6 +2296,7 @@ body.dark-mode{
 .pd-acad-card.pd-lift:hover{transform:translateY(-6px);box-shadow:var(--pd-shadow);border-color:rgba(10,77,155,.22);}
 .pd-acad-icon{width:50px;height:50px;border-radius:18px;display:grid;place-items:center;background:var(--pd-acad-soft);color:var(--pd-acad-blue);font-size:1.25rem;margin-bottom:14px;}
 .pd-acad-icon.gold{background:rgba(212,175,55,.14);color:var(--pd-acad-gold);}
+body.dark-mode .pd-acad-icon:not(.gold){color:#93c5fd;}
 .pd-acad-card h3{margin:0 0 8px;font-size:1.14rem;line-height:1.35;color:var(--pd-acad-ink);}
 .pd-acad-card p{margin:0;color:var(--pd-acad-muted);line-height:1.65;}
 .pd-acad-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}

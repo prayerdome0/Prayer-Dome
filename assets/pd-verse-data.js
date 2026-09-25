@@ -11,10 +11,10 @@
     'use strict';
 
     var SLOTS = [
-        { id: 'morning',   label: 'Morning Verse',   icon: '🌅', defaultTime: '06:30', greeting: 'Good morning' },
-        { id: 'midday',    label: 'Midday Verse',    icon: '☀️', defaultTime: '12:00', greeting: 'Grace for midday' },
-        { id: 'afternoon', label: 'Afternoon Verse', icon: '🌤️', defaultTime: '15:30', greeting: 'Strength this afternoon' },
-        { id: 'evening',   label: 'Evening Verse',   icon: '🌙', defaultTime: '20:00', greeting: 'Rest well tonight' }
+        { id: 'morning',   label: 'Morning Verse',   icon: 'pd-i-sunrise', defaultTime: '06:30', greeting: 'Good morning' },
+        { id: 'midday',    label: 'Midday Verse',    icon: 'pd-i-sun', defaultTime: '12:00', greeting: 'Grace for midday' },
+        { id: 'afternoon', label: 'Afternoon Verse', icon: 'pd-i-cloud-sun', defaultTime: '15:30', greeting: 'Strength this afternoon' },
+        { id: 'evening',   label: 'Evening Verse',   icon: 'pd-i-moon', defaultTime: '20:00', greeting: 'Rest well tonight' }
     ];
 
     var VERSES = {

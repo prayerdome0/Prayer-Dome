@@ -106,8 +106,8 @@ function makeWindow(fetchImpl, urls) {
   /* ---------- 5. location.ipFallback renders rich info ---------- */
   const w4 = makeWindow(null, { 'https://ipwho.is/': IPWHO_JSON, 'https://ipapi.co/json/': IPAPI_JSON });
   const result = await new Promise(resolve => w4.PDApp.location.ipFallback(resolve));
-  t('ipFallback name includes flag + city + region + country',
-    result.name === '🇿🇲 Chipata, Eastern Province, Zambia', JSON.stringify(result.name));
+  t('ipFallback name is city + region + country (no flag emoji; the card shows an icon)',
+    result.name === 'Chipata, Eastern Province, Zambia', JSON.stringify(result.name));
   t('ipFallback coords include lat/lon + time + ISP',
     /-13\.63°/.test(result.coords) && /\d{2}:\d{2}/.test(result.coords) && result.coords.includes('ZAMTEL'), JSON.stringify(result.coords));
   t('ipFallback exposes lat/lng', result.lat === -13.6333 && result.lng === 32.65);

@@ -42,6 +42,19 @@
     div.textContent = String(str);
     return div.innerHTML;
   }
+  /* Icon class for a saved icon value (Lucide name, legacy Font Awesome name
+   * or emoji). Admin-edited lists live in localStorage, so values saved before
+   * the Lucide migration still arrive here. See assets/pd-icons.js. */
+  /* Notification titles saved before the migration may start with an emoji.
+   * The panel already shows a type icon, so drop it when rendering. */
+  var LEADING_EMOJI = /^(?![\u00A9\u00AE\u2122])(?:\p{Extended_Pictographic}|\p{Regional_Indicator})(?:[\uFE0F\u200D]|\p{Extended_Pictographic}|\p{Regional_Indicator}|\p{Emoji_Modifier})*\s*/u;
+  function plainTitle(title) {
+    return String(title == null ? '' : title).replace(LEADING_EMOJI, '');
+  }
+  function iconCls(value, fallback) {
+    if (window.PDIcons) return window.PDIcons.cls(value, fallback);
+    return 'pd-i ' + (/^pd-i-[a-z0-9-]+$/.test(value || '') ? value : fallback);
+  }
   function $(sel, root) { return (root || document).querySelector(sel); }
   function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
   function toast(message, type) {
@@ -54,7 +67,7 @@
     }
     var t = document.createElement('div');
     t.className = 'pd-toast' + (type === 'error' ? ' pd-toast-error' : '');
-    t.innerHTML = '<i class="fas ' + (type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle') + '"></i> ' + esc(message);
+    t.innerHTML = '<i class="pd-i ' + (type === 'error' ? 'pd-i-circle-alert' : 'pd-i-circle-check') + '"></i> ' + esc(message);
     container.appendChild(t);
     setTimeout(function () { t.classList.add('pd-toast-out'); setTimeout(function () { t.remove(); }, 400); }, 3400);
   }
@@ -80,10 +93,10 @@
   /* --------------------------------------------------------- academy nav */
   var academyNav = {
     links: [
-      { href: '/lessons.html', icon: 'fa-graduation-cap', label: 'Teaching', match: 'lessons' },
-      { href: '/stories.html', icon: 'fa-book-open-reader', label: 'Stories', match: 'stories' },
-      { href: '/quiz.html', icon: 'fa-star', label: 'Quizzes', match: 'quiz' },
-      { href: '/resources.html', icon: 'fa-folder-open', label: 'Resources', match: 'resources' }
+      { href: '/lessons.html', icon: 'pd-i-graduation-cap', label: 'Teaching', match: 'lessons' },
+      { href: '/stories.html', icon: 'pd-i-book-open-text', label: 'Stories', match: 'stories' },
+      { href: '/quiz.html', icon: 'pd-i-star', label: 'Quizzes', match: 'quiz' },
+      { href: '/resources.html', icon: 'pd-i-folder-open', label: 'Resources', match: 'resources' }
     ],
     init: function () {
       var nav = $('#pdDrawer .pd-drawer-nav');
@@ -92,7 +105,7 @@
       if (drawerHtml.indexOf('/lessons.html') === -1) {
         var prayerLink = $('a[href="/bible.html"], a[href="/sermons.html"]', nav);
         var html = academyNav.links.map(function (l) {
-          return '<a class="pd-drawer-link" href="' + l.href + '"><i class="fas ' + l.icon + '"></i> ' + esc(l.label) + '</a>';
+          return '<a class="pd-drawer-link" href="' + l.href + '"><i class="pd-i ' + l.icon + '"></i> ' + esc(l.label) + '</a>';
         }).join('');
         if (prayerLink) prayerLink.insertAdjacentHTML('afterend', html);
         else nav.insertAdjacentHTML('beforeend', html);
@@ -229,7 +242,7 @@
         + 'display:flex;align-items:center;gap:10px;max-width:min(92vw,480px);padding:12px 18px;border-radius:16px;'
         + 'background:#0d1b33;color:#e6eefb;font:600 .8rem/1.45 Inter,system-ui,sans-serif;'
         + 'box-shadow:0 16px 40px rgba(0,0,0,.4);transition:transform .35s cubic-bezier(.2,.9,.3,1.1);';
-      el.innerHTML = '<i class="fas fa-wifi" style="color:#4DA3FF;flex-shrink:0;"></i>'
+      el.innerHTML = '<i class="pd-i pd-i-wifi" style="color:#4DA3FF;flex-shrink:0;"></i>'
         + '<span>You’re offline. Some features are unavailable, but your downloaded Bible and saved content are still available.</span>';
       document.body.appendChild(el);
       var show = function () {
@@ -567,7 +580,7 @@
       // 1. Cached value first (instant render).
       var cached = lsGet('pd_location', null);
       if (cached && textEl) {
-        textEl.textContent = cached.name;
+        textEl.textContent = plainTitle(cached.name); // older caches start with a flag emoji
         if (subEl) subEl.textContent = cached.coords;
         card.classList.add('pd-loc-found');
       }
@@ -631,7 +644,6 @@
       geo.lookupIP().then(function (d) {
         if (!d || !d.country) { finish(offline); return; }
         var name = [d.city, d.region, d.country].filter(Boolean).join(', ') || 'Global Network';
-        if (d.flag) name = d.flag + ' ' + name;
         var sub = [];
         if (d.lat != null && d.lon != null) sub.push(Number(d.lat).toFixed(2) + '°, ' + Number(d.lon).toFixed(2) + '°');
         if (d.localTime) sub.push(d.localTime);
@@ -656,8 +668,8 @@
       if (!items.length) { bar.style.display = 'none'; return; }
       var render = function () {
         var html = items.map(function (a, i) {
-          return '<span class="pd-marquee-item" data-i="' + i + '"><i class="fas ' + esc(a.icon || 'fa-bullhorn') + '"></i> ' + esc(a.text) + '</span>';
-        }).join('<i class="fas fa-cross pd-marquee-sep"></i>');
+          return '<span class="pd-marquee-item" data-i="' + i + '"><i class="' + iconCls(a.icon, 'pd-i-megaphone') + '" aria-hidden="true"></i> ' + esc(a.text) + '</span>';
+        }).join('<i class="pd-i pd-i-latin-cross pd-marquee-sep"></i>');
         // Duplicate for a seamless loop.
         track.innerHTML = '<div class="pd-marquee-group">' + html + '</div><div class="pd-marquee-group" aria-hidden="true">' + html + '</div>';
       };
@@ -847,7 +859,7 @@
           '<p>Prayer Dome would like to send you daily Bible verses, live service alerts and prayer updates. You can turn this off at any time in Settings.</p>' +
           '<div class="pd-notif-pop-actions">' +
             '<button class="pd-notif-pop-btn pd-notif-pop-btn--ghost" data-action="dismiss">Not now</button>' +
-            '<button class="pd-notif-pop-btn pd-notif-pop-btn--primary" data-action="enable"><i class="fas fa-bell"></i> Allow</button>' +
+            '<button class="pd-notif-pop-btn pd-notif-pop-btn--primary" data-action="enable"><i class="pd-i pd-i-bell"></i> Allow</button>' +
           '</div>' +
           '<small class="pd-notif-pop-hint">Prayer Dome · A House of Prayer for All Nations</small>' +
         '</div>';
@@ -1049,7 +1061,7 @@
         // Let every other open tab render it instantly (they re-push silently,
         // so this does not loop).
         broadcast('notification', n);
-        toast(n.title + (n.message ? ' — ' + n.message : ''), 'success');
+        toast(plainTitle(n.title) + (n.message ? ' — ' + n.message : ''), 'success');
         notifications.notifyDevice(n);
       }
       // Persist to Firestore once (as a broadcast record, without FCM tokens).
@@ -1074,22 +1086,23 @@
       var list = notifications.listEl;
       if (!list) return;
       if (!notifications.items.length) {
-        list.innerHTML = '<div class="pd-notif-empty"><i class="fas fa-bell-slash"></i><p>' + esc(i18n.t('notifications.empty')) + '</p></div>';
+        list.innerHTML = '<div class="pd-notif-empty"><i class="pd-i pd-i-bell-off"></i><p>' + esc(i18n.t('notifications.empty')) + '</p></div>';
         return;
       }
       var icons = {
-        live: 'fa-tower-broadcast', sermon: 'fa-microphone-lines', prayer: 'fa-hands-praying',
-        event: 'fa-calendar-day', news: 'fa-newspaper', scripture: 'fa-book-bible', general: 'fa-bullhorn'
+        live: 'pd-i-radio', sermon: 'pd-i-mic', prayer: 'pd-i-hands-praying',
+        event: 'pd-i-calendar', news: 'pd-i-newspaper', scripture: 'pd-i-book-open', urgent: 'pd-i-triangle-alert',
+        general: 'pd-i-megaphone'
       };
       list.innerHTML = notifications.items.map(function (n) {
         var when = new Date(n.time);
         var label = isNaN(when) ? '' : when.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         return '<div class="pd-notif-item' + (n.read ? '' : ' pd-notif-unread') + '" data-id="' + esc(n.id) + '">' +
-          '<div class="pd-notif-icon"><i class="fas ' + (icons[n.type] || icons.general) + '"></i></div>' +
-          '<div class="pd-notif-body"><div class="pd-notif-title">' + esc(n.title) + '</div>' +
+          '<div class="pd-notif-icon"><i class="pd-i ' + (icons[n.type] || icons.general) + '"></i></div>' +
+          '<div class="pd-notif-body"><div class="pd-notif-title">' + esc(plainTitle(n.title)) + '</div>' +
           '<div class="pd-notif-msg">' + esc(n.message) + '</div>' +
           '<div class="pd-notif-time">' + esc(label) + '</div></div>' +
-          (n.link ? '<a class="pd-notif-go" href="' + esc(n.link) + '"><i class="fas fa-chevron-right"></i></a>' : '') +
+          (n.link ? '<a class="pd-notif-go" href="' + esc(n.link) + '" aria-label="Open"><i class="pd-i pd-i-chevron-right"></i></a>' : '') +
           '</div>';
       }).join('');
       $$('.pd-notif-item', list).forEach(function (el) {
@@ -1496,7 +1509,7 @@
       }
       el.innerHTML =
         '<div class="pd-scripture-card">' +
-          '<div class="pd-scripture-icon"><i class="fas fa-book-bible"></i></div>' +
+          '<div class="pd-scripture-icon"><i class="pd-i pd-i-book"></i></div>' +
           '<p class="pd-scripture-kicker">' + esc(i18n.t('scripture.featured')) + '</p>' +
           '<blockquote class="pd-scripture-text">“' + esc(text) + '”</blockquote>' +
           '<p class="pd-scripture-ref">— ' + esc(ref) + '</p>' +
@@ -1541,7 +1554,7 @@
         radio.playing = false;
         if (btn) btn.classList.remove('pd-radio-playing');
         var icon = btn && btn.querySelector('i');
-        if (icon) icon.className = 'fas fa-play';
+        if (icon) icon.className = 'pd-i pd-i-play';
         var indicator = $('#pdRadioNow');
         if (indicator) indicator.style.display = 'none';
         broadcast('radio:stopped', { url: url });
@@ -1553,12 +1566,12 @@
         $$('[data-pd-radio]').forEach(function (b) {
           b.classList.remove('pd-radio-playing');
           var ic = b.querySelector('i');
-          if (ic) ic.className = 'fas fa-play';
+          if (ic) ic.className = 'pd-i pd-i-play';
         });
         if (btn) {
           btn.classList.add('pd-radio-playing');
           var icon2 = btn.querySelector('i');
-          if (icon2) icon2.className = 'fas fa-pause';
+          if (icon2) icon2.className = 'pd-i pd-i-pause';
         }
         var indicator = $('#pdRadioNow');
         if (indicator) {
@@ -1665,11 +1678,11 @@
       var l = share.links(opts);
       host.classList.add('pd-share-row');
       host.innerHTML =
-        '<a class="pd-share-btn pd-share-wa" target="_blank" rel="noopener" href="' + l.whatsapp + '"><i class="fab fa-whatsapp"></i> WhatsApp</a>' +
-        '<a class="pd-share-btn pd-share-fb" target="_blank" rel="noopener" href="' + l.facebook + '"><i class="fab fa-facebook-f"></i> Facebook</a>' +
-        '<a class="pd-share-btn pd-share-x" target="_blank" rel="noopener" href="' + l.x + '"><i class="fab fa-x-twitter"></i> X</a>' +
-        '<a class="pd-share-btn pd-share-tg" target="_blank" rel="noopener" href="' + l.telegram + '"><i class="fab fa-telegram"></i> Telegram</a>' +
-        '<button type="button" class="pd-share-btn pd-share-copy"><i class="fas fa-link"></i> Copy link</button>';
+        '<a class="pd-share-btn pd-share-wa" target="_blank" rel="noopener" href="' + l.whatsapp + '"><i class="pd-i pd-i-brand-whatsapp"></i> WhatsApp</a>' +
+        '<a class="pd-share-btn pd-share-fb" target="_blank" rel="noopener" href="' + l.facebook + '"><i class="pd-i pd-i-brand-facebook"></i> Facebook</a>' +
+        '<a class="pd-share-btn pd-share-x" target="_blank" rel="noopener" href="' + l.x + '"><i class="pd-i pd-i-brand-x"></i> X</a>' +
+        '<a class="pd-share-btn pd-share-tg" target="_blank" rel="noopener" href="' + l.telegram + '"><i class="pd-i pd-i-brand-telegram"></i> Telegram</a>' +
+        '<button type="button" class="pd-share-btn pd-share-copy"><i class="pd-i pd-i-link"></i> Copy link</button>';
       var copyBtn = host.querySelector('.pd-share-copy');
       if (copyBtn) copyBtn.addEventListener('click', function () { share.copy(l.url); });
     }

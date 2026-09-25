@@ -16,7 +16,8 @@
 <meta property="og:image" content="/assets/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="/assets/pd-icons.css">
+<script src="/assets/pd-icons.js"></script>
 <link rel="stylesheet" href="/assets/pd-brand.css">
 <link rel="manifest" href="/manifest.json">
 <script src="/assets/pd-cloud-video.js"></script>
@@ -142,13 +143,13 @@
     <h1>Scripture Studio — AI Video</h1>
   </div>
   <span class="spacer"></span>
-  <a class="std-back" href="/admin.html"><i class="fas fa-arrow-left"></i> Admin</a>
+  <a class="std-back" href="/admin.html"><i class="pd-i pd-i-arrow-left"></i> Admin</a>
 </header>
 
 <div class="std-wrap">
 
   <div class="card" style="border-left:4px solid #d4af37;">
-    <h2><i class="fas fa-wand-magic-sparkles" style="color:#d4af37"></i> Write it once — Prayer Dome renders the video</h2>
+    <h2><i class="pd-i pd-i-wand-sparkles" style="color:#d4af37"></i> Write it once — Prayer Dome renders the video</h2>
     <p class="hint" style="margin-bottom:0;">
       Type or generate a script, choose the look and the narration, then press <strong>Render</strong>. The video is
       drawn frame by frame in this browser and uploaded straight to <strong>Prayer Dome cloud storage</strong> — nothing is
@@ -189,8 +190,8 @@
         <p class="hint">One thought per paragraph. Leave a blank line between paragraphs — each becomes a scene on screen.</p>
         <textarea id="vScript" rows="12" placeholder="Leave a blank line between paragraphs…"></textarea>
         <div class="btn-row">
-          <button class="btn ghost" type="button" id="btnOutline"><i class="fas fa-list-ul"></i> Build an outline for me</button>
-          <button class="btn ghost" type="button" id="btnVerse"><i class="fas fa-book-bible"></i> Insert today's verse</button>
+          <button class="btn ghost" type="button" id="btnOutline"><i class="pd-i pd-i-list"></i> Build an outline for me</button>
+          <button class="btn ghost" type="button" id="btnVerse"><i class="pd-i pd-i-book"></i> Insert today's verse</button>
         </div>
         <div class="scene-list" id="sceneList"></div>
         <div class="status" id="scriptStatus"></div>
@@ -263,33 +264,33 @@
       <div class="card">
         <h2><span class="num">5</span> Preview &amp; render</h2>
         <div class="stage">
-          <span class="stage-badge" id="recBadge">● RECORDING</span>
+          <span class="stage-badge" id="recBadge"><i class="pd-i pd-i-circle-fill" aria-hidden="true"></i> RECORDING</span>
           <canvas id="stage" width="1280" height="720"></canvas>
         </div>
         <div class="meter"><i id="renderBar"></i></div>
         <div class="status" id="renderStatus">Ready when you are.</div>
         <div class="btn-row">
-          <button class="btn ghost" type="button" id="btnPreview"><i class="fas fa-eye"></i> Preview</button>
-          <button class="btn gold" type="button" id="btnRender"><i class="fas fa-clapperboard"></i> Render &amp; save to cloud</button>
-          <button class="btn danger" type="button" id="btnStop" style="display:none;"><i class="fas fa-stop"></i> Stop</button>
+          <button class="btn ghost" type="button" id="btnPreview"><i class="pd-i pd-i-eye"></i> Preview</button>
+          <button class="btn gold" type="button" id="btnRender"><i class="pd-i pd-i-clapperboard"></i> Render &amp; save to cloud</button>
+          <button class="btn danger" type="button" id="btnStop" style="display:none;"><i class="pd-i pd-i-square"></i> Stop</button>
         </div>
       </div>
 
       <div class="card out" id="outCard">
-        <h2><i class="fas fa-cloud-arrow-up" style="color:#16a34a"></i> Saved to Prayer Dome cloud</h2>
+        <h2><i class="pd-i pd-i-cloud-upload" style="color:#16a34a"></i> Saved to Prayer Dome cloud</h2>
         <div class="stage"><video id="outVideo" controls controlsList="nodownload noremoteplayback" disablepictureinpicture playsinline></video></div>
         <div class="out-url" id="outUrl"></div>
         <label class="fl" for="outDesc">Description shown in the app and in social previews</label>
         <textarea id="outDesc" rows="3" maxlength="400" placeholder="A short description…"></textarea>
         <div class="btn-row">
-          <button class="btn" type="button" id="btnPublish"><i class="fas fa-paper-plane"></i> Publish to the app library</button>
-          <button class="btn ghost" type="button" id="btnCopy"><i class="fas fa-copy"></i> Copy link</button>
+          <button class="btn" type="button" id="btnPublish"><i class="pd-i pd-i-send"></i> Publish to the app library</button>
+          <button class="btn ghost" type="button" id="btnCopy"><i class="pd-i pd-i-copy"></i> Copy link</button>
         </div>
         <div class="status" id="publishStatus"></div>
       </div>
 
       <div class="card">
-        <h2><i class="fas fa-film" style="color:#0A4D9B"></i> Published AI videos</h2>
+        <h2><i class="pd-i pd-i-film" style="color:#0A4D9B"></i> Published AI videos</h2>
         <p class="hint" style="margin-bottom:0;">Everything the ministry has published into the app library.</p>
         <div class="lib" id="libGrid"></div>
         <div class="status" id="libStatus">Loading…</div>
@@ -345,7 +346,8 @@ window.dispatchEvent(new Event('pd-studio-cloud-ready'));
   /* ══════════════════════════════════════════ templates */
   var TEMPLATES = {
     sermon: {
-      label: '🎤 Sermon',
+      label: 'Sermon',
+      icon: 'pd-i-mic',
       title: 'A House of Prayer for All Nations',
       scripture: 'Isaiah 56:7',
       theme: 'royal',
@@ -358,7 +360,8 @@ window.dispatchEvent(new Event('pd-studio-cloud-ready'));
       ].join('\n\n')
     },
     story: {
-      label: '📖 Bible Story',
+      label: 'Bible Story',
+      icon: 'pd-i-book-open',
       title: 'The Prodigal Son',
       scripture: 'Luke 15:11-32',
       theme: 'parchment',
@@ -373,7 +376,8 @@ window.dispatchEvent(new Event('pd-studio-cloud-ready'));
       ].join('\n\n')
     },
     devotional: {
-      label: '🌅 Devotional',
+      label: 'Devotional',
+      icon: 'pd-i-sunrise',
       title: 'New Every Morning',
       scripture: 'Lamentations 3:22-23',
       theme: 'dawn',
@@ -386,7 +390,8 @@ window.dispatchEvent(new Event('pd-studio-cloud-ready'));
       ].join('\n\n')
     },
     inspiration: {
-      label: '✨ Inspirational',
+      label: 'Inspirational',
+      icon: 'pd-i-sparkles',
       title: 'You Are Not Forgotten',
       scripture: 'Isaiah 49:16',
       theme: 'night',
@@ -398,7 +403,8 @@ window.dispatchEvent(new Event('pd-studio-cloud-ready'));
       ].join('\n\n')
     },
     promo: {
-      label: '📣 Promotional',
+      label: 'Promotional',
+      icon: 'pd-i-megaphone',
       title: 'Join Prayer Dome Live',
       scripture: 'Matthew 18:20',
       theme: 'royal',
@@ -916,7 +922,7 @@ window.dispatchEvent(new Event('pd-studio-cloud-ready'));
   var chips = $('templateChips');
   chips.innerHTML = Object.keys(TEMPLATES).map(function (k, i) {
     return '<button type="button" class="chip' + (i === 0 ? ' on' : '') + '" data-key="' + k + '">' +
-      esc(TEMPLATES[k].label) + '</button>';
+      '<i class="pd-i ' + TEMPLATES[k].icon + '" aria-hidden="true"></i> ' + esc(TEMPLATES[k].label) + '</button>';
   }).join('');
   chips.addEventListener('click', function (e) {
     var chip = e.target.closest('.chip');
@@ -927,14 +933,14 @@ window.dispatchEvent(new Event('pd-studio-cloud-ready'));
   });
 
   var VOICES = [
-    { key: 'speech', label: '🔊 Prayer Dome voice (device)' },
-    { key: 'file', label: '🎧 AI voice-over file' },
-    { key: 'mic', label: '🎙️ My microphone' },
-    { key: 'silent', label: '🤫 Silent (text only)' }
+    { key: 'speech', icon: 'pd-i-volume-2', label: 'Prayer Dome voice (device)' },
+    { key: 'file', icon: 'pd-i-headphones', label: 'AI voice-over file' },
+    { key: 'mic', icon: 'pd-i-mic', label: 'My microphone' },
+    { key: 'silent', icon: 'pd-i-volume-x', label: 'Silent (text only)' }
   ];
   var vchips = $('voiceChips');
   vchips.innerHTML = VOICES.map(function (v, i) {
-    return '<button type="button" class="chip' + (i === 0 ? ' on' : '') + '" data-voice="' + v.key + '">' + v.label + '</button>';
+    return '<button type="button" class="chip' + (i === 0 ? ' on' : '') + '" data-voice="' + v.key + '"><i class="pd-i ' + v.icon + '" aria-hidden="true"></i> ' + v.label + '</button>';
   }).join('');
   vchips.addEventListener('click', function (e) {
     var chip = e.target.closest('.chip');
