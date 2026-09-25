@@ -1005,6 +1005,8 @@
       notifications._registering = (async function () {
         try {
           var reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
+          // Also ensure main PWA service worker is registered for installability & offline
+          try { await navigator.serviceWorker.register('/sw.js', { scope: '/' }); } catch(e){}
           var appMod = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js');
           var msgMod = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js');
           if (!(await msgMod.isSupported())) return null;
@@ -1823,6 +1825,98 @@
     }
   };
 
+  /* ------------------------------------------------- consistent header/footer
+   * Every page must share the same premium Prayer Dome header and footer.
+   * This module auto-injects a consistent topbar/drawer/footer if missing,
+   * and normalizes the navigation so the structure is identical across all pages.
+   * Keeps brand colors #0A4D9B / #d4af37 and the official logo only.
+   * --------------------------------------------------------------- */
+  var layout = {
+    HEADER_HTML: ''
+      + '<button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="pd-i pd-i-menu"></i></button>'
+      + '<a href="/" class="pd-topbar-center"><div class="pd-topbar-logo"><img src="/assets/logo.png" alt="PD Logo"></div><div class="pd-topbar-word">PRAYER DOME</div></a>'
+      + '<div class="pd-topbar-right">'
+      + '<select class="pd-lang-select" aria-label="Language"><option value="en">English</option><option value="tum">Tumbuka</option><option value="ssw">siSwati</option><option value="bem">Bemba</option><option value="nya">Nyanja</option></select>'
+      + '<button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="pd-i pd-i-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>'
+      + '<button class="theme-toggle-btn" onclick="toggleDarkMode&&toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>'
+      + '</div>',
+    DRAWER_LINKS: [
+      {href:'/', icon:'pd-i-house', label:'Home'},
+      {href:'/lessons', icon:'pd-i-graduation-cap', label:'Teaching'},
+      {href:'/stories', icon:'pd-i-book-open-text', label:'Stories'},
+      {href:'/quiz', icon:'pd-i-star', label:'Quizzes'},
+      {href:'/game', icon:'pd-i-gamepad-2', label:'Games'},
+      {href:'/resources', icon:'pd-i-folder-open', label:'Resources'},
+      {href:'/sermons', icon:'pd-i-mic', label:'Sermons'},
+      {href:'/prayer', icon:'pd-i-hands-praying', label:'Prayer Wall'},
+      {href:'/account', icon:'pd-i-circle-user', label:'Account'},
+    ],
+    FOOTER_HTML: ''
+      + '<div class="pd-footer-logo"><img src="/assets/logo.png" alt="Prayer Dome"><span class="pd-footer-brand">PRAYER DOME</span></div>'
+      + '<div class="pd-footer-nav"><a href="/">Home</a><a href="/lessons">Teaching</a><a href="/quiz">Quiz</a><a href="/game">Games</a><a href="/prayer">Prayer</a><a href="/account">Account</a></div>'
+      + '<p class="pd-footer-copy">© 2018 PRAYER DOME MINISTRY. ALL RIGHTS RESERVED. · A House of Prayer for All Nations</p>',
+    ensure: function(){
+      try {
+        // Ensure topbar exists
+        var topbar = document.querySelector('.pd-topbar');
+        if(!topbar){
+          topbar = document.createElement('header');
+          topbar.className='pd-topbar';
+          topbar.innerHTML = layout.HEADER_HTML;
+          document.body.insertBefore(topbar, document.body.firstChild);
+        } else {
+          // Normalize existing topbar content if missing parts
+          if(!topbar.querySelector('.pd-lang-select') || !topbar.querySelector('#pdNotifBell')){
+            // Keep existing but ensure right side has language+bells+theme
+            var right = topbar.querySelector('.pd-topbar-right');
+            if(!right){
+              right=document.createElement('div'); right.className='pd-topbar-right'; topbar.appendChild(right);
+            }
+            if(!right.querySelector('.pd-lang-select')){
+              var sel=document.createElement('select'); sel.className='pd-lang-select'; sel.setAttribute('aria-label','Language');
+              sel.innerHTML='<option value="en">English</option><option value="tum">Tumbuka</option><option value="ssw">siSwati</option><option value="bem">Bemba</option><option value="nya">Nyanja</option>';
+              right.insertBefore(sel, right.firstChild);
+            }
+            if(!right.querySelector('#pdNotifBell')){
+              var bell=document.createElement('button'); bell.className='pd-bell-btn'; bell.id='pdNotifBell'; bell.setAttribute('aria-label','Notifications');
+              bell.innerHTML='<i class="pd-i pd-i-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span>';
+              right.appendChild(bell);
+            }
+            if(!right.querySelector('.theme-toggle-btn')){
+              var th=document.createElement('button'); th.className='theme-toggle-btn'; th.setAttribute('aria-label','Toggle dark mode');
+              th.setAttribute('onclick','toggleDarkMode&&toggleDarkMode()'); th.innerHTML='<i class="pd-i pd-i-moon"></i>';
+              right.appendChild(th);
+            }
+          }
+        }
+        // Ensure drawer exists and has consistent links
+        var drawer = document.getElementById('pdDrawer') || document.querySelector('.pd-drawer');
+        if(!drawer){
+          drawer=document.createElement('aside'); drawer.className='pd-drawer'; drawer.id='pdDrawer'; drawer.setAttribute('aria-label','Main menu');
+          drawer.innerHTML='<nav class="pd-drawer-nav"></nav>'; document.body.insertBefore(drawer, topbar.nextSibling || document.body.firstChild.nextSibling);
+        }
+        var nav = drawer.querySelector('.pd-drawer-nav') || drawer;
+        if(nav && nav.children.length < 5){
+          nav.innerHTML = layout.DRAWER_LINKS.map(function(l){ return '<a class="pd-drawer-link" href="'+l.href+'"><i class="pd-i '+l.icon+'"></i> '+l.label+'</a>'; }).join('');
+        }
+        // Ensure footer exists
+        var footer = document.querySelector('.pd-footer');
+        if(!footer){
+          footer=document.createElement('footer'); footer.className='pd-footer';
+          footer.innerHTML = layout.FOOTER_HTML;
+          document.body.appendChild(footer);
+        } else {
+          // Normalize footer nav if missing games link or inconsistent
+          var navF = footer.querySelector('.pd-footer-nav');
+          if(navF && navF.children.length < 5){
+            navF.innerHTML = '<a href="/">Home</a><a href="/lessons">Teaching</a><a href="/quiz">Quiz</a><a href="/game">Games</a><a href="/prayer">Prayer</a><a href="/account">Account</a>';
+          }
+        }
+      } catch(e){}
+    },
+    init: function(){ layout.ensure(); }
+  };
+
   /* ---------------------------------------------------------------- public */
   window.PDApp = {
     version: VERSION,
@@ -1840,6 +1934,7 @@
     stats: stats,
     live: live,
     news: news,
+    layout: layout,
     academyNav: academyNav,
     scripture: scripture,
     radio: radio,
@@ -1850,6 +1945,7 @@
     init: function () {
       // Each module is isolated: one failure must never break the rest.
       var modules = [
+        ['layout', layout.init],
         ['ui', ui.init], ['i18n', i18n.init], ['location', location.init],
         ['announcements', announcements.init], ['notifications', notifications.init],
         ['banners', banners.init], ['stats', stats.init], ['live', live.init],

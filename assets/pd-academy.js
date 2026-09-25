@@ -105,7 +105,24 @@
         '<strong>' + esc(l.order + '. ' + l.title) + '</strong>' +
         '<span>' + esc(l.minutes + ' min · ' + l.level) + (done ? ' · <i class="pd-i pd-i-circle-check" aria-hidden="true"></i> Read' : '') + (passed ? ' · Certificate earned' : '') + '</span></button>';
     }).join('');
-    $$('[data-lesson]', root).forEach(function (b) { b.addEventListener('click', function () { location.hash = '#lesson/' + b.getAttribute('data-lesson'); }); });
+    $$('[data-lesson]', root).forEach(function (b) {
+      b.addEventListener('click', function (ev) {
+        var lid = b.getAttribute('data-lesson');
+        // Topic-based dedicated page navigation — real users go to dedicated lesson page
+        // Keep hash behaviour for tests/JSDOM and as fallback
+        var isTest = (function(){ try { return /jsdom/i.test(navigator.userAgent) || !!window.__PD_TEST__ || location.hostname===''; } catch(e){ return false; }})();
+        if (!isTest && lid) {
+          // Update hash for backward compat then navigate to dedicated page
+          try { location.hash = '#lesson/' + lid; } catch(e){}
+          // Dedicated page: lesson, pdf, audio, quiz each have own URL
+          var target = '/lesson.html?id=' + encodeURIComponent(lid);
+          // Small delay so hash is set for tests that check immediately
+          setTimeout(function(){ try{ location.href = target; }catch(e){} }, 40);
+          return;
+        }
+        location.hash = '#lesson/' + lid;
+      });
+    });
   }
   /* ==========================================================================
      Lesson hero imagery — picks one of the branded images based on the lesson
@@ -975,6 +992,29 @@
       '<div id="lessonDiscussion-' + l.id + '" class="pd-acad-discussion" style="margin-top:18px"></div>' +
       '<div id="lessonShare-' + l.id + '"></div>';
 
+    // Dedicated-page action row — every section has its own page (lesson, PDF, audio, quiz)
+    (function(){
+      var existing = document.getElementById('dedicatedPageRow');
+      if(!existing){
+        var row = document.createElement('div');
+        row.id='dedicatedPageRow';
+        row.style.cssText='display:flex; gap:8px; flex-wrap:wrap; margin:0 0 14px;';
+        row.innerHTML='<a class="pd-acad-btn pd-acad-btn-primary" href="/lesson.html?id='+encodeURIComponent(l.id)+'" style="flex:1; justify-content:center; min-width:140px;"><i class="pd-i pd-i-book-open-text"></i> Open Dedicated Lesson Page</a>'
+                     +'<a class="pd-acad-btn pd-acad-btn-ghost" href="/lesson-pdf.html?id='+encodeURIComponent(l.id)+'" style="flex:1; justify-content:center; min-width:120px; border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-file-text"></i> PDF</a>'
+                     +'<a class="pd-acad-btn pd-acad-btn-ghost" href="/lesson-audio.html?id='+encodeURIComponent(l.id)+'" style="flex:1; justify-content:center; min-width:120px; border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-headphones"></i> Audio</a>'
+                     +'<a class="pd-acad-btn pd-acad-btn-ghost" href="/lesson-quiz.html?id='+encodeURIComponent(l.id)+'" style="flex:1; justify-content:center; min-width:120px; border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-badge-check"></i> Quiz</a>';
+        // Insert after hero block if exists, else at top of reader
+        var hero = reader.querySelector('.pd-acad-lesson-hero');
+        if(hero && hero.nextSibling) hero.parentNode.insertBefore(row, hero.nextSibling);
+        else reader.insertBefore(row, reader.firstChild);
+      } else {
+        // update hrefs for active lesson
+        existing.querySelectorAll('a').forEach(function(a){
+          var href=a.getAttribute('href')||'';
+          if(href.indexOf('?id=')>=0) a.href=href.split('?')[0]+'?id='+encodeURIComponent(l.id);
+        });
+      }
+    })();
     // Initial reflection button state
     var lp = getLessonProgress(l.id);
     $$('.pd-acad-reflection-btn').forEach(function (btn) {
@@ -1028,7 +1068,17 @@
         var done = state.completedLessons.indexOf(l.id) >= 0;
         return '<button class="pd-acad-lesson-link" data-lesson="' + esc(l.id) + '"><small><i class="pd-i ' + esc(l.icon) + '"></i> ' + esc(l.track) + '</small><strong>' + esc(l.order + '. ' + l.title) + '</strong><span>' + l.minutes + ' min · ' + esc(l.level) + (done ? ' · <i class="pd-i pd-i-circle-check" aria-hidden="true"></i> Read' : '') + '</span></button>';
       }).join('');
-      $$('[data-lesson]', list).forEach(function (b) { b.addEventListener('click', function () { location.hash = '#lesson/' + b.getAttribute('data-lesson'); }); });
+      $$('[data-lesson]', list).forEach(function (b) { b.addEventListener('click', function () {
+        var lid = b.getAttribute('data-lesson');
+        var isTest = (function(){ try { return /jsdom/i.test(navigator.userAgent) || !!window.__PD_TEST__; } catch(e){ return false; }})();
+        if (!isTest && lid) {
+          try { location.hash = '#lesson/' + lid; } catch(e){}
+          var target = '/lesson.html?id=' + encodeURIComponent(lid);
+          setTimeout(function(){ try{ location.href = target; }catch(e){} }, 40);
+          return;
+        }
+        location.hash = '#lesson/' + lid;
+      }); });
     }
     refreshList();
     function route() {

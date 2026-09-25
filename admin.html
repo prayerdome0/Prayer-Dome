@@ -1852,7 +1852,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, getDoc, doc, updateDoc, setDoc, deleteDoc, query, where, orderBy, startAfter, serverTimestamp, increment, addDoc, limit, onSnapshot, Timestamp, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo", authDomain: "prayer-dome.firebaseapp.com", projectId: "prayer-dome", storageBucket: "prayer-dome.firebasestorage.app", messagingSenderId: "198295153196", appId: "1:198295153196:web:1222b31948d7974ba3bf89" };
@@ -1860,6 +1860,42 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         const cloudFunctions = getFunctions(app);
+
+        // Persistent admin authentication — remains logged in across sessions
+        // Secure session management with automatic restoration
+        try {
+            await setPersistence(auth, browserLocalPersistence);
+        } catch(e) { console.warn('Auth persistence setup:', e); }
+
+        // Session management helpers
+        const ADMIN_SESSION_KEY = 'pd_admin_session';
+        function saveAdminSession(user) {
+            try {
+                localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({
+                    uid: user.uid,
+                    email: user.email,
+                    timestamp: Date.now()
+                }));
+            } catch(e) {}
+        }
+        function clearAdminSession() {
+            try { localStorage.removeItem(ADMIN_SESSION_KEY); } catch(e) {}
+        }
+        function getAdminSession() {
+            try {
+                const raw = localStorage.getItem(ADMIN_SESSION_KEY);
+                return raw ? JSON.parse(raw) : null;
+            } catch(e) { return null; }
+        }
+        // Restore UI immediately if valid session exists — no login prompt flash
+        (function restoreAdminUi() {
+            const sess = getAdminSession();
+            if (sess && (Date.now() - sess.timestamp) < 7*24*60*60*1000) {
+                const lm = document.getElementById('loginModal');
+                const gl = document.getElementById('globalLoader');
+                if (gl) gl.style.display = 'flex';
+            }
+        })();
 
         // Hand Firestore to the shared premium layer (pd-app.js) so banners,
         // news, notifications, live status and stats sync to every page.
@@ -5617,6 +5653,7 @@ window.toggleDarkMode = function() {
                     const snap = await getDoc(doc(db, "memberships", user.uid));
                     if (snap.exists() && snap.data().role === 'admin') {
                         adminUser = user;
+                        saveAdminSession(user);
                         // Register this device for push so "Send test notification"
                         // and "Send to all" have a token to reach.
                         window.PD_UID = user.uid;
@@ -5627,16 +5664,38 @@ window.toggleDarkMode = function() {
                         document.getElementById('topbarName').innerText = snap.data().fullName || 'Admin';
                         document.getElementById('topbarAvatar').innerText = (snap.data().fullName || 'A')[0];
                         document.getElementById('loginModal').style.display = 'none';
+                        document.getElementById('globalLoader').style.display = 'none';
                         await loadDashboardPerformance();
                         setupAdminRealtimeListeners();
                         watchLiveStatus();
+                        // Keep session alive — refresh timestamp periodically
+                        setInterval(() => saveAdminSession(user), 5*60*1000);
                     } else { 
+                        clearAdminSession();
                         await signOut(auth); 
                         document.getElementById('loginModal').style.display = 'flex'; 
+                        document.getElementById('globalLoader').style.display = 'none';
                         toast('Access Denied - Admin privileges required', 'error'); 
                     }
-                } catch(e) { console.error("Auth check error:", e); document.getElementById('loginModal').style.display = 'flex'; }
-            } else { document.getElementById('loginModal').style.display = 'flex'; }
+                } catch(e) { 
+                    console.error("Auth check error:", e); 
+                    // Don't immediately sign out on transient network error — keep session
+                    const sess = getAdminSession();
+                    if (!sess) document.getElementById('loginModal').style.display = 'flex';
+                    document.getElementById('globalLoader').style.display = 'none';
+                }
+            } else { 
+                // Check if we have a recent valid session — restore without login if valid
+                const sess = getAdminSession();
+                if (sess && (Date.now() - sess.timestamp) < 7*24*60*60*1000) {
+                    // Session still valid but Firebase says no user — likely transient, keep loader
+                    document.getElementById('loginModal').style.display = 'none';
+                } else {
+                    clearAdminSession();
+                    document.getElementById('loginModal').style.display = 'flex'; 
+                }
+                document.getElementById('globalLoader').style.display = 'none';
+            }
             hideLoading();
         });
 
@@ -5665,8 +5724,22 @@ window.toggleDarkMode = function() {
             }
         };
 
-        window.adminLogin = async () => { const email=document.getElementById('adminEmail').value, pass=document.getElementById('adminPassword').value; if(!email||!pass) return toast('Enter credentials','error'); showLoading(); try{ await signInWithEmailAndPassword(auth, email, pass); } catch(e){ toast(e.message,'error'); } finally{ hideLoading(); } };
-        window.logoutAdmin = async () => { await signOut(auth); window.location.href = 'index.html'; };
+        window.adminLogin = async () => { 
+            const email=document.getElementById('adminEmail').value, pass=document.getElementById('adminPassword').value; 
+            if(!email||!pass) return toast('Enter credentials','error'); 
+            showLoading(); 
+            try{ 
+                await setPersistence(auth, browserLocalPersistence);
+                await signInWithEmailAndPassword(auth, email, pass); 
+                toast('Welcome back, Admin', 'success');
+            } catch(e){ toast(e.message,'error'); } finally{ hideLoading(); } 
+        };
+        window.logoutAdmin = async () => { 
+            clearAdminSession();
+            await signOut(auth); 
+            try { localStorage.clear(); sessionStorage.clear(); } catch(e) {}
+            window.location.href = 'index.html'; 
+        };
         
         setTimeout(() => { if(!adminUser) document.getElementById('globalLoader').style.display = 'none'; }, 5000);
     </script>
