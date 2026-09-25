@@ -3,7 +3,7 @@
 // shade) even when the app is closed — see /assets/pd-verse-data.js.
 try { importScripts('/assets/pd-verse-data.js'); } catch (e) { /* verses unavailable offline */ }
 // Bump CACHE_NAME whenever the precache list changes.
-const CACHE_NAME = 'prayer-dome-v18';
+const CACHE_NAME = 'prayer-dome-v19';
 
 // Shell assets worth having available offline.
 const PRECACHE = [
@@ -22,6 +22,9 @@ const PRECACHE = [
     '/translate.html',
     '/translation-data.js',
     '/assets/pd-brand.css',
+    // Icon system (Lucide SVG icons); needed by every page, including offline.
+    '/assets/pd-icons.css',
+    '/assets/pd-icons.js',
     '/assets/pd-motion.js',
     '/live.html',
     '/gallery.html',
@@ -224,8 +227,7 @@ async function specialVerseForToday() {
 }
 
 async function showVerseNotification(verse) {
-    const title = (verse.icon ? verse.icon + ' ' : '') +
-        (verse.slotLabel || 'Daily Verse') + ' \u00b7 Prayer Dome';
+    const title = (verse.slotLabel || 'Daily Verse') + ' \u00b7 Prayer Dome';
     return self.registration.showNotification(title, {
         body: '\u201C' + verse.text + '\u201D\n\u2014 ' + verse.reference +
               ' (' + (verse.translation || 'KJV') + ')',

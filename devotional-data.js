@@ -322,13 +322,13 @@ export function getDailyDevotional() {
     // Check for seasonal/holiday devotionals first
     if (season && seasonalDevotionals[season]) {
         const seasonal = seasonalDevotionals[season];
-        let periodIcon = 'fa-star';
-        let periodName = `${season.charAt(0).toUpperCase() + season.slice(1)} Special 🎉`;
+        let periodIcon = 'pd-i-star';
+        let periodName = `${season.charAt(0).toUpperCase() + season.slice(1)} Special`;
         
-        if (season === 'christmas') periodIcon = 'fa-gift';
-        if (season === 'easter') periodIcon = 'fa-cross';
-        if (season === 'newYear') periodIcon = 'fa-calendar-alt';
-        if (season === 'thanksgiving') periodIcon = 'fa-leaf';
+        if (season === 'christmas') periodIcon = 'pd-i-gift';
+        if (season === 'easter') periodIcon = 'pd-i-latin-cross';
+        if (season === 'newYear') periodIcon = 'pd-i-calendar-days';
+        if (season === 'thanksgiving') periodIcon = 'pd-i-leaf';
         
         return {
             ...seasonal,
@@ -344,13 +344,13 @@ export function getDailyDevotional() {
     const dayOfMonth = now.getDate();
     if (dayOfMonth === 1 || dayOfMonth === 15) {
         const hour2 = now.getHours();
-        let periodName2 = 'Morning Devotional 🌅';
-        if (hour2 >= 12 && hour2 < 17) periodName2 = 'Afternoon Devotional ☀️';
-        else if (hour2 >= 17 || hour2 < 5) periodName2 = 'Evening Devotional 🌙';
+        let periodName2 = 'Morning Devotional';
+        if (hour2 >= 12 && hour2 < 17) periodName2 = 'Afternoon Devotional';
+        else if (hour2 >= 17 || hour2 < 5) periodName2 = 'Evening Devotional';
         return {
             period: 'featured',
-            periodIcon: 'fa-star-of-life',
-            periodName: `Theme Scripture — Mark 7:37 ✨`,
+            periodIcon: 'pd-i-sparkles',
+            periodName: `Theme Scripture — Mark 7:37`,
             verse: 'Mark 7:37',
             text: 'He hath done all things well: he maketh both the deaf to hear, and the dumb to speak.',
             theme: 'He does everything blamelessly.',
@@ -363,17 +363,17 @@ export function getDailyDevotional() {
     
     // Determine time of day
     let period = 'morning';
-    let periodIcon = 'fa-sun';
-    let periodName = 'Morning Devotional 🌅';
+    let periodIcon = 'pd-i-sun';
+    let periodName = 'Morning Devotional';
     
     if (hour >= 12 && hour < 17) {
         period = 'afternoon';
-        periodIcon = 'fa-cloud-sun';
-        periodName = 'Afternoon Devotional ☀️';
+        periodIcon = 'pd-i-cloud-sun';
+        periodName = 'Afternoon Devotional';
     } else if (hour >= 17 || hour < 5) {
         period = 'evening';
-        periodIcon = 'fa-moon';
-        periodName = 'Evening Devotional 🌙';
+        periodIcon = 'pd-i-moon';
+        periodName = 'Evening Devotional';
     }
     
     // Get consistent daily devotional using day of year

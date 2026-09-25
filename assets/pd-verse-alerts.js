@@ -27,9 +27,11 @@
     var LOGO = '/assets/logo-192.png';
     var BADGE = '/assets/logo-192.png';
 
+    // Always read the verse API through `global`: translation-data.js declares a
+    // top-level `const PD_VERSES` (translations) that shadows the bare identifier.
     function defaults() {
         var slots = {};
-        (global.PD_VERSES ? PD_VERSES.SLOTS : []).forEach(function (s) {
+        (global.PD_VERSES ? global.PD_VERSES.SLOTS : []).forEach(function (s) {
             slots[s.id] = { on: true, time: s.defaultTime };
         });
         return {
@@ -113,7 +115,7 @@
 
                 ctx.fillStyle = '#f6df8a';
                 ctx.font = 'bold 26px Inter, Arial, sans-serif';
-                ctx.fillText((verse.icon || '') + '  ' + (verse.slotLabel || 'Daily Verse').toUpperCase(), 70, 96);
+                ctx.fillText((verse.slotLabel || 'Daily Verse').toUpperCase(), 70, 96);
 
                 // Verse body — wrapped
                 ctx.fillStyle = '#ffffff';
@@ -160,7 +162,7 @@
         options = options || {};
         if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return false;
 
-        var title = (verse.icon ? verse.icon + ' ' : '') + (verse.slotLabel || 'Daily Verse') + ' · Prayer Dome';
+        var title = (verse.slotLabel || 'Daily Verse') + ' · Prayer Dome';
         var body = '\u201C' + verse.text + '\u201D\n— ' + verse.reference + ' (' + (verse.translation || 'KJV') + ')';
         var image = null;
         try { image = await buildVerseCard(verse); } catch (e) { image = null; }
@@ -229,7 +231,7 @@
     }
 
     async function verseForSlot(slotId) {
-        var base = global.PD_VERSES ? PD_VERSES.verseFor(slotId) : null;
+        var base = global.PD_VERSES ? global.PD_VERSES.verseFor(slotId) : null;
         if (!base) return null;
         var special = await loadSpecialVerse();
         if (special && (special.slots === 'all' || String(special.slots).indexOf(slotId) > -1)) {
@@ -253,7 +255,7 @@
         var now = new Date();
         var minutes = now.getHours() * 60 + now.getMinutes();
         var stamp = today();
-        var slots = global.PD_VERSES ? PD_VERSES.SLOTS : [];
+        var slots = global.PD_VERSES ? global.PD_VERSES.SLOTS : [];
 
         for (var i = 0; i < slots.length; i++) {
             var id = slots[i].id;
@@ -331,11 +333,11 @@
         if (!host) return;
         injectStyles();
         var settings = read();
-        var slots = global.PD_VERSES ? PD_VERSES.SLOTS : [];
+        var slots = global.PD_VERSES ? global.PD_VERSES.SLOTS : [];
 
         host.innerHTML =
             '<div class="pd-verse-card">' +
-              '<h3><i class="fas fa-book-bible"></i> Daily Bible Verse on your phone</h3>' +
+              '<h3><i class="pd-i pd-i-book"></i> Daily Bible Verse on your phone</h3>' +
               '<p class="pd-verse-sub">Receive Scripture on your device through the day — morning, midday, afternoon and evening. Verses appear as notifications on your lock screen, with the reference and Prayer Dome branding.</p>' +
               '<div class="pd-verse-master">' +
                 '<div><strong>Send me daily verses</strong><br><small style="font-size:.72rem;opacity:.75;">Works even when the app is closed</small></div>' +
@@ -345,7 +347,7 @@
                 slots.map(function (s) {
                     var conf = settings.slots[s.id] || { on: true, time: s.defaultTime };
                     return '<div class="pd-verse-slot">' +
-                        '<span class="pd-vs-icon">' + s.icon + '</span>' +
+                        '<span class="pd-vs-icon"><i class="pd-i ' + s.icon + '" aria-hidden="true"></i></span>' +
                         '<div class="pd-vs-body">' +
                           '<span class="pd-vs-name">' + s.label + '</span>' +
                           '<input type="time" value="' + conf.time + '" data-verse-time="' + s.id + '">' +
@@ -356,14 +358,14 @@
               '</div>' +
               '<div class="pd-verse-preview" id="pdVersePreview">Loading today\u2019s verse…</div>' +
               '<div class="pd-verse-actions">' +
-                '<button class="pd-verse-btn primary" id="pdVerseTest"><i class="fas fa-bell"></i> Send a test verse now</button>' +
-                '<a class="pd-verse-btn" href="/bible.html"><i class="fas fa-book-open"></i> Open the Bible</a>' +
+                '<button class="pd-verse-btn primary" id="pdVerseTest"><i class="pd-i pd-i-bell"></i> Send a test verse now</button>' +
+                '<a class="pd-verse-btn" href="/bible.html"><i class="pd-i pd-i-book-open"></i> Open the Bible</a>' +
               '</div>' +
-              '<p class="pd-verse-note"><i class="fas fa-circle-info"></i> On Android you can also add the <strong>Prayer Dome Verse widget</strong> to your home or lock screen. On iPhone, install Prayer Dome to the Home Screen and allow notifications to receive verses on the lock screen.</p>' +
+              '<p class="pd-verse-note"><i class="pd-i pd-i-info"></i> On Android you can also add the <strong>Prayer Dome Verse widget</strong> to your home or lock screen. On iPhone, install Prayer Dome to the Home Screen and allow notifications to receive verses on the lock screen.</p>' +
             '</div>';
 
         var preview = host.querySelector('#pdVersePreview');
-        verseForSlot(global.PD_VERSES ? PD_VERSES.currentSlot() : 'morning').then(function (v) {
+        verseForSlot(global.PD_VERSES ? global.PD_VERSES.currentSlot() : 'morning').then(function (v) {
             if (preview && v) preview.innerHTML = '\u201C' + v.text + '\u201D<br><strong style="font-style:normal;">— ' + v.reference + ' (' + v.translation + ')</strong>';
         });
 
@@ -384,7 +386,7 @@
             }
             s.enabled = e.target.checked;
             write(s);
-            if (s.enabled) { startTimer(); if (global.PDApp) PDApp.toast('Daily verses switched on 🙏', 'success'); }
+            if (s.enabled) { startTimer(); if (global.PDApp) PDApp.toast('Daily verses switched on', 'success'); }
             else if (global.PDApp) PDApp.toast('Daily verses switched off');
         });
 
@@ -414,9 +416,9 @@
                 if (global.PDApp) PDApp.toast('Allow notifications first', 'error');
                 return;
             }
-            var v = await verseForSlot(global.PD_VERSES ? PD_VERSES.currentSlot() : 'morning');
+            var v = await verseForSlot(global.PD_VERSES ? global.PD_VERSES.currentSlot() : 'morning');
             if (v) await showVerse(v, { silent: false });
-            if (global.PDApp) PDApp.toast('Verse sent to your device 📖', 'success');
+            if (global.PDApp) PDApp.toast('Verse sent to your device', 'success');
         });
     }
 

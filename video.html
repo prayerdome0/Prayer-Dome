@@ -125,7 +125,8 @@
     </script>
     <!-- PD-SEO:END -->
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/pd-icons.css">
+    <script src="/assets/pd-icons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -480,17 +481,17 @@
         <div class="logo-ring"><img src="/assets/logo.png" alt="Logo"></div>
         <div><h2 style="font-size: 1rem;">PRAYER DOME LIVE</h2></div>
     </a>
-    <button onclick="window.location.href='index.html'" style="background: none; border: none; color: white; font-size: 1.2rem;"><i class="fas fa-home"></i></button>
+    <button onclick="window.location.href='index.html'" style="background: none; border: none; color: white; font-size: 1.2rem;" aria-label="Home"><i class="pd-i pd-i-house"></i></button>
 </header>
 
 <!-- Permission Modal -->
 <div id="permissionModal" class="permission-modal" style="display: flex;">
     <div class="permission-card">
-        <div class="permission-icon"><i class="fas fa-video"></i></div>
+        <div class="permission-icon"><i class="pd-i pd-i-video"></i></div>
         <h3>Camera & Microphone Access</h3>
         <p style="font-size: 0.8rem; margin: 10px 0;">Prayer Dome needs access to stream live from your phone.</p>
-        <button class="permission-btn" onclick="requestPermissions()">📱 Allow Access</button>
-        <button class="permission-btn" style="background: transparent; border: 1px solid var(--border);" onclick="skipPermissions()">👁️ Watch Only</button>
+        <button class="permission-btn" onclick="requestPermissions()"><i class="pd-i pd-i-smartphone" aria-hidden="true"></i> Allow Access</button>
+        <button class="permission-btn" style="background: transparent; border: 1px solid var(--border);" onclick="skipPermissions()"><i class="pd-i pd-i-eye" aria-hidden="true"></i> Watch Only</button>
     </div>
 </div>
 
@@ -501,7 +502,7 @@
         <span id="liveStatusText">Offline</span>
     </div>
     <div class="status-indicator">
-        <i class="fas fa-eye"></i>
+        <i class="pd-i pd-i-eye"></i>
         <span id="viewerCount">0</span>
     </div>
 </div>
@@ -515,7 +516,7 @@
     
     <div class="video-container" id="playerContainer">
         <div class="placeholder">
-            <i class="fas fa-satellite-dish"></i>
+            <i class="pd-i pd-i-satellite-dish"></i>
             <h3>No Live Stream</h3>
             <p style="font-size: 0.75rem;">Next service: Sunday 9:00 AM</p>
         </div>
@@ -523,93 +524,93 @@
     
     <div class="news-ticker">
         <div class="news-ticker-content" id="tickerContent">
-            <i class="fas fa-church"></i> PRAYER DOME LIVE - A House of Prayer for All Nations
+            <i class="pd-i pd-i-church"></i> PRAYER DOME LIVE - A House of Prayer for All Nations
         </div>
     </div>
 </div>
 
 <!-- Mobile Streaming Controls -->
 <div class="mobile-stream-controls" id="streamControls" style="display: none;">
-    <button class="mobile-control-btn" id="toggleMicBtn" onclick="toggleMicrophone()">
-        <i class="fas fa-microphone"></i>
+    <button class="mobile-control-btn" id="toggleMicBtn" onclick="toggleMicrophone()" aria-label="Toggle microphone">
+        <i class="pd-i pd-i-mic"></i>
     </button>
-    <button class="mobile-control-btn" id="toggleCamBtn" onclick="toggleCamera()">
-        <i class="fas fa-video"></i>
+    <button class="mobile-control-btn" id="toggleCamBtn" onclick="toggleCamera()" aria-label="Toggle camera">
+        <i class="pd-i pd-i-video"></i>
     </button>
-    <button class="mobile-control-btn" id="endStreamBtn" onclick="stopLiveStream()" style="background: var(--accent-red);">
-        <i class="fas fa-stop"></i>
+    <button class="mobile-control-btn" id="endStreamBtn" onclick="stopLiveStream()" style="background: var(--accent-red);" aria-label="End live stream">
+        <i class="pd-i pd-i-square"></i>
     </button>
 </div>
 
 <!-- CHAT SECTION -->
 <div class="chat-section">
     <div class="chat-header">
-        <h3><i class="fas fa-comments"></i> Live Chat</h3>
-        <span style="font-size: 0.7rem;"><i class="fas fa-user"></i> <span id="viewerCountChat">0</span></span>
+        <h3><i class="pd-i pd-i-messages-square"></i> Live Chat</h3>
+        <span style="font-size: 0.7rem;"><i class="pd-i pd-i-user"></i> <span id="viewerCountChat">0</span></span>
     </div>
     
     <div class="reaction-strip">
-        <button class="reaction-btn" onclick="sendReaction('🙏')">🙏</button>
-        <button class="reaction-btn" onclick="sendReaction('❤️')">❤️</button>
-        <button class="reaction-btn" onclick="sendReaction('🔥')">🔥</button>
-        <button class="reaction-btn" onclick="sendReaction('🎉')">🎉</button>
-        <button class="reaction-btn" onclick="sendReaction('🕊️')">🕊️</button>
-        <button class="reaction-btn" onclick="sendReaction('✨')">✨</button>
-        <button class="reaction-btn" onclick="sendReaction('📖')">📖</button>
-        <button class="reaction-btn" onclick="sendReaction('⛪')">⛪</button>
+        <button class="reaction-btn" onclick="sendReaction('pray')" aria-label="Pray" title="Pray"><i class="pd-i pd-i-hands-praying" aria-hidden="true"></i></button>
+        <button class="reaction-btn" onclick="sendReaction('love')" aria-label="Love" title="Love"><i class="pd-i pd-i-heart" aria-hidden="true"></i></button>
+        <button class="reaction-btn" onclick="sendReaction('fire')" aria-label="On fire" title="On fire"><i class="pd-i pd-i-flame" aria-hidden="true"></i></button>
+        <button class="reaction-btn" onclick="sendReaction('celebrate')" aria-label="Celebrate" title="Celebrate"><i class="pd-i pd-i-party-popper" aria-hidden="true"></i></button>
+        <button class="reaction-btn" onclick="sendReaction('peace')" aria-label="Peace" title="Peace"><i class="pd-i pd-i-bird" aria-hidden="true"></i></button>
+        <button class="reaction-btn" onclick="sendReaction('glory')" aria-label="Glory" title="Glory"><i class="pd-i pd-i-sparkles" aria-hidden="true"></i></button>
+        <button class="reaction-btn" onclick="sendReaction('word')" aria-label="The Word" title="The Word"><i class="pd-i pd-i-book-open" aria-hidden="true"></i></button>
+        <button class="reaction-btn" onclick="sendReaction('church')" aria-label="Church" title="Church"><i class="pd-i pd-i-church" aria-hidden="true"></i></button>
     </div>
     
     <div class="chat-messages" id="chatMessages">
-        <div style="text-align: center; color: var(--text-sub); padding: 40px;">💬 Be the first to chat!</div>
+        <div style="text-align: center; color: var(--text-sub); padding: 40px;"><i class="pd-i pd-i-message-circle" aria-hidden="true"></i> Be the first to chat!</div>
     </div>
     
     <div class="chat-input-area">
         <input type="text" id="chatInput" placeholder="Type message..." onkeypress="if(event.key==='Enter') sendMessage()">
-        <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        <button onclick="sendMessage()" aria-label="Send message"><i class="pd-i pd-i-send"></i></button>
     </div>
 </div>
 
 <!-- BROADCASTER PANEL (For phone streamers) -->
 <div id="broadcasterPanel" class="broadcaster-panel">
-    <h3><i class="fas fa-broadcast-tower"></i> Start Mobile Streaming</h3>
+    <h3><i class="pd-i pd-i-radio-tower"></i> Start Mobile Streaming</h3>
     
     <input type="text" id="broadcastTitle" class="mobile-input" placeholder="Stream Title (e.g., Sunday Service)">
     <input type="text" id="broadcastDesc" class="mobile-input" placeholder="Description">
     
     <div id="rtmpInfoPanel" style="display: none;">
         <div class="rtmp-info">
-            <p><strong>📡 RTMP URL:</strong></p>
+            <p><strong><i class="pd-i pd-i-satellite-dish" aria-hidden="true"></i> RTMP URL:</strong></p>
             <p id="rtmpUrl">-</p>
-            <p><strong>🔑 Stream Key:</strong></p>
+            <p><strong><i class="pd-i pd-i-key-round" aria-hidden="true"></i> Stream Key:</strong></p>
             <p id="streamKey">-</p>
         </div>
-        <button class="permission-btn" style="background: var(--accent-blue); padding: 10px;" onclick="copyRTMPInfo()">📋 Copy Stream Info</button>
+        <button class="permission-btn" style="background: var(--accent-blue); padding: 10px;" onclick="copyRTMPInfo()"><i class="pd-i pd-i-copy" aria-hidden="true"></i> Copy Stream Info</button>
         <p style="font-size: 0.65rem; margin-top: 10px; text-align: center;">
-            ⚠️ Use these with streaming apps like Larix Broadcaster or PRISM Live Studio
+            <i class="pd-i pd-i-triangle-alert" aria-hidden="true"></i> Use these with streaming apps like Larix Broadcaster or PRISM Live Studio
         </p>
     </div>
     
     <button class="btn-live" id="startStreamBtn" onclick="startMobileStream()">
-        <i class="fas fa-play-circle"></i> START STREAMING
+        <i class="pd-i pd-i-circle-play"></i> START STREAMING
     </button>
     
     <div id="cloudRecordStatus" style="display:none; margin-top:12px; font-size:0.78rem; color:var(--accent-gold); background:rgba(0,0,0,.25); border-radius:10px; padding:8px 12px;"></div>
 
     <div id="previewArea" class="preview-area">
         <video id="localVideo" autoplay muted playsinline></video>
-        <p style="text-align: center; font-size: 0.7rem; margin-top: 8px;">🔴 You are LIVE! Share this screen</p>
+        <p style="text-align: center; font-size: 0.7rem; margin-top: 8px;"><i class="pd-i pd-i-radio" aria-hidden="true"></i> You are LIVE! Share this screen</p>
     </div>
 </div>
 
 <!-- Past Recordings -->
-<div class="section-title"><i class="fas fa-history"></i> Past Recordings</div>
+<div class="section-title"><i class="pd-i pd-i-rotate-ccw-clock"></i> Past Recordings</div>
 <div class="video-grid" id="pastVideosGrid">
     <div style="text-align: center; padding: 20px;">Loading...</div>
 </div>
 
 <!-- AI-assisted video library: sermons, Bible stories, devotionals,
      inspirational messages and promotional clips published by the ministry. -->
-<div class="section-title" id="aiVideoHeading"><i class="fas fa-wand-magic-sparkles"></i> Prayer Dome Video Library</div>
+<div class="section-title" id="aiVideoHeading"><i class="pd-i pd-i-wand-sparkles"></i> Prayer Dome Video Library</div>
 <div id="aiVideoFilters" style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px;"></div>
 <div class="video-grid" id="aiVideosGrid">
     <div style="text-align: center; padding: 20px;">Loading...</div>
@@ -754,10 +755,10 @@
                             const el = document.getElementById('cloudRecordStatus');
                             if (!el) return;
                             el.style.display = 'block';
-                            el.textContent = snap.state === 'finishing'
-                                ? '☁️ Finishing upload…'
-                                : '☁️ Saving to cloud — ' + snap.parts.length + ' part(s), ' +
-                                  ((snap.uploadedBytes / 1048576).toFixed(1)) + ' MB uploaded';
+                            el.innerHTML = '<i class="pd-i pd-i-cloud-upload" aria-hidden="true"></i> ' + (snap.state === 'finishing'
+                                ? 'Finishing upload…'
+                                : 'Saving to cloud — ' + snap.parts.length + ' part(s), ' +
+                                  ((snap.uploadedBytes / 1048576).toFixed(1)) + ' MB uploaded');
                         },
                         onError: err => showToast('Cloud upload issue: ' + (err.message || err), 'error')
                     });
@@ -769,14 +770,14 @@
             }
 
             isStreaming = true;
-            showToast("🔴 LIVE! Share the RTMP info with your streaming app", "success");
+            showToast("LIVE! Share the RTMP info with your streaming app", "success");
             confetti({ particleCount: 100, spread: 70 });
             
             // Add system message
             await addDoc(collection(db, "liveChat"), {
                 userId: 'system',
-                name: '📢 System',
-                message: `🔴 ${currentUser.displayName || currentUser.email} started a live stream: "${title}"`,
+                name: 'System',
+                message: `${currentUser.displayName || currentUser.email} started a live stream: "${title}"`,
                 timestamp: serverTimestamp(),
                 isSystem: true
             });
@@ -832,15 +833,15 @@
         }
         const statusEl = document.getElementById('cloudRecordStatus');
         if (statusEl) {
-            statusEl.textContent = (cloud && cloud.playbackUrl)
-                ? '☁️ Recording saved to cloud storage — members can watch it in the app.'
-                : '⚠️ The cloud upload did not complete.';
+            statusEl.innerHTML = (cloud && cloud.playbackUrl)
+                ? '<i class="pd-i pd-i-cloud-check" aria-hidden="true"></i> Recording saved to cloud storage — members can watch it in the app.'
+                : '<i class="pd-i pd-i-triangle-alert" aria-hidden="true"></i> The cloud upload did not complete.';
         }
         
         await addDoc(collection(db, "liveChat"), {
             userId: 'system',
-            name: '📢 System',
-            message: `🔴 The live stream has ended. Thank you for watching!`,
+            name: 'System',
+            message: `The live stream has ended. Thank you for watching!`,
             timestamp: serverTimestamp(),
             isSystem: true
         });
@@ -870,7 +871,7 @@
                 audioTrack.enabled = !audioTrack.enabled;
                 const btn = document.getElementById('toggleMicBtn');
                 btn.style.background = audioTrack.enabled ? 'var(--accent-green)' : 'var(--accent-red)';
-                btn.innerHTML = audioTrack.enabled ? '<i class="fas fa-microphone"></i>' : '<i class="fas fa-microphone-slash"></i>';
+                btn.innerHTML = audioTrack.enabled ? '<i class="pd-i pd-i-mic"></i>' : '<i class="pd-i pd-i-mic-off"></i>';
                 showToast(audioTrack.enabled ? "Mic ON" : "Mic OFF", "info");
             }
         }
@@ -883,7 +884,7 @@
                 videoTrack.enabled = !videoTrack.enabled;
                 const btn = document.getElementById('toggleCamBtn');
                 btn.style.background = videoTrack.enabled ? 'var(--accent-green)' : 'var(--accent-red)';
-                btn.innerHTML = videoTrack.enabled ? '<i class="fas fa-video"></i>' : '<i class="fas fa-video-slash"></i>';
+                btn.innerHTML = videoTrack.enabled ? '<i class="pd-i pd-i-video"></i>' : '<i class="pd-i pd-i-video-off"></i>';
                 showToast(videoTrack.enabled ? "Camera ON" : "Camera OFF", "info");
             }
         }
@@ -939,7 +940,17 @@
         await updateDoc(liveRef, { [`viewers.${currentUser.uid}`]: serverTimestamp() }).catch(() => {});
     };
 
-    window.sendReaction = async (reaction) => {
+    // Live reactions are saved as chat messages. The stored value is the original
+    // emoji code, so messages already saved (and older app versions) stay readable;
+    // the UI always renders the matching Lucide icon (PDIcons.resolve).
+    const LIVE_REACTIONS = {
+        pray: '\u{1F64F}', love: '\u2764\uFE0F', fire: '\u{1F525}', celebrate: '\u{1F389}',
+        peace: '\u{1F54A}\uFE0F', glory: '\u2728', word: '\u{1F4D6}', church: '\u26EA'
+    };
+
+    window.sendReaction = async (name) => {
+        const reaction = LIVE_REACTIONS[name];
+        if (!reaction) return;
         if (!currentUser) {
             showToast("Login to react", "error");
             return;
@@ -962,16 +973,16 @@
             
             const container = document.getElementById('chatMessages');
             if (messages.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 30px;">💬 No messages yet</div>';
+                container.innerHTML = '<div style="text-align: center; padding: 30px;"><i class="pd-i pd-i-message-circle" aria-hidden="true"></i> No messages yet</div>';
                 return;
             }
             
             container.innerHTML = messages.map(msg => `
                 <div class="chat-message">
-                    <div class="message-avatar">${msg.isSystem ? '📢' : (msg.name?.charAt(0) || 'A')}</div>
+                    <div class="message-avatar">${msg.isSystem ? '<i class="pd-i pd-i-megaphone" aria-hidden="true"></i>' : escapeHtml(msg.name?.charAt(0) || 'A')}</div>
                     <div class="message-content">
                         <div class="message-name">${msg.isSystem ? 'System' : (msg.name || 'Anonymous')}</div>
-                        <div class="message-text">${msg.isReaction ? `<span style="font-size: 1.2rem;">${escapeHtml(msg.message)}</span>` : escapeHtml(msg.message)}</div>
+                        <div class="message-text">${msg.isReaction ? `<span class="chat-reaction" style="font-size: 1.2rem; color: var(--accent-gold);">${window.PDIcons ? PDIcons.html(msg.message, '', 'pd-i-heart') : escapeHtml(msg.message)}</span>` : escapeHtml(msg.message)}</div>
                         <div class="message-time">${msg.timestamp ? moment(msg.timestamp.toDate()).format('h:mm A') : 'Now'}</div>
                     </div>
                 </div>
@@ -1038,7 +1049,7 @@
                 const rec = doc.data();
                 return `
                     <div class="video-card" onclick="playRecording('${doc.id}')">
-                        <div class="thumb">${rec.thumbnail ? `<img src="${escapeHtml(rec.thumbnail)}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;">` : '<div style="background:#1a1a2e; height:100%; display:flex; align-items:center; justify-content:center;"><i class="fas fa-video" style="color:var(--accent-gold);"></i></div>'}</div>
+                        <div class="thumb">${rec.thumbnail ? `<img src="${escapeHtml(rec.thumbnail)}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;">` : '<div style="background:#1a1a2e; height:100%; display:flex; align-items:center; justify-content:center;"><i class="pd-i pd-i-video" style="color:var(--accent-gold);"></i></div>'}</div>
                         <div class="card-body">
                             <h4>${escapeHtml(rec.title || 'Recording')}</h4>
                             <p>${moment(rec.createdAt?.toDate()).format('MMM D')}</p>
@@ -1116,7 +1127,7 @@
                 '<span style="position:absolute;top:8px;left:8px;background:rgba(10,77,155,.92);color:#fff;font:800 .58rem/1 inherit;letter-spacing:.06em;padding:5px 9px;border-radius:999px;">AI-ASSISTED</span>';
             const thumb = v.thumb
                 ? `<img src="${escapeHtml(v.thumb)}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.src='/assets/og-image.png';">`
-                : '<div style="background:#0A4D9B;height:100%;display:flex;align-items:center;justify-content:center;"><i class="fas fa-wand-magic-sparkles" style="color:var(--accent-gold);font-size:1.5rem;"></i></div>';
+                : '<div style="background:#0A4D9B;height:100%;display:flex;align-items:center;justify-content:center;"><i class="pd-i pd-i-wand-sparkles" style="color:var(--accent-gold);font-size:1.5rem;"></i></div>';
             return `
                 <div class="video-card" onclick="playAiVideo('${v.id}')">
                     <div class="thumb" style="position:relative;">${thumb}${badge}</div>

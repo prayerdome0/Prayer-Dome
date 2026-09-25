@@ -547,7 +547,7 @@
         try {
             await this.fb.addDoc(this.fb.collection(this.fb.db, 'liveChat'), {
                 liveId: liveId, userId: 'system', name: 'System',
-                message: '🔴 LIVE NOW: "' + title + '" — welcome to Prayer Dome Live',
+                message: 'LIVE NOW: "' + title + '" — welcome to Prayer Dome Live',
                 isSystem: true, timestamp: this.fb.serverTimestamp()
             });
         } catch (e) {}
@@ -772,7 +772,7 @@
         try {
             await this.fb.addDoc(this.fb.collection(this.fb.db, 'liveChat'), {
                 liveId: this.state.liveId, userId: 'system', name: 'System',
-                message: '🔴 The live broadcast has ended. The recording is being processed and will appear in the archive shortly.',
+                message: 'The live broadcast has ended. The recording is being processed and will appear in the archive shortly.',
                 isSystem: true, timestamp: this.fb.serverTimestamp()
             });
         } catch (e) {}

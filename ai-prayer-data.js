@@ -17,7 +17,7 @@ const PD_TOPICS = [
   {
     id: 'fear',
     title: 'Fear & Anxiety',
-    icon: 'fa-shield-halved',
+    icon: 'pd-i-shield',
     colour: '#3b82f6',
     match: ['fear', 'afraid', 'scared', 'terrified', 'anxiety', 'anxious', 'worry', 'worried',
             'panic', 'nervous', 'dread', 'fearful', 'overwhelmed', 'cant sleep', "can't sleep",
@@ -44,7 +44,7 @@ const PD_TOPICS = [
   {
     id: 'grief',
     title: 'Grief & Loss',
-    icon: 'fa-dove',
+    icon: 'pd-i-bird',
     colour: '#8b5cf6',
     match: ['grief', 'grieving', 'died', 'death', 'lost my', 'passed away', 'funeral', 'mourning',
             'mourn', 'bereaved', 'bereavement', 'miss him', 'miss her', 'miss them', 'widow',
@@ -71,7 +71,7 @@ const PD_TOPICS = [
   {
     id: 'provision',
     title: 'Provision & Finances',
-    icon: 'fa-wheat-awn',
+    icon: 'pd-i-wheat',
     colour: '#d4af37',
     match: ['money', 'financial', 'finances', 'provision', 'provide', 'broke', 'debt', 'rent',
             'bills', 'poverty', 'poor', 'job', 'unemployed', 'jobless', 'employment', 'salary',
@@ -99,7 +99,7 @@ const PD_TOPICS = [
   {
     id: 'healing',
     title: 'Healing & Sickness',
-    icon: 'fa-heart-pulse',
+    icon: 'pd-i-heart-pulse',
     colour: '#ef4444',
     match: ['heal', 'healing', 'sick', 'sickness', 'illness', 'ill', 'disease', 'cancer', 'pain',
             'hospital', 'surgery', 'diagnosis', 'diagnosed', 'doctor', 'recovery', 'body', 'health',
@@ -126,7 +126,7 @@ const PD_TOPICS = [
   {
     id: 'family',
     title: 'Family & Home',
-    icon: 'fa-house-chimney-heart',
+    icon: 'pd-i-house-heart',
     colour: '#3b82f6',
     match: ['family', 'my children', 'my child', 'son', 'daughter', 'kids', 'parents', 'mother',
             'father', 'mom', 'dad', 'brother', 'sister', 'home', 'household', 'relatives',
@@ -153,7 +153,7 @@ const PD_TOPICS = [
   {
     id: 'marriage',
     title: 'Marriage & Relationships',
-    icon: 'fa-ring',
+    icon: 'pd-i-gem',
     colour: '#ec4899',
     match: ['marriage', 'married', 'husband', 'wife', 'spouse', 'divorce', 'separated', 'affair',
             'unfaithful', 'my relationship', 'boyfriend', 'girlfriend', 'engaged', 'fiance',
@@ -181,7 +181,7 @@ const PD_TOPICS = [
   {
     id: 'guidance',
     title: 'Direction & Decisions',
-    icon: 'fa-compass',
+    icon: 'pd-i-compass',
     colour: '#0ea5e9',
     match: ['direction', 'guidance', 'guide', 'decision', 'decide', 'confused', 'lost', 'purpose',
             'calling', 'career', 'which way', 'what should i do', 'dont know what', "don't know what",
@@ -208,7 +208,7 @@ const PD_TOPICS = [
   {
     id: 'forgiveness',
     title: 'Forgiveness & Guilt',
-    icon: 'fa-hands-holding-circle',
+    icon: 'pd-i-heart-handshake',
     colour: '#8b5cf6',
     match: ['forgive', 'forgiveness', 'guilt', 'guilty', 'shame', 'ashamed', 'sin', 'sinned',
             'mistake', 'regret', 'condemned', 'condemnation', 'unworthy', 'dirty', 'failed god',
@@ -236,7 +236,7 @@ const PD_TOPICS = [
   {
     id: 'depression',
     title: 'Depression & Despair',
-    icon: 'fa-cloud-sun',
+    icon: 'pd-i-cloud-sun',
     colour: '#64748b',
     match: ['depression', 'depressed', 'hopeless', 'no hope', 'despair', 'give up', 'giving up',
             'empty', 'numb', 'worthless', 'pointless', 'no point', 'darkness', 'tired of life',
@@ -265,7 +265,7 @@ const PD_TOPICS = [
   {
     id: 'strength',
     title: 'Strength & Endurance',
-    icon: 'fa-mountain-sun',
+    icon: 'pd-i-mountain',
     colour: '#f59e0b',
     match: ['strength', 'strong', 'weak', 'weary', 'tired', 'endure', 'endurance', 'persevere',
             'keep going', 'struggling', 'hard season', 'difficult', 'trials', 'trial', 'pressure',
@@ -292,7 +292,7 @@ const PD_TOPICS = [
   {
     id: 'protection',
     title: 'Protection & Safety',
-    icon: 'fa-shield-heart',
+    icon: 'pd-i-shield-check',
     colour: '#0d9488',
     match: ['protection', 'protect', 'safety', 'safe', 'danger', 'dangerous', 'attack', 'enemies',
             'enemy', 'witchcraft', 'evil', 'accident', 'travel', 'journey', 'journeys',
@@ -319,7 +319,7 @@ const PD_TOPICS = [
   {
     id: 'thanksgiving',
     title: 'Thanksgiving & Praise',
-    icon: 'fa-hands-clapping',
+    icon: 'pd-i-party-popper',
     colour: '#3b82f6',
     match: ['thank', 'thanks', 'thanksgiving', 'grateful', 'gratitude', 'praise', 'worship',
             'testimony', 'answered', 'god did it', 'breakthrough', 'celebrate', 'happy', 'joy',
@@ -346,8 +346,8 @@ const PD_TOPICS = [
   {
     id: 'faith',
     title: 'Faith & Doubt',
-    icon: 'fa-seedling',
-    colour: '#0A4D9B',
+    icon: 'pd-i-sprout',
+    colour: 'var(--topic-brand, #0A4D9B)',
     match: ['faith', 'doubt', 'doubting', 'unbelief', 'believe', 'trust god', 'is god real',
             'where is god', 'god silent', 'unanswered', 'backslid', 'backslidden', 'far from god',
             'spiritual dryness', 'dry', 'lukewarm', 'lost my faith'],
@@ -373,7 +373,7 @@ const PD_TOPICS = [
   {
     id: 'salvation',
     title: 'Salvation & New Life',
-    icon: 'fa-cross',
+    icon: 'pd-i-latin-cross',
     colour: '#b45309',
     match: ['salvation', 'saved', 'born again', 'give my life', 'accept jesus', 'become a christian',
             'repent', 'repentance', 'start over', 'new life', 'how do i get saved', 'unsaved',
@@ -400,7 +400,7 @@ const PD_TOPICS = [
   {
     id: 'work',
     title: 'Work & Study',
-    icon: 'fa-briefcase',
+    icon: 'pd-i-briefcase',
     colour: '#6366f1',
     match: ['work', 'workplace', 'boss', 'colleague', 'promotion', 'interview', 'exam', 'exams',
             'test', 'school', 'studies', 'studying', 'student', 'results', 'graduation', 'thesis',
@@ -427,7 +427,7 @@ const PD_TOPICS = [
   {
     id: 'addiction',
     title: 'Addiction & Freedom',
-    icon: 'fa-unlock',
+    icon: 'pd-i-lock-open',
     colour: '#dc2626',
     match: ['addiction', 'addicted', 'alcohol', 'drinking', 'drunk', 'drugs', 'smoking',
             'pornography', 'porn', 'lust', 'gambling', 'habit', 'bondage', 'struggle with',
@@ -454,8 +454,8 @@ const PD_TOPICS = [
   {
     id: 'church',
     title: 'Church & Ministry',
-    icon: 'fa-church',
-    colour: '#0A4D9B',
+    icon: 'pd-i-church',
+    colour: 'var(--topic-brand, #0A4D9B)',
     match: ['church', 'ministry', 'pastor', 'revival', 'congregation', 'serve', 'serving',
             'volunteer', 'church leaders', 'leadership', 'my calling', 'preach', 'worship team',
             'cell group', 'outreach', 'missions', 'evangelism', 'souls'],
@@ -481,7 +481,7 @@ const PD_TOPICS = [
   {
     id: 'nation',
     title: 'Nation & Leaders',
-    icon: 'fa-globe',
+    icon: 'pd-i-globe',
     colour: '#0891b2',
     match: ['nation', 'country', 'government', 'president', 'leaders', 'leaders of', 'politics', 'election',
             'peace in', 'war', 'corruption', 'economy', 'zambia', 'africa', 'world', 'society',
@@ -508,8 +508,8 @@ const PD_TOPICS = [
   {
     id: 'general',
     title: 'General Prayer',
-    icon: 'fa-hands-praying',
-    colour: '#0A4D9B',
+    icon: 'pd-i-hands-praying',
+    colour: 'var(--topic-brand, #0A4D9B)',
     match: [],
     opening: 'Whatever you are carrying right now, you are welcome to bring it just as it is. God is not waiting for you to word it perfectly.',
     verses: [

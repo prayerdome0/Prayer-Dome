@@ -134,7 +134,8 @@
 }
     </script>
     <!-- PD-SEO:END -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/pd-icons.css">
+    <script src="/assets/pd-icons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -371,15 +372,15 @@
                 <p>HOLY BIBLE</p>
             </div>
         </div>
-        <button class="theme-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+        <button class="theme-btn" onclick="toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>
     </header>
 
     <div class="app-wrapper">
         <div class="app-tabs">
-            <button class="app-tab active" onclick="switchTab('read')"><i class="fas fa-book-open"></i> Read</button>
-            <button class="app-tab" onclick="switchTab('progress')"><i class="fas fa-chart-line"></i> Progress</button>
-            <button class="app-tab" onclick="switchTab('notebook')"><i class="fas fa-bookmark"></i> Notebook</button>
-            <button class="app-tab" onclick="switchTab('search')"><i class="fas fa-search"></i> Search</button>
+            <button class="app-tab active" onclick="switchTab('read')"><i class="pd-i pd-i-book-open"></i> Read</button>
+            <button class="app-tab" onclick="switchTab('progress')"><i class="pd-i pd-i-chart-line"></i> Progress</button>
+            <button class="app-tab" onclick="switchTab('notebook')"><i class="pd-i pd-i-bookmark"></i> Notebook</button>
+            <button class="app-tab" onclick="switchTab('search')"><i class="pd-i pd-i-search"></i> Search</button>
         </div>
 
         <!-- READ TAB -->
@@ -387,7 +388,7 @@
             <!-- Reading Progress Bar -->
             <div class="progress-container">
                 <div class="progress-header">
-                    <span><i class="fas fa-bible"></i> Bible Reading Progress</span>
+                    <span><i class="pd-i pd-i-book"></i> Bible Reading Progress</span>
                     <span id="progressPercent">0%</span>
                 </div>
                 <div class="progress-bar-bg">
@@ -409,14 +410,14 @@
                 <div class="nav-controls">
                     <select id="bookSelect" onchange="updateChapters()"></select>
                     <select id="chapterSelect"></select>
-                    <button class="btn-read" onclick="fetchChapter()"><i class="fas fa-bible"></i> READ CHAPTER</button>
+                    <button class="btn-read" onclick="fetchChapter()"><i class="pd-i pd-i-book"></i> READ CHAPTER</button>
                 </div>
                 <span id="savedOfflineBadge" style="display:none; align-items:center; gap:6px; font-size:.72rem; font-weight:700; color:#0A4D9B; background:rgba(10,77,155,.1); border:1px solid rgba(10,77,155,.25); border-radius:50px; padding:6px 14px; margin-top:10px;"></span>
             </div>
 
             <div class="bible-reader" id="bibleReader">
                 <div style="text-align:center; padding:50px 0; opacity:0.6;">
-                    <i class="fas fa-book-reader fa-4x" style="color: var(--accent-gold);"></i>
+                    <i class="pd-i pd-i-book-open-text pd-i-4x" style="color: var(--accent-gold);"></i>
                     <h3 style="margin-top:20px;">Select a Chapter to Begin</h3>
                 </div>
             </div>
@@ -425,7 +426,7 @@
         <!-- PROGRESS TAB -->
         <div id="tab-progress" class="tab-content">
             <h2 style="margin-bottom: 20px; color: var(--accent-green); font-family: 'Playfair Display', serif;">
-                <i class="fas fa-chart-line"></i> Reading Progress by Book
+                <i class="pd-i pd-i-chart-line"></i> Reading Progress by Book
             </h2>
             <div id="readingPlanGrid" class="reading-plan-grid"></div>
         </div>
@@ -433,8 +434,8 @@
         <!-- NOTEBOOK TAB -->
         <div id="tab-notebook" class="tab-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="color: var(--accent-green); font-family: 'Playfair Display', serif;"><i class="fas fa-bookmark"></i> My Notes & Favorites</h2>
-                <button class="btn-read" style="padding: 8px 20px;" onclick="openNoteModal(true)"><i class="fas fa-plus"></i> New Note</button>
+                <h2 style="color: var(--accent-green); font-family: 'Playfair Display', serif;"><i class="pd-i pd-i-bookmark"></i> My Notes & Favorites</h2>
+                <button class="btn-read" style="padding: 8px 20px;" onclick="openNoteModal(true)"><i class="pd-i pd-i-plus"></i> New Note</button>
             </div>
             <div id="notebookList"></div>
         </div>
@@ -443,7 +444,7 @@
         <div id="tab-search" class="tab-content">
             <div class="controls-panel">
                 <input type="text" id="searchInput" placeholder="Search scriptures (e.g., love, faith, Jesus)..." style="width:100%; padding:14px; border-radius:16px; border:2px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 1rem;">
-                <button class="btn-read" style="width:100%; margin-top:12px;" onclick="searchBible()"><i class="fas fa-search"></i> Search Bible</button>
+                <button class="btn-read" style="width:100%; margin-top:12px;" onclick="searchBible()"><i class="pd-i pd-i-search"></i> Search Bible</button>
             </div>
             <div id="searchResults"></div>
         </div>
@@ -451,24 +452,24 @@
 
     <!-- Floating Action Bar -->
     <div class="action-bar" id="actionBar">
-        <button onclick="copyVerse()" title="Copy Verse"><i class="fas fa-copy"></i></button>
-        <button onclick="saveNoteFromVerse()" title="Save Note"><i class="fas fa-bookmark"></i></button>
-        <button onclick="startAudioFromSelected()" title="Listen"><i class="fas fa-play-circle"></i></button>
+        <button onclick="copyVerse()" title="Copy Verse"><i class="pd-i pd-i-copy"></i></button>
+        <button onclick="saveNoteFromVerse()" title="Save Note"><i class="pd-i pd-i-bookmark"></i></button>
+        <button onclick="startAudioFromSelected()" title="Listen"><i class="pd-i pd-i-circle-play"></i></button>
     </div>
 
     <!-- Audio Player -->
     <div class="audio-player" id="audioPlayer">
         <div style="display:flex; align-items:center; gap:12px;">
-            <i class="fas fa-headphones" style="color:var(--accent-green); font-size: 1.3rem;"></i>
+            <i class="pd-i pd-i-headphones" style="color:var(--accent-green); font-size: 1.3rem;"></i>
             <div>
                 <b id="audioRef">Select a chapter</b>
                 <p style="font-size:10px; opacity:0.6;" id="audioVer"></p>
             </div>
         </div>
         <div style="display:flex; gap:20px; align-items:center;">
-            <button onclick="audioSkip(-1)"><i class="fas fa-step-backward"></i></button>
-            <button onclick="toggleAudio()" id="playBtn" style="width:45px; height:45px; background:var(--accent-green); color:white; border:none; border-radius:50%; cursor:pointer;"><i class="fas fa-play"></i></button>
-            <button onclick="audioSkip(1)"><i class="fas fa-step-forward"></i></button>
+            <button onclick="audioSkip(-1)" aria-label="Previous verse"><i class="pd-i pd-i-skip-back"></i></button>
+            <button onclick="toggleAudio()" id="playBtn" style="width:45px; height:45px; background:var(--accent-green); color:white; border:none; border-radius:50%; cursor:pointer;" aria-label="Play or pause reading"><i class="pd-i pd-i-play"></i></button>
+            <button onclick="audioSkip(1)" aria-label="Next verse"><i class="pd-i pd-i-skip-forward"></i></button>
         </div>
         <select id="audioSpeed" style="padding:5px 10px; border-radius:20px;">
             <option value="0.8">0.8x</option>
@@ -481,7 +482,7 @@
     <!-- Note Modal -->
     <div class="modal" id="noteModal">
         <div class="modal-content">
-            <h3 style="color: var(--accent-green); font-family: 'Playfair Display', serif;"><i class="fas fa-pen-fancy"></i> Add Note</h3>
+            <h3 style="color: var(--accent-green); font-family: 'Playfair Display', serif;"><i class="pd-i pd-i-pen-line"></i> Add Note</h3>
             <p id="noteRef" style="color: var(--accent-gold); margin: 10px 0;"></p>
             <textarea id="noteText" placeholder="Write your thoughts, insights, or prayer points..."></textarea>
             <div style="display: flex; gap: 12px;">
@@ -594,7 +595,7 @@
                 const toast = document.createElement('div');
                 toast.className = 'toast';
                 toast.style.cssText = 'position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:var(--accent-green); color:white; padding:8px 20px; border-radius:30px; z-index:2000; font-weight:600;';
-                toast.innerHTML = '📖 Chapter marked as read!';
+                toast.innerHTML = '<i class="pd-i pd-i-book-open" aria-hidden="true"></i> Chapter marked as read!';
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 2000);
             } catch (error) {
@@ -627,7 +628,7 @@
                         <div class="book-progress-bar">
                             <div class="book-progress-fill" style="width: ${percent}%"></div>
                         </div>
-                        ${isComplete ? '<div class="book-complete-badge"><i class="fas fa-check-circle"></i> Complete</div>' : ''}
+                        ${isComplete ? '<div class="book-complete-badge"><i class="pd-i pd-i-circle-check"></i> Complete</div>' : ''}
                     </div>
                 `;
             }).join('');
@@ -696,7 +697,7 @@
             if (!badge) return;
             const saved = Object.keys(cacheAll()).length;
             badge.style.display = saved ? 'inline-flex' : 'none';
-            badge.textContent = `📖 ${saved} chapter${saved === 1 ? '' : 's'} saved offline`;
+            badge.innerHTML = `<i class="pd-i pd-i-download" aria-hidden="true"></i> ${saved} chapter${saved === 1 ? '' : 's'} saved offline`;
         }
 
         window.fetchChapter = async () => {
@@ -754,11 +755,11 @@
                 }
                 reader.innerHTML = `
                     <div style="text-align:center; padding:34px 16px; color:var(--text-mute,#64748b);">
-                        <i class="fas fa-wifi" style="font-size:1.8rem; opacity:.45; display:block; margin-bottom:12px;"></i>
+                        <i class="pd-i pd-i-wifi" style="font-size:1.8rem; opacity:.45; display:block; margin-bottom:12px;"></i>
                         <p style="font-weight:700; color:var(--text-main,#0f172a); margin:0 0 6px;">Unable to load this chapter</p>
                         <p style="font-size:.85rem; margin:0 0 14px;">${navigator.onLine ? 'The chapter could not be downloaded. Please try again.' : "You're offline and this chapter has not been saved on this device yet. Chapters you have read stay available offline."}</p>
                         <button onclick="fetchChapter()" style="background:var(--accent-green,#0A4D9B); border:0; color:#fff; font-weight:800; padding:10px 22px; border-radius:50px; cursor:pointer;">
-                            <i class="fas fa-rotate-right"></i> Try Again
+                            <i class="pd-i pd-i-rotate-cw"></i> Try Again
                         </button>
                     </div>`;
             }
@@ -770,7 +771,7 @@
                 n = document.createElement('div');
                 n.id = 'bibleOfflineNotice';
                 n.style.cssText = 'margin:10px auto 0; max-width:720px; display:flex; align-items:center; gap:10px; background:rgba(10,77,155,.1); border:1px solid rgba(10,77,155,.3); color:var(--text-main,#0f172a); border-radius:14px; padding:10px 14px; font-size:.8rem; font-weight:600;';
-                n.innerHTML = '<i class="fas fa-book-bookmark" style="color:#0A4D9B;"></i><span>Reading your saved copy — this chapter is available offline.</span>';
+                n.innerHTML = '<i class="pd-i pd-i-book-bookmark" style="color:#0A4D9B;"></i><span>Reading your saved copy — this chapter is available offline.</span>';
                 const reader = document.getElementById('bibleReader');
                 reader.parentNode.insertBefore(n, reader);
             }
@@ -814,7 +815,7 @@
             if (selectedVerseIdx !== null && currentVerses[selectedVerseIdx]) {
                 const v = currentVerses[selectedVerseIdx];
                 navigator.clipboard.writeText(`${v.text} — ${currentBookName} ${currentChapter}:${v.verse}`);
-                alert("✓ Verse copied to clipboard!");
+                alert("Verse copied to clipboard!");
                 document.getElementById('actionBar').style.display = 'none';
             }
         };
@@ -887,15 +888,15 @@
             }
             
             if (notesList.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:40px;"><i class="fas fa-book-open"></i><p>No notes yet. Select a verse to save!</p></div>';
+                container.innerHTML = '<div style="text-align:center; padding:40px;"><i class="pd-i pd-i-book-open"></i><p>No notes yet. Select a verse to save!</p></div>';
                 return;
             }
             
             container.innerHTML = notesList.map(n => `
                 <div class="notebook-item">
-                    <div class="notebook-ref"><i class="fas fa-pen"></i> ${n.reference}</div>
+                    <div class="notebook-ref"><i class="pd-i pd-i-pen"></i> ${n.reference}</div>
                     <div class="notebook-text">${escapeHtml(n.note)}</div>
-                    <div class="notebook-date"><i class="far fa-clock"></i> ${moment(n.date).format('MMM D, YYYY')}</div>
+                    <div class="notebook-date"><i class="pd-i pd-i-clock"></i> ${moment(n.date).format('MMM D, YYYY')}</div>
                 </div>
             `).join('');
         }
@@ -916,7 +917,7 @@
                 }
                 resultsDiv.innerHTML = data.slice(0, 30).map(item => `
                     <div class="search-result-item" onclick="goToChapterAndVerse('${item.book_name}', ${item.chapter}, ${item.verse})">
-                        <div class="search-result-ref"><i class="fas fa-bible"></i> ${item.book_name} ${item.chapter}:${item.verse}</div>
+                        <div class="search-result-ref"><i class="pd-i pd-i-book"></i> ${item.book_name} ${item.chapter}:${item.verse}</div>
                         <div class="search-result-text">${escapeHtml(item.text)}</div>
                     </div>
                 `).join('');
@@ -983,14 +984,14 @@
             
             speech.speak(utter);
             isReading = true;
-            document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
+            document.getElementById('playBtn').innerHTML = '<i class="pd-i pd-i-pause"></i>';
         }
 
         window.toggleAudio = () => {
             if (isReading && speech.speaking) {
                 speech.cancel();
                 isReading = false;
-                document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>';
+                document.getElementById('playBtn').innerHTML = '<i class="pd-i pd-i-play"></i>';
             } else if (isReading && !speech.speaking) {
                 playAudio();
             } else {
@@ -1012,7 +1013,7 @@
         function stopAudio() {
             if (speech.speaking) speech.cancel();
             isReading = false;
-            document.getElementById('playBtn').innerHTML = '<i class="fas fa-play"></i>';
+            document.getElementById('playBtn').innerHTML = '<i class="pd-i pd-i-play"></i>';
             document.querySelectorAll('.verse-item').forEach(el => el.classList.remove('reading'));
         }
 

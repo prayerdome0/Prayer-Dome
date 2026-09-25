@@ -64,7 +64,7 @@
     var total = DATA.lessons.length || 1;
     return Math.round((quizState().completedLessons.length / total) * 100);
   }
-  function iconFor(trackId) { var t = DATA.tracks.filter(function (x) { return x.id === trackId; })[0]; return t ? t.icon : 'fa-book'; }
+  function iconFor(trackId) { var t = DATA.tracks.filter(function (x) { return x.id === trackId; })[0]; return t ? t.icon : 'pd-i-book'; }
   function tr(key, fallback) {
     try {
       if (window.pdT) {
@@ -89,7 +89,7 @@
     root.innerHTML = DATA.tracks.map(function (t) {
       var count = DATA.lessons.filter(function (l) { return l.trackId === t.id; }).length;
       return '<a class="pd-acad-card pd-lift" href="/lessons?track=' + encodeURIComponent(t.id) + '">' +
-        '<div class="pd-acad-icon ' + (t.color === 'gold' ? 'gold' : '') + '"><i class="fas ' + esc(t.icon) + '"></i></div>' +
+        '<div class="pd-acad-icon ' + (t.color === 'gold' ? 'gold' : '') + '"><i class="pd-i ' + esc(t.icon) + '"></i></div>' +
         '<h3>' + esc(trackTitle(t)) + '</h3><p>' + esc(t.summary) + '</p>' +
         '<div class="pd-acad-meta"><span class="pd-acad-chip ' + (t.color === 'gold' ? 'gold' : '') + '">' + count + ' lessons</span></div></a>';
     }).join('');
@@ -101,9 +101,9 @@
       var done = state.completedLessons.indexOf(l.id) >= 0;
       var passed = state.passedQuizzes[l.quizId];
       return '<button class="pd-acad-lesson-link ' + (activeId === l.id ? 'is-active' : '') + '" data-lesson="' + esc(l.id) + '">' +
-        '<small><i class="fas ' + esc(l.icon) + '"></i> ' + esc(tr('academy.track.'+l.trackId, l.track)) + '</small>' +
+        '<small><i class="pd-i ' + esc(l.icon) + '"></i> ' + esc(tr('academy.track.'+l.trackId, l.track)) + '</small>' +
         '<strong>' + esc(l.order + '. ' + l.title) + '</strong>' +
-        '<span>' + esc(l.minutes + ' min · ' + l.level + (done ? ' · ✓ Read' : '') + (passed ? ' · Certificate earned' : '')) + '</span></button>';
+        '<span>' + esc(l.minutes + ' min · ' + l.level) + (done ? ' · <i class="pd-i pd-i-circle-check" aria-hidden="true"></i> Read' : '') + (passed ? ' · Certificate earned' : '') + '</span></button>';
     }).join('');
     $$('[data-lesson]', root).forEach(function (b) { b.addEventListener('click', function () { location.hash = '#lesson/' + b.getAttribute('data-lesson'); }); });
   }
@@ -252,16 +252,16 @@
 
     var ctaHtml;
     if (passed) {
-      ctaHtml = '<button class="pd-acad-btn pd-acad-btn-primary" id="launchQuizBtn"><i class="fas fa-redo"></i> Retake Quiz</button>';
+      ctaHtml = '<button class="pd-acad-btn pd-acad-btn-primary" id="launchQuizBtn"><i class="pd-i pd-i-rotate-cw"></i> Retake Quiz</button>';
     } else if (canTake) {
-      ctaHtml = '<button class="pd-acad-take-quiz-cta" id="launchQuizBtn" type="button"><span class="pd-acad-cta-pulse"></span><i class="fas fa-star"></i> Take Quiz &mdash; Pass for Certificate</button>';
+      ctaHtml = '<button class="pd-acad-take-quiz-cta" id="launchQuizBtn" type="button"><span class="pd-acad-cta-pulse"></span><i class="pd-i pd-i-star"></i> Take Quiz &mdash; Pass for Certificate</button>';
     } else {
-      ctaHtml = '<button class="pd-acad-take-quiz-locked" id="launchQuizBtn" type="button" disabled aria-disabled="true"><i class="fas fa-lock"></i> Take Quiz &mdash; complete lesson first</button>';
+      ctaHtml = '<button class="pd-acad-take-quiz-locked" id="launchQuizBtn" type="button" disabled aria-disabled="true"><i class="pd-i pd-i-lock"></i> Take Quiz &mdash; complete lesson first</button>';
     }
 
     var progressHtml =
       '<div class="pd-acad-completion-progress">' +
-        '<small>' + (canTake ? '<i class="fas fa-check-circle" style="color:#16a34a"></i> Lesson complete &mdash; you may take the quiz.' : 'Complete the lesson to unlock the quiz.') + '</small>' +
+        '<small>' + (canTake ? '<i class="pd-i pd-i-circle-check" style="color:#16a34a"></i> Lesson complete &mdash; you may take the quiz.' : 'Complete the lesson to unlock the quiz.') + '</small>' +
         '<div class="pd-acad-progress" aria-label="Lesson completion"><span style="width:' + Math.max(progress, canTake ? 100 : 0) + '%"></span></div>' +
       '</div>';
 
@@ -270,9 +270,9 @@
         remaining.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ul></div>';
 
     var actionsHtml = '<div class="pd-acad-quiz-gate">' + progressHtml +
-      (passed ? '<button class="pd-acad-mark-read is-complete"><i class="fas fa-award"></i> Certificate earned (' + passed.score + '%)</button>' : '') +
-      (completed && !passed ? '<button class="pd-acad-mark-read is-complete" disabled><i class="fas fa-check"></i> Lesson complete</button>' :
-        (!completed ? '<button class="pd-acad-mark-read" id="manualMarkCompleteBtn"><i class="fas fa-check-circle"></i> Mark lesson complete</button>' : '')) +
+      (passed ? '<button class="pd-acad-mark-read is-complete"><i class="pd-i pd-i-award"></i> Certificate earned (' + passed.score + '%)</button>' : '') +
+      (completed && !passed ? '<button class="pd-acad-mark-read is-complete" disabled><i class="pd-i pd-i-check"></i> Lesson complete</button>' :
+        (!completed ? '<button class="pd-acad-mark-read" id="manualMarkCompleteBtn"><i class="pd-i pd-i-circle-check"></i> Mark lesson complete</button>' : '')) +
       ctaHtml +
     '</div>';
 
@@ -280,7 +280,7 @@
       '<div class="pd-acad-quiz-gate-wrap">' +
         actionsHtml +
         checkListHtml +
-        '<p style="margin-top:14px; font-size:.85rem; color:var(--pd-acad-muted)"><i class="fas fa-shuffle"></i> Smart question bank: ' + bankSize + ' questions in this lesson pool &mdash; every attempt randomly samples 10. Answer positions are also shuffled so you can\'t memorise them.</p>' +
+        '<p style="margin-top:14px; font-size:.85rem; color:var(--pd-acad-muted)"><i class="pd-i pd-i-shuffle"></i> Smart question bank: ' + bankSize + ' questions in this lesson pool &mdash; every attempt randomly samples 10. Answer positions are also shuffled so you can\'t memorise them.</p>' +
       '</div>';
 
     var manualBtn = $('#manualMarkCompleteBtn');
@@ -348,10 +348,10 @@
         '<div class="pd-acad-quiz-modal" role="document">' +
           '<div class="pd-acad-quiz-modal-head">' +
             '<div>' +
-              '<small><i class="fas fa-graduation-cap"></i> Knowledge Check &middot; Pass ' + q.passingScore + '%+ for a certificate</small>' +
+              '<small><i class="pd-i pd-i-graduation-cap"></i> Knowledge Check &middot; Pass ' + q.passingScore + '%+ for a certificate</small>' +
               '<h3>' + esc(lesson.title) + '</h3>' +
             '</div>' +
-            '<button class="pd-acad-quiz-modal-close" id="quizCloseBtn" type="button" aria-label="Close quiz"><i class="fas fa-times"></i></button>' +
+            '<button class="pd-acad-quiz-modal-close" id="quizCloseBtn" type="button" aria-label="Close quiz"><i class="pd-i pd-i-x"></i></button>' +
           '</div>' +
           '<div class="pd-acad-quiz-progress-strip" id="quizProgressStrip">' +
             '<strong id="quizQNum">Question 1 of 10</strong>' +
@@ -386,7 +386,7 @@
 
     body.innerHTML = '' +
       '<div class="pd-acad-quiz-question" key="' + a.currentIdx + '">' +
-        '<span class="pd-acad-quiz-question-label"><i class="fas fa-question-circle"></i> Question ' + (a.currentIdx + 1) + ' of ' + total + '</span>' +
+        '<span class="pd-acad-quiz-question-label"><i class="pd-i pd-i-circle-question-mark"></i> Question ' + (a.currentIdx + 1) + ' of ' + total + '</span>' +
         '<h4>' + esc(qz.text) + '</h4>' +
       '</div>' +
       '<div class="pd-acad-quiz-options" id="quizOptions">' +
@@ -398,8 +398,8 @@
         }).join('') +
       '</div>' +
       '<div class="pd-acad-quiz-actions">' +
-        '<button class="pd-acad-btn pd-acad-btn-ghost" id="quizCloseBtn2" type="button"><i class="fas fa-arrow-left"></i> Back to lesson</button>' +
-        '<button class="pd-acad-btn pd-acad-btn-primary" id="quizNextBtn" type="button" disabled>' + (a.currentIdx === total - 1 ? '<i class="fas fa-flag-checkered"></i> See result' : 'Next question <i class="fas fa-arrow-right"></i>') + '</button>' +
+        '<button class="pd-acad-btn pd-acad-btn-ghost" id="quizCloseBtn2" type="button"><i class="pd-i pd-i-arrow-left"></i> Back to lesson</button>' +
+        '<button class="pd-acad-btn pd-acad-btn-primary" id="quizNextBtn" type="button" disabled>' + (a.currentIdx === total - 1 ? '<i class="pd-i pd-i-flag"></i> See result' : 'Next question <i class="pd-i pd-i-arrow-right"></i>') + '</button>' +
       '</div>';
 
     bindQuizQuestion();
@@ -419,17 +419,17 @@
         opts.forEach(function (b) { b.disabled = true; });
         if (a.selection === correctIdx) {
           btn.classList.add('is-correct');
-          btn.querySelector('.pd-acad-option-mark') ? null : (function(){ var m = document.createElement('span'); m.className = 'pd-acad-option-mark'; m.innerHTML = '<i class="fas fa-check"></i> Correct'; btn.appendChild(m); })();
+          btn.querySelector('.pd-acad-option-mark') ? null : (function(){ var m = document.createElement('span'); m.className = 'pd-acad-option-mark'; m.innerHTML = '<i class="pd-i pd-i-check"></i> Correct'; btn.appendChild(m); })();
           a.score += 1;
           showQuizFeedback(true, qz);
           if (window.confetti) confetti({ particleCount: 50, spread: 70, origin: { y: 0.7 } });
         } else {
           btn.classList.add('is-wrong');
-          var mark = document.createElement('span'); mark.className = 'pd-acad-option-mark'; mark.innerHTML = '<i class="fas fa-times"></i> Incorrect'; btn.appendChild(mark);
+          var mark = document.createElement('span'); mark.className = 'pd-acad-option-mark'; mark.innerHTML = '<i class="pd-i pd-i-x"></i> Incorrect'; btn.appendChild(mark);
           var correctBtn = opts[correctIdx];
           if (correctBtn) {
             correctBtn.classList.add('is-correct');
-            var cmark = document.createElement('span'); cmark.className = 'pd-acad-option-mark'; cmark.innerHTML = '<i class="fas fa-check"></i> Correct answer'; correctBtn.appendChild(cmark);
+            var cmark = document.createElement('span'); cmark.className = 'pd-acad-option-mark'; cmark.innerHTML = '<i class="pd-i pd-i-check"></i> Correct answer'; correctBtn.appendChild(cmark);
           }
           showQuizFeedback(false, qz, qz.options[correctIdx]);
         }
@@ -455,10 +455,10 @@
     var fb = document.createElement('div');
     fb.className = 'pd-acad-quiz-feedback ' + (isCorrect ? 'correct' : 'wrong');
     if (isCorrect) {
-      fb.innerHTML = '<i class="fas fa-check-circle"></i><div><strong>Correct!</strong> ' +
+      fb.innerHTML = '<i class="pd-i pd-i-circle-check"></i><div><strong>Correct!</strong> ' +
         '<span>' + esc('That is the right answer.') + '</span></div>';
     } else {
-      fb.innerHTML = '<i class="fas fa-times-circle"></i><div><strong>Not quite.</strong> ' +
+      fb.innerHTML = '<i class="pd-i pd-i-circle-x"></i><div><strong>Not quite.</strong> ' +
         '<span>The correct answer is <em>' + esc(correctOption ? correctOption.t : '') + '</em>. ' +
         'Take a moment to reflect, then continue.</span></div>';
     }
@@ -497,23 +497,23 @@
 
     body.innerHTML = '' +
       '<div class="pd-acad-quiz-result ' + (passed ? 'is-pass' : 'is-fail') + '">' +
-        '<div class="pd-acad-result-icon"><i class="fas ' + (passed ? 'fa-trophy' : 'fa-book-reader') + '"></i></div>' +
-        '<h2>' + (passed ? '🎉 Congratulations!' : '📚 Keep learning!') + '</h2>' +
+        '<div class="pd-acad-result-icon"><i class="pd-i ' + (passed ? 'pd-i-trophy' : 'pd-i-book-open-text') + '"></i></div>' +
+        '<h2>' + (passed ? 'Congratulations!' : 'Keep learning!') + '</h2>' +
         '<div class="pd-acad-result-score">' + percent + '%</div>' +
         '<p>You answered <strong>' + a.score + '</strong> of ' + total + ' questions correctly.</p>' +
         '<div class="pd-acad-result-meta">' +
-          '<span class="pd-acad-chip ' + (passed ? 'gold' : '') + '"><i class="fas ' + (passed ? 'fa-check' : 'fa-redo') + '"></i> ' + (passed ? 'Status: PASSED' : 'Status: ' + (100 - percent) + '% short of 80%') + '</span>' +
-          '<span class="pd-acad-chip"><i class="fas fa-clock"></i> ' + a.quiz.passingScore + '% required to pass</span>' +
-          (certificate ? '<span class="pd-acad-chip gold"><i class="fas fa-award"></i> Certificate ' + esc(certificate) + '</span>' : '') +
+          '<span class="pd-acad-chip ' + (passed ? 'gold' : '') + '"><i class="pd-i ' + (passed ? 'pd-i-check' : 'pd-i-rotate-cw') + '"></i> ' + (passed ? 'Status: PASSED' : 'Status: ' + (100 - percent) + '% short of 80%') + '</span>' +
+          '<span class="pd-acad-chip"><i class="pd-i pd-i-clock"></i> ' + a.quiz.passingScore + '% required to pass</span>' +
+          (certificate ? '<span class="pd-acad-chip gold"><i class="pd-i pd-i-award"></i> Certificate ' + esc(certificate) + '</span>' : '') +
         '</div>' +
         '<div class="pd-acad-quiz-result-actions">' +
           (passed
-            ? '<button class="pd-acad-btn pd-acad-btn-primary" id="quizDownloadCertBtn"><i class="fas fa-download"></i> Download Certificate</button>' +
-              (a.lesson.nextLessonId ? '<a class="pd-acad-btn pd-acad-btn-secondary" id="quizContinueBtn" href="#lesson/' + esc(a.lesson.nextLessonId) + '"><i class="fas fa-arrow-right"></i> Continue to next lesson</a>' : '') +
-              '<button class="pd-acad-btn pd-acad-btn-ghost" id="quizReviewBtn"><i class="fas fa-eye"></i> Review answers</button>'
-            : '<button class="pd-acad-btn pd-acad-btn-primary" id="quizRetakeBtn"><i class="fas fa-redo"></i> Retake quiz</button>' +
-              '<button class="pd-acad-btn pd-acad-btn-secondary" id="quizReviewLessonBtn"><i class="fas fa-book-open"></i> Review lesson</button>' +
-              '<button class="pd-acad-btn pd-acad-btn-ghost" id="quizReviewBtn"><i class="fas fa-eye"></i> Review answers</button>') +
+            ? '<button class="pd-acad-btn pd-acad-btn-primary" id="quizDownloadCertBtn"><i class="pd-i pd-i-download"></i> Download Certificate</button>' +
+              (a.lesson.nextLessonId ? '<a class="pd-acad-btn pd-acad-btn-secondary" id="quizContinueBtn" href="#lesson/' + esc(a.lesson.nextLessonId) + '"><i class="pd-i pd-i-arrow-right"></i> Continue to next lesson</a>' : '') +
+              '<button class="pd-acad-btn pd-acad-btn-ghost" id="quizReviewBtn"><i class="pd-i pd-i-eye"></i> Review answers</button>'
+            : '<button class="pd-acad-btn pd-acad-btn-primary" id="quizRetakeBtn"><i class="pd-i pd-i-rotate-cw"></i> Retake quiz</button>' +
+              '<button class="pd-acad-btn pd-acad-btn-secondary" id="quizReviewLessonBtn"><i class="pd-i pd-i-book-open"></i> Review lesson</button>' +
+              '<button class="pd-acad-btn pd-acad-btn-ghost" id="quizReviewBtn"><i class="pd-i pd-i-eye"></i> Review answers</button>') +
         '</div>' +
       '</div>';
 
@@ -557,7 +557,7 @@
     var html = '' +
       '<div class="pd-acad-quiz-review">' +
         '<div class="pd-acad-quiz-review-head">' +
-          '<h3><i class="fas fa-list-check"></i> Answer review</h3>' +
+          '<h3><i class="pd-i pd-i-list-checks"></i> Answer review</h3>' +
           '<div class="pd-acad-quiz-result-meta">' +
             '<span class="pd-acad-chip">' + correctCount + ' / ' + total + ' correct</span>' +
           '</div>' +
@@ -569,19 +569,19 @@
           var chosenOption = ans.idx != null ? qz.options[ans.idx] : null;
           var isCorrect = !!ans.correct;
           return '<div class="pd-acad-quiz-review-item ' + (isCorrect ? 'is-correct' : 'is-wrong') + '">' +
-            '<span class="pd-acad-review-status"><i class="fas ' + (isCorrect ? 'fa-check' : 'fa-times') + '"></i> ' + (isCorrect ? 'Correct' : 'Incorrect') + '</span>' +
+            '<span class="pd-acad-review-status"><i class="pd-i ' + (isCorrect ? 'pd-i-check' : 'pd-i-x') + '"></i> ' + (isCorrect ? 'Correct' : 'Incorrect') + '</span>' +
             '<h5>Q' + (i + 1) + '. ' + esc(qz.text) + '</h5>' +
             (chosenOption ? '<div class="pd-acad-review-line">Your answer: <em>' + esc(chosenOption.t) + '</em></div>' : '<div class="pd-acad-review-line">You did not answer this question.</div>') +
             (isCorrect ? '' : '<div class="pd-acad-review-line">Correct answer: <strong>' + esc(correctOption.t) + '</strong></div>') +
-            '<div class="pd-acad-review-explain"><i class="fas fa-lightbulb"></i> ' +
+            '<div class="pd-acad-review-explain"><i class="pd-i pd-i-lightbulb"></i> ' +
               esc('Revisit the lesson section on ' + esc(a.quiz.track || 'this topic') + ' before retaking — the next attempt draws 10 fresh questions from the full bank.') +
             '</div>' +
           '</div>';
         }).join('') +
         '</div>' +
         '<div class="pd-acad-quiz-actions">' +
-          '<button class="pd-acad-btn pd-acad-btn-ghost" id="quizReviewBackBtn"><i class="fas fa-arrow-left"></i> Back to result</button>' +
-          '<button class="pd-acad-btn pd-acad-btn-primary" id="quizRetake2"><i class="fas fa-redo"></i> Retake quiz</button>' +
+          '<button class="pd-acad-btn pd-acad-btn-ghost" id="quizReviewBackBtn"><i class="pd-i pd-i-arrow-left"></i> Back to result</button>' +
+          '<button class="pd-acad-btn pd-acad-btn-primary" id="quizRetake2"><i class="pd-i pd-i-rotate-cw"></i> Retake quiz</button>' +
         '</div>' +
       '</div>';
     body.innerHTML = html;
@@ -636,20 +636,20 @@
     var items = thread.length ? thread.map(function (t) {
       return '<div class="pd-acad-discussion-item">' +
         '<strong>' + esc(t.name || 'Member') + '</strong>' +
-        '<small>' + esc(new Date(t.date).toLocaleString()) + (t.pinned ? ' &middot; <i class="fas fa-thumbtack"></i> Pinned by instructor' : '') + '</small>' +
+        '<small>' + esc(new Date(t.date).toLocaleString()) + (t.pinned ? ' &middot; <i class="pd-i pd-i-pin"></i> Pinned by instructor' : '') + '</small>' +
         '<p>' + esc(t.body) + '</p>' +
       '</div>';
     }).join('') : '<div class="pd-acad-discussion-empty">No questions yet. Be the first to share what you learned or ask for clarity.</div>';
     mount.innerHTML = '' +
       '<header class="pd-acad-discussion-head">' +
-        '<h3><i class="fas fa-comments"></i> Q&amp;A &middot; ' + thread.length + ' ' + (thread.length === 1 ? 'post' : 'posts') + '</h3>' +
+        '<h3><i class="pd-i pd-i-messages-square"></i> Q&amp;A &middot; ' + thread.length + ' ' + (thread.length === 1 ? 'post' : 'posts') + '</h3>' +
         '<small>Helpful answers can be pinned by the instructor</small>' +
       '</header>' +
       '<div class="pd-acad-discussion-list">' + items + '</div>' +
       '<form class="pd-acad-discussion-form" id="discussionForm-' + lesson.id + '">' +
         '<textarea name="body" placeholder="Ask a question or share what stood out to you…" required></textarea>' +
         '<div style="display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap">' +
-          '<button type="submit" class="pd-acad-btn pd-acad-btn-primary"><i class="fas fa-paper-plane"></i> Post</button>' +
+          '<button type="submit" class="pd-acad-btn pd-acad-btn-primary"><i class="pd-i pd-i-send"></i> Post</button>' +
         '</div>' +
       '</form>';
 
@@ -677,7 +677,7 @@
     if (!mount) return;
     mount.innerHTML = '<div class="pd-acad-lesson-share">' +
       '<div>' +
-        '<strong><i class="fas fa-share-nodes"></i> Share this lesson</strong>' +
+        '<strong><i class="pd-i pd-i-share-2"></i> Share this lesson</strong>' +
         '<br><small>Help a friend grow alongside you.</small>' +
       '</div>' +
       '<div class="pd-share-row" id="pdShareRow-' + lesson.id + '"></div>' +
@@ -695,9 +695,9 @@
         });
       } catch (e) {
         // Fallback share row if PDApp.share is unavailable
-        row.innerHTML = '<a class="pd-share-btn pd-share-fb" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(location.origin + '/lessons?lesson=' + lesson.id) + '"><i class="fab fa-facebook-f"></i> Facebook</a>' +
-          '<a class="pd-share-btn pd-share-wa" target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent(lesson.title + ' — prayerdome.net/lessons?lesson=' + lesson.id) + '"><i class="fab fa-whatsapp"></i> WhatsApp</a>' +
-          '<a class="pd-share-btn pd-share-copy" href="#" onclick="event.preventDefault(); navigator.clipboard.writeText(\'' + (location.origin + '/lessons?lesson=' + lesson.id) + '\')"><i class="fas fa-link"></i> Copy link</a>';
+        row.innerHTML = '<a class="pd-share-btn pd-share-fb" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(location.origin + '/lessons?lesson=' + lesson.id) + '"><i class="pd-i pd-i-brand-facebook"></i> Facebook</a>' +
+          '<a class="pd-share-btn pd-share-wa" target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent(lesson.title + ' — prayerdome.net/lessons?lesson=' + lesson.id) + '"><i class="pd-i pd-i-brand-whatsapp"></i> WhatsApp</a>' +
+          '<a class="pd-share-btn pd-share-copy" href="#" onclick="event.preventDefault(); navigator.clipboard.writeText(\'' + (location.origin + '/lessons?lesson=' + lesson.id) + '\')"><i class="pd-i pd-i-link"></i> Copy link</a>';
       }
     }
   }
@@ -837,9 +837,9 @@
     var heroImg = lessonHeroImage(l);
     var objectives = lessonObjectiveList(l);
     var heroStats = '' +
-      '<span><i class="fas fa-clock"></i> ' + esc(l.minutes + ' min') + '</span>' +
-      '<span><i class="fas fa-layer-group"></i> ' + esc(l.level) + '</span>' +
-      '<span><i class="fas fa-question-circle"></i> ' + ((q && q.questions) ? q.questions.length : 30) + ' Q pool</span>';
+      '<span><i class="pd-i pd-i-clock"></i> ' + esc(l.minutes + ' min') + '</span>' +
+      '<span><i class="pd-i pd-i-layers"></i> ' + esc(l.level) + '</span>' +
+      '<span><i class="pd-i pd-i-circle-question-mark"></i> ' + ((q && q.questions) ? q.questions.length : 30) + ' Q pool</span>';
 
     var heroBlock = '' +
       '<section class="pd-acad-lesson-hero" aria-label="Lesson hero banner">' +
@@ -847,9 +847,9 @@
         '<div class="pd-acad-lesson-hero-body">' +
           '<div style="flex:1; min-width: 220px">' +
             '<div class="pd-acad-lesson-hero-meta">' +
-              '<span class="pd-acad-chip"><i class="fas ' + esc(l.icon) + '"></i> ' + esc(l.track) + '</span>' +
-              '<span class="pd-acad-chip"><i class="fas fa-book-open"></i> Lesson ' + esc(l.order) + '</span>' +
-              (passed ? '<span class="pd-acad-chip gold"><i class="fas fa-award"></i> Passed · ' + passed.score + '%</span>' : '') +
+              '<span class="pd-acad-chip"><i class="pd-i ' + esc(l.icon) + '"></i> ' + esc(l.track) + '</span>' +
+              '<span class="pd-acad-chip"><i class="pd-i pd-i-book-open"></i> Lesson ' + esc(l.order) + '</span>' +
+              (passed ? '<span class="pd-acad-chip gold"><i class="pd-i pd-i-award"></i> Passed · ' + passed.score + '%</span>' : '') +
             '</div>' +
             '<h2>' + esc(l.title) + '</h2>' +
             '<p class="subtitle">' + esc(l.subtitle || '') + '</p>' +
@@ -860,22 +860,22 @@
 
     var objectivesBlock = '' +
       '<div class="pd-acad-lesson-objectives" aria-label="Lesson objectives">' +
-        '<h4><i class="fas fa-bullseye"></i> What you will learn</h4>' +
+        '<h4><i class="pd-i pd-i-target"></i> What you will learn</h4>' +
         '<ul>' + objectives.map(function (o) { return '<li>' + esc(o) + '</li>'; }).join('') + '</ul>' +
       '</div>';
 
-    var reflectionBlock = '<div class="pd-acad-callout"><h4 style="margin-top:0"><i class="fas fa-question"></i> Reflection questions</h4><ul>' +
+    var reflectionBlock = '<div class="pd-acad-callout"><h4 style="margin-top:0"><i class="pd-i pd-i-circle-question-mark"></i> Reflection questions</h4><ul>' +
       l.reflection.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ul>' +
       '<div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px">' +
-        '<button class="pd-acad-btn pd-acad-btn-secondary pd-acad-reflection-btn" data-flag="reflected"><i class="fas fa-check"></i> I reflected on these</button>' +
-        '<button class="pd-acad-btn pd-acad-btn-ghost pd-acad-reflection-btn" data-flag="prayer"><i class="fas fa-pray"></i> I prayed this through</button>' +
+        '<button class="pd-acad-btn pd-acad-btn-secondary pd-acad-reflection-btn" data-flag="reflected"><i class="pd-i pd-i-check"></i> I reflected on these</button>' +
+        '<button class="pd-acad-btn pd-acad-btn-ghost pd-acad-reflection-btn" data-flag="prayer"><i class="pd-i pd-i-hands-praying"></i> I prayed this through</button>' +
       '</div></div>';
 
     reader.innerHTML = heroBlock +
-      '<div class="pd-acad-meta"><span class="pd-acad-chip"><i class="fas ' + esc(l.icon) + '"></i> ' + esc(l.track) + '</span>' +
-      '<span class="pd-acad-chip gold"><i class="fas fa-clock"></i> ' + l.minutes + ' min</span>' +
-      '<span class="pd-acad-chip"><i class="fas fa-layer-group"></i> ' + esc(l.level) + '</span>' +
-      '<span class="pd-acad-chip"><i class="fas fa-bookmark"></i> Key Scripture: ' + esc(l.scripture) + '</span>' +
+      '<div class="pd-acad-meta"><span class="pd-acad-chip"><i class="pd-i ' + esc(l.icon) + '"></i> ' + esc(l.track) + '</span>' +
+      '<span class="pd-acad-chip gold"><i class="pd-i pd-i-clock"></i> ' + l.minutes + ' min</span>' +
+      '<span class="pd-acad-chip"><i class="pd-i pd-i-layers"></i> ' + esc(l.level) + '</span>' +
+      '<span class="pd-acad-chip"><i class="pd-i pd-i-bookmark"></i> Key Scripture: ' + esc(l.scripture) + '</span>' +
       '</div>' +
       '<h2>' + esc(l.title) + '</h2><p class="subtitle">' + esc(l.subtitle) + '</p>' +
       objectivesBlock +
@@ -939,7 +939,7 @@
       var state = quizState();
       list.innerHTML = filtered.map(function (l) {
         var done = state.completedLessons.indexOf(l.id) >= 0;
-        return '<button class="pd-acad-lesson-link" data-lesson="' + esc(l.id) + '"><small><i class="fas ' + esc(l.icon) + '"></i> ' + esc(l.track) + '</small><strong>' + esc(l.order + '. ' + l.title) + '</strong><span>' + l.minutes + ' min · ' + esc(l.level) + (done ? ' · ✓ Read' : '') + '</span></button>';
+        return '<button class="pd-acad-lesson-link" data-lesson="' + esc(l.id) + '"><small><i class="pd-i ' + esc(l.icon) + '"></i> ' + esc(l.track) + '</small><strong>' + esc(l.order + '. ' + l.title) + '</strong><span>' + l.minutes + ' min · ' + esc(l.level) + (done ? ' · <i class="pd-i pd-i-circle-check" aria-hidden="true"></i> Read' : '') + '</span></button>';
       }).join('');
       $$('[data-lesson]', list).forEach(function (b) { b.addEventListener('click', function () { location.hash = '#lesson/' + b.getAttribute('data-lesson'); }); });
     }
@@ -970,7 +970,7 @@
       if (!grid) return;
       grid.innerHTML = items.length ? items.map(function (s) {
         var lesson = PD_ACADEMY.getLesson(s.lessonId);
-        return '<article class="pd-acad-card pd-lift pd-acad-story"><img src="' + esc(s.image) + '" alt=""><div><div class="pd-acad-meta"><span class="pd-acad-chip gold">' + esc(s.category) + '</span><span class="pd-acad-chip"><i class="fas fa-clock"></i> ' + s.readingTime + ' min</span></div><h3>' + esc(s.title) + '</h3><p>' + esc(s.excerpt) + '</p><p style="margin-top:12px">' + s.body.slice(0, 2).map(esc).join(' ') + '</p><div class="pd-acad-hero-actions"><a class="pd-acad-btn pd-acad-btn-secondary" href="/stories?story=' + encodeURIComponent(s.id) + '"><i class="fas fa-book-open"></i> Read</a>' + (lesson ? '<a class="pd-acad-btn pd-acad-btn-ghost" href="/lessons?track=' + encodeURIComponent(lesson.trackId) + '#lesson/' + encodeURIComponent(lesson.id) + '">Linked lesson</a>' : '') + '</div></div></article>';
+        return '<article class="pd-acad-card pd-lift pd-acad-story"><img src="' + esc(s.image) + '" alt=""><div><div class="pd-acad-meta"><span class="pd-acad-chip gold">' + esc(s.category) + '</span><span class="pd-acad-chip"><i class="pd-i pd-i-clock"></i> ' + s.readingTime + ' min</span></div><h3>' + esc(s.title) + '</h3><p>' + esc(s.excerpt) + '</p><p style="margin-top:12px">' + s.body.slice(0, 2).map(esc).join(' ') + '</p><div class="pd-acad-hero-actions"><a class="pd-acad-btn pd-acad-btn-secondary" href="/stories?story=' + encodeURIComponent(s.id) + '"><i class="pd-i pd-i-book-open"></i> Read</a>' + (lesson ? '<a class="pd-acad-btn pd-acad-btn-ghost" href="/lessons?track=' + encodeURIComponent(lesson.trackId) + '#lesson/' + encodeURIComponent(lesson.id) + '">Linked lesson</a>' : '') + '</div></div></article>';
       }).join('') : '<div class="pd-acad-empty">No stories match your search.</div>';
     }
     if (search) search.addEventListener('input', render);
@@ -984,10 +984,10 @@
     overlay.className = 'pd-modern-modal';
     overlay.style.position = 'fixed'; overlay.style.inset = '0'; overlay.style.zIndex = '9999'; overlay.style.background = 'rgba(7,36,77,.72)'; overlay.style.display = 'flex'; overlay.style.alignItems = 'center'; overlay.style.justifyContent = 'center'; overlay.style.padding = '20px';
     overlay.innerHTML = '<div style="max-width:820px;max-height:90vh;overflow:auto;background:var(--pd-acad-card);color:var(--pd-acad-ink);border-radius:28px;padding:30px;box-shadow:var(--pd-shadow-lg);border:1px solid var(--pd-acad-border)">' +
-      '<div style="display:flex;justify-content:space-between;gap:16px;align-items:start"><div><span class="pd-acad-chip gold">' + esc(s.category) + '</span><h2 style="font-family:Playfair Display,Georgia,serif;color:var(--pd-acad-blue);margin:12px 0">' + esc(s.title) + '</h2><p style="color:var(--pd-acad-muted)">By ' + esc(s.author) + ' · ' + s.readingTime + ' min read</p></div><button class="pd-acad-btn pd-acad-btn-ghost" data-close><i class="fas fa-times"></i></button></div>' +
+      '<div style="display:flex;justify-content:space-between;gap:16px;align-items:start"><div><span class="pd-acad-chip gold">' + esc(s.category) + '</span><h2 style="font-family:Playfair Display,Georgia,serif;color:var(--pd-acad-blue);margin:12px 0">' + esc(s.title) + '</h2><p style="color:var(--pd-acad-muted)">By ' + esc(s.author) + ' · ' + s.readingTime + ' min read</p></div><button class="pd-acad-btn pd-acad-btn-ghost" data-close aria-label="Close"><i class="pd-i pd-i-x"></i></button></div>' +
       '<img src="' + esc(s.image) + '" style="width:100%;height:280px;object-fit:cover;border-radius:22px;margin:18px 0">' +
       '<div class="pd-acad-story-body">' + s.body.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') + '</div>' +
-      '<div class="pd-acad-callout"><strong>Reflection:</strong> ' + esc(s.prompt) + '</div><a class="pd-acad-btn pd-acad-btn-primary" href="/lessons#lesson/' + encodeURIComponent(s.lessonId) + '"><i class="fas fa-arrow-right"></i> Continue to lesson</a></div>';
+      '<div class="pd-acad-callout"><strong>Reflection:</strong> ' + esc(s.prompt) + '</div><a class="pd-acad-btn pd-acad-btn-primary" href="/lessons#lesson/' + encodeURIComponent(s.lessonId) + '"><i class="pd-i pd-i-arrow-right"></i> Continue to lesson</a></div>';
     document.body.appendChild(overlay);
     overlay.addEventListener('click', function (e) { if (e.target === overlay || e.target.closest('[data-close]')) overlay.remove(); });
   }
@@ -996,7 +996,7 @@
     updateOverview();
     var grid = $('#resourceGrid'); if (!grid) return;
     grid.innerHTML = DATA.resources.map(function (r) {
-      return '<article class="pd-acad-card pd-lift pd-acad-resource"><div class="pd-acad-icon gold"><i class="fas ' + esc(r.icon) + '"></i></div><div style="flex:1"><h3>' + esc(r.title) + '</h3><p>' + esc(r.description) + '</p><div class="pd-acad-meta"><span class="pd-acad-chip">' + esc(r.category) + '</span><span class="pd-acad-chip gold">' + esc(r.format) + '</span><span class="pd-acad-chip">' + esc(r.version) + '</span></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="pd-acad-btn pd-acad-btn-secondary" href="' + esc(r.url) + '"><i class="fas fa-eye"></i> Read</a><a class="pd-acad-btn pd-acad-btn-primary" href="' + esc(r.downloadUrl || r.url) + '" download><i class="fas fa-download"></i> Download</a></div></article>';
+      return '<article class="pd-acad-card pd-lift pd-acad-resource"><div class="pd-acad-icon gold"><i class="pd-i ' + esc(r.icon) + '"></i></div><div style="flex:1"><h3>' + esc(r.title) + '</h3><p>' + esc(r.description) + '</p><div class="pd-acad-meta"><span class="pd-acad-chip">' + esc(r.category) + '</span><span class="pd-acad-chip gold">' + esc(r.format) + '</span><span class="pd-acad-chip">' + esc(r.version) + '</span></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="pd-acad-btn pd-acad-btn-secondary" href="' + esc(r.url) + '"><i class="pd-i pd-i-eye"></i> Read</a><a class="pd-acad-btn pd-acad-btn-primary" href="' + esc(r.downloadUrl || r.url) + '" download><i class="pd-i pd-i-download"></i> Download</a></div></article>';
     }).join('');
   }
 
@@ -1020,7 +1020,7 @@
           var grid = document.getElementById('resourceGrid');
           if (grid && DATA.resources) {
             grid.innerHTML = DATA.resources.map(function (r) {
-              return '<article class="pd-acad-card pd-lift pd-acad-resource"><div class="pd-acad-icon gold"><i class="fas ' + esc(r.icon) + '"></i></div><div style="flex:1"><h3>' + esc(r.title) + '</h3><p>' + esc(r.description) + '</p><div class="pd-acad-meta"><span class="pd-acad-chip">' + esc(r.category) + '</span><span class="pd-acad-chip gold">' + esc(r.format) + '</span><span class="pd-acad-chip">' + esc(r.version) + '</span></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="pd-acad-btn pd-acad-btn-secondary" href="' + esc(r.url) + '"><i class="fas fa-eye"></i> ' + tr('action.read','Read') + '</a><a class="pd-acad-btn pd-acad-btn-primary" href="' + esc(r.downloadUrl || r.url) + '" download><i class="fas fa-download"></i> ' + tr('action.download','Download') + '</a></div></article>';
+              return '<article class="pd-acad-card pd-lift pd-acad-resource"><div class="pd-acad-icon gold"><i class="pd-i ' + esc(r.icon) + '"></i></div><div style="flex:1"><h3>' + esc(r.title) + '</h3><p>' + esc(r.description) + '</p><div class="pd-acad-meta"><span class="pd-acad-chip">' + esc(r.category) + '</span><span class="pd-acad-chip gold">' + esc(r.format) + '</span><span class="pd-acad-chip">' + esc(r.version) + '</span></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><a class="pd-acad-btn pd-acad-btn-secondary" href="' + esc(r.url) + '"><i class="pd-i pd-i-eye"></i> ' + tr('action.read','Read') + '</a><a class="pd-acad-btn pd-acad-btn-primary" href="' + esc(r.downloadUrl || r.url) + '" download><i class="pd-i pd-i-download"></i> ' + tr('action.download','Download') + '</a></div></article>';
             }).join('');
           }
         }
@@ -1256,7 +1256,7 @@
       return '<button class="pd-acad-lesson-link ' + (active ? 'is-active' : '') + '" onclick="selectCourseModule(\'' + m.id + '\')">' +
         '<small>Module ' + (idx + 1) + '</small>' +
         '<strong>' + esc(m.title) + '</strong>' +
-        '<span>' + (done ? '✓ Complete' : 'In Progress') + '</span>' +
+        '<span>' + (done ? '<i class="pd-i pd-i-circle-check" aria-hidden="true"></i> Complete' : 'In Progress') + '</span>' +
       '</button>';
     }).join('');
   }
@@ -1286,11 +1286,11 @@
     var isComplete = progress === 100;
 
     var tabsHtml = '<div class="course-steps-tabbar">' +
-      '<button class="course-step-tab ' + (activeTab === 'lesson' ? 'active' : '') + '" onclick="setCourseTab(\'lesson\')"><i class="fas fa-book-open"></i> 📖 Lesson</button>' +
-      '<button class="course-step-tab ' + (activeTab === 'pdf' ? 'active' : '') + '" onclick="setCourseTab(\'pdf\')"><i class="fas fa-file-pdf"></i> 📄 Study PDF</button>' +
-      '<button class="course-step-tab ' + (activeTab === 'audio' ? 'active' : '') + '" onclick="setCourseTab(\'audio\')"><i class="fas fa-headphones"></i> 🎧 Audio</button>' +
-      '<button class="course-step-tab ' + (activeTab === 'video' ? 'active' : '') + '" onclick="setCourseTab(\'video\')"><i class="fas fa-video"></i> 🎥 Video</button>' +
-      '<button class="course-step-tab ' + (activeTab === 'activity' ? 'active' : '') + '" onclick="setCourseTab(\'activity\')"><i class="fas fa-pen-clip"></i> 📝 Activity</button>' +
+      '<button class="course-step-tab ' + (activeTab === 'lesson' ? 'active' : '') + '" onclick="setCourseTab(\'lesson\')"><i class="pd-i pd-i-book-open"></i> Lesson</button>' +
+      '<button class="course-step-tab ' + (activeTab === 'pdf' ? 'active' : '') + '" onclick="setCourseTab(\'pdf\')"><i class="pd-i pd-i-file-text"></i> Study PDF</button>' +
+      '<button class="course-step-tab ' + (activeTab === 'audio' ? 'active' : '') + '" onclick="setCourseTab(\'audio\')"><i class="pd-i pd-i-headphones"></i> Audio</button>' +
+      '<button class="course-step-tab ' + (activeTab === 'video' ? 'active' : '') + '" onclick="setCourseTab(\'video\')"><i class="pd-i pd-i-video"></i> Video</button>' +
+      '<button class="course-step-tab ' + (activeTab === 'activity' ? 'active' : '') + '" onclick="setCourseTab(\'activity\')"><i class="pd-i pd-i-notebook-pen"></i> Activity</button>' +
     '</div>';
 
     var tabContent = '';
@@ -1300,14 +1300,14 @@
       '</div>';
     } else if (activeTab === 'pdf') {
       tabContent = '<div style="text-align:center; padding:30px;">' +
-        '<i class="fas fa-file-pdf" style="font-size:4rem; color:var(--pd-red); margin-bottom:16px;"></i>' +
+        '<i class="pd-i pd-i-file-text" style="font-size:4rem; color:var(--pd-red); margin-bottom:16px;"></i>' +
         '<h3>Download Course Study Guide</h3>' +
         '<p style="margin-bottom:20px;">Download the official PDF Guide to study offline and follow along.</p>' +
-        '<a class="pd-acad-btn pd-acad-btn-primary" href="' + esc(m.pdf) + '" download><i class="fas fa-download"></i> Download Study Guide</a>' +
+        '<a class="pd-acad-btn pd-acad-btn-primary" href="' + esc(m.pdf) + '" download><i class="pd-i pd-i-download"></i> Download Study Guide</a>' +
       '</div>';
     } else if (activeTab === 'audio') {
       tabContent = '<div style="text-align:center; padding:30px;">' +
-        '<i class="fas fa-circle-play" style="font-size:4rem; color:var(--pd-blue); margin-bottom:16px;"></i>' +
+        '<i class="pd-i pd-i-circle-play" style="font-size:4rem; color:var(--pd-blue); margin-bottom:16px;"></i>' +
         '<h3>Audio Narration</h3>' +
         '<audio id="courseAudio" controls src="' + esc(m.audio) + '" style="width:100%; max-width:500px; margin:20px auto 10px; display:block;"></audio>' +
         '<p style="font-size:0.8rem; font-weight:700; color:var(--pd-gold); margin-top:12px;" id="courseAudioCredit">PrayerDome Team Production</p>' +
@@ -1330,16 +1330,16 @@
       '</div>';
     } else if (activeTab === 'activity') {
       tabContent = '<div>' +
-        '<h4 style="margin-bottom:10px;"><i class="fas fa-question-circle"></i> Module Activity Challenge:</h4>' +
+        '<h4 style="margin-bottom:10px;"><i class="pd-i pd-i-circle-question-mark"></i> Module Activity Challenge:</h4>' +
         '<p style="font-weight:600; margin-bottom:14px; font-family:\'Lora\', serif;">' + esc(m.activity) + '</p>' +
         '<textarea id="activityReflection" class="form-control" rows="4" placeholder="Type your answer here..." style="width:100%; padding:12px; border-radius:12px; margin-bottom:16px;"></textarea>' +
-        '<button class="pd-acad-btn pd-acad-btn-primary" onclick="submitCourseModuleActivity()"><i class="fas fa-check-circle"></i> Complete Module &amp; Save</button>' +
+        '<button class="pd-acad-btn pd-acad-btn-primary" onclick="submitCourseModuleActivity()"><i class="pd-i pd-i-circle-check"></i> Complete Module &amp; Save</button>' +
       '</div>';
     }
 
     reader.innerHTML = '<div class="pd-acad-meta">' +
-      '<span class="pd-acad-chip"><i class="fas fa-scroll"></i> ' + esc(course.title) + '</span>' +
-      '<span class="pd-acad-chip gold"><i class="fas fa-layer-group"></i> Discipleship Course</span>' +
+      '<span class="pd-acad-chip"><i class="pd-i pd-i-scroll-text"></i> ' + esc(course.title) + '</span>' +
+      '<span class="pd-acad-chip gold"><i class="pd-i pd-i-layers"></i> Discipleship Course</span>' +
     '</div>' +
     '<h2>' + esc(m.title) + '</h2>' +
     tabsHtml +
@@ -1354,23 +1354,23 @@
 
     if (cert) {
       return '<div class="course-congrats-card">' +
-        '<h2>🎓 COURSE COMPLETED SUCCESSFULLY!</h2>' +
+        '<h2><i class="pd-i pd-i-graduation-cap" aria-hidden="true"></i> COURSE COMPLETED SUCCESSFULLY!</h2>' +
         '<p style="margin:12px 0 20px;">Congratulations! You have successfully completed the ' + esc(course.title) + ' course and passed the final exam.</p>' +
-        '<button class="pd-acad-btn pd-acad-btn-primary" id="downloadCourseCertBtn"><i class="fas fa-download"></i> Download Official Certificate</button>' +
+        '<button class="pd-acad-btn pd-acad-btn-primary" id="downloadCourseCertBtn"><i class="pd-i pd-i-download"></i> Download Official Certificate</button>' +
       '</div>';
     }
 
     if (hasSub) {
       return '<div class="course-congrats-card">' +
-        '<h2>📝 Final Exam Submitted!</h2>' +
+        '<h2><i class="pd-i pd-i-clipboard-check" aria-hidden="true"></i> Final Exam Submitted!</h2>' +
         '<p style="margin:12px 0 20px;">Your final exam answers have been submitted to the Pastor/Admin for grading. Once graded, your certificate will appear here.</p>' +
       '</div>';
     }
 
     return '<div class="course-congrats-card">' +
-      '<h2>🎉 Congratulations!</h2>' +
+      '<h2><i class="pd-i pd-i-party-popper" aria-hidden="true"></i> Congratulations!</h2>' +
       '<p style="margin:12px 0 20px;">You have successfully read and completed all required modules in the <strong>' + esc(course.title) + '</strong> course!</p>' +
-      '<button class="pd-acad-btn pd-acad-btn-primary" onclick="startFinalCourseExam()"><i class="fas fa-graduation-cap"></i> TAKE FINAL EXAM</button>' +
+      '<button class="pd-acad-btn pd-acad-btn-primary" onclick="startFinalCourseExam()"><i class="pd-i pd-i-graduation-cap"></i> TAKE FINAL EXAM</button>' +
     '</div>';
   }
 
@@ -1389,9 +1389,9 @@
     if (currentIdx + 1 < course.modules.length) {
       activeModuleId = course.modules[currentIdx + 1].id;
       activeTab = 'lesson';
-      alert('✓ Module complete! Proceeding to the next module.');
+      alert('Module complete! Proceeding to the next module.');
     } else {
-      alert('🎉 Incredible work! You have completed all modules for this course.');
+      alert('Incredible work! You have completed all modules for this course.');
     }
 
     renderCoursesGrid();
@@ -1412,8 +1412,8 @@
     modal.id = 'examModal';
     modal.innerHTML = '<div class="exam-modal-content">' +
       '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">' +
-        '<h2><i class="fas fa-graduation-cap" style="color:var(--pd-gold);"></i> ' + esc(course.title) + ' Course - Final Exam</h2>' +
-        '<button class="pd-acad-btn pd-acad-btn-ghost" onclick="document.getElementById(\'examModal\').remove()"><i class="fas fa-times"></i></button>' +
+        '<h2><i class="pd-i pd-i-graduation-cap" style="color:var(--pd-gold);"></i> ' + esc(course.title) + ' Course - Final Exam</h2>' +
+        '<button class="pd-acad-btn pd-acad-btn-ghost" onclick="document.getElementById(\'examModal\').remove()" aria-label="Close"><i class="pd-i pd-i-x"></i></button>' +
       '</div>' +
       '<p style="margin-bottom:20px; color:var(--text-dim); font-size:0.95rem;">This final exam contains multiple-choice, true/false, fill-in-the-blank, and written theory questions. Written questions will be manually graded by the Admin.</p>' +
       '<form id="examForm" onsubmit="submitFinalExam(event)">' +
@@ -1440,7 +1440,7 @@
             inputHtml +
           '</div>';
         }).join('') +
-        '<button type="submit" class="pd-acad-btn pd-acad-btn-primary btn-block" style="margin-top:10px;"><i class="fas fa-paper-plane"></i> SUBMIT FINAL EXAM</button>' +
+        '<button type="submit" class="pd-acad-btn pd-acad-btn-primary btn-block" style="margin-top:10px;"><i class="pd-i pd-i-send"></i> SUBMIT FINAL EXAM</button>' +
       '</form>' +
     '</div>';
 
@@ -1560,11 +1560,11 @@
     var passed = percent >= 80;
 
     modal.innerHTML = '<div style="margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:10px;">' +
-      '<h2><i class="fas fa-clipboard-check" style="color:var(--pd-gold);"></i> Final Exam Review</h2>' +
+      '<h2><i class="pd-i pd-i-clipboard-check" style="color:var(--pd-gold);"></i> Final Exam Review</h2>' +
     '</div>' +
     '<div class="glass-card" style="padding:20px; text-align:center; margin-bottom:24px; border:2px solid ' + (passed ? '#22c55e' : 'var(--pd-red)') + ';">' +
       '<h3>Auto-Graded Score: ' + percent + '%</h3>' +
-      (passed ? '<p style="color:#22c55e; font-weight:700; font-size:1.1rem; margin-top:8px;">🎉 Congratulations! You passed the initial knowledge exam with ' + percent + '%.</p>' :
+      (passed ? '<p style="color:#22c55e; font-weight:700; font-size:1.1rem; margin-top:8px;"><i class="pd-i pd-i-party-popper" aria-hidden="true"></i> Congratulations! You passed the initial knowledge exam with ' + percent + '%.</p>' :
                 '<p style="color:var(--pd-red); font-weight:700; font-size:1.1rem; margin-top:8px;">You scored ' + percent + '%. You need to retake the exam (80% auto-graded is required to pass).</p>') +
       '<p style="font-size:0.9rem; margin-top:8px; color:var(--text-dim);">Your theory and short answers have been submitted to the Admin for grading. Once graded, your certificate will be finalized!</p>' +
     '</div>' +
@@ -1572,7 +1572,7 @@
     review.map(function (q, idx) {
       var isCorrect = q.isCorrect;
       var cardClass = isCorrect === true ? 'correct' : (isCorrect === false ? 'incorrect' : '');
-      var indicator = isCorrect === true ? '<span style="color:#22c55e;">✓ Correct</span>' : (isCorrect === false ? '<span style="color:var(--pd-red);">❌ Wrong</span>' : '<span style="color:var(--pd-gold);">✍ Pending Admin Grading</span>');
+      var indicator = isCorrect === true ? '<span style="color:#22c55e;"><i class="pd-i pd-i-circle-check" aria-hidden="true"></i> Correct</span>' : (isCorrect === false ? '<span style="color:var(--pd-red);"><i class="pd-i pd-i-circle-x" aria-hidden="true"></i> Wrong</span>' : '<span style="color:var(--pd-gold);"><i class="pd-i pd-i-pen-line" aria-hidden="true"></i> Pending Admin Grading</span>');
 
       return '<div class="exam-review-card ' + cardClass + '" style="background:var(--bg-elev); padding:16px; border-radius:12px; margin-bottom:12px; border-left:4px solid ' + (isCorrect === true ? '#22c55e' : (isCorrect === false ? 'var(--pd-red)' : 'var(--pd-gold)')) + ';">' +
         '<strong>Question ' + (idx + 1) + ': ' + esc(q.text) + '</strong>' +
@@ -1585,8 +1585,8 @@
       '</div>';
     }).join('') +
     '<div style="margin-top:20px; display:flex; gap:10px;">' +
-      (passed ? '<button class="pd-acad-btn pd-acad-btn-primary btn-block" onclick="document.getElementById(\'examModal\').remove(); renderCourseModuleReader();"><i class="fas fa-arrow-right"></i> CONTINUE</button>' :
-                '<button class="pd-acad-btn pd-acad-btn-primary btn-block" onclick="document.getElementById(\'examModal\').remove(); startFinalCourseExam();"><i class="fas fa-redo"></i> RETAKE EXAM</button>') +
+      (passed ? '<button class="pd-acad-btn pd-acad-btn-primary btn-block" onclick="document.getElementById(\'examModal\').remove(); renderCourseModuleReader();"><i class="pd-i pd-i-arrow-right"></i> CONTINUE</button>' :
+                '<button class="pd-acad-btn pd-acad-btn-primary btn-block" onclick="document.getElementById(\'examModal\').remove(); startFinalCourseExam();"><i class="pd-i pd-i-rotate-cw"></i> RETAKE EXAM</button>') +
     '</div>';
   }
 

@@ -106,7 +106,8 @@
     </script>
     <!-- PD-SEO:END -->
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/pd-icons.css">
+    <script src="/assets/pd-icons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -401,7 +402,8 @@
         .branch-card { background: var(--bg-card); border-radius: 24px; padding: 20px; border: 1px solid var(--border-color); box-shadow: var(--shadow); display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease; cursor: pointer; position: relative; }
         .branch-card:hover { transform: translateY(-3px); border-color: var(--accent-green); }
         .branch-card.closest { border: 2px solid var(--accent-gold); background: linear-gradient(135deg, rgba(212,175,55,0.08), var(--bg-card)); }
-        .branch-card.closest::before { content: '🎯 CLOSEST'; position: absolute; top: -10px; right: 10px; font-size: 8px; background: var(--accent-gold); color: white; padding: 3px 10px; border-radius: 20px; font-weight: 800; }
+        .branch-card.closest::before { content: 'CLOSEST'; position: absolute; top: -10px; right: 10px; font-size: 8px; line-height: 11px; background: var(--accent-gold); color: white; padding: 3px 21px 3px 10px; border-radius: 20px; font-weight: 800; }
+        .branch-card.closest::after { content: ''; position: absolute; top: -6px; right: 18px; width: 9px; height: 9px; background-color: #fff; -webkit-mask: var(--pd-icon-locate-fixed) center / contain no-repeat; mask: var(--pd-icon-locate-fixed) center / contain no-repeat; }
         .branch-info h4 { font-weight: 800; font-size: 1rem; margin-bottom: 5px; display: flex; align-items: center; gap: 8px;}
         .branch-dist { font-size: 11px; background: rgba(212, 175, 55, 0.15); color: var(--accent-gold); font-weight: 800; padding: 6px 12px; border-radius: 20px; }
 
@@ -496,6 +498,10 @@
             .reviews-grid { grid-template-columns: 1fr; }
             .founder-img-wrapper { width: 110px; height: 110px; }
         }
+        /* Dark mode: brand blue (#0A4D9B) is about 2:1 on navy, so headings and icons use the
+           light brand tint (#93c5fd) and controls without a colour get readable text. */
+        body.dark-mode .nav-link.active,
+        body.dark-mode .portal-icon { color: #93c5fd; }
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
@@ -526,88 +532,88 @@
             <div class="pd-drawer-title">Prayer Dome</div>
             <small>A House of Prayer for All Nations</small>
         </div>
-        <button class="pd-drawer-close" aria-label="Close menu"><i class="fas fa-times"></i></button>
+        <button class="pd-drawer-close" aria-label="Close menu"><i class="pd-i pd-i-x"></i></button>
     </div>
     <nav class="pd-drawer-nav">
-        <a class="pd-drawer-link" href="/"><i class="fas fa-home"></i> Home</a>
-        <a class="pd-drawer-link pd-drawer-live" href="/live.html"><i class="fas fa-tower-broadcast"></i> Live Service</a>
-        <a class="pd-drawer-link" href="/prayer.html"><i class="fas fa-hands-praying"></i> Prayer Wall</a>
-        <a class="pd-drawer-link" href="/bible.html"><i class="fas fa-book-open"></i> Bible Center</a>
-        <a class="pd-drawer-link" href="/sermons.html"><i class="fas fa-microphone-lines"></i> Sermon Center</a>
-        <a class="pd-drawer-link" href="/video.html"><i class="fas fa-photo-film"></i> Gospel Media</a>
-        <a class="pd-drawer-link" href="/news.html"><i class="fas fa-newspaper"></i> Christian News</a>
-        <a class="pd-drawer-link" href="/testimony.html"><i class="fas fa-star-of-life"></i> Testimony Center</a>
-        <a class="pd-drawer-link" href="/events.html"><i class="fas fa-calendar-days"></i> Event Calendar</a>
-        <a class="pd-drawer-link" href="/chat.html"><i class="fas fa-comments"></i> Community Hub</a>
-        <a class="pd-drawer-link" href="/ai-prayer.html"><i class="fas fa-wand-magic-sparkles"></i> Prayer Assistant</a>
-        <a class="pd-drawer-link" href="/gallery.html"><i class="fas fa-images"></i> Gallery</a>
-        <a class="pd-drawer-link" href="/quiz.html"><i class="fas fa-star"></i> Bible Quiz</a>
-        <a class="pd-drawer-link" href="/game.html"><i class="fas fa-gamepad"></i> Faith Journey</a>
-        <a class="pd-drawer-link" href="/give.html"><i class="fas fa-heart"></i> Give</a>
-        <a class="pd-drawer-link" href="/account.html"><i class="fas fa-user-circle"></i> My Account</a>
+        <a class="pd-drawer-link" href="/"><i class="pd-i pd-i-house"></i> Home</a>
+        <a class="pd-drawer-link pd-drawer-live" href="/live.html"><i class="pd-i pd-i-radio"></i> Live Service</a>
+        <a class="pd-drawer-link" href="/prayer.html"><i class="pd-i pd-i-hands-praying"></i> Prayer Wall</a>
+        <a class="pd-drawer-link" href="/bible.html"><i class="pd-i pd-i-book-open"></i> Bible Center</a>
+        <a class="pd-drawer-link" href="/sermons.html"><i class="pd-i pd-i-mic"></i> Sermon Center</a>
+        <a class="pd-drawer-link" href="/video.html"><i class="pd-i pd-i-circle-play"></i> Gospel Media</a>
+        <a class="pd-drawer-link" href="/news.html"><i class="pd-i pd-i-newspaper"></i> Christian News</a>
+        <a class="pd-drawer-link" href="/testimony.html"><i class="pd-i pd-i-sparkles"></i> Testimony Center</a>
+        <a class="pd-drawer-link" href="/events.html"><i class="pd-i pd-i-calendar-days"></i> Event Calendar</a>
+        <a class="pd-drawer-link" href="/chat.html"><i class="pd-i pd-i-messages-square"></i> Community Hub</a>
+        <a class="pd-drawer-link" href="/ai-prayer.html"><i class="pd-i pd-i-wand-sparkles"></i> Prayer Assistant</a>
+        <a class="pd-drawer-link" href="/gallery.html"><i class="pd-i pd-i-images"></i> Gallery</a>
+        <a class="pd-drawer-link" href="/quiz.html"><i class="pd-i pd-i-star"></i> Bible Quiz</a>
+        <a class="pd-drawer-link" href="/game.html"><i class="pd-i pd-i-gamepad-2"></i> Faith Journey</a>
+        <a class="pd-drawer-link" href="/give.html"><i class="pd-i pd-i-heart"></i> Give</a>
+        <a class="pd-drawer-link" href="/account.html"><i class="pd-i pd-i-circle-user"></i> My Account</a>
     </nav>
     <div class="pd-drawer-foot">
-        <i class="fas fa-bible"></i> “He does everything blamelessly.” — Mark 7:37<br>
+        <i class="pd-i pd-i-book"></i> “He does everything blamelessly.” — Mark 7:37<br>
         <span style="opacity:.7;">© Prayer Dome Ministry · Zambia · Eswatini · Ireland</span>
     </div>
 </aside>
 
 <header class="pd-topbar">
-    <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+    <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="pd-i pd-i-menu"></i></button>
     <a href="index.html" class="pd-topbar-center">
         <div class="pd-topbar-logo"><img src="/assets/logo.png" alt="PD Logo"></div>
         <div class="pd-topbar-word">PRAYER DOME</div>
     </a>
     <div class="pd-topbar-right">
         <select class="pd-lang-select" aria-label="Language">
-            <option value="en">🇬🇧 English</option>
-            <option value="tum">🇲🇼 Tumbuka</option>
-            <option value="ssw">🇸🇿 siSwati</option>
-            <option value="bem">🇿🇲 Bemba</option>
-            <option value="nya">🇲🇼 Nyanja</option>
+            <option value="en">English</option>
+            <option value="tum">Tumbuka</option>
+            <option value="ssw">siSwati</option>
+            <option value="bem">Bemba</option>
+            <option value="nya">Nyanja</option>
         </select>
-        <button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="fas fa-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>
-        <button class="theme-toggle-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+        <button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="pd-i pd-i-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>
+        <button class="theme-toggle-btn" onclick="toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>
     </div>
 </header>
 
 <!-- Live Location Card -->
 <div class="pd-location-card" id="pdLocationCard">
-    <div class="pd-location-pin"><i class="fas fa-location-crosshairs"></i></div>
+    <div class="pd-location-pin"><i class="pd-i pd-i-locate-fixed"></i></div>
     <div class="pd-location-info">
         <span class="pd-location-label" data-pd-t="location.title">You are worshipping from</span>
         <div class="pd-location-name" id="pdLocationName">Detecting your location…</div>
         <div class="pd-location-coords" id="pdLocationSub"></div>
     </div>
-    <button class="pd-location-retry" id="pdLocationRetry" title="Refresh location"><i class="fas fa-rotate-right"></i></button>
+    <button class="pd-location-retry" id="pdLocationRetry" title="Refresh location"><i class="pd-i pd-i-rotate-cw"></i></button>
 </div>
 
 <!-- Moving Announcement Bar -->
 <div class="pd-marquee" id="pdAnnouncementBar">
-    <span class="pd-marquee-label"><i class="fas fa-bullhorn"></i> News</span>
+    <span class="pd-marquee-label"><i class="pd-i pd-i-megaphone"></i> News</span>
     <div class="pd-marquee-viewport"><div class="pd-marquee-track"></div></div>
 </div>
 
 <!-- Notification Center (instant in-app push) -->
 <div class="pd-notif-panel" id="pdNotifPanel">
     <div class="pd-notif-head">
-        <h3><i class="fas fa-bell"></i> <span data-pd-t="notifications.title">Notifications</span></h3>
+        <h3><i class="pd-i pd-i-bell"></i> <span data-pd-t="notifications.title">Notifications</span></h3>
         <div class="pd-notif-head-actions">
-            <button title="Mark all read" onclick="PDApp.notifications.markAllRead()"><i class="fas fa-check-double"></i></button>
-            <button title="Clear" onclick="PDApp.notifications.clear()"><i class="fas fa-trash-can"></i></button>
-            <button title="Close" onclick="PDApp.ui.toggleNotifPanel(false)"><i class="fas fa-times"></i></button>
+            <button title="Mark all read" onclick="PDApp.notifications.markAllRead()"><i class="pd-i pd-i-check-check"></i></button>
+            <button title="Clear" onclick="PDApp.notifications.clear()"><i class="pd-i pd-i-trash"></i></button>
+            <button title="Close" onclick="PDApp.ui.toggleNotifPanel(false)"><i class="pd-i pd-i-x"></i></button>
         </div>
     </div>
     <div id="pdNotifList"></div>
     <div class="pd-notif-head" style="border-top: 1px solid var(--border-color); border-radius: 0;">
-        <h3><i class="fas fa-bullhorn"></i> Announcements</h3>
+        <h3><i class="pd-i pd-i-megaphone"></i> Announcements</h3>
         <div class="pd-notif-head-actions">
-            <button title="Delete all" onclick="deleteAllNotifications()"><i class="fas fa-trash-alt"></i></button>
+            <button title="Delete all" onclick="deleteAllNotifications()"><i class="pd-i pd-i-trash"></i></button>
         </div>
     </div>
     <div id="notificationList">
         <div class="empty-notifications">
-            <i class="fas fa-bell-slash" style="font-size: 3rem; opacity: 0.3; margin-bottom: 10px; display: block;"></i>
+            <i class="pd-i pd-i-bell-off" style="font-size: 3rem; opacity: 0.3; margin-bottom: 10px; display: block;"></i>
             <p>No announcements yet</p>
         </div>
     </div>
@@ -623,9 +629,9 @@
     <h1 id="typingHeading"></h1>
     <p id="js-welcome-message">A House of Prayer for All Nations. Experience the supernatural atmosphere today.</p>
     <div class="hero-cta">
-        <a href="/live.html" class="cta-live"><i class="fas fa-tower-broadcast"></i> Watch Live</a>
-        <a href="/prayer.html" class="cta-pray"><i class="fas fa-hands-praying"></i> Prayer Wall</a>
-        <a href="/bible.html" class="cta-ghost"><i class="fas fa-book-open"></i> Read Bible</a>
+        <a href="/live.html" class="cta-live"><i class="pd-i pd-i-radio"></i> Watch Live</a>
+        <a href="/prayer.html" class="cta-pray"><i class="pd-i pd-i-hands-praying"></i> Prayer Wall</a>
+        <a href="/bible.html" class="cta-ghost"><i class="pd-i pd-i-book-open"></i> Read Bible</a>
     </div>
 </div>
 
@@ -637,12 +643,12 @@
     <section class="pd-challenge" id="weeklyChallenge" aria-label="Weekly prayer challenge">
         <div class="pd-challenge-glow"></div>
         <div class="pd-challenge-head">
-            <div class="pd-challenge-ribbon"><i class="fas fa-fire"></i> THIS WEEK'S PRAYER CHALLENGE</div>
+            <div class="pd-challenge-ribbon"><i class="pd-i pd-i-flame"></i> THIS WEEK'S PRAYER CHALLENGE</div>
             <div class="pd-challenge-dates" id="challengeDates">Loading…</div>
         </div>
         <div class="pd-challenge-body">
             <div class="pd-challenge-main">
-                <h3 class="pd-challenge-title" id="challengeTitle"><i class="fas fa-dove"></i> Loading…</h3>
+                <h3 class="pd-challenge-title" id="challengeTitle"><i class="pd-i pd-i-bird"></i> Loading…</h3>
                 <p class="pd-challenge-focus" id="challengeFocus">Loading this week's focus…</p>
                 <p class="pd-challenge-verse" id="challengeVerse">“…” <span id="challengeVerseRef">—</span></p>
             </div>
@@ -654,8 +660,8 @@
                     </svg>
                     <div class="pd-challenge-ring-label"><strong id="challengeDoneCount">0</strong><span>/7 days</span></div>
                 </div>
-                <button class="pd-challenge-today" id="challengePrayToday" onclick="PDChallenge.prayToday()"><i class="fas fa-hands-praying"></i> <span id="challengePrayTodayLabel">I prayed today</span></button>
-                <div class="pd-challenge-share" onclick="PDChallenge.share()"><i class="fas fa-share-alt"></i> Share challenge</div>
+                <button class="pd-challenge-today" id="challengePrayToday" onclick="PDChallenge.prayToday()"><i class="pd-i pd-i-hands-praying"></i> <span id="challengePrayTodayLabel">I prayed today</span></button>
+                <div class="pd-challenge-share" onclick="PDChallenge.share()"><i class="pd-i pd-i-share-2"></i> Share challenge</div>
             </div>
         </div>
         <div class="pd-challenge-days" id="challengeDays"><!-- 7 day chips rendered by JS --></div>
@@ -670,7 +676,7 @@
         </div>
         <div class="founder-info">
             <h3 class="founder-name">Pastor Seedwell K. Masuku</h3>
-            <span class="founder-title"><i class="fas fa-crown"></i> Founder & President</span>
+            <span class="founder-title"><i class="pd-i pd-i-crown"></i> Founder & President</span>
             <p class="founder-bio">Called by God to raise an army of intercessors globally. Pastor Seedwell leads Prayer Dome with a mandate to demonstrate the raw power of the Holy Spirit, bringing healing, deliverance, and prophetic direction to the nations.</p>
         </div>
     </div>
@@ -678,26 +684,26 @@
     <!-- Daily Devotional - Dynamic Morning/Afternoon/Evening -->
     <div class="glass-card devotional-container">
         <div class="devotional-header">
-            <h2><i class="fas fa-book-open"></i> Daily Devotional</h2>
+            <h2><i class="pd-i pd-i-book-open"></i> Daily Devotional</h2>
             <div class="time-indicator" id="timeIndicator">
-                <i class="fas fa-sun" id="timeIcon"></i>
+                <i class="pd-i pd-i-sun" id="timeIcon"></i>
                 <span id="currentTimeText">Loading...</span>
             </div>
         </div>
         
         <div class="timezone-info" id="timezoneInfo">
-            <i class="fas fa-globe"></i> Loading your timezone...
+            <i class="pd-i pd-i-globe"></i> Loading your timezone...
         </div>
         
         <div id="dailyContent">
             <div class="verse-card" id="verseAnimationArea">
-                <div class="verse-icon"><i class="fas fa-quote-right"></i></div>
+                <div class="verse-icon"><i class="pd-i pd-i-quote"></i></div>
                 <div class="verse-text" id="dailyScripture" data-pd-no-auto>Loading scripture...</div>
-                <div class="verse-ref" id="dailyRef"><i class="fas fa-bible"></i> — </div>
+                <div class="verse-ref" id="dailyRef"><i class="pd-i pd-i-book"></i> — </div>
             </div>
             
             <div class="commentary-card">
-                <div class="commentary-title"><i class="fas fa-lightbulb"></i> INSIGHT & REFLECTION</div>
+                <div class="commentary-title"><i class="pd-i pd-i-lightbulb"></i> INSIGHT & REFLECTION</div>
                 <div class="commentary-text" id="dailyMessage">
                     <div class="loading-spinner"></div>
                 </div>
@@ -705,7 +711,7 @@
             
             <div class="prayer-card">
                 <div class="prayer-title">
-                    <i class="fas fa-praying-hands"></i>
+                    <i class="pd-i pd-i-hands-praying"></i>
                     <span>PRAYER FOR THIS TIME</span>
                 </div>
                 <div class="prayer-text" id="dailyPrayer">Loading prayer...</div>
@@ -713,7 +719,7 @@
         </div>
         
         <div class="next-update-timer">
-            <i class="fas fa-hourglass-half"></i>
+            <i class="pd-i pd-i-hourglass"></i>
             <span>Next devotional in</span>
             <span class="update-badge" id="nextUpdateCountdown">--:--</span>
         </div>
@@ -721,115 +727,115 @@
 
     <!-- Portal Grid -->
     <div class="portal-grid" data-pd-stagger="55">
-        <a href="/bible.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-bible"></i></div><span data-pd-t="bible">Bible</span></a>
-        <a href="/ai-prayer.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-wand-magic-sparkles"></i></div><span data-pd-t="assistant">Assistant</span></a>
-        <a href="/sermons.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-microphone-lines"></i></div><span data-pd-t="sermons">Sermons</span></a>
-        <a href="/lessons.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-graduation-cap"></i></div><span data-pd-t="teaching">Teaching</span></a>
-        <a href="/stories.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-book-open-reader"></i></div><span data-pd-t="stories">Stories</span></a>
-        <a href="/resources.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-folder-open"></i></div><span data-pd-t="resources">Resources</span></a>
-        <a href="/translate.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-language"></i></div><span data-pd-t="translate">Translate</span></a>
-        <a href="/gallery.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-camera"></i></div><span data-pd-t="gallery">Gallery</span></a>
-        <a href="/give.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-heart"></i></div><span data-pd-t="give">Give</span></a>
-        <a href="/live.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-tower-broadcast"></i></div><span data-pd-t="live">Live</span></a>
-        <a href="/quiz.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-brain"></i></div><span data-pd-t="quiz">Quiz</span></a>
-        <a href="/game.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-gamepad"></i></div><span>Game</span></a>
-        <a href="/membership.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-id-card"></i></div><span data-pd-t="membership">Membership</span></a>
-        <a href="/support.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-hand-holding-heart"></i></div><span data-pd-t="support">Support</span></a>
-        <a href="/testimony.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-star"></i></div><span data-pd-t="testimony">Testimony</span></a>
-        <a href="/events.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-calendar-alt"></i></div><span data-pd-t="events">Events</span></a>
-        <a href="/news.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-newspaper"></i></div><span data-pd-t="news">News</span></a>
-        <a href="/video.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-photo-film"></i></div><span data-pd-t="media">Media</span></a>
-        <a href="/about.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-church"></i></div><span data-pd-t="about">About</span></a>
-        <a href="/contact.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-envelope"></i></div><span data-pd-t="contact">Contact</span></a>
-        <a href="/team.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-users"></i></div><span data-pd-t="team">Team</span></a>
-        <a href="/chat.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="fas fa-comments"></i></div><span data-pd-t="chat">Chat</span></a>
+        <a href="/bible.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-book"></i></div><span data-pd-t="bible">Bible</span></a>
+        <a href="/ai-prayer.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-wand-sparkles"></i></div><span data-pd-t="assistant">Assistant</span></a>
+        <a href="/sermons.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-mic"></i></div><span data-pd-t="sermons">Sermons</span></a>
+        <a href="/lessons.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-graduation-cap"></i></div><span data-pd-t="teaching">Teaching</span></a>
+        <a href="/stories.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-book-open-text"></i></div><span data-pd-t="stories">Stories</span></a>
+        <a href="/resources.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-folder-open"></i></div><span data-pd-t="resources">Resources</span></a>
+        <a href="/translate.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-languages"></i></div><span data-pd-t="translate">Translate</span></a>
+        <a href="/gallery.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-camera"></i></div><span data-pd-t="gallery">Gallery</span></a>
+        <a href="/give.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-heart"></i></div><span data-pd-t="give">Give</span></a>
+        <a href="/live.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-radio"></i></div><span data-pd-t="live">Live</span></a>
+        <a href="/quiz.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-brain"></i></div><span data-pd-t="quiz">Quiz</span></a>
+        <a href="/game.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-gamepad-2"></i></div><span>Game</span></a>
+        <a href="/membership.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-id-card"></i></div><span data-pd-t="membership">Membership</span></a>
+        <a href="/support.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-hand-heart"></i></div><span data-pd-t="support">Support</span></a>
+        <a href="/testimony.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-star"></i></div><span data-pd-t="testimony">Testimony</span></a>
+        <a href="/events.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-calendar-days"></i></div><span data-pd-t="events">Events</span></a>
+        <a href="/news.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-newspaper"></i></div><span data-pd-t="news">News</span></a>
+        <a href="/video.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-circle-play"></i></div><span data-pd-t="media">Media</span></a>
+        <a href="/about.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-church"></i></div><span data-pd-t="about">About</span></a>
+        <a href="/contact.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-mail"></i></div><span data-pd-t="contact">Contact</span></a>
+        <a href="/team.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-users"></i></div><span data-pd-t="team">Team</span></a>
+        <a href="/chat.html" class="portal-item pd-reveal pd-reveal-zoom"><div class="portal-icon"><i class="pd-i pd-i-messages-square"></i></div><span data-pd-t="chat">Chat</span></a>
     </div>
 
     <!-- Prayer Dome Academy preview -->
-    <div class="section-label pd-reveal"><i class="fas fa-graduation-cap"></i> Grow in Faith</div>
+    <div class="section-label pd-reveal"><i class="pd-i pd-i-graduation-cap"></i> Grow in Faith</div>
     <section class="pd-acad-grid pd-acad-grid-4" style="padding:0 20px 30px">
-        <a class="pd-acad-card pd-lift" href="/lessons.html"><div class="pd-acad-icon"><i class="fas fa-graduation-cap"></i></div><h3>Teaching</h3><p>Detailed lessons across foundations, prayer, the Word, character and mission.</p><div class="pd-acad-meta"><span class="pd-acad-chip">18 lessons</span></div></a>
-        <a class="pd-acad-card pd-lift" href="/stories.html"><div class="pd-acad-icon gold"><i class="fas fa-book-open-reader"></i></div><h3>Stories</h3><p>Meaningful, readable stories that inspire faith and link to lessons.</p><div class="pd-acad-meta"><span class="pd-acad-chip gold">10 stories</span></div></a>
-        <a class="pd-acad-card pd-lift" href="/quiz.html"><div class="pd-acad-icon"><i class="fas fa-certificate"></i></div><h3>Quizzes</h3><p>Test your knowledge and earn certificates when you pass lesson quizzes.</p><div class="pd-acad-meta"><span class="pd-acad-chip">18 quizzes</span></div></a>
-        <a class="pd-acad-card pd-lift" href="/resources.html"><div class="pd-acad-icon gold"><i class="fas fa-folder-open"></i></div><h3>Resources</h3><p>Download PDF guides: statement of faith, discipleship tools and team handbooks.</p><div class="pd-acad-meta"><span class="pd-acad-chip gold">6 downloads</span></div></a>
+        <a class="pd-acad-card pd-lift" href="/lessons.html"><div class="pd-acad-icon"><i class="pd-i pd-i-graduation-cap"></i></div><h3>Teaching</h3><p>Detailed lessons across foundations, prayer, the Word, character and mission.</p><div class="pd-acad-meta"><span class="pd-acad-chip">18 lessons</span></div></a>
+        <a class="pd-acad-card pd-lift" href="/stories.html"><div class="pd-acad-icon gold"><i class="pd-i pd-i-book-open-text"></i></div><h3>Stories</h3><p>Meaningful, readable stories that inspire faith and link to lessons.</p><div class="pd-acad-meta"><span class="pd-acad-chip gold">10 stories</span></div></a>
+        <a class="pd-acad-card pd-lift" href="/quiz.html"><div class="pd-acad-icon"><i class="pd-i pd-i-badge-check"></i></div><h3>Quizzes</h3><p>Test your knowledge and earn certificates when you pass lesson quizzes.</p><div class="pd-acad-meta"><span class="pd-acad-chip">18 quizzes</span></div></a>
+        <a class="pd-acad-card pd-lift" href="/resources.html"><div class="pd-acad-icon gold"><i class="pd-i pd-i-folder-open"></i></div><h3>Resources</h3><p>Download PDF guides: statement of faith, discipleship tools and team handbooks.</p><div class="pd-acad-meta"><span class="pd-acad-chip gold">6 downloads</span></div></a>
     </section>
 
     <!-- Upcoming Events -->
-    <div class="section-label pd-reveal"><i class="fas fa-calendar-alt"></i> Upcoming Events</div>
+    <div class="section-label pd-reveal"><i class="pd-i pd-i-calendar-days"></i> Upcoming Events</div>
     <div id="upcomingEvents" style="margin-bottom: 30px;">
         <div class="loading-spinner"></div>
     </div>
 
     <!-- Recent Testimonies -->
-    <div class="section-label pd-reveal"><i class="fas fa-star"></i> Recent Testimonies</div>
+    <div class="section-label pd-reveal"><i class="pd-i pd-i-star"></i> Recent Testimonies</div>
     <div id="recentTestimonies" style="margin-bottom: 30px;">
         <div class="loading-spinner"></div>
     </div>
 
     <!-- Christian News Center preview -->
-    <div class="section-label pd-reveal"><i class="fas fa-newspaper"></i> Christian News</div>
+    <div class="section-label pd-reveal"><i class="pd-i pd-i-newspaper"></i> Christian News</div>
     <div id="pdHomeNews" style="padding: 0 20px 30px;"></div>
 
     <!-- Branch Tracker -->
-    <div class="section-label pd-reveal"><i class="fas fa-map-marked-alt"></i> Church Locations</div>
+    <div class="section-label pd-reveal"><i class="pd-i pd-i-map-pinned"></i> Church Locations</div>
     <div class="branch-grid">
         <div class="branch-card" id="card-chama">
             <div class="branch-info">
-                <h4><i class="fas fa-church"></i> Chama, Zambia</h4>
+                <h4><i class="pd-i pd-i-church"></i> Chama, Zambia</h4>
                 <p style="font-size: 0.7rem; color: var(--text-sub);">Central Hub</p>
             </div>
-            <span class="branch-dist" id="dist-chama"><i class="fas fa-spinner fa-spin"></i></span>
+            <span class="branch-dist" id="dist-chama"><i class="pd-i pd-i-loader-circle pd-i-spin"></i></span>
         </div>
         <div class="branch-card" id="card-eswatini">
             <div class="branch-info">
-                <h4><i class="fas fa-church"></i> Manzini, Eswatini</h4>
+                <h4><i class="pd-i pd-i-church"></i> Manzini, Eswatini</h4>
                 <p style="font-size: 0.7rem; color: var(--text-sub);">Headquarters</p>
             </div>
-            <span class="branch-dist" id="dist-eswatini"><i class="fas fa-spinner fa-spin"></i></span>
+            <span class="branch-dist" id="dist-eswatini"><i class="pd-i pd-i-loader-circle pd-i-spin"></i></span>
         </div>
         <div class="branch-card" id="card-ireland">
             <div class="branch-info">
-                <h4><i class="fas fa-church"></i> Cork, Ireland</h4>
+                <h4><i class="pd-i pd-i-church"></i> Cork, Ireland</h4>
                 <p style="font-size: 0.7rem; color: var(--text-sub);">Europe Branch</p>
             </div>
-            <span class="branch-dist" id="dist-ireland"><i class="fas fa-spinner fa-spin"></i></span>
+            <span class="branch-dist" id="dist-ireland"><i class="pd-i pd-i-loader-circle pd-i-spin"></i></span>
         </div>
     </div>
 
     <!-- Reviews Section -->
-    <div class="section-label pd-reveal"><i class="fas fa-comment-dots"></i> Member Reviews</div>
+    <div class="section-label pd-reveal"><i class="pd-i pd-i-message-circle-more"></i> Member Reviews</div>
     <div class="reviews-section pd-reveal">
         <div class="reviews-grid" id="reviewsGrid">
             <div class="loading-spinner"></div>
         </div>
         
         <div class="add-review-card" id="addReviewForm" style="display: none;">
-            <div class="add-review-title"><i class="fas fa-pen-fancy"></i> Share Your Experience</div>
+            <div class="add-review-title"><i class="pd-i pd-i-pen-line"></i> Share Your Experience</div>
             <div class="form-group">
-                <label><i class="fas fa-user"></i> Your Name</label>
+                <label><i class="pd-i pd-i-user"></i> Your Name</label>
                 <input type="text" id="reviewerName" class="form-control" placeholder="Enter your name" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--border-color); background:var(--bg-primary);">
             </div>
             <div class="rating-input" id="ratingStars">
-                <i class="fas fa-star rating-star" data-rating="1"></i>
-                <i class="fas fa-star rating-star" data-rating="2"></i>
-                <i class="fas fa-star rating-star" data-rating="3"></i>
-                <i class="fas fa-star rating-star" data-rating="4"></i>
-                <i class="fas fa-star rating-star" data-rating="5"></i>
+                <i class="pd-i pd-i-star rating-star" data-rating="1"></i>
+                <i class="pd-i pd-i-star rating-star" data-rating="2"></i>
+                <i class="pd-i pd-i-star rating-star" data-rating="3"></i>
+                <i class="pd-i pd-i-star rating-star" data-rating="4"></i>
+                <i class="pd-i pd-i-star rating-star" data-rating="5"></i>
             </div>
             <div class="form-group">
-                <label><i class="fas fa-comment"></i> Your Review</label>
+                <label><i class="pd-i pd-i-message-circle"></i> Your Review</label>
                 <textarea id="reviewText" rows="3" class="form-control" placeholder="Share how Prayer Dome has impacted your life..." style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--border-color); background:var(--bg-primary);"></textarea>
             </div>
             <div class="form-group">
-                <label><i class="fas fa-camera"></i> Your Photo (Optional)</label>
-                <button type="button" class="btn-submit-review" onclick="uploadReviewPhoto()" style="width: auto; padding: 8px 20px;"><i class="fas fa-cloud-upload-alt"></i> Upload Photo</button>
+                <label><i class="pd-i pd-i-camera"></i> Your Photo (Optional)</label>
+                <button type="button" class="btn-submit-review" onclick="uploadReviewPhoto()" style="width: auto; padding: 8px 20px;"><i class="pd-i pd-i-cloud-upload"></i> Upload Photo</button>
                 <input type="hidden" id="reviewPhotoUrl">
                 <div id="reviewPhotoPreview" style="margin-top:10px;"></div>
             </div>
-            <button class="btn-submit-review" onclick="submitReview()"><i class="fas fa-paper-plane"></i> Submit Review</button>
+            <button class="btn-submit-review" onclick="submitReview()"><i class="pd-i pd-i-send"></i> Submit Review</button>
         </div>
         
-        <button class="btn-submit-review" id="showReviewBtn" onclick="showReviewForm()" style="margin-top:20px; background: var(--accent-purple);"><i class="fas fa-star"></i> Write a Review</button>
+        <button class="btn-submit-review" id="showReviewBtn" onclick="showReviewForm()" style="margin-top:20px; background: var(--accent-purple);"><i class="pd-i pd-i-star"></i> Write a Review</button>
     </div>
 
     <!-- Footer -->
@@ -841,21 +847,21 @@
         <p class="copyright">© 2018 PRAYER DOME MINISTRY. ALL RIGHTS RESERVED.</p>
         
         <div class="social-links">
-            <a href="https://www.facebook.com/profile.php?id=847255098474902" target="_blank" class="social-link facebook"><i class="fab fa-facebook-f"></i><span>Facebook</span></a>
-            <a href="https://wa.me/26876581804" target="_blank" class="social-link whatsapp"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></a>
-            <a href="mailto:info@prayerdome.net" class="social-link email"><i class="fas fa-envelope"></i><span>Email</span></a>
-            <a href="/admin.html" id="btn-admin" class="social-link admin-btn-special" style="display: none;"><i class="fas fa-shield-alt"></i><span>Admin</span></a>
-            <a href="/finance.html" id="btn-finance" class="social-link admin-btn-special" style="display: none;"><i class="fas fa-chart-line"></i><span>Finance</span></a>
-            <a href="/privacy.html" class="social-link"><i class="fas fa-shield-alt"></i><span>Privacy</span></a>
+            <a href="https://www.facebook.com/profile.php?id=847255098474902" target="_blank" class="social-link facebook"><i class="pd-i pd-i-brand-facebook"></i><span>Facebook</span></a>
+            <a href="https://wa.me/26876581804" target="_blank" class="social-link whatsapp"><i class="pd-i pd-i-brand-whatsapp"></i><span>WhatsApp</span></a>
+            <a href="mailto:info@prayerdome.net" class="social-link email"><i class="pd-i pd-i-mail"></i><span>Email</span></a>
+            <a href="/admin.html" id="btn-admin" class="social-link admin-btn-special" style="display: none;"><i class="pd-i pd-i-shield"></i><span>Admin</span></a>
+            <a href="/finance.html" id="btn-finance" class="social-link admin-btn-special" style="display: none;"><i class="pd-i pd-i-chart-line"></i><span>Finance</span></a>
+            <a href="/privacy.html" class="social-link"><i class="pd-i pd-i-shield"></i><span>Privacy</span></a>
         </div>
         
         <div class="contact-info">
-            <p><i class="fas fa-phone-alt"></i> <a href="tel:+26876581804" style="color: inherit; text-decoration: none;">+268 7658 1804</a></p>
-            <p><i class="fas fa-map-marker-alt"></i> Eswatini, Ireland & Zambia</p>
+            <p><i class="pd-i pd-i-phone"></i> <a href="tel:+26876581804" style="color: inherit; text-decoration: none;">+268 7658 1804</a></p>
+            <p><i class="pd-i pd-i-map-pin"></i> Eswatini, Ireland & Zambia</p>
         </div>
         
         <div class="ministry-verse">
-            <i class="fas fa-bible"></i>
+            <i class="pd-i pd-i-book"></i>
             <p style="font-weight: 700;">"He does everything blamelessly."</p>
             <span style="font-size: 0.8rem;">Mark 7:37</span>
         </div>
@@ -865,17 +871,17 @@
 <!-- Bottom Navigation -->
 <div class="bottom-ui-system">
     <nav class="nav-bar" id="mainNavBar">
-        <a href="/" class="nav-link active"><i class="fas fa-home"></i><span>Home</span></a>
-        <a href="/bible.html" class="nav-link"><i class="fas fa-book-open"></i><span>Bible</span></a>
-        <a href="/prayer.html" class="nav-link"><i class="fas fa-hands-praying"></i><span>Pray</span></a>
-        <a href="/sermons.html" class="nav-link"><i class="fas fa-microphone-lines"></i><span>Sermons</span></a>
-        <a href="/ai-prayer.html" class="nav-link"><i class="fas fa-wand-magic-sparkles"></i><span>Assistant</span></a>
-        <a href="/account.html" class="nav-link"><i class="fas fa-user-circle"></i><span>Account</span></a>
+        <a href="/" class="nav-link active"><i class="pd-i pd-i-house"></i><span>Home</span></a>
+        <a href="/bible.html" class="nav-link"><i class="pd-i pd-i-book-open"></i><span>Bible</span></a>
+        <a href="/prayer.html" class="nav-link"><i class="pd-i pd-i-hands-praying"></i><span>Pray</span></a>
+        <a href="/sermons.html" class="nav-link"><i class="pd-i pd-i-mic"></i><span>Sermons</span></a>
+        <a href="/ai-prayer.html" class="nav-link"><i class="pd-i pd-i-wand-sparkles"></i><span>Assistant</span></a>
+        <a href="/account.html" class="nav-link"><i class="pd-i pd-i-circle-user"></i><span>Account</span></a>
     </nav>
     
     <div class="ticker-bar">
         <div class="ticker-track">
-            <i class="fas fa-church"></i> "A HOUSE OF PRAYER FOR ALL NATIONS" • <i class="fas fa-cross"></i> "JESUS CHRIST IS THE SAME YESTERDAY, TODAY AND FOREVER" • <i class="fas fa-crown"></i> "PASTOR SEEDWELL WELCOMES YOU TO THE DOME" • <i class="fas fa-clock"></i> "EVERY SUNDAY AT 09:00 AM" • <i class="fas fa-globe-africa"></i> "CONNECTING ZAMBIA, ESWATINI, AND IRELAND"
+            <i class="pd-i pd-i-church"></i> "A HOUSE OF PRAYER FOR ALL NATIONS" • <i class="pd-i pd-i-latin-cross"></i> "JESUS CHRIST IS THE SAME YESTERDAY, TODAY AND FOREVER" • <i class="pd-i pd-i-crown"></i> "PASTOR SEEDWELL WELCOMES YOU TO THE DOME" • <i class="pd-i pd-i-clock"></i> "EVERY SUNDAY AT 09:00 AM" • <i class="pd-i pd-i-earth"></i> "CONNECTING ZAMBIA, ESWATINI, AND IRELAND"
         </div>
     </div>
 </div>
@@ -925,7 +931,7 @@
         const timeIcon = document.getElementById('timeIcon');
         const timeText = document.getElementById('currentTimeText');
         if (timeIcon && timeText) {
-            timeIcon.className = `fas ${devotional.periodIcon || 'fa-sun'}`;
+            timeIcon.className = `pd-i ${devotional.periodIcon || 'pd-i-sun'}`;
             timeText.innerHTML = devotional.periodName;
         }
         
@@ -942,7 +948,7 @@
         const prayerEl = document.getElementById('dailyPrayer');
         
         if (scriptureEl) scriptureEl.innerHTML = `"${devotional.text || devotional.verse}"`;
-        if (refEl) refEl.innerHTML = `<i class="fas fa-bible"></i> — ${devotional.verse}`;
+        if (refEl) refEl.innerHTML = `<i class="pd-i pd-i-book"></i> — ${devotional.verse}`;
         if (messageEl) messageEl.innerHTML = devotional.message;
         if (prayerEl) prayerEl.innerHTML = devotional.prayer;
         
@@ -1023,7 +1029,7 @@
         let text = 'Your timezone: ' + (tz || 'Local time');
         if (place) text += ' | ' + (flag ? flag + ' ' : '') + place;
         if (clock) text += ' · ' + clock;
-        span.innerHTML = '<i class="fas fa-globe"></i> ' + text;
+        span.innerHTML = '<i class="pd-i pd-i-globe"></i> ' + text;
         resolvedTimezone = tz || null;
     }
 
@@ -1068,12 +1074,12 @@
     // ==================== TYPING ANIMATION ====================
     
     const encouragingMessages = [
-        "<i class='fas fa-fire'></i> Welcome to Prayer Dome!",
-        "<i class='fas fa-church'></i> A House of Prayer for All Nations",
-        "<i class='fas fa-star-of-life'></i> Enter His Gates with Thanksgiving",
-        "<i class='fas fa-shield-alt'></i> Be Strong and Courageous!",
-        "<i class='fas fa-bullseye'></i> Your Breakthrough Starts Here",
-        "<i class='fas fa-dove'></i> Experience God's Supernatural Power"
+        "<i class='pd-i pd-i-flame'></i> Welcome to Prayer Dome!",
+        "<i class='pd-i pd-i-church'></i> A House of Prayer for All Nations",
+        "<i class='pd-i pd-i-sparkles'></i> Enter His Gates with Thanksgiving",
+        "<i class='pd-i pd-i-shield'></i> Be Strong and Courageous!",
+        "<i class='pd-i pd-i-target'></i> Your Breakthrough Starts Here",
+        "<i class='pd-i pd-i-bird'></i> Experience God's Supernatural Power"
     ];
 
     let messageIndex = 0;
@@ -1143,8 +1149,8 @@
             const dist = calculateDistance(lat, lng, branch.lat, branch.lon);
             const distEl = document.getElementById(branch.el);
             if (distEl) {
-                if (dist < 1) distEl.innerHTML = `<i class="fas fa-check-circle"></i> You are here!`;
-                else distEl.innerHTML = `<i class="fas fa-route"></i> ${dist} KM`;
+                if (dist < 1) distEl.innerHTML = `<i class="pd-i pd-i-circle-check"></i> You are here!`;
+                else distEl.innerHTML = `<i class="pd-i pd-i-route"></i> ${dist} KM`;
             }
             if (dist < minDistance) { minDistance = dist; closestBranch = key; }
         }
@@ -1179,13 +1185,13 @@
             const snapshot = await getDocs(eventsQuery);
             const container = document.getElementById('upcomingEvents');
             if (snapshot.empty) {
-                container.innerHTML = '<div class="content-card" style="justify-content:center;"><i class="fas fa-calendar-times"></i> No upcoming events</div>';
+                container.innerHTML = '<div class="content-card" style="justify-content:center;"><i class="pd-i pd-i-calendar-x"></i> No upcoming events</div>';
                 return;
             }
             container.innerHTML = snapshot.docs.map(doc => {
                 const event = doc.data();
                 const eventDate = event.date?.toDate() || new Date();
-                return `<div class="content-card" onclick="window.location.href='events.html'"><div class="content-icon"><i class="fas fa-calendar-day"></i></div><div style="flex:1;"><h4 style="font-weight: 800;">${escapeHtml(event.title || 'Event')}</h4><p style="font-size: 0.75rem; color: var(--accent-green);">${moment(eventDate).format('dddd, MMMM D • h:mm A')}</p><p style="font-size: 0.7rem;"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(event.location || 'Prayer Dome')}</p></div><i class="fas fa-chevron-right"></i></div>`;
+                return `<div class="content-card" onclick="window.location.href='events.html'"><div class="content-icon"><i class="pd-i pd-i-calendar"></i></div><div style="flex:1;"><h4 style="font-weight: 800;">${escapeHtml(event.title || 'Event')}</h4><p style="font-size: 0.75rem; color: var(--accent-green);">${moment(eventDate).format('dddd, MMMM D • h:mm A')}</p><p style="font-size: 0.7rem;"><i class="pd-i pd-i-map-pin"></i> ${escapeHtml(event.location || 'Prayer Dome')}</p></div><i class="pd-i pd-i-chevron-right"></i></div>`;
             }).join('');
         } catch (error) { console.error("Error loading events:", error); }
     }
@@ -1196,12 +1202,12 @@
             const snapshot = await getDocs(testimoniesQuery);
             const container = document.getElementById('recentTestimonies');
             if (snapshot.empty) {
-                container.innerHTML = '<div class="content-card" style="justify-content:center;"><i class="fas fa-microphone-alt"></i> No testimonies yet. Be the first!</div>';
+                container.innerHTML = '<div class="content-card" style="justify-content:center;"><i class="pd-i pd-i-mic"></i> No testimonies yet. Be the first!</div>';
                 return;
             }
             container.innerHTML = snapshot.docs.map(doc => {
                 const t = doc.data();
-                return `<div class="content-card" onclick="window.location.href='testimony.html'" style="border-left-color: var(--accent-gold);"><div class="content-icon" style="background: rgba(212, 175, 55, 0.1); color: var(--accent-gold);"><i class="fas fa-quote-left"></i></div><div style="flex: 1;"><p style="font-size: 0.85rem; font-style: italic;">"${escapeHtml(t.content?.substring(0, 100))}${t.content?.length > 100 ? '...' : ''}"</p><p style="font-size: 0.7rem; color: var(--accent-gold); font-weight:700; margin-top:5px;">— ${escapeHtml(t.author || 'Anonymous')}</p></div></div>`;
+                return `<div class="content-card" onclick="window.location.href='testimony.html'" style="border-left-color: var(--accent-gold);"><div class="content-icon" style="background: rgba(212, 175, 55, 0.1); color: var(--accent-gold);"><i class="pd-i pd-i-quote"></i></div><div style="flex: 1;"><p style="font-size: 0.85rem; font-style: italic;">"${escapeHtml(t.content?.substring(0, 100))}${t.content?.length > 100 ? '...' : ''}"</p><p style="font-size: 0.7rem; color: var(--accent-gold); font-weight:700; margin-top:5px;">— ${escapeHtml(t.author || 'Anonymous')}</p></div></div>`;
             }).join('');
         } catch (error) { console.error("Error loading testimonies:", error); }
     }
@@ -1214,22 +1220,23 @@
             const snapshot = await getDocs(reviewsQuery);
             const container = document.getElementById('reviewsGrid');
             if (snapshot.empty) {
-                container.innerHTML = '<div class="review-card" style="text-align:center; padding:40px;"><i class="fas fa-star" style="font-size: 48px; opacity:0.3;"></i><p style="margin-top:15px;">No reviews yet. Be the first to share!</p></div>';
+                container.innerHTML = '<div class="review-card" style="text-align:center; padding:40px;"><i class="pd-i pd-i-star" style="font-size: 48px; opacity:0.3;"></i><p style="margin-top:15px;">No reviews yet. Be the first to share!</p></div>';
                 return;
             }
             container.innerHTML = snapshot.docs.map(doc => {
                 const r = doc.data();
-                const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+                const rating = Math.max(0, Math.min(5, Math.round(Number(r.rating) || 0)));
+                const stars = '<i class="pd-i pd-i-star-fill"></i>'.repeat(rating) + '<i class="pd-i pd-i-star"></i>'.repeat(5 - rating);
                 return `<div class="review-card">
                     <div class="review-header">
-                        ${r.photoUrl ? `<img src="${r.photoUrl}" class="review-avatar">` : `<div class="review-avatar" style="background: linear-gradient(135deg, var(--accent-green), var(--accent-gold)); display: flex; align-items: center; justify-content: center;"><i class="fas fa-user" style="color:white; font-size:1.5rem;"></i></div>`}
+                        ${r.photoUrl ? `<img src="${r.photoUrl}" class="review-avatar">` : `<div class="review-avatar" style="background: linear-gradient(135deg, var(--accent-green), var(--accent-gold)); display: flex; align-items: center; justify-content: center;"><i class="pd-i pd-i-user" style="color:white; font-size:1.5rem;"></i></div>`}
                         <div class="review-info">
                             <h4>${escapeHtml(r.name)}</h4>
-                            <div class="review-stars">${stars}</div>
+                            <div class="review-stars" role="img" aria-label="${rating} out of 5 stars">${stars}</div>
                             <div class="review-date">${moment(r.timestamp?.toDate()).format('MMM D, YYYY')}</div>
                         </div>
                     </div>
-                    <div class="review-text"><i class="fas fa-quote-left"></i> ${escapeHtml(r.review)}</div>
+                    <div class="review-text"><i class="pd-i pd-i-quote"></i> ${escapeHtml(r.review)}</div>
                 </div>`;
             }).join('');
         } catch (error) { console.error("Error loading reviews:", error); }
@@ -1263,7 +1270,7 @@
                 timestamp: serverTimestamp()
             });
             
-            showToast("✅ Thank you for your review!", "success");
+            showToast("Thank you for your review!", "success");
             confetti({ particleCount: 100, spread: 70 });
             
             document.getElementById('reviewerName').value = '';
@@ -1360,7 +1367,7 @@
         const container = document.getElementById('notificationList');
         if (!container) return;
         if (notifications.length === 0) {
-            container.innerHTML = `<div class="empty-notifications"><i class="fas fa-bell-slash" style="font-size: 3rem; opacity: 0.3;"></i><p>No announcements yet</p></div>`;
+            container.innerHTML = `<div class="empty-notifications"><i class="pd-i pd-i-bell-off" style="font-size: 3rem; opacity: 0.3;"></i><p>No announcements yet</p></div>`;
             return;
         }
         container.innerHTML = notifications.map(notif => `
@@ -1368,9 +1375,9 @@
                 <div class="notification-content" onclick="markNotificationRead('${notif.id}')">
                     <div class="notification-title">${escapeHtml(notif.title)}</div>
                     <div class="notification-message">${escapeHtml(notif.message)}</div>
-                    <span class="notification-time"><i class="far fa-clock"></i> ${notif.time}</span>
+                    <span class="notification-time"><i class="pd-i pd-i-clock"></i> ${notif.time}</span>
                 </div>
-                <button class="delete-notif-btn" onclick="event.stopPropagation(); deleteNotification('${notif.id}')"><i class="fas fa-trash-alt"></i></button>
+                <button class="delete-notif-btn" onclick="event.stopPropagation(); deleteNotification('${notif.id}')" aria-label="Delete notification"><i class="pd-i pd-i-trash"></i></button>
             </div>
         `).join('');
     }
@@ -1427,7 +1434,7 @@
                 adminLink.href = "admin.html";
                 adminLink.id = "nav-admin-link";
                 adminLink.className = "nav-link";
-                adminLink.innerHTML = '<i class="fas fa-shield-alt" style="color:var(--accent-red);"></i><span style="color:var(--accent-red);">Admin</span>';
+                adminLink.innerHTML = '<i class="pd-i pd-i-shield" style="color:var(--accent-red);"></i><span style="color:var(--accent-red);">Admin</span>';
                 navBar.appendChild(adminLink);
                 const btnAdmin = document.getElementById('btn-admin');
                 if (btnAdmin) btnAdmin.style.display = 'inline-flex';
@@ -1450,7 +1457,7 @@
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
         toast.className = `toast ${type === 'error' ? 'error' : ''}`;
-        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+        toast.innerHTML = `<i class="pd-i ${type === 'success' ? 'pd-i-circle-check' : 'pd-i-circle-alert'}"></i> ${message}`;
         container.appendChild(toast);
         setTimeout(() => toast.remove(), 3500);
     }
@@ -1458,7 +1465,7 @@
     window.toggleDarkMode = function() {
         document.body.classList.toggle('dark-mode');
         const btn = document.querySelector('.theme-toggle-btn i');
-        if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
+        if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'pd-i pd-i-sun' : 'pd-i pd-i-moon';
     };
 
     // ==================== WEEKLY PRAYER CHALLENGE ====================
@@ -1533,7 +1540,7 @@
             const btn = document.getElementById('challengePrayToday');
             const btnLabel = document.getElementById('challengePrayTodayLabel');
 
-            if (title) title.innerHTML = `<i class="fas ${c.icon || 'fa-dove'}"></i> ${escapeHtml(c.title)}`;
+            if (title) title.innerHTML = `<i class="${window.PDIcons ? PDIcons.cls(c.icon, 'pd-i-bird') : 'pd-i pd-i-bird'}" aria-hidden="true"></i> ${escapeHtml(c.title)}`;
             if (focus) focus.textContent = c.focus;
             if (verse) verse.innerHTML = `“${escapeHtml(c.verse)}” <span id="challengeVerseRef">— ${escapeHtml(c.verseRef)}</span>`;
 
@@ -1547,7 +1554,7 @@
                 daysEl.innerHTML = c.tasks.map((task, i) => `
                     <div class="pd-challenge-day ${this.days[i] ? 'done' : ''}${i === this.todayIndex ? ' is-today' : ''}">
                         <div class="pd-challenge-day-name">${DAY_NAMES[i]}${i === this.todayIndex ? ' · Today' : ''}</div>
-                        <div class="pd-challenge-day-check">${this.days[i] ? '<i class="fas fa-check-circle"></i>' : (i === this.todayIndex ? '<i class="far fa-circle"></i>' : '')}</div>
+                        <div class="pd-challenge-day-check">${this.days[i] ? '<i class="pd-i pd-i-circle-check"></i>' : (i === this.todayIndex ? '<i class="pd-i pd-i-circle"></i>' : '')}</div>
                         <div class="pd-challenge-day-tip">${escapeHtml(task)}</div>
                     </div>`).join('');
             }
@@ -1561,7 +1568,9 @@
             if (btn && btnLabel) {
                 const todayDone = !!this.days[this.todayIndex];
                 btn.classList.toggle('done', todayDone);
-                btnLabel.textContent = todayDone ? 'Done for today ✓' : 'I prayed today';
+                btnLabel.textContent = todayDone ? 'Done for today' : 'I prayed today';
+                const btnIcon = btn.querySelector('.pd-i');
+                if (btnIcon) btnIcon.className = todayDone ? 'pd-i pd-i-circle-check' : 'pd-i pd-i-hands-praying';
             }
         },
 
@@ -1572,13 +1581,13 @@
             this.render();
             const done = this.days.filter(Boolean).length;
             if (this.days[this.todayIndex]) {
-                showToast('🙏 Amen! Day ' + (this.todayIndex + 1) + ' marked — keep going!');
+                showToast('Amen! Day ' + (this.todayIndex + 1) + ' marked — keep going!');
             } else {
                 showToast('Unmarked — it\'s never too late to pray today.');
             }
             if (done === 7) {
                 if (window.confetti) confetti({ particleCount: 180, spread: 90, origin: { y: 0.6 } });
-                showToast('🎉 You completed this week\'s challenge — glory to God!');
+                showToast('You completed this week\'s challenge — glory to God!');
             }
             if (auth.currentUser) {
                 try {
@@ -1592,7 +1601,7 @@
         share() {
             const c = this.challenge;
             if (!c) return;
-            const text = `🔥 Prayer Dome Weekly Challenge: ${c.title}\n\n${c.focus}\n\n“${c.verse}” — ${c.verseRef}\n\nPray with me this week! 🙏`;
+            const text = `Prayer Dome Weekly Challenge: ${c.title}\n\n${c.focus}\n\n“${c.verse}” — ${c.verseRef}\n\nPray with me this week!`;
             if (navigator.share) { navigator.share({ title: 'Prayer Dome Challenge', text }).catch(() => {}); }
             else if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text).then(() => showToast('Challenge copied — share it!'));
@@ -1633,7 +1642,7 @@
         if (!container || !window.PDApp) return;
         const items = PDApp.news.list().slice(0, 3);
         if (!items.length) {
-            container.innerHTML = '<div class="content-card" style="justify-content:center;"><i class="fas fa-newspaper"></i> News coming soon. Check the News Center!</div>';
+            container.innerHTML = '<div class="content-card" style="justify-content:center;"><i class="pd-i pd-i-newspaper"></i> News coming soon. Check the News Center!</div>';
             return;
         }
         container.innerHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px;">
@@ -1644,7 +1653,7 @@
                         <span class="pd-news-cat">${escapeHtml(n.category || 'Ministry News')}</span>
                         <h3>${escapeHtml(n.title)}</h3>
                         <p>${escapeHtml((n.summary || '').substring(0, 110))}${(n.summary || '').length > 110 ? '…' : ''}</p>
-                        <div class="pd-news-meta"><i class="far fa-clock"></i> ${n.date ? new Date(n.date).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Latest'} · <i class="fas fa-user"></i> ${escapeHtml(n.author || 'Prayer Dome')}</div>
+                        <div class="pd-news-meta"><i class="pd-i pd-i-clock"></i> ${n.date ? new Date(n.date).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : 'Latest'} · <i class="pd-i pd-i-user"></i> ${escapeHtml(n.author || 'Prayer Dome')}</div>
                     </div>
                 </a>`).join('')}
         </div>`;

@@ -31,12 +31,12 @@ PD_CONTENT.THEME_SCRIPTURE = {
 
 /* --- Moving announcement bar (auto-scrolling marquee) --------------------- */
 PD_CONTENT.DEFAULT_ANNOUNCEMENTS = [
-  { id: 'ann-1', text: 'Welcome to Prayer Dome — A House of Prayer for All Nations', icon: 'fa-church', active: true },
-  { id: 'ann-2', text: 'Join Today\'s Prayer Session — every Sunday at 09:00 AM', icon: 'fa-clock', active: true },
-  { id: 'ann-3', text: 'New Sermon Available — watch in the Sermon Center', icon: 'fa-microphone-lines', active: true },
-  { id: 'ann-4', text: 'Upcoming Revival Meeting — details in Events & News', icon: 'fa-fire', active: true },
-  { id: 'ann-5', text: 'Prayer Request Updates — check the Prayer Wall', icon: 'fa-hands-praying', active: true },
-  { id: 'ann-6', text: 'Community News — read the latest in the News Center', icon: 'fa-newspaper', active: true }
+  { id: 'ann-1', text: 'Welcome to Prayer Dome — A House of Prayer for All Nations', icon: 'pd-i-church', active: true },
+  { id: 'ann-2', text: 'Join Today\'s Prayer Session — every Sunday at 09:00 AM', icon: 'pd-i-clock', active: true },
+  { id: 'ann-3', text: 'New Sermon Available — watch in the Sermon Center', icon: 'pd-i-mic', active: true },
+  { id: 'ann-4', text: 'Upcoming Revival Meeting — details in Events & News', icon: 'pd-i-flame', active: true },
+  { id: 'ann-5', text: 'Prayer Request Updates — check the Prayer Wall', icon: 'pd-i-hands-praying', active: true },
+  { id: 'ann-6', text: 'Community News — read the latest in the News Center', icon: 'pd-i-newspaper', active: true }
 ];
 
 /* --- Scheduled hero banners (video or image) ----------------------------- */
@@ -102,14 +102,14 @@ PD_CONTENT.DEFAULT_RADIO = [
     name: 'Prayer Dome Radio',
     tagline: 'Worship, teaching and prayer around the clock',
     streamUrl: 'https://stream.radio.co/sample.mp3',   // admin replaces with licensed stream
-    icon: 'fa-tower-broadcast'
+    icon: 'pd-i-radio'
   },
   {
     id: 'radio-2',
     name: 'Prayer Dome Worship Mix',
     tagline: 'Continuous worship atmosphere',
     streamUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3', // demo audio — replace in Admin
-    icon: 'fa-music'
+    icon: 'pd-i-music'
   }
 ];
 
@@ -203,7 +203,7 @@ PD_CONTENT.WEEKLY_CHALLENGES = [
   {
     id: 'chal-praise',
     title: 'The Week of Praise',
-    icon: 'fa-hands-praying',
+    icon: 'pd-i-hands-praying',
     focus: 'Begin every day with thanksgiving. Before you ask God for anything, praise Him for who He is and what He has already done.',
     verse: 'Enter into his gates with thanksgiving, and into his courts with praise: be thankful unto him, and bless his name.',
     verseRef: 'Psalm 100:4',
@@ -220,7 +220,7 @@ PD_CONTENT.WEEKLY_CHALLENGES = [
   {
     id: 'chal-fast',
     title: 'The Week of Fasting',
-    icon: 'fa-dove',
+    icon: 'pd-i-bird',
     focus: 'Set aside something this week — a meal, a habit, a comfort — and give that space to prayer and seeking God\u2019s face.',
     verse: 'But thou, when thou fastest, anoint thine head, and wash thy face; That thou appear not unto men to fast, but unto thy Father which is in secret.',
     verseRef: 'Matthew 6:17-18',
@@ -237,7 +237,7 @@ PD_CONTENT.WEEKLY_CHALLENGES = [
   {
     id: 'chal-family',
     title: 'The Week of Family Prayer',
-    icon: 'fa-people-roof',
+    icon: 'pd-i-house-heart',
     focus: 'Pray with your household or your spiritual family every day. Agreement in prayer opens doors that solitude cannot.',
     verse: 'Again I say unto you, That if two of you shall agree on earth as touching any thing that they shall ask, it shall be done for them of my Father which is in heaven.',
     verseRef: 'Matthew 18:19',
@@ -254,7 +254,7 @@ PD_CONTENT.WEEKLY_CHALLENGES = [
   {
     id: 'chal-word',
     title: 'The Week of the Word',
-    icon: 'fa-book-bible',
+    icon: 'pd-i-book',
     focus: 'Let scripture lead your prayers. Read, meditate and pray the Word back to God instead of only praying your own words.',
     verse: 'Thy word is a lamp unto my feet, and a light unto my path.',
     verseRef: 'Psalm 119:105',
@@ -271,7 +271,7 @@ PD_CONTENT.WEEKLY_CHALLENGES = [
   {
     id: 'chal-intercession',
     title: 'The Week of Intercession',
-    icon: 'fa-earth-africa',
+    icon: 'pd-i-earth',
     focus: 'Stand in the gap for others — your family, your church, your nation and the nations. Intercession is love on its knees.',
     verse: 'I exhort therefore, that, first of all, supplications, prayers, intercessions, and giving of thanks, be made for all men.',
     verseRef: '1 Timothy 2:1',
@@ -288,7 +288,7 @@ PD_CONTENT.WEEKLY_CHALLENGES = [
   {
     id: 'chal-silence',
     title: 'The Week of Stillness',
-    icon: 'fa-moon',
+    icon: 'pd-i-moon',
     focus: 'Be still and know. This week, learn to listen — silence your words, your devices and your worries so God can speak.',
     verse: 'Be still, and know that I am God: I will be exalted among the heathen, I will be exalted in the earth.',
     verseRef: 'Psalm 46:10',
@@ -305,7 +305,7 @@ PD_CONTENT.WEEKLY_CHALLENGES = [
   {
     id: 'chal-generosity',
     title: 'The Week of Generosity',
-    icon: 'fa-hand-holding-heart',
+    icon: 'pd-i-hand-heart',
     focus: 'Give as you have received — time, money, food, encouragement. A generous heart is a praying heart made visible.',
     verse: 'Give, and it shall be given unto you; good measure, pressed down, and shaken together, and running over, shall men give into your bosom.',
     verseRef: 'Luke 6:38',
@@ -322,7 +322,7 @@ PD_CONTENT.WEEKLY_CHALLENGES = [
   {
     id: 'chal-healing',
     title: 'The Week of Healing',
-    icon: 'fa-heart-pulse',
+    icon: 'pd-i-heart-pulse',
     focus: 'Bring every wound — body, mind and heart — before the Healer. Pray healing over yourself, your loved ones and your memories.',
     verse: 'He healeth the broken in heart, and bindeth up their wounds.',
     verseRef: 'Psalm 147:3',
@@ -339,7 +339,7 @@ PD_CONTENT.WEEKLY_CHALLENGES = [
   {
     id: 'chal-gratitude',
     title: 'The Week of Gratitude',
-    icon: 'fa-star',
+    icon: 'pd-i-star',
     focus: 'Cultivate a heart of thanks. Gratitude is the language of heaven — the more you thank God, the more you see His hand.',
     verse: 'In every thing give thanks: for this is the will of God in Christ Jesus concerning you.',
     verseRef: '1 Thessalonians 5:18',
@@ -356,7 +356,7 @@ PD_CONTENT.WEEKLY_CHALLENGES = [
   {
     id: 'chal-humility',
     title: 'The Week of Humility',
-    icon: 'fa-person-praying',
+    icon: 'pd-i-hands-praying',
     focus: 'Bow low so God can lift you high. This week, practise humility before God and before people.',
     verse: 'Humble yourselves in the sight of the Lord, and he shall lift you up.',
     verseRef: 'James 4:10',
@@ -373,7 +373,7 @@ PD_CONTENT.WEEKLY_CHALLENGES = [
   {
     id: 'chal-awakening',
     title: 'The Week of Awakening',
-    icon: 'fa-fire',
+    icon: 'pd-i-flame',
     focus: 'Ask the Lord to rekindle your first love. Pray for personal revival and for a spiritual awakening across your community.',
     verse: 'Will thou not revive us again: that thy people may rejoice in thee?',
     verseRef: 'Psalm 85:6',
@@ -390,7 +390,7 @@ PD_CONTENT.WEEKLY_CHALLENGES = [
   {
     id: 'chal-soulwinning',
     title: 'The Week of the Harvest',
-    icon: 'fa-seedling',
+    icon: 'pd-i-sprout',
     focus: 'Pray for souls. Intercede for the lost, pray for boldness to witness, and look for one open door to share your faith.',
     verse: 'The harvest truly is plenteous, but the labourers are few; Pray ye therefore the Lord of the harvest, that he will send forth labourers into his harvest.',
     verseRef: 'Matthew 9:37-38',

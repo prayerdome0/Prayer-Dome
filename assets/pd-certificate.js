@@ -334,9 +334,9 @@
     btn.addEventListener('click', function () {
       if (btn.disabled) return;
       btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Preparing…';
+      btn.innerHTML = '<i class="pd-i pd-i-loader-circle pd-i-spin"></i> Preparing…';
       return download(opts).then(function () {
-        btn.innerHTML = '<i class="fas fa-check"></i> Downloaded';
+        btn.innerHTML = '<i class="pd-i pd-i-check"></i> Downloaded';
         setTimeout(function () { btn.innerHTML = original; btn.disabled = false; }, 2200);
         // Optional tracking hook (e.g. bump the download counter in Firestore)
         if (typeof opts.onDownload === 'function') {

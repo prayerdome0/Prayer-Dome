@@ -125,7 +125,8 @@
     </script>
     <!-- PD-SEO:END -->
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/pd-icons.css">
+    <script src="/assets/pd-icons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -277,9 +278,9 @@
         .level-badge.completed { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); border-color: var(--accent-green); color: white; animation: completedPulse 0.5s ease; }
         @keyframes completedPulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
         .level-badge.locked { opacity: 0.4; cursor: not-allowed; background: var(--bg-card); position: relative; }
-        .level-badge.locked::after { content: '\f023'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; font-size: 0.8rem; top: 8px; right: 8px; opacity: 0.5; }
+        .level-badge.locked::after { content: ''; position: absolute; top: 8px; right: 8px; width: 0.8rem; height: 0.8rem; background-color: currentColor; -webkit-mask: var(--pd-icon-lock) center / contain no-repeat; mask: var(--pd-icon-lock) center / contain no-repeat; opacity: 0.5; }
         .level-badge.current { border: 3px solid var(--accent-gold); transform: scale(1.05); background: rgba(212, 175, 55, 0.15); color: var(--accent-gold); animation: pulseBorder 2s infinite; }
-        .level-badge.current::before { content: '▶'; position: absolute; top: -8px; left: -8px; font-size: 12px; color: var(--accent-gold); }
+        .level-badge.current::before { content: ''; position: absolute; top: -8px; left: -8px; width: 12px; height: 12px; background-color: var(--accent-gold); -webkit-mask: var(--pd-icon-play-fill) center / contain no-repeat; mask: var(--pd-icon-play-fill) center / contain no-repeat; }
 
         @keyframes pulseBorder { 0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); } 50% { box-shadow: 0 0 0 8px rgba(212, 175, 55, 0); } }
 
@@ -548,6 +549,10 @@
             .option-btn { padding: 15px; font-size: 0.9rem; }
             .option-letter { width: 32px; height: 32px; font-size: 0.9rem; }
         }
+        /* Dark mode: brand blue (#0A4D9B) is about 2:1 on navy, so headings and icons use the
+           light brand tint (#93c5fd) and controls without a colour get readable text. */
+        .quiz-accent { color: var(--accent-green); }
+        body.dark-mode .quiz-accent { color: #93c5fd; }
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
@@ -578,7 +583,7 @@
                 <p>BIBLE QUIZ</p>
             </div>
         </div>
-        <button class="theme-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+        <button class="theme-btn" onclick="toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>
     </header>
 
     <div class="toast-container" id="toastContainer"></div>
@@ -588,12 +593,12 @@
         <!-- Stats Bar -->
         <div class="stats-bar glass-card">
             <div class="score-display">
-                <div class="score-box"><i class="fas fa-star"></i> <span id="totalScore">0</span> Pts</div>
-                <div class="level-box"><i class="fas fa-map-marker-alt"></i> Level <span id="currentLevelDisplay">1</span>/<span id="totalLevelsDisplay">7</span></div>
-                <div class="streak-counter" id="streakCounter"><i class="fas fa-fire"></i> Streak: 0</div>
+                <div class="score-box"><i class="pd-i pd-i-star"></i> <span id="totalScore">0</span> Pts</div>
+                <div class="level-box"><i class="pd-i pd-i-map-pin"></i> Level <span id="currentLevelDisplay">1</span>/<span id="totalLevelsDisplay">7</span></div>
+                <div class="streak-counter" id="streakCounter"><i class="pd-i pd-i-flame"></i> Streak: 0</div>
             </div>
             <button class="btn-modern" style="padding: 10px 20px; font-size: 0.85rem; background: var(--bg-primary); color: var(--text-main); border: 1px solid var(--border-color); box-shadow: none;" onclick="resetProgress()">
-                <i class="fas fa-redo-alt"></i> Reset
+                <i class="pd-i pd-i-rotate-cw"></i> Reset
             </button>
         </div>
 
@@ -601,17 +606,17 @@
         <section class="pd-acad-card" style="margin-bottom:26px">
             <div class="pd-acad-section-head" style="margin-top:0">
                 <div>
-                    <h2 style="font-family:Playfair Display,serif;color:var(--accent-green)"><i class="fas fa-graduation-cap"></i> Teaching Quizzes & Certificates</h2>
+                    <h2 class="quiz-accent" style="font-family:Playfair Display,serif"><i class="pd-i pd-i-graduation-cap"></i> Teaching Quizzes & Certificates</h2>
                     <p>Complete a lesson in the Academy, then pass its 6-question quiz with 80% or higher to unlock a printable certificate.</p>
                 </div>
-                <a class="btn-modern" href="/lessons.html" style="background:var(--accent-green);color:white"><i class="fas fa-book-open"></i> Open Lessons</a>
+                <a class="btn-modern" href="/lessons.html" style="background:var(--accent-green);color:white"><i class="pd-i pd-i-book-open"></i> Open Lessons</a>
             </div>
             <div id="academyQuizGrid" class="pd-acad-grid pd-acad-grid-3"></div>
         </section>
 
         <!-- Level Map Grid -->
         <div id="levelMap" style="display: block;">
-            <h2 style="margin-bottom: 20px; color: var(--accent-green); font-weight: 800; font-family: 'Playfair Display', serif;"><i class="fas fa-map-signs"></i> Journey Map</h2>
+            <h2 class="quiz-accent" style="margin-bottom: 20px; font-weight: 800; font-family: 'Playfair Display', serif;"><i class="pd-i pd-i-signpost"></i> Journey Map</h2>
             <div class="level-grid" id="levelGrid"></div>
         </div>
 
@@ -619,15 +624,15 @@
         <div class="glass-card" id="quizActiveScreen" style="display: none;">
             <div class="quiz-top-bar">
                 <div style="font-weight: 800; color: var(--accent-gold); font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
-                    <i class="fas fa-question-circle"></i> Question <span id="qCurrent">1</span>/<span id="qTotal">10</span>
+                    <i class="pd-i pd-i-circle-question-mark"></i> Question <span id="qCurrent">1</span>/<span id="qTotal">10</span>
                 </div>
                 <div class="powerups-container">
                     <button class="powerup-btn" id="btnFifty" onclick="useFiftyFifty()" title="50/50 Lifeline">
-                        <i class="fas fa-magic"></i>
+                        <i class="pd-i pd-i-wand-sparkles"></i>
                         <span class="powerup-count" id="countFifty">3</span>
                     </button>
                     <button class="powerup-btn" id="btnFreeze" onclick="useFreezeTime()" title="Freeze Time" style="color: var(--accent-purple); border-color: var(--accent-purple);">
-                        <i class="fas fa-snowflake"></i>
+                        <i class="pd-i pd-i-snowflake"></i>
                         <span class="powerup-count" id="countFreeze" style="background: var(--accent-purple);">3</span>
                     </button>
                 </div>
@@ -642,7 +647,7 @@
 
             <div style="text-align: right; margin-top: 30px;">
                 <button class="btn-modern" id="nextBtn" onclick="nextQuestion()" disabled style="width: 100%; max-width: 300px;">
-                    Next Question <i class="fas fa-arrow-right"></i>
+                    Next Question <i class="pd-i pd-i-arrow-right"></i>
                 </button>
             </div>
         </div>
@@ -650,11 +655,11 @@
         <!-- Leaderboard -->
         <div class="leaderboard-card" id="leaderboardSection">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h2 style="color: var(--accent-gold); font-weight: 800; font-family: 'Playfair Display', serif;"><i class="fas fa-globe"></i> Global Top 10</h2>
-                <button class="btn-modern" style="padding: 8px 16px; font-size: 0.8rem; background: var(--bg-primary); color: var(--text-main); border: 1px solid var(--border-color); box-shadow: none;" onclick="loadLeaderboard()"><i class="fas fa-sync-alt"></i></button>
+                <h2 style="color: var(--accent-gold); font-weight: 800; font-family: 'Playfair Display', serif;"><i class="pd-i pd-i-globe"></i> Global Top 10</h2>
+                <button class="btn-modern" style="padding: 8px 16px; font-size: 0.8rem; background: var(--bg-primary); color: var(--text-main); border: 1px solid var(--border-color); box-shadow: none;" onclick="loadLeaderboard()" aria-label="Refresh leaderboard"><i class="pd-i pd-i-refresh-cw"></i></button>
             </div>
             <div id="leaderboardList">
-                <div style="text-align: center; padding: 30px;"><i class="fas fa-spinner fa-spin" style="font-size: 30px; color: var(--accent-green);"></i></div>
+                <div class="quiz-accent" style="text-align: center; padding: 30px;"><i class="pd-i pd-i-loader-circle pd-i-spin" style="font-size: 30px;"></i></div>
             </div>
         </div>
     </div>
@@ -664,15 +669,15 @@
         <div class="modal-content">
             <div class="trophy-container">
                 <div class="trophy-glow"></div>
-                <i class="fas fa-trophy trophy-icon" id="modalIcon"></i>
+                <i class="pd-i pd-i-trophy trophy-icon" id="modalIcon"></i>
             </div>
             <h1 style="font-family: 'Inter', sans-serif; font-size: 2.2rem; color: var(--accent-green); margin-bottom: 10px;" id="modalTitle">LEVEL CLEARED!</h1>
             <p style="font-size: 1.1rem; margin-bottom: 5px; color: var(--text-main);">Score: <strong style="color: var(--accent-gold); font-size: 1.8rem;" id="modalScore">0</strong></p>
             <p style="color: var(--text-sub); margin-bottom: 30px; font-weight: 500;" id="modalSubtitle">Great job! You unlocked the next level.</p>
             
             <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <button class="btn-modern" id="modalActionBtn" onclick="continueToMap()" style="flex: 1; min-width: 150px;">Continue <i class="fas fa-map-marked-alt"></i></button>
-                <button class="btn-modern" style="background: var(--bg-primary); color: var(--text-main); border: 2px solid var(--border-color); flex: 1; min-width: 150px; box-shadow: none;" onclick="retryLevel()"><i class="fas fa-redo-alt"></i> Retry</button>
+                <button class="btn-modern" id="modalActionBtn" onclick="continueToMap()" style="flex: 1; min-width: 150px;">Continue <i class="pd-i pd-i-map-pinned"></i></button>
+                <button class="btn-modern" style="background: var(--bg-primary); color: var(--text-main); border: 2px solid var(--border-color); flex: 1; min-width: 150px; box-shadow: none;" onclick="retryLevel()"><i class="pd-i pd-i-rotate-cw"></i> Retry</button>
             </div>
         </div>
     </div>
@@ -686,10 +691,10 @@
                     <h2 id="academyModalTitle" style="font-family:Playfair Display,serif;color:var(--accent-green);margin:10px 0">Quiz</h2>
                     <p style="color:var(--text-sub)" id="academyModalDesc"></p>
                 </div>
-                <button class="btn-modern" style="padding:8px 12px;background:var(--bg-primary);color:var(--text-main);border:1px solid var(--border-color);box-shadow:none" onclick="closeAcademyQuiz()"><i class="fas fa-times"></i></button>
+                <button class="btn-modern" style="padding:8px 12px;background:var(--bg-primary);color:var(--text-main);border:1px solid var(--border-color);box-shadow:none" onclick="closeAcademyQuiz()" aria-label="Close"><i class="pd-i pd-i-x"></i></button>
             </div>
             <div id="academyModalQuestions"></div>
-            <button class="btn-modern" style="width:100%;margin-top:16px;background:linear-gradient(135deg,var(--accent-green),var(--accent-gold));color:white" onclick="submitAcademyModalQuiz()"><i class="fas fa-certificate"></i> Submit for Certificate</button>
+            <button class="btn-modern" style="width:100%;margin-top:16px;background:linear-gradient(135deg,var(--accent-green),var(--accent-gold));color:white" onclick="submitAcademyModalQuiz()"><i class="pd-i pd-i-badge-check"></i> Submit for Certificate</button>
             <div id="academyModalResult"></div>
         </div>
     </div>
@@ -906,7 +911,7 @@
                 const isCurrent = i === userProgress.currentLevel;
                 const div = document.createElement('div');
                 div.className = `level-badge ${isCompleted ? 'completed' : ''} ${!isUnlocked ? 'locked' : ''} ${isCurrent ? 'current' : ''}`;
-                div.innerHTML = isCompleted ? '<i class="fas fa-check" style="font-size: 16px;"></i>' : i;
+                div.innerHTML = isCompleted ? '<i class="pd-i pd-i-check" style="font-size: 16px;"></i>' : i;
                 if (isUnlocked) div.onclick = () => startLevel(i);
                 grid.appendChild(div);
             }
@@ -1043,9 +1048,9 @@
             mScore.innerText = scoreInLevel;
             
             if (passed) {
-                mTitle.innerText = "LEVEL CLEARED! 🎉";
+                mTitle.innerText = "LEVEL CLEARED!";
                 mTitle.style.color = "var(--accent-green)";
-                mIcon.className = "fas fa-trophy trophy-icon";
+                mIcon.className = "pd-i pd-i-trophy trophy-icon";
                 mIcon.style.color = "var(--accent-gold)";
                 mSub.innerText = "Awesome job! You unlocked the next level.";
                 actionBtn.style.display = "inline-flex";
@@ -1060,9 +1065,9 @@
                 }
                 saveProgress();
             } else {
-                mTitle.innerText = "LEVEL FAILED 😢";
+                mTitle.innerText = "LEVEL FAILED";
                 mTitle.style.color = "var(--accent-red)";
-                mIcon.className = "fas fa-heart-broken trophy-icon";
+                mIcon.className = "pd-i pd-i-heart-crack trophy-icon";
                 mIcon.style.color = "var(--accent-red)";
                 mSub.innerText = `You need ${Math.ceil(passScore)} points to pass. Try again!`;
                 actionBtn.style.display = "none";
@@ -1098,7 +1103,7 @@
                     hiddenCount++;
                 }
             }
-            showToast('✨ 50/50 Applied! Two wrong options removed.', 'success');
+            showToast('50/50 Applied! Two wrong options removed.', 'success');
         };
 
         window.useFreezeTime = function() {
@@ -1108,7 +1113,7 @@
             if (powerups.freeze === 0) document.getElementById('btnFreeze').disabled = true;
             timeFrozen = true;
             document.getElementById('timerFill').style.background = 'var(--accent-purple)';
-            showToast('❄️ Timer Frozen for 5 seconds!', 'success');
+            showToast('Timer Frozen for 5 seconds!', 'success');
             setTimeout(() => {
                 timeFrozen = false;
                 document.getElementById('timerFill').style.background = '';
@@ -1117,7 +1122,7 @@
 
         function updateStreakUI() {
             const el = document.getElementById('streakCounter');
-            el.innerHTML = `<i class="fas fa-fire"></i> Streak: ${streak}`;
+            el.innerHTML = `<i class="pd-i pd-i-flame"></i> Streak: ${streak}`;
             if (streak >= 3) el.classList.add('on-fire');
             else el.classList.remove('on-fire');
         }
@@ -1136,7 +1141,7 @@
 
         async function loadLeaderboard() {
             const list = document.getElementById('leaderboardList');
-            list.innerHTML = '<div style="text-align: center; padding: 30px;"><i class="fas fa-spinner fa-spin" style="font-size: 30px; color: var(--accent-green);"></i></div>';
+            list.innerHTML = '<div class="quiz-accent" style="text-align: center; padding: 30px;"><i class="pd-i pd-i-loader-circle pd-i-spin" style="font-size: 30px;"></i></div>';
             try {
                 const q = query(collection(db, "userQuiz"), orderBy("totalScore", "desc"), limit(10));
                 const snap = await getDocs(q);
@@ -1158,7 +1163,7 @@
                         <div class="lb-item">
                             <div style="display:flex; align-items:center; gap: 15px;">
                                 <span class="lb-rank">#${rank}</span>
-                                <span style="font-weight: 600; color:var(--text-main);"><i class="fas fa-user-circle"></i> ${escapeHtml(name.split(' ')[0])}</span>
+                                <span style="font-weight: 600; color:var(--text-main);"><i class="pd-i pd-i-circle-user"></i> ${escapeHtml(name.split(' ')[0])}</span>
                             </div>
                             <div class="lb-score">${data.totalScore} pts</div>
                         </div>
@@ -1184,7 +1189,7 @@
             if (!cont) return;
             const t = document.createElement('div');
             t.className = `toast ${type === 'error' ? 'error' : ''}`;
-            t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i> ${msg}`;
+            t.innerHTML = `<i class="pd-i ${type === 'success' ? 'pd-i-circle-check' : 'pd-i-info'}"></i> ${msg}`;
             cont.appendChild(t);
             setTimeout(() => {
                 t.style.opacity = '0';
@@ -1195,11 +1200,11 @@
 
         window.toggleDarkMode = function() {
             document.body.classList.toggle('dark-mode');
-            showToast(document.body.classList.contains('dark-mode') ? 'Dark Mode ON 🌙' : 'Light Mode ON ☀️');
+            showToast(document.body.classList.contains('dark-mode') ? 'Dark Mode ON' : 'Light Mode ON');
         };
 
         window.resetProgress = function() {
-            if (confirm('⚠️ RESET ALL PROGRESS ⚠️\n\nAre you sure? All your scores, completed levels, and total points will be permanently lost!')) {
+            if (confirm('RESET ALL PROGRESS\n\nAre you sure? All your scores, completed levels, and total points will be permanently lost!')) {
                 userProgress = {
                     completedLevels: [],
                     currentLevel: 1,
@@ -1251,7 +1256,7 @@
             root.innerHTML=PD_ACADEMY.DATA.quizzes.map(q=>{
                 const lesson=PD_ACADEMY.getLesson(q.lessonId); const passed=progress.passedQuizzes && progress.passedQuizzes[q.id];
                 return `<button class="pd-acad-card pd-lift" onclick="openAcademyQuiz('${q.id}')" style="text-align:left;cursor:pointer">
-                    <div class="pd-acad-icon gold"><i class="fas ${passed?'fa-certificate':'fa-star'}"></i></div>
+                    <div class="pd-acad-icon gold"><i class="pd-i ${passed?'pd-i-badge-check':'pd-i-star'}"></i></div>
                     <h3>${q.title}</h3><p>${q.track} · 5 questions each attempt · Pass 80%</p>
                     <div class="pd-acad-meta"><span class="pd-acad-chip ${passed?'gold':''}">${passed?'Certificate earned':'Ready to take'}</span>${lesson?`<span class="pd-acad-chip">${lesson.minutes} min lesson</span>`:''}</div>
                 </button>`;
@@ -1307,7 +1312,7 @@
                     }, { merge: true }).catch(() => {});
                 }
                 const nextLesson = lesson && lesson.nextLessonId ? PD_ACADEMY.getLesson(lesson.nextLessonId) : null;
-                result.innerHTML=`<div class="pd-acad-cert"><img class="pd-acad-cert-logo" src="/assets/logo.png" alt="Prayer Dome logo"><span class="pd-acad-cert-brand">Prayer Dome Academy</span><h3>Certificate of Completion</h3><p>This certifies that</p><div class="name">${escapeAcademyHtml(academyName())}</div><p>has completed</p><h3 class="cert-course">${q.title}</h3><p class="cert-meta">Score: ${percent}% · Certificate ID: ${certId}</p><p class="pd-acad-cert-verse">“He does everything blamelessly.” — Mark 7:37</p><div class="pd-acad-cert-foot"><div class="pd-acad-cert-sign"><span class="sig">Prayer Dome</span><em>Ministry Team</em></div><div class="pd-acad-cert-seal"><i class="fas fa-award"></i></div></div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn-modern no-print" id="academyModalDownloadCert" style="background:linear-gradient(135deg,var(--accent-green),var(--accent-gold));color:#fff"><i class="fas fa-download"></i> Download Certificate</button><button class="btn-modern no-print" onclick="window.print()" style="background:var(--accent-gold);color:#1f2937"><i class="fas fa-print"></i> Print / Save</button>${nextLesson?`<a class="btn-modern no-print" href="/lessons#lesson/${encodeURIComponent(nextLesson.id)}" style="background:var(--accent-blue);color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:8px"><i class="fas fa-arrow-right"></i> Next lesson: ${escapeAcademyHtml(nextLesson.title)}</a>`:''}</div></div>`;
+                result.innerHTML=`<div class="pd-acad-cert"><img class="pd-acad-cert-logo" src="/assets/logo.png" alt="Prayer Dome logo"><span class="pd-acad-cert-brand">Prayer Dome Academy</span><h3>Certificate of Completion</h3><p>This certifies that</p><div class="name">${escapeAcademyHtml(academyName())}</div><p>has completed</p><h3 class="cert-course">${q.title}</h3><p class="cert-meta">Score: ${percent}% · Certificate ID: ${certId}</p><p class="pd-acad-cert-verse">“He does everything blamelessly.” — Mark 7:37</p><div class="pd-acad-cert-foot"><div class="pd-acad-cert-sign"><span class="sig">Prayer Dome</span><em>Ministry Team</em></div><div class="pd-acad-cert-seal"><i class="pd-i pd-i-award"></i></div></div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn-modern no-print" id="academyModalDownloadCert" style="background:linear-gradient(135deg,var(--accent-green),var(--accent-gold));color:#fff"><i class="pd-i pd-i-download"></i> Download Certificate</button><button class="btn-modern no-print" onclick="window.print()" style="background:var(--accent-gold);color:#1f2937"><i class="pd-i pd-i-printer"></i> Print / Save</button>${nextLesson?`<a class="btn-modern no-print" href="/lessons#lesson/${encodeURIComponent(nextLesson.id)}" style="background:var(--accent-blue);color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:8px"><i class="pd-i pd-i-arrow-right"></i> Next lesson: ${escapeAcademyHtml(nextLesson.title)}</a>`:''}</div></div>`;
                 const pdCertDl=document.getElementById('academyModalDownloadCert');
                 if(pdCertDl){
                     if(window.PDCertificate){
@@ -1322,12 +1327,12 @@
                     } else { pdCertDl.style.display='none'; }
                 }
             } else {
-                result.innerHTML=`<div class="pd-acad-callout"><strong>Try again.</strong> You scored ${percent}%. Review the linked lesson and aim for 80% or higher. The questions change each time you retake.</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px"><button class="btn-modern" onclick="openAcademyQuiz('${q.id}')" style="background:var(--accent-blue);color:#fff"><i class="fas fa-redo"></i> Retake Quiz</button></div>`;
+                result.innerHTML=`<div class="pd-acad-callout"><strong>Try again.</strong> You scored ${percent}%. Review the linked lesson and aim for 80% or higher. The questions change each time you retake.</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px"><button class="btn-modern" onclick="openAcademyQuiz('${q.id}')" style="background:var(--accent-blue);color:#fff"><i class="pd-i pd-i-rotate-cw"></i> Retake Quiz</button></div>`;
             }
         };
         document.addEventListener('DOMContentLoaded', renderAcademyQuizzes);
 
-        console.log('✅ Prayer Dome Quiz v2 - 30 Levels, Unique Questions, Randomized Answers!');
+        console.log('Prayer Dome Quiz v2 - 30 Levels, Unique Questions, Randomized Answers!');
     </script>
 </body>
 </html>

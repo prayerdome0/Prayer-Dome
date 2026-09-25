@@ -125,7 +125,8 @@
     </script>
     <!-- PD-SEO:END -->
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/pd-icons.css">
+    <script src="/assets/pd-icons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -350,10 +351,11 @@
             font-family: 'Playfair Display', serif;
             font-weight: 700;
         }
-        .room-search { padding: 12px 16px 8px; }
+        .room-search { padding: 12px 16px 8px; position: relative; }
+        .room-search-icon { position: absolute; left: 31px; top: calc(50% + 2px); transform: translateY(-50%); color: var(--text-sub); font-size: .9rem; pointer-events: none; }
         .room-search input {
             width: 100%;
-            padding: 11px 16px;
+            padding: 11px 16px 11px 40px;
             border-radius: 28px;
             border: 1px solid var(--border-color);
             background: var(--bg-primary);
@@ -419,6 +421,7 @@
             align-items: center;
             justify-content: center;
             font-size: 1.1rem;
+            color: #fff;
             flex-shrink: 0;
             position: relative;
             transition: transform 0.35s var(--ease-spring), box-shadow 0.3s;
@@ -428,6 +431,8 @@
             transform: scale(1.1) rotate(-6deg); 
             box-shadow: 0 6px 16px rgba(10,77,155,0.3);
         }
+        .online-pill { display: inline-flex; align-items: center; gap: 3px; color: #22c55e; font-size: .62rem; font-weight: 700; }
+        .online-pill .pd-i { font-size: .5rem; }
         .online-dot {
             position: absolute;
             bottom: 2px;
@@ -761,7 +766,8 @@
             height: 46px;
             font-size: 1rem;
             cursor: pointer;
-            color: var(--accent-gold);
+            /* Deep gold: bright gold is under 2:1 on the light composer (icon-only controls need 3:1). */
+            color: var(--pd-gold-deep, #a67c00);
             transition: transform 0.35s var(--ease-spring), background 0.25s, color 0.25s, box-shadow 0.3s, scale 0.2s;
             flex-shrink: 0;
             position: relative;
@@ -1017,8 +1023,8 @@
         }
         .settings-item:last-child { border-bottom: none; }
         .settings-item:hover { background: rgba(59,130,246, 0.05); padding-left: 8px; }
-        .settings-item .fa-chevron-right { font-size: 0.68rem; color: var(--text-sub); transition: transform 0.25s var(--ease-spring), color 0.2s; }
-        .settings-item:hover .fa-chevron-right { transform: translateX(3px); color: var(--accent-green); }
+        .settings-item .pd-i-chevron-right { font-size: 0.68rem; color: var(--text-sub); transition: transform 0.25s var(--ease-spring), color 0.2s; }
+        .settings-item:hover .pd-i-chevron-right { transform: translateX(3px); color: var(--accent-green); }
         .settings-item-left { display: flex; align-items: center; gap: 12px; }
         .settings-icon {
             width: 34px;
@@ -1276,6 +1282,10 @@
                 transition-duration: 0.01ms !important;
             }
         }
+        /* Dark mode: brand blue (#0A4D9B) is about 2:1 on navy, so headings and icons use the
+           light brand tint (#93c5fd) and controls without a colour get readable text. */
+        body.dark-mode .christian-btn:not(.gold):not(:hover) { color: #93c5fd; }
+        body.dark-mode .media-btn { color: var(--accent-gold); }
 </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
@@ -1291,7 +1301,7 @@
 
     <header class="chat-header">
         <div style="display: flex; align-items: center; gap: 15px;">
-            <button class="header-btn" id="sidebarToggle" style="display: none;"><i class="fas fa-bars"></i></button>
+            <button class="header-btn" id="sidebarToggle" style="display: none;" aria-label="Open menu"><i class="pd-i pd-i-menu"></i></button>
             <div class="logo-area" onclick="window.location.href='index.html'">
                 <div class="logo-ring">
                     <img src="/assets/logo.png" alt="Logo">
@@ -1303,17 +1313,17 @@
             </div>
         </div>
         <div class="header-actions">
-            <a href="index.html" class="header-btn"><i class="fas fa-home"></i></a>
-            <button class="header-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+            <a href="index.html" class="header-btn" aria-label="Home"><i class="pd-i pd-i-house"></i></a>
+            <button class="header-btn" onclick="toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>
         </div>
     </header>
     
     <!-- Main Tabs -->
     <div class="main-tabs">
-        <button class="main-tab active" onclick="switchMainTab('chats')"><i class="fas fa-comments"></i><span> Chats</span><span id="chatsBadge" class="room-badge" style="display:none;margin-left:6px;font-size:.6rem;">0</span></button>
-        <button class="main-tab" onclick="switchMainTab('status')"><i class="fas fa-circle-notch"></i><span> Status</span></button>
-        <button class="main-tab" onclick="switchMainTab('calls')"><i class="fas fa-phone"></i><span> Calls</span><span id="callsBadge" class="room-badge" style="display:none;margin-left:6px;font-size:.6rem;background:#ef4444;">•</span></button>
-        <button class="main-tab" onclick="switchMainTab('settings')"><i class="fas fa-cog"></i><span> Settings</span></button>
+        <button class="main-tab active" onclick="switchMainTab('chats')"><i class="pd-i pd-i-messages-square"></i><span> Chats</span><span id="chatsBadge" class="room-badge" style="display:none;margin-left:6px;font-size:.6rem;">0</span></button>
+        <button class="main-tab" onclick="switchMainTab('status')"><i class="pd-i pd-i-circle-dashed"></i><span> Status</span></button>
+        <button class="main-tab" onclick="switchMainTab('calls')"><i class="pd-i pd-i-phone"></i><span> Calls</span><span id="callsBadge" class="room-badge" style="display:none;margin-left:6px;font-size:.6rem;background:#ef4444;">•</span></button>
+        <button class="main-tab" onclick="switchMainTab('settings')"><i class="pd-i pd-i-settings"></i><span> Settings</span></button>
     </div>
     
     <!-- CHATS TAB -->
@@ -1321,18 +1331,19 @@
         <div class="chats-container">
             <div class="rooms-sidebar" id="roomsSidebar">
                 <div class="rooms-header">
-                    <h3><i class="fas fa-comment-dots"></i> Conversations</h3>
+                    <h3><i class="pd-i pd-i-message-circle-more"></i> Conversations</h3>
                     <div style="display:flex;gap:8px;margin-top:10px;">
-                        <button class="header-btn" style="flex:1;" onclick="startPrivateChat()"><i class="fas fa-user-plus"></i> New Chat</button>
-                        <button class="header-btn" style="flex:1;background:var(--grad-lux);color:#fff;border:none;" onclick="openCreateGroupModal()"><i class="fas fa-users"></i> New Group</button>
+                        <button class="header-btn" style="flex:1;" onclick="startPrivateChat()"><i class="pd-i pd-i-user-plus"></i> New Chat</button>
+                        <button class="header-btn" style="flex:1;background:var(--grad-lux);color:#fff;border:none;" onclick="openCreateGroupModal()"><i class="pd-i pd-i-users"></i> New Group</button>
                     </div>
                     <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
-                        <button class="christian-btn" style="flex:1;justify-content:center;" onclick="joinPresetGroup('prayer')"><i class="fas fa-pray"></i> Prayer Requests</button>
-                        <button class="christian-btn" style="flex:1;justify-content:center;" onclick="joinPresetGroup('bible')"><i class="fas fa-book-bible"></i> Bible Study</button>
+                        <button class="christian-btn" style="flex:1;justify-content:center;" onclick="joinPresetGroup('prayer')"><i class="pd-i pd-i-hands-praying"></i> Prayer Requests</button>
+                        <button class="christian-btn" style="flex:1;justify-content:center;" onclick="joinPresetGroup('bible')"><i class="pd-i pd-i-book"></i> Bible Study</button>
                     </div>
                 </div>
                 <div class="room-search">
-                    <input type="text" id="roomSearch" placeholder="🔍 Search rooms or people..." onkeyup="filterRooms()">
+                    <i class="pd-i pd-i-search room-search-icon" aria-hidden="true"></i>
+                    <input type="text" id="roomSearch" placeholder="Search rooms or people..." aria-label="Search rooms or people" onkeyup="filterRooms()">
                 </div>
                 <div class="room-list" id="roomList"></div>
             </div>
@@ -1340,19 +1351,19 @@
             <div class="chat-area">
                 <div class="chat-area-header" id="chatAreaHeader" onclick="openGroupInfo()" style="cursor:pointer;">
                     <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
-                        <div class="room-avatar" id="headerAvatar" style="width:38px;height:38px;font-size:.95rem;">🌍</div>
+                        <div class="room-avatar" id="headerAvatar" style="width:38px;height:38px;font-size:.95rem;"><i class="pd-i pd-i-globe" aria-hidden="true"></i></div>
                         <div class="chat-area-title" style="flex:1;min-width:0;">
-                            <h2 id="currentRoomName" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">🌍 General Fellowship</h2>
+                            <h2 id="currentRoomName" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">General Fellowship</h2>
                             <p id="currentRoomDesc" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Welcome all believers - share encouragement and prayer</p>
                             <p id="currentRoomOnline" class="last-seen" style="display:none;"></p>
                         </div>
                     </div>
-                    <div class="chat-actions" id="chatActions" onclick="event.stopPropagation()"><button class="header-btn" title="Voice call" onclick="startCall(false)"><i class="fas fa-phone"></i></button><button class="header-btn" title="Video call" onclick="startCall(true)"><i class="fas fa-video"></i></button><button class="header-btn" title="Group info" onclick="openGroupInfo()"><i class="fas fa-ellipsis-v"></i></button></div>
+                    <div class="chat-actions" id="chatActions" onclick="event.stopPropagation()"><button class="header-btn" title="Voice call" onclick="startCall(false)"><i class="pd-i pd-i-phone"></i></button><button class="header-btn" title="Video call" onclick="startCall(true)"><i class="pd-i pd-i-video"></i></button><button class="header-btn" title="Group info" onclick="openGroupInfo()"><i class="pd-i pd-i-ellipsis-vertical"></i></button></div>
                 </div>
                 
                 <div class="messages-area" id="messagesArea">
                     <div style="text-align: center; padding: 36px;">
-                        <i class="fas fa-comments" style="font-size: 34px; opacity: 0.3;"></i>
+                        <i class="pd-i pd-i-messages-square" style="font-size: 34px; opacity: 0.3;"></i>
                         <p style="font-size: 0.8rem;">Select a conversation to start chatting</p>
                     </div>
                 </div>
@@ -1362,43 +1373,43 @@
                 </div>
                 
                 <div class="christian-bar" id="christianBar">
-                    <button class="christian-btn gold" onclick="sharePrayerRequest()"><i class="fas fa-praying-hands"></i> Prayer Request</button>
-                    <button class="christian-btn" onclick="shareBibleVerse()"><i class="fas fa-book-bible"></i> Bible Verse</button>
-                    <button class="christian-btn" onclick="shareTestimony()"><i class="fas fa-star"></i> Testimony</button>
-                    <button class="christian-btn gold" onclick="shareDevotional()"><i class="fas fa-book-open"></i> Devotional</button>
-                    <button class="christian-btn" onclick="shareContact()"><i class="fas fa-address-card"></i> Contact</button>
-                    <button class="christian-btn" onclick="shareLocation()"><i class="fas fa-map-marker-alt"></i> Location</button>
+                    <button class="christian-btn gold" onclick="sharePrayerRequest()"><i class="pd-i pd-i-hands-praying"></i> Prayer Request</button>
+                    <button class="christian-btn" onclick="shareBibleVerse()"><i class="pd-i pd-i-book"></i> Bible Verse</button>
+                    <button class="christian-btn" onclick="shareTestimony()"><i class="pd-i pd-i-star"></i> Testimony</button>
+                    <button class="christian-btn gold" onclick="shareDevotional()"><i class="pd-i pd-i-book-open"></i> Devotional</button>
+                    <button class="christian-btn" onclick="shareContact()"><i class="pd-i pd-i-contact"></i> Contact</button>
+                    <button class="christian-btn" onclick="shareLocation()"><i class="pd-i pd-i-map-pin"></i> Location</button>
                 </div>
                 <div class="chat-suggestions" id="chatSuggestions">
-                    <span class="suggestion-hint"><i class="fas fa-bolt"></i></span>
-                    <button class="suggestion-chip" onclick="sendSuggestion('Amen, God is good! 🙌')">Amen 🙌</button>
-                    <button class="suggestion-chip" onclick="sendSuggestion('God bless you and your family 🌿')">God bless you 🌿</button>
-                    <button class="suggestion-chip" onclick="sendSuggestion('I am praying for you today 🙏')">Praying for you 🙏</button>
-                    <button class="suggestion-chip" onclick="sendSuggestion('Welcome to the Prayer Dome family! 🕊️')">Welcome 🕊️</button>
-                    <button class="suggestion-chip" onclick="sendSuggestion('🙏 Prayer answered — Glory to God!')">Answered 🙏</button>
+                    <span class="suggestion-hint"><i class="pd-i pd-i-zap"></i></span>
+                    <button class="suggestion-chip" onclick="sendSuggestion('Amen, God is good!')"><i class="pd-i pd-i-hands-praying" aria-hidden="true"></i> Amen</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion('God bless you and your family')"><i class="pd-i pd-i-leaf" aria-hidden="true"></i> God bless you</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion('I am praying for you today')"><i class="pd-i pd-i-hand-heart" aria-hidden="true"></i> Praying for you</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion('Welcome to the Prayer Dome family!')"><i class="pd-i pd-i-bird" aria-hidden="true"></i> Welcome</button>
+                    <button class="suggestion-chip" onclick="sendSuggestion('Prayer answered — Glory to God!')"><i class="pd-i pd-i-sparkles" aria-hidden="true"></i> Answered</button>
                 </div>
                 <div class="chat-input-area" style="position:relative;">
                     <div class="attachment-menu" id="attachmentMenu">
-                        <div class="attachment-item" onclick="uploadPhoto();toggleAttachmentMenu()"><i class="fas fa-image" style="background:#25D366;"></i> Gallery</div>
-                        <div class="attachment-item" onclick="uploadVideo();toggleAttachmentMenu()"><i class="fas fa-video" style="background:#3b82f6;"></i> Video</div>
-                        <div class="attachment-item" onclick="uploadDocument();toggleAttachmentMenu()"><i class="fas fa-file-pdf" style="background:#ef4444;"></i> Document</div>
-                        <div class="attachment-item" onclick="uploadAudioFile();toggleAttachmentMenu()"><i class="fas fa-music" style="background:#8b5cf6;"></i> Audio</div>
-                        <div class="attachment-item" onclick="shareContact();toggleAttachmentMenu()"><i class="fas fa-address-card" style="background:#0A4D9B;"></i> Contact</div>
-                        <div class="attachment-item" onclick="shareLocation();toggleAttachmentMenu()"><i class="fas fa-map-marker-alt" style="background:#f59e0b;"></i> Location</div>
-                        <div class="attachment-item" onclick="shareBibleVerse();toggleAttachmentMenu()"><i class="fas fa-book-bible" style="background:#d4af37;"></i> Bible</div>
-                        <div class="attachment-item" onclick="createPoll();toggleAttachmentMenu()"><i class="fas fa-poll" style="background:#10b981;"></i> Poll</div>
+                        <div class="attachment-item" onclick="uploadPhoto();toggleAttachmentMenu()"><i class="pd-i pd-i-image" style="background:#25D366;"></i> Gallery</div>
+                        <div class="attachment-item" onclick="uploadVideo();toggleAttachmentMenu()"><i class="pd-i pd-i-video" style="background:#3b82f6;"></i> Video</div>
+                        <div class="attachment-item" onclick="uploadDocument();toggleAttachmentMenu()"><i class="pd-i pd-i-file-text" style="background:#ef4444;"></i> Document</div>
+                        <div class="attachment-item" onclick="uploadAudioFile();toggleAttachmentMenu()"><i class="pd-i pd-i-music" style="background:#8b5cf6;"></i> Audio</div>
+                        <div class="attachment-item" onclick="shareContact();toggleAttachmentMenu()"><i class="pd-i pd-i-contact" style="background:#0A4D9B;"></i> Contact</div>
+                        <div class="attachment-item" onclick="shareLocation();toggleAttachmentMenu()"><i class="pd-i pd-i-map-pin" style="background:#f59e0b;"></i> Location</div>
+                        <div class="attachment-item" onclick="shareBibleVerse();toggleAttachmentMenu()"><i class="pd-i pd-i-book" style="background:#d4af37;"></i> Bible</div>
+                        <div class="attachment-item" onclick="createPoll();toggleAttachmentMenu()"><i class="pd-i pd-i-chart-bar" style="background:#10b981;"></i> Poll</div>
                     </div>
-                    <div class="emoji-picker" id="emojiPicker">
+                    <div class="emoji-picker" id="emojiPicker" data-pd-emoji-keyboard aria-label="Insert emoji">
                         <button onclick="insertEmoji('😊')">😊</button><button onclick="insertEmoji('❤️')">❤️</button><button onclick="insertEmoji('🙏')">🙏</button><button onclick="insertEmoji('😇')">😇</button><button onclick="insertEmoji('✝️')">✝️</button><button onclick="insertEmoji('🕊️')">🕊️</button><button onclick="insertEmoji('🔥')">🔥</button><button onclick="insertEmoji('✨')">✨</button><button onclick="insertEmoji('🙌')">🙌</button><button onclick="insertEmoji('👋')">👋</button><button onclick="insertEmoji('😂')">😂</button><button onclick="insertEmoji('🥰')">🥰</button><button onclick="insertEmoji('😎')">😎</button><button onclick="insertEmoji('🤗')">🤗</button><button onclick="insertEmoji('💪')">💪</button><button onclick="insertEmoji('👍')">👍</button><button onclick="insertEmoji('🎉')">🎉</button><button onclick="insertEmoji('😢')">😢</button><button onclick="insertEmoji('🌿')">🌿</button><button onclick="insertEmoji('📖')">📖</button><button onclick="insertEmoji('⛪')">⛪</button><button onclick="insertEmoji('💒')">💒</button><button onclick="insertEmoji('🙇')">🙇</button><button onclick="insertEmoji('👏')">👏</button>
                     </div>
                     <div class="media-buttons">
-                        <button class="media-btn" onclick="toggleEmojiPicker()" title="Emoji" aria-label="Emoji"><i class="fas fa-smile"></i></button>
-                        <button class="media-btn" onclick="toggleAttachmentMenu()" title="Attach" aria-label="Attach"><i class="fas fa-paperclip"></i></button>
-                        <button class="media-btn" onclick="startVoiceRecording()" title="Voice Message" aria-label="Voice message"><i class="fas fa-microphone"></i></button>
+                        <button class="media-btn" onclick="toggleEmojiPicker()" title="Emoji" aria-label="Emoji"><i class="pd-i pd-i-face-slightly-smiling"></i></button>
+                        <button class="media-btn" onclick="toggleAttachmentMenu()" title="Attach" aria-label="Attach"><i class="pd-i pd-i-paperclip"></i></button>
+                        <button class="media-btn" onclick="startVoiceRecording()" title="Voice Message" aria-label="Voice message"><i class="pd-i pd-i-mic"></i></button>
                     </div>
                     <input type="text" id="messageInput" class="chat-input" placeholder="Type a message" autocomplete="off" maxlength="2000" onkeypress="if(event.key==='Enter') sendMessage()" oninput="onMessageInput()">
                     <button class="chat-send" id="chatSendBtn" onclick="sendMessage()" aria-label="Send message">
-                        <i class="fas fa-paper-plane"></i>
+                        <i class="pd-i pd-i-send"></i>
                         <span class="send-label">Send</span>
                     </button>
                 </div>
@@ -1410,20 +1421,20 @@
     <div id="tab-status" class="tab-content">
         <div class="status-container">
             <div class="my-status-card" onclick="addStatus()">
-                <div class="my-status-avatar"><i class="fas fa-plus"></i></div>
+                <div class="my-status-avatar"><i class="pd-i pd-i-plus"></i></div>
                 <div>
                     <h3>My Status</h3>
                     <p>Tap to add a photo, video or text that disappears in 24 hours</p>
                     <div class="status-stats" id="myStatusStats"></div>
                 </div>
-                <button class="header-btn" style="margin-left:auto;background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.3);" onclick="event.stopPropagation();addTextStatus()"><i class="fas fa-font"></i> Text</button>
+                <button class="header-btn" style="margin-left:auto;background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.3);" onclick="event.stopPropagation();addTextStatus()"><i class="pd-i pd-i-type"></i> Text</button>
             </div>
             
-            <h3 style="margin: 20px 0 10px;"><i class="fas fa-users"></i> Friends' Status</h3>
+            <h3 style="margin: 20px 0 10px;"><i class="pd-i pd-i-users"></i> Friends' Status</h3>
             <div id="statusGrid" class="status-grid">
                 <div style="text-align: center; grid-column: 1/-1; padding: 40px;">Loading statuses...</div>
             </div>
-            <p style="font-size:.68rem;color:var(--text-sub);margin-top:14px;text-align:center;"><i class="fas fa-lock"></i> Status updates disappear after 24 hours • Tap to view • Long-press to react • Swipe to reply</p>
+            <p style="font-size:.68rem;color:var(--text-sub);margin-top:14px;text-align:center;"><i class="pd-i pd-i-lock"></i> Status updates disappear after 24 hours • Tap to view • Long-press to react • Swipe to reply</p>
         </div>
     </div>
     <!-- CALLS TAB -->
@@ -1436,11 +1447,11 @@
                 <button class="calls-filter" onclick="filterCalls('outgoing')" id="filterOutgoing">Outgoing</button>
             </div>
             <div style="padding:14px;display:flex;gap:10px;">
-                <button class="header-btn" style="flex:1;background:var(--grad-main);color:#fff;border:none;" onclick="startPrivateChat()"><i class="fas fa-phone"></i> New Call</button>
-                <button class="header-btn" style="flex:1;" onclick="clearCallHistory()"><i class="fas fa-trash"></i> Clear</button>
+                <button class="header-btn" style="flex:1;background:var(--grad-main);color:#fff;border:none;" onclick="startPrivateChat()"><i class="pd-i pd-i-phone"></i> New Call</button>
+                <button class="header-btn" style="flex:1;" onclick="clearCallHistory()"><i class="pd-i pd-i-trash"></i> Clear</button>
             </div>
             <div id="callsList" style="background:var(--bg-card);border-top:1px solid var(--border-color);min-height:300px;">
-                <div style="text-align:center;padding:40px;color:var(--text-sub);"><i class="fas fa-phone" style="font-size:2rem;opacity:.3;"></i><p>No calls yet — your voice & video call history will appear here</p></div>
+                <div style="text-align:center;padding:40px;color:var(--text-sub);"><i class="pd-i pd-i-phone" style="font-size:2rem;opacity:.3;"></i><p>No calls yet — your voice & video call history will appear here</p></div>
             </div>
         </div>
     </div>
@@ -1449,31 +1460,31 @@
     <div id="tab-settings" class="tab-content">
         <div class="settings-container">
             <div class="settings-card">
-                <h3 style="margin-bottom: 15px;"><i class="fas fa-user-circle"></i> Profile</h3>
+                <h3 style="margin-bottom: 15px;"><i class="pd-i pd-i-circle-user"></i> Profile</h3>
                 <div class="settings-item" onclick="editProfile()">
                     <div class="settings-item-left">
-                        <div class="settings-icon"><i class="fas fa-user"></i></div>
+                        <div class="settings-icon"><i class="pd-i pd-i-user"></i></div>
                         <div>
                             <div><strong>Display Name</strong></div>
                             <div id="profileName" style="font-size: 0.8rem; color: var(--text-sub);">Loading...</div>
                         </div>
                     </div>
-                    <i class="fas fa-chevron-right"></i>
+                    <i class="pd-i pd-i-chevron-right"></i>
                 </div>
                 <div class="settings-item" onclick="changePhoto()">
                     <div class="settings-item-left">
-                        <div class="settings-icon"><i class="fas fa-camera"></i></div>
+                        <div class="settings-icon"><i class="pd-i pd-i-camera"></i></div>
                         <div><strong>Profile Photo</strong></div>
                     </div>
-                    <i class="fas fa-chevron-right"></i>
+                    <i class="pd-i pd-i-chevron-right"></i>
                 </div>
             </div>
             
             <div class="settings-card">
-                <h3 style="margin-bottom: 15px;"><i class="fas fa-bell"></i> Notifications</h3>
+                <h3 style="margin-bottom: 15px;"><i class="pd-i pd-i-bell"></i> Notifications</h3>
                 <div class="settings-item">
                     <div class="settings-item-left">
-                        <div class="settings-icon"><i class="fas fa-bell"></i></div>
+                        <div class="settings-icon"><i class="pd-i pd-i-bell"></i></div>
                         <div><strong>Push Notifications</strong></div>
                     </div>
                     <div class="toggle-switch" id="notifToggle" onclick="toggleNotification()">
@@ -1482,7 +1493,7 @@
                 </div>
                 <div class="settings-item">
                     <div class="settings-item-left">
-                        <div class="settings-icon"><i class="fas fa-volume-up"></i></div>
+                        <div class="settings-icon"><i class="pd-i pd-i-volume-2"></i></div>
                         <div><strong>Message Sounds</strong></div>
                     </div>
                     <div class="toggle-switch" id="soundToggle" onclick="toggleSound()">
@@ -1492,10 +1503,10 @@
             </div>
             
             <div class="settings-card">
-                <h3 style="margin-bottom: 15px;"><i class="fas fa-shield-alt"></i> Privacy & Safety</h3>
+                <h3 style="margin-bottom: 15px;"><i class="pd-i pd-i-shield"></i> Privacy & Safety</h3>
                 <div class="settings-item">
                     <div class="settings-item-left">
-                        <div class="settings-icon"><i class="fas fa-eye"></i></div>
+                        <div class="settings-icon"><i class="pd-i pd-i-eye"></i></div>
                         <div><div><strong>Read Receipts</strong></div><div class="privacy-item-desc">If turned off, you won't send or receive read receipts</div></div>
                     </div>
                     <div class="toggle-switch" id="readReceiptToggle" onclick="toggleReadReceipts()">
@@ -1504,7 +1515,7 @@
                 </div>
                 <div class="settings-item">
                     <div class="settings-item-left">
-                        <div class="settings-icon"><i class="fas fa-user-secret"></i></div>
+                        <div class="settings-icon"><i class="pd-i pd-i-eye"></i></div>
                         <div><div><strong>Show Online Status</strong></div><div class="privacy-item-desc">Let others see when you're online</div></div>
                     </div>
                     <div class="toggle-switch" id="onlineToggle" onclick="toggleOnlineStatus()">
@@ -1513,7 +1524,7 @@
                 </div>
                 <div class="settings-item">
                     <div class="settings-item-left">
-                        <div class="settings-icon"><i class="fas fa-clock"></i></div>
+                        <div class="settings-icon"><i class="pd-i pd-i-clock"></i></div>
                         <div><div><strong>Last Seen</strong></div><div class="privacy-item-desc">Who can see your last seen</div></div>
                     </div>
                     <select id="lastSeenPrivacy" onchange="savePrivacySetting('lastSeen',this.value)" style="border:1px solid var(--border-color);border-radius:12px;padding:6px 10px;background:var(--bg-primary);font-size:.75rem;">
@@ -1524,7 +1535,7 @@
                 </div>
                 <div class="settings-item">
                     <div class="settings-item-left">
-                        <div class="settings-icon"><i class="fas fa-user-circle"></i></div>
+                        <div class="settings-icon"><i class="pd-i pd-i-circle-user"></i></div>
                         <div><div><strong>Profile Photo</strong></div><div class="privacy-item-desc">Who can see your photo</div></div>
                     </div>
                     <select id="photoPrivacy" onchange="savePrivacySetting('photo',this.value)" style="border:1px solid var(--border-color);border-radius:12px;padding:6px 10px;background:var(--bg-primary);font-size:.75rem;">
@@ -1535,7 +1546,7 @@
                 </div>
                 <div class="settings-item">
                     <div class="settings-item-left">
-                        <div class="settings-icon"><i class="fas fa-circle-notch"></i></div>
+                        <div class="settings-icon"><i class="pd-i pd-i-circle-dashed"></i></div>
                         <div><div><strong>Status Visibility</strong></div><div class="privacy-item-desc">Who can see your status</div></div>
                     </div>
                     <select id="statusPrivacy" onchange="savePrivacySetting('status',this.value)" style="border:1px solid var(--border-color);border-radius:12px;padding:6px 10px;background:var(--bg-primary);font-size:.75rem;">
@@ -1546,44 +1557,44 @@
                 </div>
                 <div class="settings-item" onclick="blockedUsers()">
                     <div class="settings-item-left">
-                        <div class="settings-icon"><i class="fas fa-ban"></i></div>
+                        <div class="settings-icon"><i class="pd-i pd-i-ban"></i></div>
                         <div><div><strong>Blocked Users</strong></div><div class="privacy-item-desc" id="blockedCount">0 blocked</div></div>
                     </div>
-                    <i class="fas fa-chevron-right"></i>
+                    <i class="pd-i pd-i-chevron-right"></i>
                 </div>
                 <div class="settings-item" onclick="reportUser()">
                     <div class="settings-item-left">
-                        <div class="settings-icon" style="background:rgba(239,68,68,.15);color:#ef4444;"><i class="fas fa-flag"></i></div>
+                        <div class="settings-icon" style="background:rgba(239,68,68,.15);color:#ef4444;"><i class="pd-i pd-i-flag"></i></div>
                         <div><div><strong>Report a User</strong></div><div class="privacy-item-desc">Report abuse or spam</div></div>
                     </div>
-                    <i class="fas fa-chevron-right"></i>
+                    <i class="pd-i pd-i-chevron-right"></i>
                 </div>
             </div>
             
             <div class="settings-card">
-                <h3 style="margin-bottom: 15px;"><i class="fas fa-database"></i> Data & Storage</h3>
+                <h3 style="margin-bottom: 15px;"><i class="pd-i pd-i-database"></i> Data & Storage</h3>
                 <div class="settings-item" onclick="clearMediaCache()">
                     <div class="settings-item-left">
-                        <div class="settings-icon"><i class="fas fa-trash-alt"></i></div>
+                        <div class="settings-icon"><i class="pd-i pd-i-trash"></i></div>
                         <div><strong>Clear Media Cache</strong></div>
                     </div>
-                    <i class="fas fa-chevron-right"></i>
+                    <i class="pd-i pd-i-chevron-right"></i>
                 </div>
             </div>
             
             <div class="settings-card">
-                <h3 style="margin-bottom: 15px;"><i class="fas fa-info-circle"></i> About</h3>
+                <h3 style="margin-bottom: 15px;"><i class="pd-i pd-i-info"></i> About</h3>
                 <div class="settings-item" onclick="showAbout()">
                     <div class="settings-item-left">
-                        <div class="settings-icon"><i class="fas fa-church"></i></div>
+                        <div class="settings-icon"><i class="pd-i pd-i-church"></i></div>
                         <div><strong>Prayer Dome Chat</strong></div>
                     </div>
-                    <i class="fas fa-chevron-right"></i>
+                    <i class="pd-i pd-i-chevron-right"></i>
                 </div>
             </div>
             
             <button class="header-btn" style="width: 100%; margin-top: 20px; background: var(--accent-red); color: white; border: none;" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i> Logout
+                <i class="pd-i pd-i-log-out"></i> Logout
             </button>
         </div>
     </div>
@@ -1593,27 +1604,27 @@
         <div class="status-view-header">
             <div><strong id="statusViewName">User</strong><br><span id="statusViewTime" style="font-size: 0.7rem;"></span></div>
             <div>
-                <button onclick="viewStatusViewers()" style="background: none; border: none; color: white; margin-right: 15px;"><i class="fas fa-eye"></i></button>
+                <button onclick="viewStatusViewers()" style="background: none; border: none; color: white; margin-right: 15px;" aria-label="View viewers"><i class="pd-i pd-i-eye"></i></button>
                 <button onclick="closeStatusView()" style="background: none; border: none; color: white; font-size: 1.5rem;">&times;</button>
             </div>
         </div>
         <div class="status-view-media" id="statusViewMedia"></div>
         <div style="padding: 16px; text-align: center; display:flex;gap:8px;justify-content:center;flex-wrap:wrap;align-items:center;">
-            <button onclick="reactToStatus('❤️')" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;">❤️</button>
-            <button onclick="reactToStatus('🙏')" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;">🙏</button>
-            <button onclick="reactToStatus('😇')" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;">😇</button>
-            <button onclick="reactToStatus('🔥')" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;">🔥</button>
-            <button onclick="reactToStatus('✨')" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;">✨</button>
-            <button onclick="replyToStatus()" class="header-btn" style="background: var(--accent-green); color: white;"><i class="fas fa-reply"></i> Reply</button>
+            <button onclick="reactToStatus('love')" aria-label="Love" title="Love" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;"><i class="pd-i pd-i-heart" aria-hidden="true"></i></button>
+            <button onclick="reactToStatus('pray')" aria-label="Praying" title="Praying" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;"><i class="pd-i pd-i-hands-praying" aria-hidden="true"></i></button>
+            <button onclick="reactToStatus('blessed')" aria-label="Blessed" title="Blessed" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;"><i class="pd-i pd-i-face-slightly-smiling" aria-hidden="true"></i></button>
+            <button onclick="reactToStatus('fire')" aria-label="On fire" title="On fire" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;"><i class="pd-i pd-i-flame" aria-hidden="true"></i></button>
+            <button onclick="reactToStatus('glory')" aria-label="Glory" title="Glory" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:1.2rem;cursor:pointer;"><i class="pd-i pd-i-sparkles" aria-hidden="true"></i></button>
+            <button onclick="replyToStatus()" class="header-btn" style="background: var(--accent-green); color: white;"><i class="pd-i pd-i-reply"></i> Reply</button>
         </div>
     </div>
     
     <!-- Voice Recording Modal -->
     <div id="voiceModal" class="modal-overlay">
         <div class="modal-content" style="text-align: center;">
-            <h3><i class="fas fa-microphone"></i> Voice Message</h3>
+            <h3><i class="pd-i pd-i-mic"></i> Voice Message</h3>
             <div style="margin: 20px 0;">
-                <button id="recordBtn" style="width: 64px; height: 64px; border-radius: 50%; background: var(--accent-red); color: white; border: none; font-size: 1.4rem; cursor: pointer; transition: transform 0.25s;"><i class="fas fa-microphone"></i></button>
+                <button id="recordBtn" style="width: 64px; height: 64px; border-radius: 50%; background: var(--accent-red); color: white; border: none; font-size: 1.4rem; cursor: pointer; transition: transform 0.25s;" aria-label="Record voice message"><i class="pd-i pd-i-mic"></i></button>
             </div>
             <div id="recordingStatus">Press to start recording</div>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
@@ -1626,7 +1637,7 @@
     <!-- Viewers Modal -->
     <div id="viewersModal" class="modal-overlay">
         <div class="modal-content viewers-modal">
-            <h3 style="color: var(--accent-green); margin-bottom: 20px;"><i class="fas fa-eye"></i> Status Viewers</h3>
+            <h3 style="color: var(--accent-green); margin-bottom: 20px;"><i class="pd-i pd-i-eye"></i> Status Viewers</h3>
             <div id="viewersList"></div>
             <button class="header-btn" style="margin-top: 20px; width: 100%;" onclick="closeModal('viewersModal')">Close</button>
         </div>
@@ -1635,7 +1646,7 @@
     <!-- New Private Chat Modal -->
     <div id="newChatModal" class="modal-overlay">
         <div class="modal-content">
-            <h3 style="color: var(--accent-green); margin-bottom: 20px;"><i class="fas fa-user-plus"></i> Start New Chat</h3>
+            <h3 style="color: var(--accent-green); margin-bottom: 20px;"><i class="pd-i pd-i-user-plus"></i> Start New Chat</h3>
             <div class="form-group">
                 <input type="text" id="searchUser" class="chat-input" placeholder="Search by name or email..." onkeyup="searchUsers()" style="width: 100%;">
             </div>
@@ -1647,7 +1658,7 @@
     <!-- Create Group Modal -->
     <div id="createGroupModal" class="modal-overlay">
         <div class="modal-content">
-            <h3 style="color:var(--accent-green);"><i class="fas fa-users"></i> Create Group</h3>
+            <h3 style="color:var(--accent-green);"><i class="pd-i pd-i-users"></i> Create Group</h3>
             <div class="form-group">
                 <label style="font-size:.75rem;font-weight:700;">Group Name *</label>
                 <input type="text" id="groupNameInput" class="chat-input" placeholder="e.g. Prayer Requests, Youth Fellowship" maxlength="40" style="width:100%;">
@@ -1659,25 +1670,25 @@
             <div class="form-group">
                 <label style="font-size:.75rem;font-weight:700;">Group Type</label>
                 <select id="groupTypeInput" class="chat-input" style="width:100%;">
-                    <option value="general">💬 General</option>
-                    <option value="prayer">🙏 Prayer Requests</option>
-                    <option value="youth">🔥 Youth Fellowship</option>
-                    <option value="women">👩 Women's Ministry</option>
-                    <option value="men">👨 Men's Ministry</option>
-                    <option value="bible">📖 Bible Study</option>
-                    <option value="leadership">👑 Church Leadership</option>
-                    <option value="worship">🎵 Worship Team</option>
+                    <option value="general">General</option>
+                    <option value="prayer">Prayer Requests</option>
+                    <option value="youth">Youth Fellowship</option>
+                    <option value="women">Women's Ministry</option>
+                    <option value="men">Men's Ministry</option>
+                    <option value="bible">Bible Study</option>
+                    <option value="leadership">Church Leadership</option>
+                    <option value="worship">Worship Team</option>
                 </select>
             </div>
             <div class="form-group">
                 <label style="font-size:.75rem;font-weight:700;">Group Icon</label>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                    <button class="header-btn" onclick="pickGroupIcon('🙏')">🙏</button><button class="header-btn" onclick="pickGroupIcon('📖')">📖</button><button class="header-btn" onclick="pickGroupIcon('🔥')">🔥</button><button class="header-btn" onclick="pickGroupIcon('✝️')">✝️</button><button class="header-btn" onclick="pickGroupIcon('👩')">👩</button><button class="header-btn" onclick="pickGroupIcon('👨')">👨</button><button class="header-btn" onclick="pickGroupIcon('🎵')">🎵</button><button class="header-btn" onclick="pickGroupIcon('💒')">💒</button>
-                    <span id="selectedGroupIcon" style="margin-left:8px;font-size:1.4rem;line-height:32px;">🌍</span>
+                    <button class="header-btn" type="button" onclick="pickGroupIcon('pray')" aria-label="Prayer" title="Prayer"><i class="pd-i pd-i-hands-praying" aria-hidden="true"></i></button><button class="header-btn" type="button" onclick="pickGroupIcon('bible')" aria-label="Bible" title="Bible"><i class="pd-i pd-i-book-open" aria-hidden="true"></i></button><button class="header-btn" type="button" onclick="pickGroupIcon('youth')" aria-label="Youth" title="Youth"><i class="pd-i pd-i-flame" aria-hidden="true"></i></button><button class="header-btn" type="button" onclick="pickGroupIcon('cross')" aria-label="Cross" title="Cross"><i class="pd-i pd-i-latin-cross" aria-hidden="true"></i></button><button class="header-btn" type="button" onclick="pickGroupIcon('women')" aria-label="Women" title="Women"><i class="pd-i pd-i-user-round" aria-hidden="true"></i></button><button class="header-btn" type="button" onclick="pickGroupIcon('men')" aria-label="Men" title="Men"><i class="pd-i pd-i-user" aria-hidden="true"></i></button><button class="header-btn" type="button" onclick="pickGroupIcon('worship')" aria-label="Worship" title="Worship"><i class="pd-i pd-i-music" aria-hidden="true"></i></button><button class="header-btn" type="button" onclick="pickGroupIcon('church')" aria-label="Church" title="Church"><i class="pd-i pd-i-church" aria-hidden="true"></i></button><button class="header-btn" type="button" onclick="pickGroupIcon('globe')" aria-label="Fellowship" title="Fellowship"><i class="pd-i pd-i-globe" aria-hidden="true"></i></button>
+                    <span id="selectedGroupIcon" style="margin-left:8px;font-size:1.4rem;line-height:32px;color:var(--accent-green);"><i class="pd-i pd-i-globe" aria-hidden="true"></i></span>
                 </div>
             </div>
             <div style="display:flex;gap:10px;margin-top:16px;">
-                <button class="header-btn" style="flex:1;background:var(--grad-main);color:#fff;border:none;" onclick="createGroup()"><i class="fas fa-check"></i> Create Group</button>
+                <button class="header-btn" style="flex:1;background:var(--grad-main);color:#fff;border:none;" onclick="createGroup()"><i class="pd-i pd-i-check"></i> Create Group</button>
                 <button class="header-btn" style="flex:1;" onclick="closeModal('createGroupModal')">Cancel</button>
             </div>
         </div>
@@ -1685,10 +1696,10 @@
     <!-- Group Info Modal -->
     <div id="groupInfoModal" class="modal-overlay">
         <div class="modal-content">
-            <h3 id="groupInfoTitle" style="color:var(--accent-green);"><i class="fas fa-info-circle"></i> Group Info</h3>
+            <h3 id="groupInfoTitle" style="color:var(--accent-green);"><i class="pd-i pd-i-info"></i> Group Info</h3>
             <div id="groupInfoBody" style="margin-top:12px;"></div>
             <div style="display:flex;gap:10px;margin-top:16px;">
-                <button class="header-btn" style="flex:1;background:var(--accent-red);color:#fff;border:none;display:none;" id="leaveGroupBtn" onclick="leaveGroup()"><i class="fas fa-sign-out-alt"></i> Leave Group</button>
+                <button class="header-btn" style="flex:1;background:var(--accent-red);color:#fff;border:none;display:none;" id="leaveGroupBtn" onclick="leaveGroup()"><i class="pd-i pd-i-log-out"></i> Leave Group</button>
                 <button class="header-btn" style="flex:1;" onclick="closeModal('groupInfoModal')">Close</button>
             </div>
         </div>
@@ -1696,7 +1707,7 @@
     <!-- Text Status Modal -->
     <div id="textStatusModal" class="modal-overlay">
         <div class="modal-content" style="background:linear-gradient(135deg,#0A4D9B,#d4af37);color:#fff;">
-            <h3 style="color:#fff;"><i class="fas fa-font"></i> Text Status</h3>
+            <h3 style="color:#fff;"><i class="pd-i pd-i-type"></i> Text Status</h3>
             <textarea id="textStatusInput" placeholder="What's on your heart? Share a scripture or encouragement..." maxlength="200" style="width:100%;min-height:90px;border-radius:14px;padding:12px;border:none;font-family:inherit;margin-top:10px;color:#0f172a;"></textarea>
             <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
                 <button class="header-btn" style="background:#fff;color:#0A4D9B;" onclick="pickStatusBg('#0A4D9B')">Blue</button>
@@ -1707,7 +1718,7 @@
             </div>
             <div id="textStatusPreview" style="margin-top:12px;padding:18px;border-radius:14px;background:#0A4D9B;text-align:center;font-weight:700;min-height:60px;display:flex;align-items:center;justify-content:center;">Preview</div>
             <div style="display:flex;gap:10px;margin-top:16px;">
-                <button class="header-btn" style="flex:1;background:#fff;color:#0A4D9B;border:none;" onclick="postTextStatus()"><i class="fas fa-paper-plane"></i> Post Status</button>
+                <button class="header-btn" style="flex:1;background:#fff;color:#0A4D9B;border:none;" onclick="postTextStatus()"><i class="pd-i pd-i-send"></i> Post Status</button>
                 <button class="header-btn" style="flex:1;background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.3);" onclick="closeModal('textStatusModal')">Cancel</button>
             </div>
         </div>
@@ -1715,7 +1726,7 @@
     <!-- Bible Verse Modal -->
     <div id="bibleModal" class="modal-overlay">
         <div class="modal-content">
-            <h3 style="color:var(--accent-green);"><i class="fas fa-book-bible"></i> Share Bible Verse</h3>
+            <h3 style="color:var(--accent-green);"><i class="pd-i pd-i-book"></i> Share Bible Verse</h3>
             <input type="text" id="bibleSearch" class="chat-input" placeholder="Search verse (e.g. John 3:16, Psalm 23)" style="width:100%;margin:10px 0;" onkeyup="filterBibleVerses()">
             <div id="bibleVersesList" style="max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
             <button class="header-btn" style="margin-top:12px;width:100%;" onclick="closeModal('bibleModal')">Close</button>
@@ -1724,12 +1735,12 @@
     <!-- Contact Share Modal -->
     <div id="contactModal" class="modal-overlay">
         <div class="modal-content">
-            <h3 style="color:var(--accent-green);"><i class="fas fa-address-card"></i> Share Contact</h3>
+            <h3 style="color:var(--accent-green);"><i class="pd-i pd-i-contact"></i> Share Contact</h3>
             <div class="form-group"><label style="font-size:.75rem;font-weight:700;">Name</label><input type="text" id="contactName" class="chat-input" placeholder="Full name" style="width:100%;"></div>
             <div class="form-group"><label style="font-size:.75rem;font-weight:700;">Phone</label><input type="tel" id="contactPhone" class="chat-input" placeholder="+268..." style="width:100%;"></div>
             <div class="form-group"><label style="font-size:.75rem;font-weight:700;">Email (optional)</label><input type="email" id="contactEmail" class="chat-input" placeholder="email@example.com" style="width:100%;"></div>
             <div style="display:flex;gap:10px;margin-top:12px;">
-                <button class="header-btn" style="flex:1;background:var(--grad-main);color:#fff;border:none;" onclick="sendContact()"><i class="fas fa-share"></i> Share Contact</button>
+                <button class="header-btn" style="flex:1;background:var(--grad-main);color:#fff;border:none;" onclick="sendContact()"><i class="pd-i pd-i-share-2"></i> Share Contact</button>
                 <button class="header-btn" style="flex:1;" onclick="closeModal('contactModal')">Cancel</button>
             </div>
         </div>
@@ -1737,11 +1748,11 @@
     <!-- Location Share Modal — choice: Current once vs Live (10s updates, auto-stop) -->
     <div id="locationModal" class="modal-overlay">
         <div class="modal-content">
-            <h3 style="color:var(--accent-green);"><i class="fas fa-map-marker-alt"></i> Share Location</h3>
+            <h3 style="color:var(--accent-green);"><i class="pd-i pd-i-map-pin"></i> Share Location</h3>
             <p style="font-size:.78rem;color:var(--text-sub);margin:4px 0 12px;">Choose how to share your location. Live sharing uses your browser's real GPS permission and updates the same card.</p>
-            <button class="header-btn" style="width:100%;background:var(--grad-main);color:#fff;border:none;margin-bottom:10px;" onclick="shareCurrentLocationOnce()"><i class="fas fa-crosshairs"></i> 📍 Current location — once</button>
+            <button class="header-btn" style="width:100%;background:var(--grad-main);color:#fff;border:none;margin-bottom:10px;" onclick="shareCurrentLocationOnce()"><i class="pd-i pd-i-crosshair"></i> Current location — once</button>
             <div style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:14px;padding:12px;">
-                <strong style="font-size:.82rem;display:flex;align-items:center;gap:6px;"><i class="fas fa-satellite-dish" style="color:#ef4444;"></i> Live location</strong>
+                <strong style="font-size:.82rem;display:flex;align-items:center;gap:6px;"><i class="pd-i pd-i-satellite-dish" style="color:#ef4444;"></i> Live location</strong>
                 <p style="font-size:.70rem;color:var(--text-sub);margin:6px 0;">Share live updates for a selected duration (max 60 min). Updates the same chat card ~every 10s with accuracy. Stops automatically.</p>
                 <label style="font-size:.75rem;font-weight:700;">Duration</label>
                 <select id="liveDurationSelect" class="chat-input" style="width:100%;margin:6px 0 10px;">
@@ -1751,9 +1762,9 @@
                     <option value="5">5 minutes (test)</option>
                     <option value="1">1 minute (test)</option>
                 </select>
-                <button class="header-btn" style="width:100%;background:linear-gradient(135deg,#ef4444,#f59e0b);color:#fff;border:none;" onclick="startLiveLocationFromModal()"><i class="fas fa-broadcast-tower"></i> Start live sharing</button>
+                <button class="header-btn" style="width:100%;background:linear-gradient(135deg,#ef4444,#f59e0b);color:#fff;border:none;" onclick="startLiveLocationFromModal()"><i class="pd-i pd-i-radio-tower"></i> Start live sharing</button>
                 <p id="liveLocationStatus" style="font-size:.68rem;color:var(--text-sub);margin-top:8px;display:none;"></p>
-                <button id="stopLiveBtn" class="header-btn" style="width:100%;margin-top:8px;background:rgba(239,68,68,.12);color:#ef4444;border-color:rgba(239,68,68,.3);display:none;" onclick="stopLiveLocation()"><i class="fas fa-stop-circle"></i> Stop live sharing</button>
+                <button id="stopLiveBtn" class="header-btn" style="width:100%;margin-top:8px;background:rgba(239,68,68,.12);color:#ef4444;border-color:rgba(239,68,68,.3);display:none;" onclick="stopLiveLocation()"><i class="pd-i pd-i-circle-stop"></i> Stop live sharing</button>
             </div>
             <button class="header-btn" style="margin-top:14px;width:100%;" onclick="closeModal('locationModal')">Cancel</button>
         </div>
@@ -1761,7 +1772,7 @@
     <!-- Blocked Users Modal -->
     <div id="blockedModal" class="modal-overlay">
         <div class="modal-content">
-            <h3 style="color:var(--accent-green);"><i class="fas fa-ban"></i> Blocked Users</h3>
+            <h3 style="color:var(--accent-green);"><i class="pd-i pd-i-ban"></i> Blocked Users</h3>
             <div id="blockedList" style="margin-top:12px;max-height:300px;overflow-y:auto;"></div>
             <button class="header-btn" style="margin-top:12px;width:100%;" onclick="closeModal('blockedModal')">Close</button>
         </div>
@@ -1769,16 +1780,16 @@
     <!-- Lightweight one-to-one call surface (PeerJS WebRTC; no paid API key required). -->
     <div id="callModal" class="modal-overlay" style="display:none;">
         <div class="modal-content" style="max-width:680px;">
-            <h3 id="callTitle" style="color:var(--accent-green);"><i class="fas fa-phone"></i> Prayer Dome call</h3>
+            <h3 id="callTitle" style="color:var(--accent-green);"><i class="pd-i pd-i-phone"></i> Prayer Dome call</h3>
             <p id="callStatus" style="color:var(--text-sub);">Connecting securely…</p>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#071b35;padding:10px;border-radius:14px;">
                 <video id="localCallVideo" autoplay muted playsinline style="width:100%;border-radius:10px;background:#000;min-height:150px;"></video>
                 <video id="remoteCallVideo" autoplay playsinline style="width:100%;border-radius:10px;background:#000;min-height:150px;"></video>
             </div>
             <div style="display:flex;justify-content:center;gap:10px;margin-top:15px;">
-                <button class="header-btn" onclick="toggleCallMic()" title="Mute microphone"><i class="fas fa-microphone" id="callMicIcon"></i></button>
-                <button class="header-btn" onclick="toggleCallCamera()" title="Camera on/off"><i class="fas fa-video" id="callCameraIcon"></i></button>
-                <button class="header-btn" style="background:#dc2626;color:white;" onclick="endCall()"><i class="fas fa-phone-slash"></i> End call</button>
+                <button class="header-btn" onclick="toggleCallMic()" title="Mute microphone"><i class="pd-i pd-i-mic" id="callMicIcon"></i></button>
+                <button class="header-btn" onclick="toggleCallCamera()" title="Camera on/off"><i class="pd-i pd-i-video" id="callCameraIcon"></i></button>
+                <button class="header-btn" style="background:#dc2626;color:white;" onclick="endCall()"><i class="pd-i pd-i-phone-off"></i> End call</button>
             </div>
         </div>
     </div>
@@ -1847,22 +1858,42 @@
                 activeCall = call; bindCall(call); document.getElementById('callStatus').textContent = 'Calling…';
             } catch(e) { showToast('Camera or microphone permission is required.', 'error'); endCall(); }
         };
-        window.toggleCallMic = () => { const t=callStream?.getAudioTracks()[0]; if(t) t.enabled=!t.enabled; document.getElementById('callMicIcon').className=t?.enabled?'fas fa-microphone':'fas fa-microphone-slash'; };
-        window.toggleCallCamera = () => { const t=callStream?.getVideoTracks()[0]; if(t) t.enabled=!t.enabled; document.getElementById('callCameraIcon').className=t?.enabled?'fas fa-video':'fas fa-video-slash'; };
+        window.toggleCallMic = () => { const t=callStream?.getAudioTracks()[0]; if(t) t.enabled=!t.enabled; document.getElementById('callMicIcon').className=t?.enabled?'pd-i pd-i-mic':'pd-i pd-i-mic-off'; };
+        window.toggleCallCamera = () => { const t=callStream?.getVideoTracks()[0]; if(t) t.enabled=!t.enabled; document.getElementById('callCameraIcon').className=t?.enabled?'pd-i pd-i-video':'pd-i pd-i-video-off'; };
         window.endCall = () => { activeCall?.close(); callStream?.getTracks().forEach(t=>t.stop()); activeCall=null; callStream=null; document.getElementById('remoteCallVideo').srcObject=null; document.getElementById('localCallVideo').srcObject=null; document.getElementById('callModal').style.display='none'; };
 
         
         // Rooms configuration
         const groupRooms = {
-            general: { name: "🌍 General Fellowship", desc: "Welcome all believers", icon: "🌍", type: "group" },
-            prayer: { name: "🙏 Prayer Warriors", desc: "Share prayer requests", icon: "🙏", type: "group" },
-            testimony: { name: "✨ Testimonies", desc: "Share what God has done", icon: "✨", type: "group" },
-            bible: { name: "📖 Bible Study", desc: "Discuss Scripture", icon: "📖", type: "group" },
-            worship: { name: "🎵 Worship & Praise", desc: "Share worship songs", icon: "🎵", type: "group" },
-            youth: { name: "🔥 Youth Connect", desc: "Ages 13-25", icon: "🔥", type: "group" },
-            women: { name: "👩 Women of Faith", desc: "Sisters in Christ", icon: "👩", type: "group" },
-            men: { name: "👨 Men of Valor", desc: "Brothers in Christ", icon: "👨", type: "group" }
+            general: { name: "General Fellowship", desc: "Welcome all believers", icon: "pd-i-globe", type: "group" },
+            prayer: { name: "Prayer Warriors", desc: "Share prayer requests", icon: "pd-i-hands-praying", type: "group" },
+            testimony: { name: "Testimonies", desc: "Share what God has done", icon: "pd-i-sparkles", type: "group" },
+            bible: { name: "Bible Study", desc: "Discuss Scripture", icon: "pd-i-book-open", type: "group" },
+            worship: { name: "Worship & Praise", desc: "Share worship songs", icon: "pd-i-music", type: "group" },
+            youth: { name: "Youth Connect", desc: "Ages 13-25", icon: "pd-i-flame", type: "group" },
+            women: { name: "Women of Faith", desc: "Sisters in Christ", icon: "pd-i-user-round", type: "group" },
+            men: { name: "Men of Valor", desc: "Brothers in Christ", icon: "pd-i-user", type: "group" }
         };
+
+        // Room avatars and names. Built-in rooms use Lucide names; groups created
+        // before the icon migration saved an emoji icon and an emoji-prefixed name,
+        // which PDIcons maps to a Lucide icon / plain text.
+        const roomIcon = (value, fallback) => '<i class="' + (window.PDIcons ? PDIcons.cls(value, fallback || 'pd-i-message-circle') : 'pd-i ' + (fallback || 'pd-i-message-circle')) + '" aria-hidden="true"></i>';
+        const roomName = (name) => window.PDIcons ? PDIcons.plain(name) : String(name || '');
+
+        // Message and status reactions. `key` is the value saved in Firestore (the
+        // original emoji code, so saved reactions and older app versions keep
+        // working); the UI always shows the Lucide `icon`.
+        const CHAT_REACTIONS = [
+            { id: 'love', key: '\u2764\uFE0F', icon: 'pd-i-heart', label: 'Love' },
+            { id: 'pray', key: '\u{1F64F}', icon: 'pd-i-hands-praying', label: 'Praying' },
+            { id: 'blessed', key: '\u{1F607}', icon: 'pd-i-face-slightly-smiling', label: 'Blessed' },
+            { id: 'fire', key: '\u{1F525}', icon: 'pd-i-flame', label: 'On fire' },
+            { id: 'glory', key: '\u2728', icon: 'pd-i-sparkles', label: 'Glory' },
+            { id: 'clap', key: '\u{1F44F}', icon: 'pd-i-party-popper', label: 'Applause' }
+        ];
+        const reactionKey = (id) => (CHAT_REACTIONS.find(r => r.id === id) || {}).key || id;
+        const reactionIcon = (key) => '<i class="' + (window.PDIcons ? PDIcons.cls(key, 'pd-i-heart') : 'pd-i pd-i-heart') + '" aria-hidden="true"></i>';
         
         let privateChats = [];
         let allRooms = [];
@@ -1895,7 +1926,7 @@
                 if (isAdmin) {
                     const actionsDiv = document.getElementById('chatActions');
                     if (actionsDiv) {
-                        actionsDiv.insertAdjacentHTML('beforeend', '<button class="header-btn" onclick="showAdminPanel()" style="background: var(--accent-gold); color: black;"><i class="fas fa-shield-alt"></i> Admin</button>');
+                        actionsDiv.insertAdjacentHTML('beforeend', '<button class="header-btn" onclick="showAdminPanel()" style="background: var(--accent-gold); color: black;"><i class="pd-i pd-i-shield"></i> Admin</button>');
                     }
                 }
             } catch(e) { console.error(e); }
@@ -2042,12 +2073,12 @@
             container.innerHTML = allRooms.map(room => `
                 <div class="room-item ${currentRoom === room.id ? 'active' : ''}" onclick="joinRoom('${room.id}', '${room.type}')">
                     <div class="room-avatar">
-                        ${room.type === 'group' ? room.icon : '👤'}
+                        ${room.type === 'group' ? roomIcon(room.icon) : roomIcon('pd-i-user')}
                         ${room.online ? '<span class="online-dot"></span>' : ''}
                     </div>
                     <div class="room-info">
                         <div class="room-name">
-                            ${escapeHtml(room.name)}
+                            ${escapeHtml(roomName(room.name))}
                             ${isAdmin ? '<span class="admin-badge">Admin</span>' : ''}
                         </div>
                         <div class="room-preview">${room.type === 'group' ? 'Tap to join conversation' : (room.online ? 'online' : 'last seen recently')}</div>
@@ -2059,14 +2090,14 @@
 
         window.filterRooms = () => {
             const search = document.getElementById('roomSearch')?.value.toLowerCase() || '';
-            const filtered = allRooms.filter(room => room.name.toLowerCase().includes(search));
+            const filtered = allRooms.filter(room => roomName(room.name).toLowerCase().includes(search));
             const container = document.getElementById('roomList');
             if (!container) return;
             container.innerHTML = filtered.map(room => `
                 <div class="room-item ${currentRoom === room.id ? 'active' : ''}" onclick="joinRoom('${room.id}', '${room.type}')">
-                    <div class="room-avatar">${room.type === 'group' ? room.icon : '👤'}</div>
+                    <div class="room-avatar">${room.type === 'group' ? roomIcon(room.icon) : roomIcon('pd-i-user')}</div>
                     <div class="room-info">
-                        <div class="room-name">${escapeHtml(room.name)}</div>
+                        <div class="room-name">${escapeHtml(roomName(room.name))}</div>
                         <div class="room-preview">${room.type === 'group' ? 'Tap to join conversation' : (room.online ? 'online' : 'last seen recently')}</div>
                     </div>
                 </div>
@@ -2084,8 +2115,8 @@
             const room = groupRooms[roomId] || { name: 'Private Chat', desc: 'Private conversation' };
             const roomNameEl = document.getElementById('currentRoomName');
             const roomDescEl = document.getElementById('currentRoomDesc');
-            if (roomNameEl) roomNameEl.innerHTML = room.name || 'Private Chat';
-            if (roomDescEl) roomDescEl.innerHTML = room.desc || 'Private conversation with a believer';
+            if (roomNameEl) roomNameEl.textContent = roomName(room.name) || 'Private Chat';
+            if (roomDescEl) roomDescEl.textContent = room.desc || 'Private conversation with a believer';
             
             if (messagesUnsubscribe) messagesUnsubscribe();
             
@@ -2157,7 +2188,7 @@
             if (!container) return;
             if (messages.length === 0) {
                 container.innerHTML = `<div style="text-align: center; padding: 36px;">
-                    <i class="fas fa-comments" style="font-size: 34px; opacity: 0.3;"></i>
+                    <i class="pd-i pd-i-messages-square" style="font-size: 34px; opacity: 0.3;"></i>
                     <p style="font-size: 0.8rem;">No messages yet. Start the conversation!</p>
                 </div>`;
                 return;
@@ -2181,9 +2212,9 @@
                     }
                 }
                 if (isOwn) {
-                    if (msg.read) statusIcon = '<span class="delivery-status read"><i class="fas fa-check-double"></i><i class="fas fa-check-double"></i></span>';
-                    else if (msg.delivered) statusIcon = '<span class="delivery-status delivered"><i class="fas fa-check-double"></i></span>';
-                    else statusIcon = '<span class="delivery-status"><i class="fas fa-check"></i></span>';
+                    if (msg.read) statusIcon = '<span class="delivery-status read"><i class="pd-i pd-i-check-check"></i><i class="pd-i pd-i-check-check"></i></span>';
+                    else if (msg.delivered) statusIcon = '<span class="delivery-status delivered"><i class="pd-i pd-i-check-check"></i></span>';
+                    else statusIcon = '<span class="delivery-status"><i class="pd-i pd-i-check"></i></span>';
                 }
                 return `
                     ${dateDivider}
@@ -2198,7 +2229,7 @@
                             ${msg.mediaUrl ? `
                                 ${msg.mediaType === 'image' ? `<img src="${msg.mediaUrl}" class="message-media" onclick="viewMedia('${msg.mediaUrl}')">` : ''}
                                 ${msg.mediaType === 'video' ? `<video src="${msg.mediaUrl}" class="message-media" controls onclick="event.stopPropagation()"></video>` : ''}
-                                ${msg.mediaType === 'document' ? `<a href="${msg.mediaUrl}" target="_blank" class="message-media" style="display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 12px; text-decoration: none; color: var(--text-main);"><i class="fas fa-file-pdf"></i> ${msg.mediaName || 'Document'}</a>` : ''}
+                                ${msg.mediaType === 'document' ? `<a href="${msg.mediaUrl}" target="_blank" class="message-media" style="display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 12px; text-decoration: none; color: var(--text-main);"><i class="pd-i pd-i-file-text"></i> ${msg.mediaName || 'Document'}</a>` : ''}
                                 ${msg.mediaType === 'audio' ? `<audio src="${msg.mediaUrl}" controls style="margin-top: 8px;"></audio>` : ''}
                             ` : ''}
                             <div class="message-time">
@@ -2380,14 +2411,14 @@
                             isRecording = false;
                             recordBtn.classList.remove('recording');
                             recordBtn.style.background = 'var(--accent-green)';
-                            recordBtn.innerHTML = '<i class="fas fa-check"></i>';
+                            recordBtn.innerHTML = '<i class="pd-i pd-i-check"></i>';
                             document.getElementById('recordingStatus').innerHTML = 'Recording complete!';
                         } else {
                             mediaRecorder.start();
                             isRecording = true;
                             recordBtn.classList.add('recording');
                             recordBtn.style.background = 'var(--accent-red)';
-                            recordBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                            recordBtn.innerHTML = '<i class="pd-i pd-i-square"></i>';
                             document.getElementById('recordingStatus').innerHTML = 'Recording... Click stop when done';
                         }
                     };
@@ -2465,7 +2496,7 @@
             const myStatusStats = document.getElementById('myStatusStats');
             if (myStatusStats && myStatuses.length > 0) {
                 const totalViews = myStatuses.reduce((sum, s) => sum + (s.viewers?.length || 0), 0);
-                myStatusStats.innerHTML = `<i class="fas fa-eye"></i> ${totalViews} views • ${myStatuses.length} active`;
+                myStatusStats.innerHTML = `<i class="pd-i pd-i-eye"></i> ${totalViews} views • ${myStatuses.length} active`;
             } else if (myStatusStats) {
                 myStatusStats.innerHTML = 'No active status';
             }
@@ -2656,7 +2687,13 @@
         
         // ===== WhatsApp-style: Groups, Christian features, Status text, Attachments, Calls, Privacy =====
         let customGroups = [];
-        let selectedGroupIcon = '🌍';
+        // Group avatars are saved as the legacy emoji code (older app versions render
+        // it directly); this app renders every value as a Lucide icon (PDIcons.cls).
+        const GROUP_ICONS = {
+            pray: '\u{1F64F}', bible: '\u{1F4D6}', youth: '\u{1F525}', cross: '\u271D\uFE0F', women: '\u{1F469}',
+            men: '\u{1F468}', worship: '\u{1F3B5}', church: '\u{1F492}', globe: '\u{1F30D}'
+        };
+        let selectedGroupIcon = GROUP_ICONS.globe;
         let textStatusBg = '#0A4D9B';
         let lastMessagesCache = {};
         let unreadCounts = {};
@@ -2684,8 +2721,8 @@
           {title:"Walk by Faith", text:"Trust Him even when you cannot see the next step. Faith moves mountains."}
         ];
 
-        window.pickGroupIcon = (icon)=>{ selectedGroupIcon=icon; const el=document.getElementById('selectedGroupIcon'); if(el) el.textContent=icon; };
-        window.openCreateGroupModal = ()=>{ document.getElementById('createGroupModal').style.display='flex'; document.getElementById('groupNameInput').value=''; document.getElementById('groupDescInput').value=''; selectedGroupIcon='🌍'; const e=document.getElementById('selectedGroupIcon'); if(e) e.textContent='🌍'; };
+        window.pickGroupIcon = (key)=>{ selectedGroupIcon=GROUP_ICONS[key]||GROUP_ICONS.globe; const el=document.getElementById('selectedGroupIcon'); if(el) el.innerHTML=roomIcon(selectedGroupIcon); };
+        window.openCreateGroupModal = ()=>{ document.getElementById('createGroupModal').style.display='flex'; document.getElementById('groupNameInput').value=''; document.getElementById('groupDescInput').value=''; selectedGroupIcon=GROUP_ICONS.globe; const e=document.getElementById('selectedGroupIcon'); if(e) e.innerHTML=roomIcon(selectedGroupIcon); };
         window.joinPresetGroup = (key)=>{ joinRoom(key,'group'); switchMainTab('chats'); };
         window.createGroup = async ()=>{
           const name=document.getElementById('groupNameInput').value.trim();
@@ -2693,13 +2730,13 @@
           const type=document.getElementById('groupTypeInput').value;
           if(!name) return showToast('Group name is required','error');
           const id='custom_'+Date.now().toString(36);
-          const group={ name: selectedGroupIcon+' '+name, desc: desc|| 'Fellowship group', icon:selectedGroupIcon, type:'group', custom:true, groupType:type, adminIds:[currentUser.uid], members:[currentUser.uid], createdAt: serverTimestamp() };
+          const group={ name: name, desc: desc|| 'Fellowship group', icon:selectedGroupIcon, type:'group', custom:true, groupType:type, adminIds:[currentUser.uid], members:[currentUser.uid], createdAt: serverTimestamp() };
           try{
             await setDoc(doc(db,'customGroups',id), group);
-            customGroups.push({id, ...group, name: selectedGroupIcon+' '+name});
+            customGroups.push({id, ...group, name: name});
             buildRoomList(); closeModal('createGroupModal'); joinRoom(id,'group'); showToast('Group created: '+name);
             // Add announcement message
-            await addDoc(collection(db, 'groupMessages_'+id, id, 'messages'), { userId:'system', userName:'System', text: `🙏 Welcome to ${name}! ${desc} — He does everything blamelessly. Mark 7:37`, timestamp: serverTimestamp(), delivered:true, read:false, system:true });
+            await addDoc(collection(db, 'groupMessages_'+id, id, 'messages'), { userId:'system', userName:'System', text: `Welcome to ${name}! ${desc} — He does everything blamelessly. Mark 7:37`, timestamp: serverTimestamp(), delivered:true, read:false, system:true });
             if(window.confetti) confetti({particleCount:80, spread:60});
           }catch(e){ showToast(e.message,'error'); }
         };
@@ -2720,7 +2757,7 @@
             const pc=privateChats.find(c=>c.id===gid);
             if(pc){
               const el=document.getElementById('groupInfoBody');
-              if(el) el.innerHTML=`<div style="text-align:center;"><div class="room-avatar" style="width:64px;height:64px;margin:0 auto;font-size:1.6rem;">${(pc.otherName||'U').charAt(0).toUpperCase()}</div><h3 style="margin-top:10px;">${escapeHtml(pc.otherName)}</h3><p style="color:var(--text-sub);font-size:.8rem;">${pc.otherOnline?'🟢 Online':'⚪ Offline'} • Last seen ${pc.otherLastSeen? moment(pc.otherLastSeen.toDate()).fromNow():'recently'}</p><p style="margin-top:12px;"><button class="header-btn" onclick="startCall(false)"> <i class="fas fa-phone"></i> Voice call</button> <button class="header-btn" onclick="startCall(true)"><i class="fas fa-video"></i> Video call</button></p><hr style="margin:16px 0;border:none;border-top:1px solid var(--border-color);"><button class="header-btn" style="width:100%;background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.3);" onclick="blockUser('${pc.otherId}')"><i class="fas fa-ban"></i> Block user</button> <button class="header-btn" style="width:100%;margin-top:8px;" onclick="reportUser('${pc.otherId}')"><i class="fas fa-flag"></i> Report</button></div>`;
+              if(el) el.innerHTML=`<div style="text-align:center;"><div class="room-avatar" style="width:64px;height:64px;margin:0 auto;font-size:1.6rem;">${(pc.otherName||'U').charAt(0).toUpperCase()}</div><h3 style="margin-top:10px;">${escapeHtml(pc.otherName)}</h3><p style="color:var(--text-sub);font-size:.8rem;">${pc.otherOnline?'<span class="online-pill"><i class="pd-i pd-i-circle-fill" aria-hidden="true"></i> Online</span>':'Offline'} • Last seen ${pc.otherLastSeen? moment(pc.otherLastSeen.toDate()).fromNow():'recently'}</p><p style="margin-top:12px;"><button class="header-btn" onclick="startCall(false)"> <i class="pd-i pd-i-phone"></i> Voice call</button> <button class="header-btn" onclick="startCall(true)"><i class="pd-i pd-i-video"></i> Video call</button></p><hr style="margin:16px 0;border:none;border-top:1px solid var(--border-color);"><button class="header-btn" style="width:100%;background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.3);" onclick="blockUser('${pc.otherId}')"><i class="pd-i pd-i-ban"></i> Block user</button> <button class="header-btn" style="width:100%;margin-top:8px;" onclick="reportUser('${pc.otherId}')"><i class="pd-i pd-i-flag"></i> Report</button></div>`;
               document.getElementById('groupInfoModal').style.display='flex';
               return;
             }
@@ -2729,7 +2766,7 @@
           const membersCount = isCustom? (isCustom.members?.length||1) : '∞';
           const admin = isCustom? isCustom.adminIds?.includes(currentUser.uid): false;
           const el=document.getElementById('groupInfoBody');
-          if(el) el.innerHTML=`<div style="text-align:center;"><div class="room-avatar" style="width:64px;height:64px;margin:0 auto;font-size:1.8rem;">${info.icon||'💬'}</div><h3 style="margin-top:10px;">${escapeHtml(info.name)}</h3><p style="color:var(--text-sub);font-size:.82rem;">${escapeHtml(info.desc||'Fellowship group')}</p><p style="margin-top:8px;"><span class="admin-badge">${isCustom? 'CUSTOM GROUP':'OFFICIAL'}</span> <span style="font-size:.7rem;color:var(--text-sub);">${membersCount} members</span></p>${info.groupType? `<p style="font-size:.7rem;margin-top:6px;color:var(--text-sub);">Type: ${info.groupType}</p>`:''}<hr style="margin:16px 0;border:none;border-top:1px solid var(--border-color);"><div style="text-align:left;background:var(--bg-primary);border-radius:14px;padding:12px;"><strong style="font-size:.8rem;">📢 Group Announcement</strong><p style="font-size:.76rem;color:var(--text-sub);margin-top:6px;">${escapeHtml(info.announcement||'No announcement yet. Admins can post one.')}</p>${admin? `<button class="header-btn" style="margin-top:8px;width:100%;" onclick="editGroupAnnouncement('${gid}')"><i class="fas fa-bullhorn"></i> Edit announcement</button>`:''}</div><div style="margin-top:12px;display:flex;gap:8px;"><button class="header-btn" style="flex:1;" onclick="shareBibleVerse()"><i class="fas fa-book-bible"></i> Share Verse</button><button class="header-btn" style="flex:1;" onclick="sharePrayerRequest()"><i class="fas fa-pray"></i> Prayer</button></div></div>`;
+          if(el) el.innerHTML=`<div style="text-align:center;"><div class="room-avatar" style="width:64px;height:64px;margin:0 auto;font-size:1.8rem;">${roomIcon(info.icon)}</div><h3 style="margin-top:10px;">${escapeHtml(roomName(info.name))}</h3><p style="color:var(--text-sub);font-size:.82rem;">${escapeHtml(info.desc||'Fellowship group')}</p><p style="margin-top:8px;"><span class="admin-badge">${isCustom? 'CUSTOM GROUP':'OFFICIAL'}</span> <span style="font-size:.7rem;color:var(--text-sub);">${membersCount} members</span></p>${info.groupType? `<p style="font-size:.7rem;margin-top:6px;color:var(--text-sub);">Type: ${info.groupType}</p>`:''}<hr style="margin:16px 0;border:none;border-top:1px solid var(--border-color);"><div style="text-align:left;background:var(--bg-primary);border-radius:14px;padding:12px;"><strong style="font-size:.8rem;"><i class="pd-i pd-i-megaphone" aria-hidden="true"></i> Group Announcement</strong><p style="font-size:.76rem;color:var(--text-sub);margin-top:6px;">${escapeHtml(info.announcement||'No announcement yet. Admins can post one.')}</p>${admin? `<button class="header-btn" style="margin-top:8px;width:100%;" onclick="editGroupAnnouncement('${gid}')"><i class="pd-i pd-i-megaphone"></i> Edit announcement</button>`:''}</div><div style="margin-top:12px;display:flex;gap:8px;"><button class="header-btn" style="flex:1;" onclick="shareBibleVerse()"><i class="pd-i pd-i-book"></i> Share Verse</button><button class="header-btn" style="flex:1;" onclick="sharePrayerRequest()"><i class="pd-i pd-i-hands-praying"></i> Prayer</button></div></div>`;
           const leaveBtn=document.getElementById('leaveGroupBtn');
           if(leaveBtn) leaveBtn.style.display = isCustom? 'inline-flex':'none';
           document.getElementById('groupInfoModal').style.display='flex';
@@ -2755,7 +2792,8 @@
             closeModal('textStatusModal'); showToast('Text status posted!'); loadStatuses();
           }catch(e){ showToast(e.message,'error'); }
         };
-        window.reactToStatus = async (emoji)=>{
+        window.reactToStatus = async (reaction)=>{
+          const emoji = reactionKey(reaction);
           if(!currentStatusId) return;
           try{
             const ref=doc(db,'statuses',currentStatusId);
@@ -2766,36 +2804,36 @@
             reacts[emoji]=reacts[emoji]||[];
             if(!reacts[emoji].includes(currentUser.uid)) reacts[emoji].push(currentUser.uid);
             await updateDoc(ref,{reactions:reacts});
-            showToast('Reacted '+emoji);
+            showToast('Reaction sent');
             // also send chat reply
             const roomId=currentRoom;
             const path=currentChatType==='group'? `groupMessages_${roomId}`:`privateMessages_${roomId}`;
-            await addDoc(collection(db, path, roomId,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `${emoji} reacted to ${snap.data().userName}'s status`, timestamp: serverTimestamp(), delivered:false, read:false, system:false });
+            await addDoc(collection(db, path, roomId,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `Reacted with ${(CHAT_REACTIONS.find(r => r.key === emoji) || { label: 'a reaction' }).label} to ${snap.data().userName}'s status`, timestamp: serverTimestamp(), delivered:false, read:false, system:false });
           }catch(e){ showToast(e.message,'error'); }
         };
 
         // Christian features
         window.sharePrayerRequest = async ()=>{
-          const text=prompt('🙏 Share your prayer request with this chat:');
+          const text=prompt('Share your prayer request with this chat:');
           if(!text||!text.trim()) return;
           const collectionPath = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
-          await addDoc(collection(db, collectionPath, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `🙏 PRAYER REQUEST: ${text.trim()}`, timestamp: serverTimestamp(), delivered:false, read:false, type:'prayerRequest', prayerText:text.trim() });
+          await addDoc(collection(db, collectionPath, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `PRAYER REQUEST: ${text.trim()}`, timestamp: serverTimestamp(), delivered:false, read:false, type:'prayerRequest', prayerText:text.trim() });
           // also to global prayers wall
           try{ await addDoc(collection(db,'prayers'),{ name: currentUser.displayName||'Anonymous', text: text.trim(), timestamp: serverTimestamp(), status:'pending' }); }catch(e){}
-          showToast('Prayer request shared 🙏');
+          showToast('Prayer request shared');
         };
         window.shareBibleVerse = ()=>{
           const modal=document.getElementById('bibleModal');
           const list=document.getElementById('bibleVersesList');
-          list.innerHTML = BIBLE_VERSES.map(v=>`<div class=\"bible-card\" style=\"cursor:pointer;border-radius:14px;\" onclick=\"sendBibleVerse('${v.ref.replace(/'/g, "\\'")}')\"><strong style=\"color:var(--accent-green);\">${escapeHtml(v.ref)}</strong><p style=\"font-size:.82rem;line-height:1.5;margin:4px 0 0;\">${escapeHtml(v.text)}</p><span style=\"font-size:.68rem;color:var(--accent-gold);margin-top:4px;display:inline-flex;align-items:center;gap:4px;\"><i class=\"fas fa-share\"></i> Tap to share</span></div>`).join('');
+          list.innerHTML = BIBLE_VERSES.map(v=>`<div class=\"bible-card\" style=\"cursor:pointer;border-radius:14px;\" onclick=\"sendBibleVerse('${v.ref.replace(/'/g, "\\'")}')\"><strong style=\"color:var(--accent-green);\">${escapeHtml(v.ref)}</strong><p style=\"font-size:.82rem;line-height:1.5;margin:4px 0 0;\">${escapeHtml(v.text)}</p><span style=\"font-size:.68rem;color:var(--accent-gold);margin-top:4px;display:inline-flex;align-items:center;gap:4px;\"><i class=\"pd-i pd-i-share-2\"></i> Tap to share</span></div>`).join('');
           modal.style.display='flex';
         };
         window.sendBibleVerse = async (ref)=>{
           const v=BIBLE_VERSES.find(x=>x.ref===ref); if(!v) return;
-          const text=`📖 ${v.ref} — “${v.text}”`;
+          const text=`${v.ref} — “${v.text}”`;
           const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
           await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text, timestamp: serverTimestamp(), delivered:false, read:false, type:'bibleVerse', verseRef: v.ref, verseText: v.text });
-          closeModal('bibleModal'); showToast('Bible verse shared 📖');
+          closeModal('bibleModal'); showToast('Bible verse shared');
         };
         window.filterBibleVerses = ()=>{
           const q=document.getElementById('bibleSearch').value.toLowerCase();
@@ -2804,21 +2842,21 @@
           list.innerHTML = filtered.map(v=>`<div class=\"bible-card\" style=\"cursor:pointer;\" onclick=\"sendBibleVerse('${v.ref.replace(/'/g, "\\'")}')\"><strong style=\"color:var(--accent-green);\">${escapeHtml(v.ref)}</strong><p style=\"font-size:.82rem;line-height:1.5;margin:4px 0 0;\">${escapeHtml(v.text)}</p></div>`).join('') || '<p style="text-align:center;color:var(--text-sub);padding:20px;">No verses found</p>';
         };
         window.shareTestimony = async ()=>{
-          const t=prompt('✨ Share your testimony:');
+          const t=prompt('Share your testimony:');
           if(!t||!t.trim()) return;
           const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
-          await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `✨ TESTIMONY: ${t.trim()} — Glory to God!`, timestamp: serverTimestamp(), delivered:false, read:false, type:'testimony' });
+          await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `TESTIMONY: ${t.trim()} — Glory to God!`, timestamp: serverTimestamp(), delivered:false, read:false, type:'testimony' });
           try{ await addDoc(collection(db,'testimonies'),{ name: currentUser.displayName||'Anonymous', text: t.trim(), timestamp: serverTimestamp(), status:'pending' }); }catch(e){}
-          showToast('Testimony shared ✨');
+          showToast('Testimony shared');
         };
         window.shareDevotional = async ()=>{
           const d=DEVOTIONALS[Math.floor(Math.random()*DEVOTIONALS.length)];
-          const chosen=prompt(`📖 Daily devotional to share:\n${d.title} — ${d.text}\n\nEdit before sharing:`, `${d.title}: ${d.text}`);
+          const chosen=prompt(`Daily devotional to share:\n${d.title} — ${d.text}\n\nEdit before sharing:`, `${d.title}: ${d.text}`);
           if(chosen===null) return;
           const text=chosen.trim()|| `${d.title}: ${d.text}`;
           const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
-          await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `📖 DEVOTIONAL: ${text}`, timestamp: serverTimestamp(), delivered:false, read:false, type:'devotional' });
-          showToast('Devotional shared 📖');
+          await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `DEVOTIONAL: ${text}`, timestamp: serverTimestamp(), delivered:false, read:false, type:'devotional' });
+          showToast('Devotional shared');
         };
         window.shareContact = ()=>{ document.getElementById('contactModal').style.display='flex'; };
         window.sendContact = async ()=>{
@@ -2827,8 +2865,8 @@
           const email=document.getElementById('contactEmail').value.trim();
           if(!name||!phone) return showToast('Name and phone required','error');
           const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
-          await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `👤 Contact: ${name} — ${phone}${email? ' — '+email:''}`, timestamp: serverTimestamp(), delivered:false, read:false, type:'contact', contact:{name, phone, email} });
-          closeModal('contactModal'); document.getElementById('contactName').value=''; document.getElementById('contactPhone').value=''; document.getElementById('contactEmail').value=''; showToast('Contact shared 👤');
+          await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `Contact: ${name} — ${phone}${email? ' — '+email:''}`, timestamp: serverTimestamp(), delivered:false, read:false, type:'contact', contact:{name, phone, email} });
+          closeModal('contactModal'); document.getElementById('contactName').value=''; document.getElementById('contactPhone').value=''; document.getElementById('contactEmail').value=''; showToast('Contact shared');
         };
         // === Location: Current once OR Live (browser GPS, 10s updates, auto-stop) ===
         let liveWatchId = null, liveInterval = null, liveTimeout = null, liveMessageId = null, liveStartTime = null, liveDurationMs = 0, liveUpdateCount = 0;
@@ -2843,7 +2881,7 @@
             const mins = Math.floor(remain/60000);
             const secs = Math.floor((remain%60000)/1000);
             s.style.display='block';
-            s.innerHTML = `<i class="fas fa-circle" style="color:#ef4444;animation:onlinePulse 1.2s infinite;font-size:.6rem;"></i> Live sharing active — ${liveUpdateCount} updates • ends in ${mins}m ${secs}s • accuracy shown on card`;
+            s.innerHTML = `<i class="pd-i pd-i-circle-fill" style="color:#ef4444;animation:onlinePulse 1.2s infinite;font-size:.6rem;"></i> Live sharing active — ${liveUpdateCount} updates • ends in ${mins}m ${secs}s • accuracy shown on card`;
             if(btn) btn.style.display='inline-flex';
           } else {
             s.style.display='none';
@@ -2866,8 +2904,8 @@
             const {latitude, longitude, accuracy}=pos.coords;
             const url=`https://www.google.com/maps?q=${latitude},${longitude}`;
             const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
-            await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `📍 Location: ${latitude.toFixed(5)}, ${longitude.toFixed(5)} ±${Math.round(accuracy)}m`, timestamp: serverTimestamp(), delivered:false, read:false, type:'location', location:{latitude, longitude, url, accuracy: Math.round(accuracy)} });
-            showToast('Location shared 📍 ±'+Math.round(accuracy)+'m');
+            await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `Location: ${latitude.toFixed(5)}, ${longitude.toFixed(5)} ±${Math.round(accuracy)}m`, timestamp: serverTimestamp(), delivered:false, read:false, type:'location', location:{latitude, longitude, url, accuracy: Math.round(accuracy)} });
+            showToast('Location shared ±'+Math.round(accuracy)+'m');
           }, err=> showToast('Location error: '+err.message,'error'), {enableHighAccuracy:true, timeout:15000, maximumAge:0});
         };
         window.startLiveLocationFromModal = async ()=>{
@@ -2893,7 +2931,7 @@
             const docRef = await addDoc(collection(db, path, currentRoom,'messages'),{
               userId: currentUser.uid,
               userName: currentUser.displayName||'Anonymous',
-              text: `📍 Live location — sharing for ${durationMinutes} min`,
+              text: `Live location — sharing for ${durationMinutes} min`,
               timestamp: serverTimestamp(),
               updatedAt: serverTimestamp(),
               delivered:false, read:false,
@@ -2921,7 +2959,7 @@
                 const u=`https://www.google.com/maps?q=${lat},${lng}`;
                 liveUpdateCount++;
                 await updateDoc(msgRef, {
-                  text: `📍 Live location — update ${liveUpdateCount} • ±${Math.round(acc)}m`,
+                  text: `Live location — update ${liveUpdateCount} • ±${Math.round(acc)}m`,
                   updatedAt: serverTimestamp(),
                   'location.latitude': lat,
                   'location.longitude': lng,
@@ -2959,7 +2997,7 @@
             try{
               const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
               const ref=doc(db, path, currentRoom,'messages', liveMessageId);
-              await updateDoc(ref, { live:false, endedAt: serverTimestamp(), text: `📍 Live location — ended after ${Math.round((Date.now()- (liveStartTime||Date.now()))/60000)} min • ${liveUpdateCount} updates` });
+              await updateDoc(ref, { live:false, endedAt: serverTimestamp(), text: `Live location — ended after ${Math.round((Date.now()- (liveStartTime||Date.now()))/60000)} min • ${liveUpdateCount} updates` });
             }catch(e){}
             showToast(isAuto ? 'Live location ended automatically' : 'Live location stopped','info');
           }
@@ -2969,15 +3007,15 @@
         // Clean up live sharing if user switches room / logs out
         window.addEventListener('beforeunload', ()=>{ if(liveWatchId!==null) try{ navigator.geolocation.clearWatch(liveWatchId);}catch(e){} });
         window.createPoll = async ()=>{
-          const q=prompt('📊 Poll question:');
+          const q=prompt('Poll question:');
           if(!q||!q.trim()) return;
           const opts=prompt('Options (comma separated, e.g. Yes, No, Maybe):');
           if(!opts) return;
           const options=opts.split(',').map(s=>s.trim()).filter(Boolean).slice(0,4);
           if(options.length<2) return showToast('Need at least 2 options','error');
           const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
-          await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `📊 Poll: ${q.trim()}`, timestamp: serverTimestamp(), delivered:false, read:false, type:'poll', poll:{question:q.trim(), options: options.map(o=>({text:o, votes:0, voters:[]} )) } });
-          showToast('Poll created 📊');
+          await addDoc(collection(db, path, currentRoom,'messages'),{ userId: currentUser.uid, userName: currentUser.displayName||'Anonymous', text: `Poll: ${q.trim()}`, timestamp: serverTimestamp(), delivered:false, read:false, type:'poll', poll:{question:q.trim(), options: options.map(o=>({text:o, votes:0, voters:[]} )) } });
+          showToast('Poll created');
         };
         window.uploadAudioFile = ()=>{
           const input=document.createElement('input'); input.type='file'; input.accept='audio/*';
@@ -2994,7 +3032,8 @@
           const v=document.getElementById('messageInput').value.trim();
           // optional: show/hide voice vs send could be added
         };
-        window.addReaction = async (msgId, emoji)=>{
+        window.addReaction = async (msgId, reaction)=>{
+          const emoji = reactionKey(reaction);
           const path = currentChatType==='group'? `groupMessages_${currentRoom}`:`privateMessages_${currentRoom}`;
           const ref=doc(db, path, currentRoom,'messages', msgId);
           const snap=await getDoc(ref); if(!snap.exists()) return;
@@ -3040,15 +3079,15 @@
             entries=entries.filter(en=> en.status===callHistoryFilter || en.direction===callHistoryFilter);
           }
           if(!entries.length){
-            c.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-sub);"><i class="fas fa-phone" style="font-size:2rem;opacity:.3;"></i><p>No calls in this filter</p></div>'; return;
+            c.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-sub);"><i class="pd-i pd-i-phone" style="font-size:2rem;opacity:.3;"></i><p>No calls in this filter</p></div>'; return;
           }
           c.innerHTML=entries.slice(0,30).map(en=>{
             const isMissed=en.status==='missed';
-            const icon=isMissed?'fa-phone-slash': (en.direction==='outgoing'?'fa-arrow-up': en.direction==='incoming'?'fa-arrow-down':'fa-phone');
+            const icon=isMissed?'pd-i-phone-off': (en.direction==='outgoing'?'pd-i-arrow-up': en.direction==='incoming'?'pd-i-arrow-down':'pd-i-phone');
             const cls=isMissed?'missed': en.direction==='outgoing'?'outgoing':'incoming';
             const when=en.timestamp?.toDate? moment(en.timestamp.toDate()).calendar(): moment(en.at||Date.now()).calendar();
             const label=isMissed?'Missed': (en.direction==='outgoing'?'Outgoing':'Incoming');
-            return `<div class="call-history-item"><div class="call-icon ${cls}"><i class="fas ${icon}"></i></div><div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(en.withUser||'Believer')} <span style="font-weight:400;font-size:.7rem;color:var(--text-sub);">• ${en.type==='video'? 'Video':'Voice'}</span></div><div style="font-size:.7rem;color:${isMissed?'#ef4444':'var(--text-sub)'};">${isMissed?'': '<i class="fas fa-check"></i> '} ${label} • ${when}</div></div><button class="header-btn" onclick="callbackUser('${(en.withUser||'').replace(/'/g,"\\'")}')" title="Call back"><i class="fas fa-phone"></i></button><button class="header-btn" onclick="callbackVideo('${(en.withUser||'').replace(/'/g,"\\'")}')"><i class="fas fa-video"></i></button></div>`;
+            return `<div class="call-history-item"><div class="call-icon ${cls}"><i class="pd-i ${icon}"></i></div><div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(en.withUser||'Believer')} <span style="font-weight:400;font-size:.7rem;color:var(--text-sub);">• ${en.type==='video'? 'Video':'Voice'}</span></div><div style="font-size:.7rem;color:${isMissed?'#ef4444':'var(--text-sub)'};">${isMissed?'': '<i class="pd-i pd-i-check"></i> '} ${label} • ${when}</div></div><button class="header-btn" onclick="callbackUser('${(en.withUser||'').replace(/'/g,"\\'")}')" title="Call back"><i class="pd-i pd-i-phone"></i></button><button class="header-btn" onclick="callbackVideo('${(en.withUser||'').replace(/'/g,"\\'")}')" aria-label="Video call"><i class="pd-i pd-i-video"></i></button></div>`;
           }).join('');
         };
         window.filterCalls = (f)=>{ callHistoryFilter=f; document.querySelectorAll('.calls-filter').forEach(b=>b.classList.remove('active')); const id='filter'+f.charAt(0).toUpperCase()+f.slice(1); const el=document.getElementById(id); if(el) el.classList.add('active'); loadCallHistory(); };
@@ -3076,7 +3115,7 @@
         window.reportUser = async (uid)=>{
           const reason=prompt('Report reason (spam, abuse, inappropriate content):'); if(reason===null) return;
           if(!reason.trim()) return showToast('Reason required','error');
-          try{ await addDoc(collection(db,'reports'),{ reporter: currentUser.uid, reported: uid||'unknown', reason: reason.trim(), room: currentRoom, timestamp: serverTimestamp() }); showToast('Report sent — thank you 🙏'); }catch(e){ showToast(e.message,'error'); }
+          try{ await addDoc(collection(db,'reports'),{ reporter: currentUser.uid, reported: uid||'unknown', reason: reason.trim(), room: currentRoom, timestamp: serverTimestamp() }); showToast('Report sent — thank you'); }catch(e){ showToast(e.message,'error'); }
         };
         window.loadBlockedUsersCount = async ()=>{
           const el=document.getElementById('blockedCount'); if(!el) return;
@@ -3100,7 +3139,7 @@
         // Request browser notifications permission on first interaction
         function requestNotificationPermission(){
           if('Notification' in window && Notification.permission==='default'){
-            Notification.requestPermission().then(p=>{ if(p==='granted') showToast('Notifications enabled 🔔'); });
+            Notification.requestPermission().then(p=>{ if(p==='granted') showToast('Notifications enabled'); });
           }
         }
         document.addEventListener('click', function _once(){ requestNotificationPermission(); document.removeEventListener('click', _once); }, {once:true});
@@ -3112,7 +3151,7 @@
           loadCustomGroups().then(()=>{
             // inject custom groups into allRooms if not already
             customGroups.forEach(g=>{
-              if(!allRooms.find(r=>r.id===g.id)) allRooms.push({id:g.id, name:g.name, icon:g.icon||'💬', type:'group', custom:true});
+              if(!allRooms.find(r=>r.id===g.id)) allRooms.push({id:g.id, name:g.name, icon:g.icon, type:'group', custom:true});
             });
             if(customGroups.length) renderRoomList();
             refreshLastMessages();
@@ -3157,13 +3196,13 @@
           container.innerHTML = allRooms.map(room=>{
             const last=lastMessagesCache[room.id];
             const isPrivate=room.type==='private';
-            const avatarContent = isPrivate? (room.otherPhoto? `<img src="${room.otherPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : '👤') : (room.icon||'💬');
+            const avatarContent = isPrivate? (room.otherPhoto? `<img src="${room.otherPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : roomIcon('pd-i-user')) : roomIcon(room.icon);
             const lastText = last? (last.text.length>28? last.text.slice(0,28)+'…': last.text) : (isPrivate? (room.online?'online':'last seen recently'):'Tap to join conversation');
             const timeStr = last?.time? moment(last.time.toDate()).format('h:mm A') : '';
             const unread = unreadCounts[room.id]||0;
             return `<div class="room-item ${currentRoom===room.id?'active':''}" onclick="joinRoom('${room.id}','${room.type}')">
               <div class="room-avatar" style="${isPrivate && room.otherPhoto? 'padding:0;overflow:hidden;':''}">${avatarContent}${room.online? '<span class="online-dot"></span>':''}</div>
-              <div class="room-info"><div class="room-name">${escapeHtml(room.name)}${isPrivate && room.online? ' • <span style="font-size:.58rem;color:#22c55e;">● online</span>':''}</div><div class="room-preview">${escapeHtml(lastText)}</div></div>
+              <div class="room-info"><div class="room-name">${escapeHtml(roomName(room.name))}${isPrivate && room.online? ' <span class="online-pill"><i class="pd-i pd-i-circle-fill" aria-hidden="true"></i> online</span>':''}</div><div class="room-preview">${escapeHtml(lastText)}</div></div>
               <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
                 ${timeStr? `<span class="room-time">${timeStr}</span>`:''}
                 ${unread>0? `<span class="room-badge">${unread>99?'99+':unread}</span>`:''}
@@ -3186,11 +3225,11 @@
           if(headerAvatar){
             if(type==='private'){
               const pc=privateChats.find(c=>c.id===roomId);
-              headerAvatar.textContent= pc?.otherName?.charAt(0).toUpperCase()||'👤';
+              if(pc?.otherName) headerAvatar.textContent=pc.otherName.charAt(0).toUpperCase(); else headerAvatar.innerHTML=roomIcon('pd-i-user');
               if(pc?.otherPhoto) headerAvatar.innerHTML=`<img src="${pc.otherPhoto}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
-              if(onlineEl){ onlineEl.style.display='block'; onlineEl.textContent= pc?.otherOnline? '🟢 online — tap for info':'⚪ last seen '+ (pc?.otherLastSeen? moment(pc.otherLastSeen.toDate()).fromNow():'recently'); }
+              if(onlineEl){ onlineEl.style.display='block'; onlineEl.innerHTML= pc?.otherOnline? '<span class="online-pill"><i class="pd-i pd-i-circle-fill" aria-hidden="true"></i> online</span> — tap for info':'last seen '+ (pc?.otherLastSeen? moment(pc.otherLastSeen.toDate()).fromNow():'recently'); }
             } else {
-              headerAvatar.textContent= room?.icon||'🌍';
+              headerAvatar.innerHTML= roomIcon(room?.icon, 'pd-i-globe');
               if(onlineEl) onlineEl.style.display='none';
             }
           }
@@ -3203,7 +3242,7 @@
           // update cache
           if(messages.length){
             const last=messages[messages.length-1];
-            lastMessagesCache[currentRoom]={text: last.text|| (last.mediaType? `[${last.mediaType}]`: last.poll? '📊 Poll': last.contact? '👤 Contact': last.location? '📍 Location': ''), time: last.timestamp, unread:0};
+            lastMessagesCache[currentRoom]={text: last.text|| (last.mediaType? `[${last.mediaType}]`: last.poll? 'Poll': last.contact? 'Contact': last.location? 'Location': ''), time: last.timestamp, unread:0};
             // unread for other rooms
             messages.forEach(m=>{
               if(m.userId!==currentUser.uid && !m.read){
@@ -3244,15 +3283,15 @@
               }
             }
             if(isOwn){
-              if(msg.read) statusIcon='<span class="delivery-status read"><i class="fas fa-check-double"></i></span>';
-              else if(msg.delivered) statusIcon='<span class="delivery-status delivered"><i class="fas fa-check-double"></i></span>';
-              else statusIcon='<span class="delivery-status"><i class="fas fa-check"></i></span>';
+              if(msg.read) statusIcon='<span class="delivery-status read"><i class="pd-i pd-i-check-check"></i></span>';
+              else if(msg.delivered) statusIcon='<span class="delivery-status delivered"><i class="pd-i pd-i-check-check"></i></span>';
+              else statusIcon='<span class="delivery-status"><i class="pd-i pd-i-check"></i></span>';
             }
             // message content by type
             let body='';
             if(msg.type==='contact' && msg.contact){
               const c=msg.contact;
-              body=`<div class="contact-card"><strong><i class="fas fa-user"></i> ${escapeHtml(c.name)}</strong><span><i class="fas fa-phone"></i> ${escapeHtml(c.phone)}</span>${c.email? `<span><i class="fas fa-envelope"></i> ${escapeHtml(c.email)}</span>`:''}<button class="header-btn" style="margin-top:6px;font-size:.7rem;" onclick="alert('Saved ${escapeHtml(c.name)}')"><i class="fas fa-user-plus"></i> Add to contacts</button></div>`;
+              body=`<div class="contact-card"><strong><i class="pd-i pd-i-user"></i> ${escapeHtml(c.name)}</strong><span><i class="pd-i pd-i-phone"></i> ${escapeHtml(c.phone)}</span>${c.email? `<span><i class="pd-i pd-i-mail"></i> ${escapeHtml(c.email)}</span>`:''}<button class="header-btn" style="margin-top:6px;font-size:.7rem;" onclick="alert('Saved ${escapeHtml(c.name)}')"><i class="pd-i pd-i-user-plus"></i> Add to contacts</button></div>`;
             } else if((msg.type==='location' || msg.type==='liveLocation') && msg.location){
               const isLive = msg.type==='liveLocation' || msg.live===true || msg.live===false;
               const acc = msg.location.accuracy ?? msg.accuracy;
@@ -3262,34 +3301,34 @@
                 const remainMs = msg.expiresAt.toDate().getTime() - Date.now();
                 if(remainMs>0){ const rm=Math.ceil(remainMs/60000); remainText = ` • ends in ~${rm} min`; } else remainText=' • ending…';
               } else if(isLive && !isEnded && msg.durationMinutes){ remainText = ` • live for ${msg.durationMinutes} min`; }
-              const liveBadge = isLive ? (isEnded ? `<span style="background:#64748b;color:#fff;font-size:.6rem;padding:2px 6px;border-radius:20px;margin-left:6px;">Ended</span>` : `<span style="background:#ef4444;color:#fff;font-size:.6rem;padding:2px 6px;border-radius:20px;margin-left:6px;animation:onlinePulse 1.2s infinite;">● LIVE</span>`) : '';
+              const liveBadge = isLive ? (isEnded ? `<span style="background:#64748b;color:#fff;font-size:.6rem;padding:2px 6px;border-radius:20px;margin-left:6px;">Ended</span>` : `<span style="background:#ef4444;color:#fff;font-size:.6rem;padding:2px 6px;border-radius:20px;margin-left:6px;animation:onlinePulse 1.2s infinite;"><i class="pd-i pd-i-circle-fill" aria-hidden="true"></i> LIVE</span>`) : '';
               const accText = acc!=null ? ` • ±${Math.round(acc)}m accuracy` : '';
               const updateInfo = msg.location.updatedAt ? `<span style="font-size:.65rem;color:var(--text-sub);">Updated ${moment(msg.location.updatedAt).fromNow()} • every ~10s${remainText}</span>` : (isLive && !isEnded ? `<span style="font-size:.65rem;color:var(--text-sub);">Live • updates every ~10s${remainText}</span>` : (accText ? `<span style="font-size:.65rem;color:var(--text-sub);">Accuracy ${accText.trim()}</span>` : ''));
-              const stopBtn = (isLive && !isEnded && currentUser && msg.userId===currentUser.uid) ? `<button class="header-btn" style="margin-top:6px;font-size:.68rem;background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.3);" onclick="stopLiveLocation()"><i class="fas fa-stop-circle"></i> Stop sharing</button>` : '';
-              body=`<div class="location-card"><strong><i class="fas fa-map-marker-alt"></i> ${isLive ? 'Live location' : 'Shared location'}${liveBadge}</strong><span style="font-size:.75rem;">${msg.location.latitude?.toFixed(5)}, ${msg.location.longitude?.toFixed(5)}${accText}</span>${updateInfo}<a href="${msg.location.url}" target="_blank" class="header-btn" style="margin-top:6px;display:inline-flex;"><i class="fas fa-external-link-alt"></i> Open in Maps</a>${stopBtn}</div>`;
+              const stopBtn = (isLive && !isEnded && currentUser && msg.userId===currentUser.uid) ? `<button class="header-btn" style="margin-top:6px;font-size:.68rem;background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.3);" onclick="stopLiveLocation()"><i class="pd-i pd-i-circle-stop"></i> Stop sharing</button>` : '';
+              body=`<div class="location-card"><strong><i class="pd-i pd-i-map-pin"></i> ${isLive ? 'Live location' : 'Shared location'}${liveBadge}</strong><span style="font-size:.75rem;">${msg.location.latitude?.toFixed(5)}, ${msg.location.longitude?.toFixed(5)}${accText}</span>${updateInfo}<a href="${msg.location.url}" target="_blank" class="header-btn" style="margin-top:6px;display:inline-flex;"><i class="pd-i pd-i-external-link"></i> Open in Maps</a>${stopBtn}</div>`;
             } else if(msg.type==='bibleVerse'){
-              body=`<div class="bible-card"><strong style="color:var(--accent-gold);"><i class="fas fa-book-bible"></i> ${escapeHtml(msg.verseRef||'Bible Verse')}</strong><p style="font-style:italic;line-height:1.5;">“${escapeHtml(msg.verseText||msg.text)}</p></div>`;
+              body=`<div class="bible-card"><strong style="color:var(--accent-gold);"><i class="pd-i pd-i-book"></i> ${escapeHtml(msg.verseRef||'Bible Verse')}</strong><p style="font-style:italic;line-height:1.5;">“${escapeHtml(msg.verseText||msg.text)}</p></div>`;
             } else if(msg.type==='prayerRequest'){
-              body=`<div class="prayer-card" style="border-left:3px solid var(--accent-gold);"><strong style="color:var(--accent-green);"><i class="fas fa-praying-hands"></i> Prayer Request</strong><p>${escapeHtml(msg.prayerText||msg.text)}</p><button class="christian-btn" style="margin-top:6px;" onclick="sendSuggestion('I am praying for you 🙏 — ${escapeHtml((msg.userName||'friend').replace(/'/g,"\\'"))}')"><i class="fas fa-pray"></i> I will pray</button></div>`;
+              body=`<div class="prayer-card" style="border-left:3px solid var(--accent-gold);"><strong style="color:var(--accent-green);"><i class="pd-i pd-i-hands-praying"></i> Prayer Request</strong><p>${escapeHtml(msg.prayerText||msg.text)}</p><button class="christian-btn" style="margin-top:6px;" onclick="sendSuggestion('I am praying for you — ${escapeHtml((msg.userName||'friend').replace(/'/g,"\\'"))}')"><i class="pd-i pd-i-hands-praying"></i> I will pray</button></div>`;
             } else if(msg.type==='poll' && msg.poll){
               const total=msg.poll.options.reduce((a,b)=>a+b.votes,0)||1;
-              body=`<div class="bible-card"><strong>📊 ${escapeHtml(msg.poll.question)}</strong>${msg.poll.options.map((o,idx)=>`<button onclick="votePoll('${msg.id}',${idx})" style="display:block;width:100%;text-align:left;margin:6px 0;padding:8px 12px;border-radius:12px;border:1px solid var(--border-color);background:var(--bg-primary);font-size:.78rem;">${escapeHtml(o.text)} <span style="float:right;color:var(--text-sub);">${o.votes} votes</span><div style="height:4px;background:rgba(212,175,55,.3);border-radius:10px;margin-top:4px;"><div style="width:${Math.round(o.votes/total*100)}%;height:100%;background:var(--accent-gold);border-radius:10px;"></div></div></button>`).join('')}<span style="font-size:.65rem;color:var(--text-sub);">${total} total votes • Tap to vote</span></div>`;
+              body=`<div class="bible-card"><strong><i class="pd-i pd-i-chart-bar" aria-hidden="true"></i> ${escapeHtml(msg.poll.question)}</strong>${msg.poll.options.map((o,idx)=>`<button onclick="votePoll('${msg.id}',${idx})" style="display:block;width:100%;text-align:left;margin:6px 0;padding:8px 12px;border-radius:12px;border:1px solid var(--border-color);background:var(--bg-primary);font-size:.78rem;">${escapeHtml(o.text)} <span style="float:right;color:var(--text-sub);">${o.votes} votes</span><div style="height:4px;background:rgba(212,175,55,.3);border-radius:10px;margin-top:4px;"><div style="width:${Math.round(o.votes/total*100)}%;height:100%;background:var(--accent-gold);border-radius:10px;"></div></div></button>`).join('')}<span style="font-size:.65rem;color:var(--text-sub);">${total} total votes • Tap to vote</span></div>`;
             } else {
               if(msg.text) body=`<div class="message-text">${escapeHtml(msg.text)}</div>`;
               if(msg.mediaUrl){
                 if(msg.mediaType==='image') body+=`<img src="${msg.mediaUrl}" class="message-media" onclick="viewMedia('${msg.mediaUrl}')">`;
                 else if(msg.mediaType==='video') body+=`<video src="${msg.mediaUrl}" class="message-media" controls onclick="event.stopPropagation()"></video>`;
-                else if(msg.mediaType==='document') body+=`<a href="${msg.mediaUrl}" target="_blank" class="message-media" style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(0,0,0,0.05);border-radius:12px;text-decoration:none;color:var(--text-main);"><i class="fas fa-file-pdf"></i> ${escapeHtml(msg.mediaName||'Document')}</a>`;
+                else if(msg.mediaType==='document') body+=`<a href="${msg.mediaUrl}" target="_blank" class="message-media" style="display:flex;align-items:center;gap:10px;padding:10px;background:rgba(0,0,0,0.05);border-radius:12px;text-decoration:none;color:var(--text-main);"><i class="pd-i pd-i-file-text"></i> ${escapeHtml(msg.mediaName||'Document')}</a>`;
                 else if(msg.mediaType==='audio') body+=`<audio src="${msg.mediaUrl}" controls style="margin-top:8px;width:100%;"></audio>`;
               }
             }
             // reactions
             const reacts=msg.reactions||{};
-            const reactsHtml=Object.keys(reacts).length? `<div class="msg-reactions">${Object.entries(reacts).map(([emoji,users])=>`<span class="msg-reaction">${emoji} ${users.length}</span>`).join('')}</div>`:'';
-            const reactBar=`<div style="position:absolute;top:-30px;right:8px;display:none;" class="reaction-bar" id="react-${msg.id}"><button onclick="addReaction('${msg.id}','❤️')">❤️</button><button onclick="addReaction('${msg.id}','🙏')">🙏</button><button onclick="addReaction('${msg.id}','😇')">😇</button><button onclick="addReaction('${msg.id}','🔥')">🔥</button><button onclick="addReaction('${msg.id}','✨')">✨</button><button onclick="addReaction('${msg.id}','👏')">👏</button></div>`;
+            const reactsHtml=Object.keys(reacts).length? `<div class="msg-reactions">${Object.entries(reacts).map(([emoji,users])=>`<span class="msg-reaction">${reactionIcon(emoji)} ${users.length}</span>`).join('')}</div>`:'';
+            const reactBar=`<div style="position:absolute;top:-30px;right:8px;display:none;" class="reaction-bar" id="react-${msg.id}">${CHAT_REACTIONS.map(r => `<button onclick="addReaction('${msg.id}','${r.id}')" aria-label="${r.label}" title="${r.label}"><i class="pd-i ${r.icon}" aria-hidden="true"></i></button>`).join('')}</div>`;
             return `${dateDivider}<div class="message ${isOwn?'sent':'received'}" onmouseenter="document.getElementById('react-${msg.id}')&&(document.getElementById('react-${msg.id}').style.display='flex')" onmouseleave="document.getElementById('react-${msg.id}')&&(document.getElementById('react-${msg.id}').style.display='none')" ontouchstart="document.getElementById('react-${msg.id}')&&(document.getElementById('react-${msg.id}').style.display='flex')" style="position:relative;">
               <div class="message-avatar">${(msg.userName||'A').charAt(0).toUpperCase()}</div>
-              <div class="message-bubble">${reactBar}<div class="message-name">${escapeHtml(msg.userName||'Anonymous')}${isAdmin && !isOwn? `<span class="admin-badge" style="cursor:pointer;" onclick="deleteMessage('${msg.id}')">Delete</span>`:''} <span style="font-size:.6rem;cursor:pointer;color:var(--text-sub);" onclick="addReaction('${msg.id}','❤️')" title="React">♡</span></div>${body}${reactsHtml}<div class="message-time">${msg.timestamp? moment(msg.timestamp.toDate()).format('h:mm A'):'Just now'} ${statusIcon}</div></div></div>`;
+              <div class="message-bubble">${reactBar}<div class="message-name">${escapeHtml(msg.userName||'Anonymous')}${isAdmin && !isOwn? `<span class="admin-badge" style="cursor:pointer;" onclick="deleteMessage('${msg.id}')">Delete</span>`:''} <span style="font-size:.6rem;cursor:pointer;color:var(--text-sub);" onclick="addReaction('${msg.id}','love')" title="React" aria-label="React"><i class="pd-i pd-i-heart" aria-hidden="true"></i></span></div>${body}${reactsHtml}<div class="message-time">${msg.timestamp? moment(msg.timestamp.toDate()).format('h:mm A'):'Just now'} ${statusIcon}</div></div></div>`;
           }).join('');
           container.scrollTop=container.scrollHeight;
           // mark read
@@ -3309,7 +3348,7 @@
           if(poll.options.some(o=> (o.voters||[]).includes(currentUser.uid))) return showToast('You already voted','info');
           poll.options[idx].votes=(poll.options[idx].votes||0)+1;
           poll.options[idx].voters=poll.options[idx].voters||[]; poll.options[idx].voters.push(currentUser.uid);
-          await updateDoc(ref,{poll}); showToast('Vote recorded ✓');
+          await updateDoc(ref,{poll}); showToast('Vote recorded');
         };
         // patch loadStatuses to handle text & reactions
         const _origLoadStatuses = loadStatuses;
@@ -3324,7 +3363,7 @@
           if(myStats){
             if(my.length) {
               const views=my.reduce((s,x)=> s + (x.viewers?.length||0),0);
-              myStats.innerHTML=`<i class="fas fa-eye"></i> ${views} views • ${my.length} active`;
+              myStats.innerHTML=`<i class="pd-i pd-i-eye"></i> ${views} views • ${my.length} active`;
             } else myStats.innerHTML='No active status';
           }
           // also show my statuses as deletable row above grid
@@ -3343,7 +3382,7 @@
             const myHtml=my.map(st=>{
               const isText=st.mediaType==='text';
               const preview=isText? `<div style="width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:${escapeHtml(st.bg||'#0A4D9B')};color:#fff;padding:12px;text-align:center;font-weight:700;font-size:.78rem;">${escapeHtml((st.text||'').slice(0,80))}</div>` : (st.mediaType==='image'? `<img src="${st.mediaUrl}" loading="lazy">`:`<video src="${st.mediaUrl}"></video>`);
-              return `<div class="status-item" style="border-color:#10b981;position:relative;" onclick="viewStatus('${st.id}','${(st.mediaUrl||'').replace(/'/g,"\\'")}','${st.mediaType}','${escapeHtml(st.userName)}','${st.timestamp?.toDate()}')">${preview}<div class="status-info"><div class="status-name">My Status • ${st.viewers?.length||0} views</div><div class="status-time">${st.timestamp? moment(st.timestamp.toDate()).fromNow():''}</div></div><button onclick="event.stopPropagation();deleteStatus('${st.id}')" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;"><i class="fas fa-trash" style="font-size:.7rem;"></i></button></div>`;
+              return `<div class="status-item" style="border-color:#10b981;position:relative;" onclick="viewStatus('${st.id}','${(st.mediaUrl||'').replace(/'/g,"\\'")}','${st.mediaType}','${escapeHtml(st.userName)}','${st.timestamp?.toDate()}')">${preview}<div class="status-info"><div class="status-name">My Status • ${st.viewers?.length||0} views</div><div class="status-time">${st.timestamp? moment(st.timestamp.toDate()).fromNow():''}</div></div><button onclick="event.stopPropagation();deleteStatus('${st.id}')" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;" aria-label="Delete status"><i class="pd-i pd-i-trash" style="font-size:.7rem;"></i></button></div>`;
             }).join('');
             container.innerHTML = myHtml + container.innerHTML;
           }

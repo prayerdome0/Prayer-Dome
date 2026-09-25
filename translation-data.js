@@ -36,7 +36,6 @@ const PD_LANGUAGES = [
     code: 'en',
     name: 'English',
     endonym: 'English',
-    flag: '🇬🇧',
     source: 'King James Version (public domain)',
     official: true,
     speech: ['en-GB', 'en-US', 'en'],
@@ -46,7 +45,6 @@ const PD_LANGUAGES = [
     code: 'tum',
     name: 'Tumbuka',
     endonym: 'Chitumbuka',
-    flag: '🇲🇼',
     source: 'Prayer Dome community draft — awaiting review',
     official: false,
     // No browser voice ships with Tumbuka. Nyanja/Swahili phonetics are the
@@ -59,7 +57,6 @@ const PD_LANGUAGES = [
     code: 'ssw',
     name: 'siSwati',
     endonym: 'siSwati',
-    flag: '🇸🇿',
     source: 'Prayer Dome community draft — awaiting review',
     official: false,
     // Zulu is the nearest Nguni voice most devices actually carry.
@@ -71,7 +68,6 @@ const PD_LANGUAGES = [
     code: 'bem',
     name: 'Bemba',
     endonym: 'Ichibemba',
-    flag: '🇿🇲',
     source: 'Prayer Dome community draft — awaiting review',
     official: false,
     // No browser voice ships with Bemba; Swahili phonetics are the closest
@@ -84,7 +80,6 @@ const PD_LANGUAGES = [
     code: 'nya',
     name: 'Nyanja (Chichewa)',
     endonym: 'Chinyanja',
-    flag: '🇲🇼',
     source: 'Prayer Dome community draft — awaiting review',
     official: false,
     // Nyanja has no dedicated browser voice; Swahili phonetics are the

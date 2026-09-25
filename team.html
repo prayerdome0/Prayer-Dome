@@ -124,7 +124,8 @@
 }
     </script>
     <!-- PD-SEO:END -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/pd-icons.css">
+    <script src="/assets/pd-icons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
@@ -660,6 +661,10 @@
             .logo-ring { width: 45px; height: 45px; }
             .brand-text h1 { font-size: 1.1rem; }
         }
+        /* Dark mode: brand blue (#0A4D9B) is about 2:1 on navy, so headings and icons use the
+           light brand tint (#93c5fd) and controls without a colour get readable text. */
+        body.dark-mode .category-btn:not(.active) { color: #e2e8f0; }
+        body.dark-mode .footer-section h3 { color: #93c5fd; }
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
@@ -684,8 +689,8 @@
             </div>
         </div>
         <div class="header-actions">
-            <a href="index.html" class="back-btn"><i class="fas fa-home"></i> Home</a>
-            <button class="theme-btn" onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+            <a href="index.html" class="back-btn"><i class="pd-i pd-i-house"></i> Home</a>
+            <button class="theme-btn" onclick="toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>
         </div>
     </header>
 
@@ -694,10 +699,10 @@
         <div class="pd-special-banner" role="region" aria-label="Prayer Dome welcome">
             <div class="pd-special-shine"></div>
             <div class="pd-special-inner">
-                <span class="pd-special-badge"><i class="fas fa-fire"></i> A House of Prayer for All Nations</span>
+                <span class="pd-special-badge"><i class="pd-i pd-i-flame"></i> A House of Prayer for All Nations</span>
                 <h2 class="pd-special-title">The Dome Is Alive &mdash; Meet the Family</h2>
                 <p class="pd-special-text">Pastors, worship leaders and ministry servants across <strong>Zambia, Eswatini &amp; Ireland</strong> &mdash; united by prayer, bound by love, sent to the nations.</p>
-                <div class="pd-special-crown"><i class="fas fa-crown"></i><span>Matthew 21:13</span></div>
+                <div class="pd-special-crown"><i class="pd-i pd-i-crown"></i><span>Matthew 21:13</span></div>
             </div>
         </div>
 
@@ -709,17 +714,17 @@
                      onerror="this.onerror=null;this.src='/assets/logo.png';this.style.objectFit='contain';this.style.padding='16px';this.style.background='#fff';">
             </div>
             <h1 id="founderName">Seedwell Khayalethu Masuku</h1>
-            <h3 id="founderTitle"><i class="fas fa-crown"></i> Founder &amp; Senior Pastor</h3>
+            <h3 id="founderTitle"><i class="pd-i pd-i-crown"></i> Founder &amp; Senior Pastor</h3>
             <p id="founderQuote">"A House of Prayer for All Nations – Matthew 21:13. Our calling is to see lives transformed through the power of prayer and the Word of God."</p>
         </div>
 
         <!-- Category Tabs -->
         <div class="category-tabs" id="categoryTabs">
-            <button class="category-btn active" onclick="filterTeam('all')"><i class="fas fa-users"></i> All Team</button>
-            <button class="category-btn" onclick="filterTeam('eswatini')"><i class="fas fa-flag"></i> Eswatini</button>
-            <button class="category-btn" onclick="filterTeam('zambia')"><i class="fas fa-flag"></i> Zambia</button>
-            <button class="category-btn" onclick="filterTeam('worship')"><i class="fas fa-music"></i> Worship</button>
-            <button class="category-btn" onclick="filterTeam('ministries')"><i class="fas fa-church"></i> Ministries</button>
+            <button class="category-btn active" onclick="filterTeam('all')"><i class="pd-i pd-i-users"></i> All Team</button>
+            <button class="category-btn" onclick="filterTeam('eswatini')"><i class="pd-i pd-i-flag"></i> Eswatini</button>
+            <button class="category-btn" onclick="filterTeam('zambia')"><i class="pd-i pd-i-flag"></i> Zambia</button>
+            <button class="category-btn" onclick="filterTeam('worship')"><i class="pd-i pd-i-music"></i> Worship</button>
+            <button class="category-btn" onclick="filterTeam('ministries')"><i class="pd-i pd-i-church"></i> Ministries</button>
         </div>
 
         <!-- Team Grid -->
@@ -728,9 +733,9 @@
         <!-- ADMIN: Team Management (visible to administrators only) -->
         <section id="teamAdminPanel" style="display:none; margin-top:28px; background:var(--bg-primary,#fff); border:1px solid rgba(10,77,155,.25); border-radius:20px; padding:22px;">
             <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-                <h2 style="margin:0; font-size:1.05rem; color:#0A4D9B;"><i class="fas fa-user-gear"></i> Team Management</h2>
+                <h2 style="margin:0; font-size:1.05rem; color:#0A4D9B;"><i class="pd-i pd-i-user-cog"></i> Team Management</h2>
                 <span id="teamAdminBadge" style="font-size:.68rem; font-weight:800; letter-spacing:.6px; background:rgba(10,77,155,.12); color:#0A4D9B; border-radius:50px; padding:4px 12px;">ADMIN</span>
-                <button class="category-btn" style="margin-left:auto;" onclick="openTeamEditor()"><i class="fas fa-plus"></i> Add Team Member</button>
+                <button class="category-btn" style="margin-left:auto;" onclick="openTeamEditor()"><i class="pd-i pd-i-plus"></i> Add Team Member</button>
             </div>
             <p style="font-size:.78rem; color:var(--text-sub,#64748b); margin:8px 0 14px;">Changes appear on the public team page immediately. Removing a member archives their profile — nothing is deleted without a second confirmation.</p>
             <div id="teamAdminList" style="display:grid; gap:10px;"></div>
@@ -742,13 +747,13 @@
                 <div style="display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border-color,#e5eaf2); position:sticky; top:0; background:var(--bg-primary,#fff); border-radius:22px 22px 0 0;">
                     <img src="/assets/logo.png" alt="" style="width:30px;height:30px;border-radius:8px;object-fit:contain;">
                     <h3 id="teamEditorTitle" style="margin:0; font-size:1rem; color:#0A4D9B; flex:1;">Add Team Member</h3>
-                    <button onclick="closeTeamEditor()" style="border:0;background:var(--bg-card,#f1f4f9);width:32px;height:32px;border-radius:50%;cursor:pointer;color:inherit;"><i class="fas fa-xmark"></i></button>
+                    <button onclick="closeTeamEditor()" style="border:0;background:var(--bg-card,#f1f4f9);width:32px;height:32px;border-radius:50%;cursor:pointer;color:inherit;" aria-label="Close"><i class="pd-i pd-i-x"></i></button>
                 </div>
                 <div style="padding:18px 20px; display:grid; gap:12px;">
                     <div style="display:flex; gap:14px; align-items:center;">
                         <img id="tmPhotoPreview" src="/assets/logo.png" alt="" style="width:74px;height:74px;border-radius:16px;object-fit:cover;background:#eef2f8;">
                         <div>
-                            <button type="button" class="category-btn" onclick="pickTeamPhoto()"><i class="fas fa-camera"></i> Choose Photo</button>
+                            <button type="button" class="category-btn" onclick="pickTeamPhoto()"><i class="pd-i pd-i-camera"></i> Choose Photo</button>
                             <div id="tmPhotoState" style="font-size:.72rem;color:var(--text-sub,#64748b);margin-top:6px;">Photos open your device picker and upload automatically.</div>
                         </div>
                     </div>
@@ -779,7 +784,7 @@
                 </div>
                 <div style="display:flex; gap:10px; padding:0 20px 20px;">
                     <button class="category-btn" style="flex:1; justify-content:center;" onclick="closeTeamEditor()">Cancel</button>
-                    <button class="category-btn active" id="teamEditorSave" style="flex:1; justify-content:center;" onclick="saveTeamMember()"><i class="fas fa-cloud-arrow-up"></i> Save Member</button>
+                    <button class="category-btn active" id="teamEditorSave" style="flex:1; justify-content:center;" onclick="saveTeamMember()"><i class="pd-i pd-i-cloud-upload"></i> Save Member</button>
                 </div>
             </div>
         </div>
@@ -789,21 +794,21 @@
     <footer class="team-footer">
         <div class="footer-content">
             <div class="footer-section">
-                <h3><i class="fas fa-church"></i> Prayer Dome</h3>
+                <h3><i class="pd-i pd-i-church"></i> Prayer Dome</h3>
                 <p>A House of Prayer for All Nations</p>
-                <p><i class="fas fa-map-marker-alt"></i> Eswatini & Zambia</p>
-                <p><i class="fas fa-phone-alt"></i> +268 7658 1804</p>
-                <p><i class="fas fa-envelope"></i> info@prayerdome.net</p>
+                <p><i class="pd-i pd-i-map-pin"></i> Eswatini & Zambia</p>
+                <p><i class="pd-i pd-i-phone"></i> +268 7658 1804</p>
+                <p><i class="pd-i pd-i-mail"></i> info@prayerdome.net</p>
             </div>
             <div class="footer-section">
-                <h3><i class="fas fa-crown"></i> Our Leadership</h3>
-                <p><i class="fas fa-user-tie"></i> Pastor Seedwell K. Masuku - Founder</p>
-                <p><i class="fas fa-church"></i> 6 Pastors in Eswatini</p>
-                <p><i class="fas fa-church"></i> 2 Pastors in Zambia</p>
-                <p><i class="fas fa-music"></i> 5 Worship Leaders</p>
+                <h3><i class="pd-i pd-i-crown"></i> Our Leadership</h3>
+                <p><i class="pd-i pd-i-user-star"></i> Pastor Seedwell K. Masuku - Founder</p>
+                <p><i class="pd-i pd-i-church"></i> 6 Pastors in Eswatini</p>
+                <p><i class="pd-i pd-i-church"></i> 2 Pastors in Zambia</p>
+                <p><i class="pd-i pd-i-music"></i> 5 Worship Leaders</p>
             </div>
             <div class="footer-section">
-                <h3><i class="fas fa-bible"></i> Scripture</h3>
+                <h3><i class="pd-i pd-i-book"></i> Scripture</h3>
                 <p>"How good and pleasant it is when God's people live together in unity!"</p>
                 <p><i>Psalm 133:1</i></p>
                 <p style="margin-top: 10px;">"So Christ himself gave the apostles, the prophets, the evangelists, the pastors and teachers, to equip his people for works of service."</p>
@@ -880,7 +885,7 @@
             renderTeamAdmin();
 
             if (!filtered.length) {
-                container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-sub,#64748b);"><i class="fas fa-users" style="font-size:1.6rem;opacity:.4;display:block;margin-bottom:10px;"></i>No team members in this category yet.</div>';
+                container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-sub,#64748b);"><i class="pd-i pd-i-users" style="font-size:1.6rem;opacity:.4;display:block;margin-bottom:10px;"></i>No team members in this category yet.</div>';
                 return;
             }
             container.innerHTML = filtered.map((member, index) => `
@@ -895,15 +900,15 @@
                         <div class="team-name">${member.name}</div>
                         <div class="team-title">${member.title}</div>
                         <div class="team-badges">
-                            <span class="team-badge"><i class="fas ${member.category === 'founder' ? 'fa-crown' : member.category === 'worship' ? 'fa-music' : member.category === 'ministries' ? 'fa-church' : 'fa-flag'}"></i> ${getCategoryName(member.category)}</span>
-                            ${member.country ? `<span class="team-badge"><i class="fas fa-globe"></i> ${member.country}</span>` : ''}
-                            ${member.role ? `<span class="team-badge"><i class="fas fa-user-tag"></i> ${member.role}</span>` : ''}
+                            <span class="team-badge"><i class="pd-i ${member.category === 'founder' ? 'pd-i-crown' : member.category === 'worship' ? 'pd-i-music' : member.category === 'ministries' ? 'pd-i-church' : 'pd-i-flag'}"></i> ${getCategoryName(member.category)}</span>
+                            ${member.country ? `<span class="team-badge"><i class="pd-i pd-i-globe"></i> ${member.country}</span>` : ''}
+                            ${member.role ? `<span class="team-badge"><i class="pd-i pd-i-tag"></i> ${member.role}</span>` : ''}
                         </div>
                         <div class="team-social">
-                            <a href="#" onclick="shareTeamMember('${member.name}')"><i class="fas fa-share-alt"></i></a>
-                            <a href="#" onclick="prayForMember('${member.name}')"><i class="fas fa-praying-hands"></i></a>
-                            ${member.email ? `<a href="mailto:${member.email}" title="Email ${member.name}"><i class="fas fa-envelope"></i></a>` : `<a href="#" onclick="contactMember('${member.name}')"><i class="fas fa-envelope"></i></a>`}
-                            ${member.phone ? `<a href="tel:${member.phone}" title="Call ${member.name}"><i class="fas fa-phone"></i></a>` : ''}
+                            <a href="#" onclick="shareTeamMember('${member.name}')" aria-label="Share"><i class="pd-i pd-i-share-2"></i></a>
+                            <a href="#" onclick="prayForMember('${member.name}')" aria-label="Pray for this member"><i class="pd-i pd-i-hands-praying"></i></a>
+                            ${member.email ? `<a href="mailto:${member.email}" title="Email ${member.name}"><i class="pd-i pd-i-mail"></i></a>` : `<a href="#" onclick="contactMember('${member.name}')" aria-label="Contact"><i class="pd-i pd-i-mail"></i></a>`}
+                            ${member.phone ? `<a href="tel:${member.phone}" title="Call ${member.name}"><i class="pd-i pd-i-phone"></i></a>` : ''}
                         </div>
                     </div>
                 </div>
@@ -935,7 +940,7 @@
         };
 
         window.shareTeamMember = function(name) {
-            const text = `Join me in supporting ${name} at Prayer Dome Ministry! 🙏 #PrayerDome`;
+            const text = `Join me in supporting ${name} at Prayer Dome Ministry! #PrayerDome`;
             if (navigator.share) {
                 navigator.share({ title: 'Prayer Dome Team', text: text });
             } else {
@@ -945,7 +950,7 @@
         };
 
         window.prayForMember = function(name) {
-            showToast(`🙏 Praying for ${name}. God bless their ministry!`, 'success');
+            showToast(`Praying for ${name}. God bless their ministry!`, 'success');
             confetti({ particleCount: 50, spread: 50, origin: { y: 0.6 } });
         };
 
@@ -963,7 +968,7 @@
             }
             const toast = document.createElement('div');
             toast.className = `toast ${type === 'error' ? 'error' : ''}`;
-            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i> ${message}`;
+            toast.innerHTML = `<i class="pd-i ${type === 'success' ? 'pd-i-circle-check' : 'pd-i-info'}"></i> ${message}`;
             document.getElementById('toastContainer').appendChild(toast);
             setTimeout(() => toast.remove(), 3500);
         }
@@ -971,7 +976,7 @@
         window.toggleDarkMode = function() {
             document.body.classList.toggle('dark-mode');
             const btn = document.querySelector('.theme-btn i');
-            if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
+            if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'pd-i pd-i-sun' : 'pd-i pd-i-moon';
         };
 
         function renderFounder(all) {
@@ -983,7 +988,7 @@
             const quote = document.getElementById('founderQuote');
             if (founder.image && img && img.src !== founder.image) img.src = founder.image;
             if (name && founder.name) name.textContent = founder.name;
-            if (title && founder.title) title.innerHTML = '<i class="fas fa-crown"></i> ' + founder.title;
+            if (title && founder.title) title.innerHTML = '<i class="pd-i pd-i-crown"></i> ' + founder.title;
             if (quote && founder.description) quote.textContent = '"' + founder.description + (founder.scripture ? ' – ' + founder.scripture : '') + '"';
         }
 
@@ -1007,9 +1012,9 @@
                         <div style="font-size:.72rem;color:var(--text-sub,#64748b);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.title || ''}${m.email ? ' · ' + m.email : ''}${m.phone ? ' · ' + m.phone : ''}</div>
                     </div>
                     ${m.archived
-                        ? `<button class="category-btn" onclick="restoreTeamMember('${m.id}')" title="Restore"><i class="fas fa-rotate-left"></i></button>`
-                        : `<button class="category-btn" onclick="openTeamEditor('${m.id}')" title="Edit"><i class="fas fa-pen"></i></button>
-                           <button class="category-btn" onclick="archiveTeamMember('${m.id}')" title="Archive" style="color:#b45309;"><i class="fas fa-box-archive"></i></button>`}
+                        ? `<button class="category-btn" onclick="restoreTeamMember('${m.id}')" title="Restore"><i class="pd-i pd-i-rotate-ccw"></i></button>`
+                        : `<button class="category-btn" onclick="openTeamEditor('${m.id}')" title="Edit"><i class="pd-i pd-i-pen"></i></button>
+                           <button class="category-btn" onclick="archiveTeamMember('${m.id}')" title="Archive" style="color:#b45309;"><i class="pd-i pd-i-archive"></i></button>`}
                 </div>
             `).join('');
         }
@@ -1116,7 +1121,7 @@
             photoUrl = f.url;
             pendingFile = null;
             document.getElementById('tmPhotoPreview').src = photoUrl;
-            document.getElementById('tmPhotoState').textContent = 'Photo attached ✓';
+            document.getElementById('tmPhotoState').innerHTML = '<i class="pd-i pd-i-circle-check" aria-hidden="true"></i> Photo attached';
         };
 
         function teamEditorError(msg) {
@@ -1131,7 +1136,7 @@
             if (!name) return teamEditorError('Please enter the member\'s full name.');
             const btn = document.getElementById('teamEditorSave');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Saving…';
+            btn.innerHTML = '<i class="pd-i pd-i-loader-circle pd-i-spin"></i> Saving…';
             try {
                 const data = {
                     name,
@@ -1157,7 +1162,7 @@
                 }
                 window.closeTeamEditor();
                 await loadTeam();
-                window.showToast && window.showToast(editorId ? 'Team member updated ✓' : 'Team member added ✓', 'success');
+                window.showToast && window.showToast(editorId ? 'Team member updated' : 'Team member added', 'success');
             } catch (e) {
                 console.error(e);
                 teamEditorError(e.code === 'permission-denied'
@@ -1165,7 +1170,7 @@
                     : 'Could not save right now. Please check your connection and try again.');
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> Save Member';
+                btn.innerHTML = '<i class="pd-i pd-i-cloud-upload"></i> Save Member';
             }
         };
 
@@ -1187,7 +1192,7 @@
             try {
                 await updateDoc(doc(db, 'teamMembers', id), { archived: false, restoredAt: serverTimestamp() });
                 await loadTeam();
-                window.showToast && window.showToast('Team member restored ✓', 'success');
+                window.showToast && window.showToast('Team member restored', 'success');
             } catch (e) {
                 window.showToast && window.showToast('Could not restore right now. Please try again.', 'error');
             }

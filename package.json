@@ -14,11 +14,12 @@
     "mobile:run": "npm run mobile:sync && npx cap run android",
     "mobile:build:debug": "npm run mobile:sync && cd android && ./gradlew assembleDebug",
     "mobile:build:release": "npm run mobile:sync && cd android && ./gradlew bundleRelease assembleRelease",
-    "test": "node tests/assistant.test.js && node tests/content.test.js && node tests/academy.test.js && node tests/admin.test.js && node tests/certificate.test.js && node tests/pages.test.js && node tests/premium.test.js && node tests/challenge.test.js && node tests/certificates.test.js && node tests/devotional.test.js && node tests/geo.test.js && node tests/i18n.test.js && node tests/translate.test.js && node tests/media.test.js && node tests/vercel.test.js && node tests/upgrade.test.js",
-    "lint": "node scripts/validate-production.mjs && python3 seo/apply-seo.py --check",
+    "test": "node tests/assistant.test.js && node tests/content.test.js && node tests/academy.test.js && node tests/admin.test.js && node tests/certificate.test.js && node tests/pages.test.js && node tests/premium.test.js && node tests/challenge.test.js && node tests/certificates.test.js && node tests/devotional.test.js && node tests/geo.test.js && node tests/i18n.test.js && node tests/translate.test.js && node tests/media.test.js && node tests/vercel.test.js && node tests/upgrade.test.js && node tests/icons.test.js",
+    "lint": "node scripts/build-icons.mjs --check && node scripts/validate-production.mjs && python3 seo/apply-seo.py --check",
     "functions:verify": "npm --prefix functions install --no-audit --no-fund && npm --prefix functions run verify",
     "verify:all": "npm run lint && npm test && npm run functions:verify",
-    "build:vercel": "node scripts/build-vercel.mjs"
+    "build:vercel": "node scripts/build-vercel.mjs",
+    "build:icons": "node scripts/build-icons.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.5.0",

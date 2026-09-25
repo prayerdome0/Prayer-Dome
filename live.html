@@ -161,7 +161,8 @@
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <link rel="dns-prefetch" href="https://www.gstatic.com">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/pd-icons.css">
+    <script src="/assets/pd-icons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
@@ -214,7 +215,7 @@
             position:relative; overflow:hidden;
         }
         .offline-hero::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 70% 30%, rgba(212,175,55,.35), transparent 60%); pointer-events:none; }
-        .offline-hero i { font-size:3rem; color:var(--pd-gold); margin-bottom:14px; position:relative; z-index:1; }
+        .offline-hero > .pd-i { font-size:3rem; color:var(--pd-gold); margin-bottom:14px; position:relative; z-index:1; }
         .offline-hero h1 { font-family:'Playfair Display',serif; font-size:1.6rem; margin-bottom:8px; position:relative; z-index:1; }
         .offline-hero p { opacity:.9; font-size:.9rem; max-width:440px; margin:0 auto; position:relative; z-index:1; }
 
@@ -235,7 +236,6 @@
         .player-badge { position:absolute; top:12px; left:12px; display:flex; gap:8px; align-items:center; }
         .reconnect-banner { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,.75); color:#fff; padding:14px 22px; border-radius:14px; display:none; align-items:center; gap:10px; font-weight:700; font-size:.88rem; backdrop-filter:blur(8px); }
         .reconnect-banner.show { display:inline-flex; }
-        .reconnect-banner i { animation:spin 1s linear infinite; }
         /* Tap-for-sound: browsers start live video muted so autoplay is
            allowed; this invites one tap to open the audio. */
         .unmute-overlay { position:absolute; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,10,26,.25); z-index:6; cursor:pointer; border:0; width:100%; }
@@ -297,6 +297,9 @@
             font-family:inherit;
         }
         .react-btn:hover { transform:translateY(-2px); border-color:var(--pd-gold); }
+        .react-btn .pd-i, .floating-reaction { color:var(--pd-gold); }
+        .react-love .pd-i, .floating-reaction.react-love { color:#ef4444; }
+        .react-fire .pd-i, .floating-reaction.react-fire { color:#f97316; }
         .react-btn:active { transform:scale(.92); }
         .react-count { font-size:.62rem; color:var(--text-dim); font-weight:800; }
 
@@ -339,7 +342,7 @@
         .msg.system { justify-content:center; }
         .msg.system .msg-text { font-size:.72rem; color:var(--text-mute); background:var(--bg-elev); padding:6px 13px; border-radius:50px; font-weight:700; text-align:center; }
         .msg.pinned { background:rgba(212,175,55,.08); border:1px solid rgba(212,175,55,.3); border-radius:12px; padding:10px; }
-        .msg.pinned .msg-name::before { content:'📌 '; }
+        .msg.pinned .msg-name::before { content:''; display:inline-block; width:.95em; height:.95em; margin-right:.3em; vertical-align:-.12em; background-color:currentColor; -webkit-mask:var(--pd-icon-pin) center / contain no-repeat; mask:var(--pd-icon-pin) center / contain no-repeat; }
         .msg.prayer .msg-text { background:rgba(212,175,55,.08); border-left:3px solid var(--pd-gold); padding:8px 11px; border-radius:0 10px 10px 0; }
         .msg-actions { display:none; gap:4px; margin-top:4px; }
         .msg:hover .msg-actions { display:flex; }
@@ -408,29 +411,29 @@
     </a>
     <div class="topbar-right">
         <span class="live-pill" id="topLivePill" style="display:none;">LIVE</span>
-        <button class="icon-btn" onclick="toggleDark()" title="Toggle theme"><i class="fas fa-moon" id="themeIcon"></i></button>
-        <a href="/account.html" class="icon-btn" title="Account"><i class="fas fa-user"></i></a>
+        <button class="icon-btn" onclick="toggleDark()" title="Toggle theme"><i class="pd-i pd-i-moon" id="themeIcon"></i></button>
+        <a href="/account.html" class="icon-btn" title="Account"><i class="pd-i pd-i-user"></i></a>
     </div>
 </header>
 
 <!-- OFFLINE STATE (default shown) -->
 <div class="offline" id="offlineView">
     <div class="offline-hero">
-        <i class="fas fa-tower-broadcast"></i>
+        <i class="pd-i pd-i-radio"></i>
         <h1>No Live Broadcast Right Now</h1>
         <p>There's no live service at the moment. Turn on notifications to be alerted the moment we go live, or browse the archive of past services below.</p>
         <div style="margin-top:20px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-            <button class="action-chip gold" id="offlineRemindBtn" onclick="toggleReminder()"><i class="fas fa-bell"></i> Notify me</button>
-            <a href="/sermons.html" class="action-chip"><i class="fas fa-microphone-lines"></i> Sermons</a>
+            <button class="action-chip gold" id="offlineRemindBtn" onclick="toggleReminder()"><i class="pd-i pd-i-bell"></i> Notify me</button>
+            <a href="/sermons.html" class="action-chip"><i class="pd-i pd-i-mic"></i> Sermons</a>
         </div>
     </div>
     <div class="section" style="padding:0; margin-top:8px;">
-        <div class="section-title"><i class="fas fa-calendar-star" style="color:var(--pd-gold);"></i> Upcoming Lives</div>
+        <div class="section-title"><i class="pd-i pd-i-calendar-clock" style="color:var(--pd-gold);"></i> Upcoming Lives</div>
         <div id="upcomingList"></div>
         <div id="upcomingGrid" style="display:none;"></div>
     </div>
     <div class="section" style="padding:0;">
-        <div class="section-title"><i class="fas fa-history" style="color:var(--pd-blue);"></i> Past Lives</div>
+        <div class="section-title"><i class="pd-i pd-i-rotate-ccw-clock" style="color:var(--pd-blue);"></i> Past Lives</div>
         <div class="archive-grid" id="archiveGrid"><div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-mute);">Loading archive…</div></div>
     </div>
     <div style="height:80px;"></div>
@@ -445,19 +448,19 @@
                 <div class="player-badge" id="playerBadges">
                     <span class="live-pill" id="playerLivePill">LIVE</span>
                 </div>
-                <div class="viewer-count-badge"><i class="fas fa-users"></i> <span id="playerViewerCount">0</span> watching</div>
+                <div class="viewer-count-badge"><i class="pd-i pd-i-users"></i> <span id="playerViewerCount">0</span> watching</div>
                 <div class="reactions-layer" id="reactionsLayer"></div>
                 <div class="tv-name-overlay" id="tvNameOverlay"><div><div class="role">Now Ministering</div><div class="name" id="tvPresenterName">Prayer Dome Ministry Team</div></div></div>
                 <div class="live-ticker" id="liveTicker"><div class="live-ticker-label">Prayer Dome</div><div class="live-ticker-track" id="liveTickerText">THEME: WALKING IN FAITH • PRAYER LINE: 097X XXX XXX • SUNDAY SERVICE: 08:00 • WEDNESDAY BIBLE STUDY: 18:00 • JOIN US FOR PRAYER</div></div>
-                <div class="reconnect-banner" id="reconnectBanner"><i class="fas fa-circle-notch"></i> Reconnecting to Live…</div>
-                <button class="unmute-overlay" id="unmuteOverlay" aria-label="Turn on sound"><span><i class="fas fa-volume-high"></i> Tap for sound</span></button>
+                <div class="reconnect-banner" id="reconnectBanner"><i class="pd-i pd-i-loader-circle pd-i-spin" aria-hidden="true"></i> Reconnecting to Live…</div>
+                <button class="unmute-overlay" id="unmuteOverlay" aria-label="Turn on sound"><span><i class="pd-i pd-i-volume-2"></i> Tap for sound</span></button>
                 <div class="unreachable-box" id="unreachableBox">
-                    <i class="fas fa-tower-broadcast"></i>
+                    <i class="pd-i pd-i-radio"></i>
                     <div>
                         <strong>Unable to reach the broadcast</strong>
                         <p>Your connection to the live stream was interrupted. Check your internet and try again.</p>
                     </div>
-                    <button onclick="retryLive()"><i class="fas fa-rotate-right"></i> Try Again</button>
+                    <button onclick="retryLive()"><i class="pd-i pd-i-rotate-cw"></i> Try Again</button>
                 </div>
                 <div class="connection-pill good" id="connectionPill"><span class="dot"></span> <span id="connectionText">Connection: Good</span></div>
                 <div class="duration-pill" id="durationPill">00:00</div>
@@ -468,29 +471,29 @@
             <h1 id="liveTitle">Prayer Dome Live</h1>
             <div class="live-meta">
                 <span class="live-pill">LIVE</span>
-                <span><i class="fas fa-users"></i> <span id="metaViewerCount">0</span> watching</span>
-                <span><i class="fas fa-comments"></i> <span id="metaComments">0</span> comments</span>
-                <span><i class="fas fa-heart"></i> <span id="metaReactions">0</span> reactions</span>
-                <span><i class="fas fa-eye"></i> <span id="metaTotalViews">0</span> total views</span>
+                <span><i class="pd-i pd-i-users"></i> <span id="metaViewerCount">0</span> watching</span>
+                <span><i class="pd-i pd-i-messages-square"></i> <span id="metaComments">0</span> comments</span>
+                <span><i class="pd-i pd-i-heart"></i> <span id="metaReactions">0</span> reactions</span>
+                <span><i class="pd-i pd-i-eye"></i> <span id="metaTotalViews">0</span> total views</span>
             </div>
             <div class="live-desc" id="liveDesc"></div>
             <div class="live-actions">
-                <button class="action-chip" id="followBtn" onclick="toggleFollow()"><i class="fas fa-heart"></i> <span id="followLabel">Follow</span></button>
-                <button class="action-chip" onclick="openShare()"><i class="fas fa-share-nodes"></i> Share</button>
-                <button class="action-chip" onclick="openReport()"><i class="fas fa-flag"></i> Report</button>
-                <button class="action-chip" id="fullscreenBtn" onclick="toggleFullscreen()"><i class="fas fa-expand"></i> Fullscreen</button>
+                <button class="action-chip" id="followBtn" onclick="toggleFollow()"><i class="pd-i pd-i-heart"></i> <span id="followLabel">Follow</span></button>
+                <button class="action-chip" onclick="openShare()"><i class="pd-i pd-i-share-2"></i> Share</button>
+                <button class="action-chip" onclick="openReport()"><i class="pd-i pd-i-flag"></i> Report</button>
+                <button class="action-chip" id="fullscreenBtn" onclick="toggleFullscreen()"><i class="pd-i pd-i-maximize"></i> Fullscreen</button>
             </div>
             <div class="reaction-bar pd-reaction-bar">
-                <button class="react-btn" onclick="sendReaction('❤️')"><span>❤️</span><span class="react-count" id="rc-❤️">0</span></button>
-                <button class="react-btn" onclick="sendReaction('🙏')"><span>🙏</span><span class="react-count" id="rc-🙏">0</span></button>
-                <button class="react-btn" onclick="sendReaction('👏')"><span>👏</span><span class="react-count" id="rc-👏">0</span></button>
-                <button class="react-btn" onclick="sendReaction('🔥')"><span>🔥</span><span class="react-count" id="rc-🔥">0</span></button>
-                <button class="react-btn" onclick="sendReaction('🙌')"><span>🙌</span><span class="react-count" id="rc-🙌">0</span></button>
+                <button class="react-btn react-love" onclick="sendReaction('love')" aria-label="Love" title="Love"><i class="pd-i pd-i-heart" aria-hidden="true"></i><span class="react-count" id="rc-love">0</span></button>
+                <button class="react-btn react-pray" onclick="sendReaction('pray')" aria-label="Amen" title="Amen"><i class="pd-i pd-i-hands-praying" aria-hidden="true"></i><span class="react-count" id="rc-pray">0</span></button>
+                <button class="react-btn react-clap" onclick="sendReaction('clap')" aria-label="Applause" title="Applause"><i class="pd-i pd-i-party-popper" aria-hidden="true"></i><span class="react-count" id="rc-clap">0</span></button>
+                <button class="react-btn react-fire" onclick="sendReaction('fire')" aria-label="On fire" title="On fire"><i class="pd-i pd-i-flame" aria-hidden="true"></i><span class="react-count" id="rc-fire">0</span></button>
+                <button class="react-btn react-glory" onclick="sendReaction('glory')" aria-label="Glory" title="Glory"><i class="pd-i pd-i-sparkles" aria-hidden="true"></i><span class="react-count" id="rc-glory">0</span></button>
             </div>
         </div>
 
         <div class="section">
-            <div class="section-title"><i class="fas fa-history" style="color:var(--pd-blue);"></i> Past Lives Archive</div>
+            <div class="section-title"><i class="pd-i pd-i-rotate-ccw-clock" style="color:var(--pd-blue);"></i> Past Lives Archive</div>
             <div class="archive-grid" id="liveArchiveGrid"></div>
         </div>
         <div style="height:30px;"></div>
@@ -498,8 +501,8 @@
 
     <aside class="chat-pane" id="chatPane">
         <div class="chat-head">
-            <strong><i class="fas fa-comments" style="color:var(--pd-gold);"></i> Live Chat <small id="chatCount">0</small></strong>
-            <button class="viewer-list-toggle" onclick="toggleViewerList()"><i class="fas fa-users"></i> Viewers</button>
+            <strong><i class="pd-i pd-i-messages-square" style="color:var(--pd-gold);"></i> Live Chat <small id="chatCount">0</small></strong>
+            <button class="viewer-list-toggle" onclick="toggleViewerList()"><i class="pd-i pd-i-users"></i> Viewers</button>
         </div>
         <div id="livePrayerList" style="display:none;"></div>
         <div class="chat-body" id="chatBody">
@@ -509,10 +512,10 @@
             <div id="chatComposer">
                 <div class="chat-input-row">
                     <input id="chatInput" class="chat-input" type="text" placeholder="Say something encouraging…" maxlength="300" autocomplete="off">
-                    <button class="send-btn" id="sendBtn" onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+                    <button class="send-btn" id="sendBtn" onclick="sendChat()" aria-label="Send message"><i class="pd-i pd-i-send"></i></button>
                 </div>
                 <div class="chat-extras">
-                    <label><input type="checkbox" id="asPrayer"> <i class="fas fa-hands-praying" style="color:var(--pd-gold);"></i> Prayer request</label>
+                    <label><input type="checkbox" id="asPrayer"> <i class="pd-i pd-i-hands-praying" style="color:var(--pd-gold);"></i> Prayer request</label>
                 </div>
             </div>
             <div id="chatLocked" style="display:none; text-align:center; font-size:.78rem; color:var(--text-dim); padding:6px 0;">
@@ -520,14 +523,14 @@
                 <button class="action-chip" style="margin-left:8px; padding:6px 10px; font-size:.7rem;" onclick="guestChat()">Continue as Guest</button>
             </div>
             <div id="chatDisabled" style="display:none; text-align:center; font-size:.78rem; color:var(--text-dim); padding:6px 0;">
-                <i class="fas fa-ban"></i> Comments are currently disabled by the broadcaster
+                <i class="pd-i pd-i-ban"></i> Comments are currently disabled by the broadcaster
             </div>
         </div>
 
         <div class="viewer-list-panel" id="viewerListPanel">
             <div class="viewer-list-head">
-                <strong><i class="fas fa-users"></i> Current Viewers (<span id="viewerListCount">0</span>)</strong>
-                <button class="icon-btn" onclick="toggleViewerList()" style="width:auto;height:auto;padding:4px 10px;"><i class="fas fa-times"></i></button>
+                <strong><i class="pd-i pd-i-users"></i> Current Viewers (<span id="viewerListCount">0</span>)</strong>
+                <button class="icon-btn" onclick="toggleViewerList()" style="width:auto;height:auto;padding:4px 10px;" aria-label="Close viewer list"><i class="pd-i pd-i-x"></i></button>
             </div>
             <div class="viewer-list-body" id="viewerListBody"></div>
         </div>
@@ -537,13 +540,13 @@
 <!-- SHARE MODAL -->
 <div class="modal-overlay" id="shareModal">
     <div class="modal">
-        <h2><i class="fas fa-share-nodes" style="color:var(--pd-gold);"></i> Share this Live</h2>
+        <h2><i class="pd-i pd-i-share-2" style="color:var(--pd-gold);"></i> Share this Live</h2>
         <p style="color:var(--text-dim); font-size:.85rem;">Invite someone to join the live broadcast.</p>
         <div class="share-row">
-            <button class="share-btn" onclick="shareTo('whatsapp')"><i class="fab fa-whatsapp" style="color:#25d366;"></i>WhatsApp</button>
-            <button class="share-btn" onclick="shareTo('facebook')"><i class="fab fa-facebook" style="color:#1877f2;"></i>Facebook</button>
-            <button class="share-btn" onclick="shareTo('twitter')"><i class="fab fa-x-twitter"></i>X</button>
-            <button class="share-btn" onclick="shareTo('telegram')"><i class="fab fa-telegram" style="color:#229ed9;"></i>Telegram</button>
+            <button class="share-btn" onclick="shareTo('whatsapp')"><i class="pd-i pd-i-brand-whatsapp" style="color:#25d366;"></i>WhatsApp</button>
+            <button class="share-btn" onclick="shareTo('facebook')"><i class="pd-i pd-i-brand-facebook" style="color:#1877f2;"></i>Facebook</button>
+            <button class="share-btn" onclick="shareTo('twitter')"><i class="pd-i pd-i-brand-x"></i>X</button>
+            <button class="share-btn" onclick="shareTo('telegram')"><i class="pd-i pd-i-brand-telegram" style="color:#229ed9;"></i>Telegram</button>
         </div>
         <div class="share-link"><input id="shareLink" value="https://prayerdome.net/live" readonly><button onclick="copyShareLink()">Copy</button></div>
         <button class="modal-close" onclick="closeModal('shareModal')">Close</button>
@@ -553,7 +556,7 @@
 <!-- REPORT MODAL -->
 <div class="modal-overlay report-modal" id="reportModal">
     <div class="modal">
-        <h2><i class="fas fa-flag" style="color:var(--pd-red);"></i> Report Content</h2>
+        <h2><i class="pd-i pd-i-flag" style="color:var(--pd-red);"></i> Report Content</h2>
         <p style="color:var(--text-dim); font-size:.85rem;">Help keep Prayer Dome safe. Our moderation team will review your report.</p>
         <textarea id="reportReason" placeholder="What's wrong with this content?"></textarea>
         <div style="display:flex; gap:8px;">
@@ -627,7 +630,7 @@
     function toast(msg, type) {
         const t = document.createElement('div');
         t.className = 'toast' + (type==='error'?' error':'');
-        t.innerHTML = `<i class="fas ${type==='error'?'fa-exclamation-circle':'fa-check-circle'}"></i> ${esc(msg)}`;
+        t.innerHTML = `<i class="pd-i ${type==='error'?'pd-i-circle-alert':'pd-i-circle-check'}"></i> ${esc(msg)}`;
         $('toastBox').appendChild(t);
         setTimeout(() => t.remove(), 3400);
     }
@@ -652,7 +655,7 @@
     function applyTheme() {
         const isLight = localStorage.getItem('pd-theme') !== 'dark';
         document.body.classList.toggle('light-mode', isLight);
-        const icon = $('themeIcon'); if (icon) icon.className = isLight ? 'fas fa-moon' : 'fas fa-sun';
+        const icon = $('themeIcon'); if (icon) icon.className = isLight ? 'pd-i pd-i-moon' : 'pd-i pd-i-sun';
     }
     function toggleDark() {
         if (localStorage.getItem('pd-theme') === 'dark') localStorage.setItem('pd-theme','light');
@@ -711,13 +714,24 @@
         $('viewerListCount').textContent = n;
     }
 
+    // Live reactions. `key` is the value stored with each reaction and in the
+    // counts (the original emoji code, kept so saved counts and older app
+    // versions keep working); the UI always shows the Lucide `icon`.
+    const REACTIONS = [
+        { id: 'love',  key: '\u2764\uFE0F', icon: 'pd-i-heart' },
+        { id: 'pray',  key: '\u{1F64F}',     icon: 'pd-i-hands-praying' },
+        { id: 'clap',  key: '\u{1F44F}',     icon: 'pd-i-party-popper' },
+        { id: 'fire',  key: '\u{1F525}',     icon: 'pd-i-flame' },
+        { id: 'glory', key: '\u{1F64C}',     icon: 'pd-i-sparkles' }
+    ];
+
     function updateReactionsUI(reactions) {
         reactions = reactions || {};
         let total = 0;
-        ['❤️','🙏','👏','🔥','🙌'].forEach(e => {
-            const count = reactions[e] || 0;
+        REACTIONS.forEach(r => {
+            const count = reactions[r.key] || 0;
             total += count;
-            const el = $('rc-'+e);
+            const el = $('rc-' + r.id);
             if (el) el.textContent = count;
         });
         $('metaReactions').textContent = total.toLocaleString();
@@ -859,7 +873,7 @@
         const pinned = commentsCache.find(c => c.id === pinnedCommentId);
         if (pinned) items.push(renderMsg(pinned, true));
         commentsCache.filter(c => !c.hidden && c.id !== pinnedCommentId).slice(-150).forEach(c => items.push(renderMsg(c, false)));
-        body.innerHTML = items.join('') || '<div class="msg system"><span class="msg-text">Be the first to say hello 👋</span></div>';
+        body.innerHTML = items.join('') || '<div class="msg system"><span class="msg-text">Be the first to say hello</span></div>';
         $('chatCount').textContent = commentsCache.length;
         $('metaComments').textContent = commentsCache.length;
         if (pinnedToBottom) body.scrollTop = body.scrollHeight;
@@ -877,16 +891,16 @@
             : esc(initials(name));
         const actions = currentUser && isAdminOfChat() ?
             '<div class="msg-actions">'+
-                '<button class="msg-action-btn" onclick="modDelete(\''+esc(m.id)+'\')"><i class="fas fa-trash"></i></button>'+
-                '<button class="msg-action-btn" onclick="modPin(\''+esc(m.id)+'\')"><i class="fas fa-thumbtack"></i></button>'+
-                (m.userId ? '<button class="msg-action-btn" onclick="modMute(\''+esc(m.userId)+'\')"><i class="fas fa-microphone-slash"></i></button>' : '')+
+                '<button class="msg-action-btn" onclick="modDelete(\''+esc(m.id)+'\')" aria-label="Delete message"><i class="pd-i pd-i-trash"></i></button>'+
+                '<button class="msg-action-btn" onclick="modPin(\''+esc(m.id)+'\')" aria-label="Pin message"><i class="pd-i pd-i-pin"></i></button>'+
+                (m.userId ? '<button class="msg-action-btn" onclick="modMute(\''+esc(m.userId)+'\')" aria-label="Mute user"><i class="pd-i pd-i-mic-off"></i></button>' : '')+
             '</div>' : '';
         return '<div class="msg '+(pinned?'pinned ':'')+(isPrayer?'prayer':'')+'" data-id="'+esc(m.id)+'">'+
             '<div class="msg-avatar">'+avatar+'</div>'+
             '<div class="msg-body">'+
                 '<div><span class="msg-name">'+esc(name)+(isAdmin?' <span class="badge-admin">ADMIN</span>':'')+'</span>'+
                 '<span class="msg-time">'+esc(fmtAgo(m.timestamp||m.createdAt))+'</span></div>'+
-                '<div class="msg-text">'+(isPrayer?'<i class="fas fa-hands-praying" style="color:var(--pd-gold);"></i> ':'')+esc(m.message||m.text||'')+'</div>'+
+                '<div class="msg-text">'+(isPrayer?'<i class="pd-i pd-i-hands-praying" style="color:var(--pd-gold);"></i> ':'')+esc(m.message||m.text||'')+'</div>'+
                 actions+
             '</div>'+
         '</div>';
@@ -955,7 +969,7 @@
             }
             if (isPrayer) {
                 $('asPrayer').checked = false;
-                toast('Prayer request sent to the team 🙏');
+                toast('Prayer request sent to the team');
                 try {
                     await addDoc(collection(db,'prayers'), {
                         name: userInfo.name, userId: userInfo.uid,
@@ -973,9 +987,12 @@
     $('chatInput').addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); sendChat(); } });
 
     /* ---------- reactions ---------- */
-    window.sendReaction = function(emoji) {
+    window.sendReaction = function(id) {
+        const reaction = REACTIONS.find(r => r.id === id);
+        if (!reaction) return;
+        const emoji = reaction.key;
         // animate instantly locally
-        spawnReaction(emoji);
+        spawnReaction(reaction);
         if (viewer && viewer.sendReaction) viewer.sendReaction(emoji);
         else {
             // Fire-and-forget
@@ -986,12 +1003,12 @@
             }
         }
     };
-    function spawnReaction(emoji) {
+    function spawnReaction(reaction) {
         const layer = $('reactionsLayer');
         if (!layer) return;
         const el = document.createElement('div');
-        el.className = 'floating-reaction';
-        el.textContent = emoji;
+        el.className = 'floating-reaction react-' + reaction.id;
+        el.innerHTML = '<i class="pd-i ' + reaction.icon + '" aria-hidden="true"></i>';
         el.style.left = (20 + Math.random()*60) + '%';
         el.style.setProperty('--drift', ((Math.random()-0.5)*100)+'px');
         el.style.animationDuration = (2 + Math.random()*1.2)+'s';
@@ -1002,8 +1019,8 @@
     setInterval(() => {
         if (!currentLive.isLive) return;
         // pull random reaction from current counts to show animation on others' reactions
-        ['❤️','🙏','👏','🔥','🙌'].forEach(e => {
-            if (Math.random() < 0.15 && (currentLive.reactions||{})[e]) spawnReaction(e);
+        REACTIONS.forEach(r => {
+            if (Math.random() < 0.15 && (currentLive.reactions||{})[r.key]) spawnReaction(r);
         });
     }, 800);
 
@@ -1055,16 +1072,16 @@
             toast('Unfollowed');
         } else {
             localStorage.setItem('pd_follow','1');
-            $('followLabel').textContent = 'Following ✓';
+            $('followLabel').textContent = 'Following';
             $('followBtn').classList.add('following');
-            toast('Following — you will be notified when we go live 💙');
+            toast('Following — you will be notified when we go live');
             if (viewer && viewer.sendEvent) viewer.sendEvent('follow', {});
             if (window.PDApp) PDApp.notifications.push({ type:'live', title:'You follow Prayer Dome Live', message:'You will be notified when we go live', link:'/live.html' });
         }
     };
     window.followStream = window.toggleFollow;
     if (localStorage.getItem('pd_follow') === '1') {
-        $('followLabel') && ($('followLabel').textContent = 'Following ✓');
+        $('followLabel') && ($('followLabel').textContent = 'Following');
         $('followBtn') && $('followBtn').classList.add('following');
     }
 
@@ -1073,19 +1090,19 @@
         const on = localStorage.getItem('pd-live-reminder') === 'on';
         if (on) {
             localStorage.setItem('pd-live-reminder','off');
-            $('offlineRemindBtn').innerHTML = '<i class="fas fa-bell"></i> Notify me';
+            $('offlineRemindBtn').innerHTML = '<i class="pd-i pd-i-bell"></i> Notify me';
             toast('Reminders off');
             return;
         }
         Notification.requestPermission().then(perm => {
             if (perm !== 'granted') return toast('Notifications blocked','error');
             localStorage.setItem('pd-live-reminder','on');
-            $('offlineRemindBtn').innerHTML = '<i class="fas fa-bell-slash"></i> Reminders on';
-            toast("We'll notify you when we go live 🔔");
+            $('offlineRemindBtn').innerHTML = '<i class="pd-i pd-i-bell-off"></i> Reminders on';
+            toast("We'll notify you when we go live");
         });
     };
     if (localStorage.getItem('pd-live-reminder') === 'on' && $('offlineRemindBtn')) {
-        $('offlineRemindBtn').innerHTML = '<i class="fas fa-bell-slash"></i> Reminders on';
+        $('offlineRemindBtn').innerHTML = '<i class="pd-i pd-i-bell-off"></i> Reminders on';
     }
 
     window.openShare = () => { $('shareLink').value = 'https://prayerdome.net/live'; openModal('shareModal'); if (viewer) viewer.sendEvent('share', {}); };
@@ -1136,17 +1153,17 @@
         if (!grid) return;
         try {
             const snap = await getDocs(query(collection(db,'liveRecordings'), orderBy('createdAt','desc'), limit(12)));
-            if (snap.empty) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-mute);"><i class="fas fa-video-slash" style="font-size:2rem; display:block; margin-bottom:8px; color:var(--pd-gold);"></i>No past services yet — recordings appear after a live ends.</div>'; return; }
+            if (snap.empty) { grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-mute);"><i class="pd-i pd-i-video-off" style="font-size:2rem; display:block; margin-bottom:8px; color:var(--pd-gold);"></i>No past services yet — recordings appear after a live ends.</div>'; return; }
             grid.innerHTML = snap.docs.map(d => {
                 const r = d.data();
                 const dur = r.durationSeconds ? fmtDuration(r.durationSeconds) : '';
-                const thumb = r.thumbnail ? '<img src="'+esc(r.thumbnail)+'" alt="">' : '<i class="fas fa-play-circle"></i>';
+                const thumb = r.thumbnail ? '<img src="'+esc(r.thumbnail)+'" alt="">' : '<i class="pd-i pd-i-circle-play"></i>';
                 const when = r.createdAt ? fmtAgo(r.createdAt) : '';
                 return '<div class="archive-card" onclick="playRecording(\''+esc(d.id)+'\')">'+
                     '<div class="archive-thumb">'+thumb+
                         (dur?'<span class="archive-duration">'+dur+'</span>':'')+'</div>'+
                     '<div class="archive-body"><strong>'+esc(r.title||'Live Service')+'</strong>'+
-                    '<small><i class="fas fa-clock"></i> '+esc(when)+(r.totalViews?' · <i class="fas fa-eye"></i> '+r.totalViews:'')+'</small></div></div>';
+                    '<small><i class="pd-i pd-i-clock"></i> '+esc(when)+(r.totalViews?' · <i class="pd-i pd-i-eye"></i> '+r.totalViews:'')+'</small></div></div>';
             }).join('');
             window.__archive = window.__archive || {};
             snap.forEach(d => { window.__archive[d.id] = d.data(); });
@@ -1188,11 +1205,11 @@
                 const t = s.scheduledFor && s.scheduledFor.toDate ? s.scheduledFor.toDate().getTime() : null;
                 if (t && t > Date.now()) upcoming.push({id:d.id, ...s});
             });
-            if (!upcoming.length) { list.innerHTML = '<div class="upcoming-card"><div class="upcoming-icon"><i class="fas fa-calendar"></i></div><div class="upcoming-body"><strong>No upcoming lives scheduled</strong><small>Check back soon or enable notifications</small></div></div>'; return; }
+            if (!upcoming.length) { list.innerHTML = '<div class="upcoming-card"><div class="upcoming-icon"><i class="pd-i pd-i-calendar"></i></div><div class="upcoming-body"><strong>No upcoming lives scheduled</strong><small>Check back soon or enable notifications</small></div></div>'; return; }
             list.innerHTML = upcoming.map(s => {
                 const d = s.scheduledFor.toDate();
                 const dateStr = d.toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'})+' · '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-                return '<div class="upcoming-card"><div class="upcoming-icon"><i class="fas fa-calendar-star"></i></div><div class="upcoming-body"><strong>'+esc(s.title||'Upcoming Live')+'</strong><small>'+esc(dateStr)+(s.category?' · '+esc(s.category):'')+'</small></div><button class="action-chip gold" onclick="setReminder(\''+esc(s.id)+'\')"><i class="fas fa-bell"></i> Remind me</button></div>';
+                return '<div class="upcoming-card"><div class="upcoming-icon"><i class="pd-i pd-i-calendar-clock"></i></div><div class="upcoming-body"><strong>'+esc(s.title||'Upcoming Live')+'</strong><small>'+esc(dateStr)+(s.category?' · '+esc(s.category):'')+'</small></div><button class="action-chip gold" onclick="setReminder(\''+esc(s.id)+'\')"><i class="pd-i pd-i-bell"></i> Remind me</button></div>';
             }).join('');
         } catch(e) {
             list.innerHTML = '';
@@ -1202,7 +1219,7 @@
         const reminders = JSON.parse(localStorage.getItem('pd_sched_reminders')||'{}');
         reminders[id] = true;
         localStorage.setItem('pd_sched_reminders', JSON.stringify(reminders));
-        toast('Reminder set 🔔');
+        toast('Reminder set');
     };
 
     /* ---------- watch live status ---------- */
@@ -1215,7 +1232,7 @@
                 currentLive = data;
                 enterLiveView(data);
                 if (localStorage.getItem('pd-live-reminder')==='on' && 'Notification' in window && Notification.permission==='granted') {
-                    new Notification('🔴 Prayer Dome is Live', { body: (data.title||'A live service has started')+' — tap to join.', icon:'/assets/logo.png' });
+                    new Notification('Prayer Dome is Live', { body: (data.title||'A live service has started')+' — tap to join.', icon:'/assets/logo.png' });
                 }
                 if (currentUser || guestName) joinAsViewer();
             } else if (isLive && currentLive.isLive) {

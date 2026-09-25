@@ -16,6 +16,7 @@ const excludedDirectories = new Set([
   '.vercel',
   'android',
   'api',
+  'docs',
   'functions',
   'mobile',
   'node_modules',
@@ -27,6 +28,7 @@ const excludedDirectories = new Set([
 const excludedFiles = new Set([
   '.gitignore',
   'BRAND-AND-CONTENT.md',
+  'ICON-SYSTEM-REPORT.md',
   'README.md',
   'UPGRADE-NOTES.md',
   'capacitor.config.json',

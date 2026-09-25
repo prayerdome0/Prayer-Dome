@@ -106,7 +106,7 @@ exports.dailyDevotionalNotification = functions.pubsub
 
       const payload = {
         notification: {
-          title: '📖 Daily Devotional — Prayer Dome',
+          title: 'Daily Devotional — Prayer Dome',
           body: dev.title ? `${dev.title}: ${dev.thought ? dev.thought.substring(0, 80) + '…' : 'Read today\'s word.'}` : 'Your daily devotional is ready.',
           icon: '/assets/logo.png',
           badge: '/assets/logo.png'
@@ -186,7 +186,7 @@ exports.prayerReminderDispatch = functions.pubsub
 
       const payload = {
         notification: {
-          title: '🙏 Prayer Time — Prayer Dome',
+          title: 'Prayer Time — Prayer Dome',
           body: 'Take a moment to lift your requests to God. He is listening.',
           icon: '/assets/logo.png',
           badge: '/assets/logo.png'

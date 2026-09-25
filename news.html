@@ -124,7 +124,8 @@
 }
     </script>
     <!-- PD-SEO:END -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/pd-icons.css">
+    <script src="/assets/pd-icons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -215,6 +216,9 @@
         .ticker-bar { background: linear-gradient(90deg, var(--accent-green), var(--accent-green-dark, #0a3d7a)); color: #fff; font-size: .62rem; font-weight: 800; letter-spacing: 1px; padding: 7px 10px; text-align: center; white-space: nowrap; overflow: hidden; }
         .ticker-bar .ticker-track { display: inline-block; animation: ticker 30s linear infinite; padding-left: 100%; }
         @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+        /* Dark mode: brand blue (#0A4D9B) is about 2:1 on navy, so headings and icons use the
+           light brand tint (#93c5fd) and controls without a colour get readable text. */
+        body.dark-mode .nav-link.active { color: #93c5fd; }
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
@@ -237,71 +241,71 @@
             <div class="pd-drawer-title">Prayer Dome</div>
             <small>A House of Prayer for All Nations</small>
         </div>
-        <button class="pd-drawer-close" aria-label="Close menu"><i class="fas fa-times"></i></button>
+        <button class="pd-drawer-close" aria-label="Close menu"><i class="pd-i pd-i-x"></i></button>
     </div>
     <nav class="pd-drawer-nav">
-        <a class="pd-drawer-link" href="/"><i class="fas fa-home"></i> Home</a>
-        <a class="pd-drawer-link pd-drawer-live" href="/live.html"><i class="fas fa-tower-broadcast"></i> Live Service</a>
-        <a class="pd-drawer-link" href="/prayer.html"><i class="fas fa-hands-praying"></i> Prayer Wall</a>
-        <a class="pd-drawer-link" href="/bible.html"><i class="fas fa-book-open"></i> Bible Center</a>
-        <a class="pd-drawer-link" href="/sermons.html"><i class="fas fa-microphone-lines"></i> Sermon Center</a>
-        <a class="pd-drawer-link" href="/video.html"><i class="fas fa-photo-film"></i> Gospel Media</a>
-        <a class="pd-drawer-link" href="/news.html"><i class="fas fa-newspaper"></i> Christian News</a>
-        <a class="pd-drawer-link" href="/testimony.html"><i class="fas fa-star-of-life"></i> Testimony Center</a>
-        <a class="pd-drawer-link" href="/events.html"><i class="fas fa-calendar-days"></i> Event Calendar</a>
-        <a class="pd-drawer-link" href="/chat.html"><i class="fas fa-comments"></i> Community Hub</a>
-        <a class="pd-drawer-link" href="/ai-prayer.html"><i class="fas fa-wand-magic-sparkles"></i> Prayer Assistant</a>
-        <a class="pd-drawer-link" href="/account.html"><i class="fas fa-user-circle"></i> My Account</a>
+        <a class="pd-drawer-link" href="/"><i class="pd-i pd-i-house"></i> Home</a>
+        <a class="pd-drawer-link pd-drawer-live" href="/live.html"><i class="pd-i pd-i-radio"></i> Live Service</a>
+        <a class="pd-drawer-link" href="/prayer.html"><i class="pd-i pd-i-hands-praying"></i> Prayer Wall</a>
+        <a class="pd-drawer-link" href="/bible.html"><i class="pd-i pd-i-book-open"></i> Bible Center</a>
+        <a class="pd-drawer-link" href="/sermons.html"><i class="pd-i pd-i-mic"></i> Sermon Center</a>
+        <a class="pd-drawer-link" href="/video.html"><i class="pd-i pd-i-circle-play"></i> Gospel Media</a>
+        <a class="pd-drawer-link" href="/news.html"><i class="pd-i pd-i-newspaper"></i> Christian News</a>
+        <a class="pd-drawer-link" href="/testimony.html"><i class="pd-i pd-i-sparkles"></i> Testimony Center</a>
+        <a class="pd-drawer-link" href="/events.html"><i class="pd-i pd-i-calendar-days"></i> Event Calendar</a>
+        <a class="pd-drawer-link" href="/chat.html"><i class="pd-i pd-i-messages-square"></i> Community Hub</a>
+        <a class="pd-drawer-link" href="/ai-prayer.html"><i class="pd-i pd-i-wand-sparkles"></i> Prayer Assistant</a>
+        <a class="pd-drawer-link" href="/account.html"><i class="pd-i pd-i-circle-user"></i> My Account</a>
     </nav>
     <div class="pd-drawer-foot">
-        <i class="fas fa-bible"></i> “He does everything blamelessly.” — Mark 7:37
+        <i class="pd-i pd-i-book"></i> “He does everything blamelessly.” — Mark 7:37
     </div>
 </aside>
 
 <header class="pd-topbar">
-    <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+    <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="pd-i pd-i-menu"></i></button>
     <a href="index.html" class="pd-topbar-center">
         <div class="pd-topbar-logo"><img src="/assets/logo.png" alt="PD Logo"></div>
         <div class="pd-topbar-word">PRAYER DOME</div>
     </a>
     <div class="pd-topbar-right">
         <select class="pd-lang-select" aria-label="Language">
-            <option value="en">🇬🇧 English</option>
-            <option value="tum">🇲🇼 Tumbuka</option>
-            <option value="ssw">🇸🇿 siSwati</option>
-            <option value="bem">🇿🇲 Bemba</option>
-            <option value="nya">🇲🇼 Nyanja</option>
+            <option value="en">English</option>
+            <option value="tum">Tumbuka</option>
+            <option value="ssw">siSwati</option>
+            <option value="bem">Bemba</option>
+            <option value="nya">Nyanja</option>
         </select>
-        <button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="fas fa-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>
-        <button class="theme-toggle-btn" onclick="toggleDarkMode()" style="background: var(--bg-primary); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 20px; cursor: pointer;"><i class="fas fa-moon"></i></button>
+        <button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="pd-i pd-i-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>
+        <button class="theme-toggle-btn" onclick="toggleDarkMode()" style="background: var(--bg-primary); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 20px; cursor: pointer;" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>
     </div>
 </header>
 
 <div class="pd-marquee" id="pdAnnouncementBar">
-    <span class="pd-marquee-label"><i class="fas fa-bullhorn"></i> News</span>
+    <span class="pd-marquee-label"><i class="pd-i pd-i-megaphone"></i> News</span>
     <div class="pd-marquee-viewport"><div class="pd-marquee-track"></div></div>
 </div>
 
 <div class="pd-notif-panel" id="pdNotifPanel">
     <div class="pd-notif-head">
-        <h3><i class="fas fa-bell"></i> Notifications</h3>
+        <h3><i class="pd-i pd-i-bell"></i> Notifications</h3>
         <div class="pd-notif-head-actions">
-            <button title="Mark all read" onclick="PDApp.notifications.markAllRead()"><i class="fas fa-check-double"></i></button>
-            <button title="Clear" onclick="PDApp.notifications.clear()"><i class="fas fa-trash-can"></i></button>
-            <button title="Close" onclick="PDApp.ui.toggleNotifPanel(false)"><i class="fas fa-times"></i></button>
+            <button title="Mark all read" onclick="PDApp.notifications.markAllRead()"><i class="pd-i pd-i-check-check"></i></button>
+            <button title="Clear" onclick="PDApp.notifications.clear()"><i class="pd-i pd-i-trash"></i></button>
+            <button title="Close" onclick="PDApp.ui.toggleNotifPanel(false)"><i class="pd-i pd-i-x"></i></button>
         </div>
     </div>
     <div id="pdNotifList"></div>
 </div>
 
 <section class="news-page-head">
-    <h1><i class="fas fa-newspaper"></i> Christian News Center</h1>
+    <h1><i class="pd-i pd-i-newspaper"></i> Christian News Center</h1>
     <p>Church updates, ministry news, revival reports, event announcements and testimonies — from the Prayer Dome family across the nations.</p>
 </section>
 
 <div class="news-toolbar">
     <div class="news-search">
-        <i class="fas fa-magnifying-glass"></i>
+        <i class="pd-i pd-i-search"></i>
         <input type="text" id="newsSearchInput" placeholder="Search news, topics, keywords…" aria-label="Search news">
     </div>
     <div class="news-cats" id="newsCats"></div>
@@ -315,7 +319,7 @@
 <!-- Article modal -->
 <div class="news-modal-overlay" id="newsModalOverlay">
     <div class="news-modal" role="dialog" aria-modal="true" aria-label="News article">
-        <button class="news-modal-close" onclick="closeArticle()"><i class="fas fa-xmark"></i></button>
+        <button class="news-modal-close" onclick="closeArticle()" aria-label="Close"><i class="pd-i pd-i-x"></i></button>
         <img class="news-modal-img" id="newsModalImg" alt="">
         <div class="news-modal-body">
             <span class="pd-news-cat" id="newsModalCat"></span>
@@ -328,20 +332,20 @@
 </div>
 
 <footer class="pd-page-footer">
-    <p class="pd-page-verse"><i class="fas fa-bible" style="color: var(--accent-gold);"></i> “He does everything blamelessly.” — Mark 7:37</p>
+    <p class="pd-page-verse"><i class="pd-i pd-i-book" style="color: var(--accent-gold);"></i> “He does everything blamelessly.” — Mark 7:37</p>
     <p>© Prayer Dome Ministry · A House of Prayer for All Nations</p>
     <p style="margin-top:6px;"><a href="/admin.html" style="color: var(--text-sub);">Admin</a> · <a href="/about.html" style="color: var(--text-sub);">About</a> · <a href="/contact.html" style="color: var(--text-sub);">Contact</a></p>
 </footer>
 
 <div class="bottom-ui-system">
     <nav class="nav-bar">
-        <a href="/" class="nav-link"><i class="fas fa-home"></i><span>Home</span></a>
-        <a href="/bible.html" class="nav-link"><i class="fas fa-book-open"></i><span>Bible</span></a>
-        <a href="/prayer.html" class="nav-link"><i class="fas fa-hands-praying"></i><span>Pray</span></a>
-        <a href="/news.html" class="nav-link active"><i class="fas fa-newspaper"></i><span>News</span></a>
-        <a href="/account.html" class="nav-link"><i class="fas fa-user-circle"></i><span>Account</span></a>
+        <a href="/" class="nav-link"><i class="pd-i pd-i-house"></i><span>Home</span></a>
+        <a href="/bible.html" class="nav-link"><i class="pd-i pd-i-book-open"></i><span>Bible</span></a>
+        <a href="/prayer.html" class="nav-link"><i class="pd-i pd-i-hands-praying"></i><span>Pray</span></a>
+        <a href="/news.html" class="nav-link active"><i class="pd-i pd-i-newspaper"></i><span>News</span></a>
+        <a href="/account.html" class="nav-link"><i class="pd-i pd-i-circle-user"></i><span>Account</span></a>
     </nav>
-    <div class="ticker-bar"><div class="ticker-track">“A HOUSE OF PRAYER FOR ALL NATIONS” • <i class="fas fa-cross"></i> “HE DOES EVERYTHING BLAMELESSLY” — MARK 7:37 • <i class="fas fa-globe-africa"></i> CONNECTING ZAMBIA, ESWATINI, SOUTH AFRICA, MALAWI & IRELAND</div></div>
+    <div class="ticker-bar"><div class="ticker-track">“A HOUSE OF PRAYER FOR ALL NATIONS” • <i class="pd-i pd-i-latin-cross"></i> “HE DOES EVERYTHING BLAMELESSLY” — MARK 7:37 • <i class="pd-i pd-i-earth"></i> CONNECTING ZAMBIA, ESWATINI, SOUTH AFRICA, MALAWI & IRELAND</div></div>
 </div>
 
 <div class="toast-container" id="toastContainer"></div>
@@ -458,7 +462,7 @@
                     <div class="pd-news-hero-body">
                         <span class="pd-news-cat">${esc(featured.category || 'Ministry News')}</span>
                         <h2>${esc(featured.title)}</h2>
-                        <div class="pd-news-meta" style="color: rgba(255,255,255,.85); margin-top:8px;"><i class="far fa-clock"></i> ${formatDate(featured.date)} · <i class="fas fa-user"></i> ${esc(featured.author || 'Prayer Dome')}</div>
+                        <div class="pd-news-meta" style="color: rgba(255,255,255,.85); margin-top:8px;"><i class="pd-i pd-i-clock"></i> ${formatDate(featured.date)} · <i class="pd-i pd-i-user"></i> ${esc(featured.author || 'Prayer Dome')}</div>
                     </div>
                 </a>`;
                 hero.querySelector('[data-open]').addEventListener('click', e => { e.preventDefault(); openArticle(featured.id); });
@@ -468,7 +472,7 @@
         }
 
         if (!items.length) {
-            grid.innerHTML = '<div class="news-loading"><i class="fas fa-newspaper" style="font-size:3rem; opacity:.3; display:block; margin-bottom:14px;"></i>No news found for this search. Check back soon!</div>';
+            grid.innerHTML = '<div class="news-loading"><i class="pd-i pd-i-newspaper" style="font-size:3rem; opacity:.3; display:block; margin-bottom:14px;"></i>No news found for this search. Check back soon!</div>';
             return;
         }
         grid.innerHTML = items.map(n => `
@@ -480,8 +484,8 @@
                     <span class="pd-news-cat">${esc(n.category || 'Ministry News')}</span>
                     <h3>${esc(n.title)}</h3>
                     <p>${esc((n.summary || '').substring(0, 140))}${(n.summary || '').length > 140 ? '…' : ''}</p>
-                    <div class="pd-news-meta"><i class="far fa-clock"></i> ${formatDate(n.date)} · <i class="fas fa-user"></i> ${esc(n.author || 'Prayer Dome')}</div>
-                    <button class="pd-btn pd-btn-dawn" data-open="${esc(n.id)}" style="margin-top:14px; padding:10px 20px; font-size:.78rem; border:none; cursor:pointer;">Read Story <i class="fas fa-arrow-right"></i></button>
+                    <div class="pd-news-meta"><i class="pd-i pd-i-clock"></i> ${formatDate(n.date)} · <i class="pd-i pd-i-user"></i> ${esc(n.author || 'Prayer Dome')}</div>
+                    <button class="pd-btn pd-btn-dawn" data-open="${esc(n.id)}" style="margin-top:14px; padding:10px 20px; font-size:.78rem; border:none; cursor:pointer;">Read Story <i class="pd-i pd-i-arrow-right"></i></button>
                 </div>
             </article>
         `).join('');
@@ -505,7 +509,7 @@
         document.getElementById('newsModalImg').onerror = function(){ this.src = NEWS_FALLBACK_IMAGE; };
         document.getElementById('newsModalCat').textContent = n.category || 'Ministry News';
         document.getElementById('newsModalTitle').textContent = n.title;
-        document.getElementById('newsModalMeta').innerHTML = `<span><i class="far fa-clock"></i> ${formatDate(n.date)}</span><span><i class="fas fa-user"></i> ${esc(n.author || 'Prayer Dome')}</span>`;
+        document.getElementById('newsModalMeta').innerHTML = `<span><i class="pd-i pd-i-clock"></i> ${formatDate(n.date)}</span><span><i class="pd-i pd-i-user"></i> ${esc(n.author || 'Prayer Dome')}</span>`;
         document.getElementById('newsModalBody').textContent = n.body || n.summary || '';
         // One branded share row across the whole app — the link resolves to
         // /share/news/<id>, which serves the featured image, title, summary
@@ -521,10 +525,10 @@
             const shareUrl = encodeURIComponent(rawShareUrl);
             const shareText = encodeURIComponent(n.title);
             shareRow.innerHTML = `
-            <button class="btn-share-wa" onclick="window.open('https://wa.me/?text=${shareText}%20${shareUrl}','_blank')"><i class="fab fa-whatsapp"></i> WhatsApp</button>
-            <button class="btn-share-fb" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=${shareUrl}','_blank')"><i class="fab fa-facebook-f"></i> Facebook</button>
-            <button class="btn-share-x" onclick="window.open('https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}','_blank')"><i class="fab fa-x-twitter"></i> X</button>
-            <button class="btn-share-copy" onclick="navigator.clipboard.writeText('${rawShareUrl}'); PDApp.toast('Story link copied — it will share with this story image');"><i class="fas fa-link"></i> Copy Story Link</button>`;
+            <button class="btn-share-wa" onclick="window.open('https://wa.me/?text=${shareText}%20${shareUrl}','_blank')"><i class="pd-i pd-i-brand-whatsapp"></i> WhatsApp</button>
+            <button class="btn-share-fb" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=${shareUrl}','_blank')"><i class="pd-i pd-i-brand-facebook"></i> Facebook</button>
+            <button class="btn-share-x" onclick="window.open('https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}','_blank')"><i class="pd-i pd-i-brand-x"></i> X</button>
+            <button class="btn-share-copy" onclick="navigator.clipboard.writeText('${rawShareUrl}'); PDApp.toast('Story link copied — it will share with this story image');"><i class="pd-i pd-i-link"></i> Copy Story Link</button>`;
         }
         updateArticleMeta(n);
         if (options.pushState !== false && history.pushState) history.pushState({ newsId: n.id }, '', `/news/${encodeURIComponent(n.id)}`);
@@ -552,7 +556,7 @@
     window.toggleDarkMode = function() {
         document.body.classList.toggle('dark-mode');
         const btn = document.querySelector('.theme-toggle-btn i');
-        if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
+        if (btn) btn.className = document.body.classList.contains('dark-mode') ? 'pd-i pd-i-sun' : 'pd-i pd-i-moon';
     };
 
     function bootstrapNews() {

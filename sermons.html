@@ -140,7 +140,8 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/assets/pd-icons.css">
+<script src="/assets/pd-icons.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
 
 <script type="application/ld+json">
@@ -467,13 +468,13 @@ body.dark-mode .nav-link.active { color:#fcd34d; }
     <div><h2>PRAYER DOME</h2><small>Sermons</small></div>
   </a>
   <div class="header-right">
-    <a href="/live.html" class="icon-btn" aria-label="Live service" title="Live service"><i class="fas fa-tower-broadcast"></i></a>
-    <button class="icon-btn" onclick="toggleDarkMode()" aria-label="Toggle dark mode"><i class="fas fa-moon"></i></button>
+    <a href="/live.html" class="icon-btn" aria-label="Live service" title="Live service"><i class="pd-i pd-i-radio"></i></a>
+    <button class="icon-btn" onclick="toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>
   </div>
 </header>
 
 <section class="hero">
-  <div class="hero-badge pd-reveal"><i class="fas fa-headphones-simple"></i> Listen &amp; Be Fed</div>
+  <div class="hero-badge pd-reveal"><i class="pd-i pd-i-headphones"></i> Listen &amp; Be Fed</div>
   <h1 class="pd-reveal" data-pd-delay="80">Sermons &amp; <span class="pd-gradient-text">Bible Stories</span></h1>
   <p class="pd-reveal" data-pd-delay="160">
     Press play and let the story be read to you — paragraph by paragraph, with the line being spoken
@@ -489,7 +490,7 @@ body.dark-mode .nav-link.active { color:#fcd34d; }
 <main>
   <div class="toolbar pd-reveal">
     <div class="search-wrap">
-      <i class="fas fa-magnifying-glass"></i>
+      <i class="pd-i pd-i-search"></i>
       <label for="searchBox" class="pd-sr-only">Search sermons</label>
       <input id="searchBox" type="search" placeholder="Search a title, book or topic…" autocomplete="off">
     </div>
@@ -503,14 +504,14 @@ body.dark-mode .nav-link.active { color:#fcd34d; }
 
   <div class="grid" id="sermonGrid" data-pd-stagger="80"></div>
   <div class="empty" id="emptyState" style="display:none;">
-    <i class="fas fa-book-open-reader"></i>
+    <i class="pd-i pd-i-book-open-text"></i>
     <p>No messages match that search yet. Try another word.</p>
   </div>
 </main>
 
 <!-- ===================== Reader ===================== -->
 <div class="reader" id="reader" role="dialog" aria-modal="true" aria-labelledby="readerTitle">
-  <button class="reader-close" onclick="closeReader()" aria-label="Close sermon"><i class="fas fa-xmark"></i></button>
+  <button class="reader-close" onclick="closeReader()" aria-label="Close sermon"><i class="pd-i pd-i-x"></i></button>
   <div class="reader-hero" id="readerHero">
     <div class="veil"></div>
     <div class="inner">
@@ -523,18 +524,18 @@ body.dark-mode .nav-link.active { color:#fcd34d; }
 
     <div class="console">
       <div class="console-row">
-        <button class="play-big" id="playBtn" onclick="togglePlay()" aria-label="Play narration"><i class="fas fa-play"></i></button>
+        <button class="play-big" id="playBtn" onclick="togglePlay()" aria-label="Play narration"><i class="pd-i pd-i-play"></i></button>
         <div class="console-meta">
           <strong id="narrState">Tap play to have this read to you</strong>
           <span id="narrPos"></span>
         </div>
-        <button class="mini-btn" id="prevBtn" onclick="stepPara(-1)" aria-label="Previous paragraph"><i class="fas fa-backward-step"></i></button>
-        <button class="mini-btn" id="nextBtn" onclick="stepPara(1)" aria-label="Next paragraph"><i class="fas fa-forward-step"></i></button>
-        <button class="mini-btn" id="stopBtn" onclick="stopNarration()" aria-label="Stop narration"><i class="fas fa-stop"></i></button>
+        <button class="mini-btn" id="prevBtn" onclick="stepPara(-1)" aria-label="Previous paragraph"><i class="pd-i pd-i-skip-back"></i></button>
+        <button class="mini-btn" id="nextBtn" onclick="stepPara(1)" aria-label="Next paragraph"><i class="pd-i pd-i-skip-forward"></i></button>
+        <button class="mini-btn" id="stopBtn" onclick="stopNarration()" aria-label="Stop narration"><i class="pd-i pd-i-square"></i></button>
       </div>
       <div class="progress-track"><div class="progress-fill" id="narrProgress"></div></div>
       <div class="speed-row">
-        <i class="fas fa-gauge-high" aria-hidden="true"></i>
+        <i class="pd-i pd-i-gauge" aria-hidden="true"></i>
         <label for="speedRange" class="pd-sr-only">Reading speed</label>
         <input type="range" id="speedRange" min="0.6" max="1.4" step="0.05" value="0.92" oninput="setSpeed(this.value)">
         <span id="speedLabel">0.92×</span>
@@ -545,34 +546,34 @@ body.dark-mode .nav-link.active { color:#fcd34d; }
     <div class="story" id="readerStory"></div>
 
     <div class="block prayer" id="readerPrayerBlock">
-      <h3><i class="fas fa-hands-praying"></i> Pray this</h3>
+      <h3><i class="pd-i pd-i-hands-praying"></i> Pray this</h3>
       <div id="readerPrayer"></div>
     </div>
 
     <div class="block" id="readerReflectBlock">
-      <h3><i class="fas fa-lightbulb"></i> Sit with this</h3>
+      <h3><i class="pd-i pd-i-lightbulb"></i> Sit with this</h3>
       <ol id="readerReflect"></ol>
     </div>
 
     <div class="pd-share-row" id="readerShareRow" aria-label="Share this message"></div>
 
     <div class="reader-actions">
-      <button class="act" onclick="shareSermon()"><i class="fas fa-share-nodes"></i> Share</button>
-      <button class="act" onclick="copySermon()"><i class="fas fa-copy"></i> Copy text</button>
-      <button class="act" onclick="toggleSave()" id="saveBtn"><i class="far fa-bookmark"></i> Save</button>
-      <a class="act" href="/prayer.html"><i class="fas fa-hands-praying"></i> Prayer wall</a>
+      <button class="act" onclick="shareSermon()"><i class="pd-i pd-i-share-2"></i> Share</button>
+      <button class="act" onclick="copySermon()"><i class="pd-i pd-i-copy"></i> Copy text</button>
+      <button class="act" onclick="toggleSave()" id="saveBtn"><i class="pd-i pd-i-bookmark"></i> Save</button>
+      <a class="act" href="/prayer.html"><i class="pd-i pd-i-hands-praying"></i> Prayer wall</a>
     </div>
   </div>
 </div>
 
 <div class="bottom-ui">
   <nav class="nav-bar">
-    <a href="/index.html" class="nav-link"><i class="fas fa-house"></i><span>Home</span></a>
-    <a href="/bible.html" class="nav-link"><i class="fas fa-book-open"></i><span>Bible</span></a>
-    <a href="/sermons.html" class="nav-link active"><i class="fas fa-microphone-lines"></i><span>Sermons</span></a>
-    <a href="/prayer.html" class="nav-link"><i class="fas fa-hands-praying"></i><span>Pray</span></a>
-    <a href="/ai-prayer.html" class="nav-link"><i class="fas fa-wand-magic-sparkles"></i><span>Assistant</span></a>
-    <a href="/account.html" class="nav-link"><i class="fas fa-user"></i><span>Account</span></a>
+    <a href="/index.html" class="nav-link"><i class="pd-i pd-i-house"></i><span>Home</span></a>
+    <a href="/bible.html" class="nav-link"><i class="pd-i pd-i-book-open"></i><span>Bible</span></a>
+    <a href="/sermons.html" class="nav-link active"><i class="pd-i pd-i-mic"></i><span>Sermons</span></a>
+    <a href="/prayer.html" class="nav-link"><i class="pd-i pd-i-hands-praying"></i><span>Pray</span></a>
+    <a href="/ai-prayer.html" class="nav-link"><i class="pd-i pd-i-wand-sparkles"></i><span>Assistant</span></a>
+    <a href="/account.html" class="nav-link"><i class="pd-i pd-i-user"></i><span>Account</span></a>
   </nav>
 </div>
 
@@ -606,7 +607,7 @@ function toast(msg, icon) {
   const w = document.getElementById('toastWrap');
   const t = document.createElement('div');
   t.className = 'toast';
-  t.innerHTML = '<i class="fas ' + (icon || 'fa-circle-check') + '"></i> ' + esc(msg);
+  t.innerHTML = '<i class="pd-i ' + (icon || 'pd-i-circle-check') + '"></i> ' + esc(msg);
   w.appendChild(t);
   setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; }, 2600);
   setTimeout(() => t.remove(), 3100);
@@ -684,7 +685,7 @@ function cardHTML(s) {
   const media = s.image
     ? '<img src="' + esc(s.image) + '" alt="" loading="lazy" decoding="async">'
     : '<div class="pd-tile-' + esc(s.tint || 'dawn') + '" style="position:absolute;inset:0"></div>' +
-      '<div class="card-fallback"><i class="fas fa-book-bible"></i></div>';
+      '<div class="card-fallback"><i class="pd-i pd-i-book"></i></div>';
 
   const tags = (s.topics || []).slice(0, 3)
     .map(function (t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('');
@@ -693,16 +694,16 @@ function cardHTML(s) {
            'aria-label="Open sermon: ' + esc(s.title) + '">' +
     '<div class="card-media">' + media +
       '<span class="card-series">' + esc(s.series || 'Message') + '</span>' +
-      '<span class="card-time"><i class="fas fa-clock"></i> ' + esc(s.minutes || 5) + ' min</span>' +
+      '<span class="card-time"><i class="pd-i pd-i-clock"></i> ' + esc(s.minutes || 5) + ' min</span>' +
     '</div>' +
-    '<div style="position:relative"><span class="card-play"><i class="fas fa-play"></i></span></div>' +
+    '<div style="position:relative"><span class="card-play"><i class="pd-i pd-i-play"></i></span></div>' +
     '<div class="card-body">' +
       '<h3>' + esc(s.title) + '</h3>' +
       (s.subtitle ? '<div class="card-sub">' + esc(s.subtitle) + '</div>' : '') +
       '<p class="card-summary">' + esc(s.summary || '') + '</p>' +
       '<div class="card-foot">' + tags +
         (s.fromAdmin ? '<span class="tag badge-admin">New</span>' : '') +
-        (s.scripture ? '<span style="margin-left:auto"><i class="fas fa-book"></i> ' + esc(s.scripture) + '</span>' : '') +
+        (s.scripture ? '<span style="margin-left:auto"><i class="pd-i pd-i-book"></i> ' + esc(s.scripture) + '</span>' : '') +
       '</div>' +
     '</div>' +
   '</button>';
@@ -806,7 +807,7 @@ function paintParagraph() {
 function setPlayIcon() {
   const btn = document.getElementById('playBtn');
   const icon = btn.querySelector('i');
-  icon.className = (speaking && !paused) ? 'fas fa-pause' : 'fas fa-play';
+  icon.className = (speaking && !paused) ? 'pd-i pd-i-pause' : 'pd-i pd-i-play';
   btn.classList.toggle('speaking', speaking && !paused);
   btn.setAttribute('aria-label', (speaking && !paused) ? 'Pause narration' : 'Play narration');
   document.getElementById('narrState').textContent =
@@ -837,7 +838,7 @@ function speakFrom(i) {
     if (e && (e.error === 'interrupted' || e.error === 'canceled')) return;
     speaking = false; paused = false;
     setPlayIcon(); paintParagraph();
-    toast('Your browser stopped the narration', 'fa-triangle-exclamation');
+    toast('Your browser stopped the narration', 'pd-i-triangle-alert');
   };
 
   speaking = true; paused = false;
@@ -847,7 +848,7 @@ function speakFrom(i) {
 }
 
 function togglePlay() {
-  if (!synth) { toast('This browser cannot read aloud', 'fa-volume-xmark'); return; }
+  if (!synth) { toast('This browser cannot read aloud', 'pd-i-volume-x'); return; }
   if (!current) return;
 
   if (speaking && !paused) {
@@ -888,7 +889,7 @@ function finishNarration() {
   paraNodes().forEach(function (n) { n.classList.remove('reading'); n.classList.add('done'); });
   document.getElementById('narrProgress').style.width = '100%';
   document.getElementById('narrState').textContent = 'Finished — may it settle in your heart';
-  toast('Message complete', 'fa-circle-check');
+  toast('Message complete', 'pd-i-circle-check');
 }
 
 function setSpeed(v) {
@@ -915,10 +916,10 @@ function openReader(id) {
 
   document.getElementById('readerTitle').textContent = s.title;
   document.getElementById('readerMeta').innerHTML =
-    [ s.speaker ? '<span><i class="fas fa-user"></i> ' + esc(s.speaker) + '</span>' : '',
-      s.scripture ? '<span><i class="fas fa-book"></i> ' + esc(s.scripture) + '</span>' : '',
-      '<span><i class="fas fa-clock"></i> ' + esc(s.minutes || 5) + ' min</span>',
-      s.series ? '<span><i class="fas fa-layer-group"></i> ' + esc(s.series) + '</span>' : ''
+    [ s.speaker ? '<span><i class="pd-i pd-i-user"></i> ' + esc(s.speaker) + '</span>' : '',
+      s.scripture ? '<span><i class="pd-i pd-i-book"></i> ' + esc(s.scripture) + '</span>' : '',
+      '<span><i class="pd-i pd-i-clock"></i> ' + esc(s.minutes || 5) + ' min</span>',
+      s.series ? '<span><i class="pd-i pd-i-layers"></i> ' + esc(s.series) + '</span>' : ''
     ].filter(Boolean).join('');
 
   const hero = document.getElementById('readerHero');
@@ -1001,14 +1002,14 @@ function showVoiceWarning() {
   const box = document.getElementById('voiceWarn');
   if (!synth) {
     box.style.display = 'block';
-    box.innerHTML = '<i class="fas fa-circle-info"></i> This browser has no speech engine, so the ' +
+    box.innerHTML = '<i class="pd-i pd-i-info"></i> This browser has no speech engine, so the ' +
                     'read-aloud button will not work here. The full text is below and you can read it as normal.';
     return;
   }
   const voices = synth.getVoices() || [];
   if (!voices.length) {
     box.style.display = 'block';
-    box.innerHTML = '<i class="fas fa-circle-info"></i> No voices have loaded yet. ' +
+    box.innerHTML = '<i class="pd-i pd-i-info"></i> No voices have loaded yet. ' +
                     'Tap play — on most phones the voice appears on the first attempt.';
     setTimeout(function () {
       if ((synth.getVoices() || []).length) box.style.display = 'none';
@@ -1049,10 +1050,10 @@ function shareSermon() {
 }
 
 function copySermon() {
-  if (!navigator.clipboard) { toast('Copying is not available here', 'fa-triangle-exclamation'); return; }
+  if (!navigator.clipboard) { toast('Copying is not available here', 'pd-i-triangle-alert'); return; }
   navigator.clipboard.writeText(sermonPlainText())
     .then(function () { toast('Message copied'); })
-    .catch(function () { toast('Could not copy', 'fa-triangle-exclamation'); });
+    .catch(function () { toast('Could not copy', 'pd-i-triangle-alert'); });
 }
 
 function toggleSave() {
@@ -1069,7 +1070,7 @@ function syncSaveBtn() {
   if (!current) return;
   const on = savedIds().indexOf(current.id) !== -1;
   const b = document.getElementById('saveBtn');
-  b.innerHTML = '<i class="' + (on ? 'fas' : 'far') + ' fa-bookmark"></i> ' + (on ? 'Saved' : 'Save');
+  b.innerHTML = '<i class="pd-i ' + (on ? 'pd-i-bookmark-check' : 'pd-i-bookmark') + '"></i> ' + (on ? 'Saved' : 'Save');
 }
 
 /* =====================================================================

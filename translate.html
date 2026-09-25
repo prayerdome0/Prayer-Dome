@@ -150,7 +150,8 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="/assets/pd-icons.css">
+<script src="/assets/pd-icons.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
 
 <style>
@@ -359,13 +360,13 @@ body.dark-mode .nav-link.active { color:#5eead4; }
     <div><h2>PRAYER DOME</h2><small id="brandSub">Translate</small></div>
   </a>
   <div style="display:flex;gap:10px;align-items:center">
-    <a href="/bible.html" class="icon-btn" aria-label="Full Bible reader" title="Full Bible reader"><i class="fas fa-book-open"></i></a>
-    <button class="icon-btn" onclick="toggleDarkMode()" aria-label="Toggle dark mode"><i class="fas fa-moon"></i></button>
+    <a href="/bible.html" class="icon-btn" aria-label="Full Bible reader" title="Full Bible reader"><i class="pd-i pd-i-book-open"></i></a>
+    <button class="icon-btn" onclick="toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>
   </div>
 </header>
 
 <section class="hero">
-  <div class="hero-badge pd-reveal"><i class="fas fa-language"></i> Five Languages</div>
+  <div class="hero-badge pd-reveal"><i class="pd-i pd-i-languages"></i> Five Languages</div>
   <h1 class="pd-reveal" data-pd-delay="70">Scripture in <span class="pd-gradient-text">your own tongue</span> — five languages</h1>
   <p class="pd-reveal" data-pd-delay="140" id="heroCopy">
     English, Chitumbuka, siSwati, Bemba and Nyanja side by side. Search a verse, switch language in one tap,
@@ -376,7 +377,7 @@ body.dark-mode .nav-link.active { color:#5eead4; }
 <main>
 
   <div class="provenance pd-reveal">
-    <i class="fas fa-circle-info"></i>
+    <i class="pd-i pd-i-info"></i>
     <div>
       <strong>About these translations — please read</strong>
       The English is the King James Version and is exact. The Chitumbuka, siSwati, Bemba and Nyanja renderings are
@@ -391,15 +392,15 @@ body.dark-mode .nav-link.active { color:#5eead4; }
   <div class="lang-note" id="langNote"></div>
 
   <div class="mode-row">
-    <button class="mode-btn active" id="modeSingle" onclick="setMode('single')"><i class="fas fa-align-left"></i> One language</button>
-    <button class="mode-btn" id="modeParallel" onclick="setMode('parallel')"><i class="fas fa-table-columns"></i> All five side by side</button>
-    <button class="mode-btn" id="stopAllBtn" onclick="stopSpeech()" style="margin-left:auto"><i class="fas fa-stop"></i> Stop audio</button>
+    <button class="mode-btn active" id="modeSingle" onclick="setMode('single')"><i class="pd-i pd-i-text-align-start"></i> One language</button>
+    <button class="mode-btn" id="modeParallel" onclick="setMode('parallel')"><i class="pd-i pd-i-columns-2"></i> All five side by side</button>
+    <button class="mode-btn" id="stopAllBtn" onclick="stopSpeech()" style="margin-left:auto"><i class="pd-i pd-i-square"></i> Stop audio</button>
   </div>
 
   <div id="votdWrap"></div>
 
   <div class="search-wrap">
-    <i class="fas fa-magnifying-glass"></i>
+    <i class="pd-i pd-i-search"></i>
     <label for="verseSearch" class="pd-sr-only">Search scripture</label>
     <input id="verseSearch" type="search" placeholder="Search a verse in any of the five languages…" autocomplete="off">
   </div>
@@ -414,7 +415,7 @@ body.dark-mode .nav-link.active { color:#5eead4; }
 
   <div id="verseList"></div>
   <div class="empty" id="emptyState" style="display:none;">
-    <i class="fas fa-magnifying-glass"></i>
+    <i class="pd-i pd-i-search"></i>
     <p>Nothing in the pack matches that yet. Try a shorter word, or a different language.</p>
   </div>
 
@@ -422,12 +423,12 @@ body.dark-mode .nav-link.active { color:#5eead4; }
 
 <div class="bottom-ui">
   <nav class="nav-bar">
-    <a href="/index.html" class="nav-link"><i class="fas fa-house"></i><span>Home</span></a>
-    <a href="/bible.html" class="nav-link"><i class="fas fa-book-open"></i><span>Bible</span></a>
-    <a href="/translate.html" class="nav-link active"><i class="fas fa-language"></i><span>Translate</span></a>
-    <a href="/sermons.html" class="nav-link"><i class="fas fa-microphone-lines"></i><span>Sermons</span></a>
-    <a href="/prayer.html" class="nav-link"><i class="fas fa-hands-praying"></i><span>Pray</span></a>
-    <a href="/account.html" class="nav-link"><i class="fas fa-user"></i><span>Account</span></a>
+    <a href="/index.html" class="nav-link"><i class="pd-i pd-i-house"></i><span>Home</span></a>
+    <a href="/bible.html" class="nav-link"><i class="pd-i pd-i-book-open"></i><span>Bible</span></a>
+    <a href="/translate.html" class="nav-link active"><i class="pd-i pd-i-languages"></i><span>Translate</span></a>
+    <a href="/sermons.html" class="nav-link"><i class="pd-i pd-i-mic"></i><span>Sermons</span></a>
+    <a href="/prayer.html" class="nav-link"><i class="pd-i pd-i-hands-praying"></i><span>Pray</span></a>
+    <a href="/account.html" class="nav-link"><i class="pd-i pd-i-user"></i><span>Account</span></a>
   </nav>
 </div>
 
@@ -454,7 +455,7 @@ function toast(msg, icon) {
   const w = document.getElementById('toastWrap');
   const t = document.createElement('div');
   t.className = 'toast';
-  t.innerHTML = '<i class="fas ' + (icon || 'fa-circle-check') + '"></i> ' + esc(msg);
+  t.innerHTML = '<i class="pd-i ' + (icon || 'pd-i-circle-check') + '"></i> ' + esc(msg);
   w.appendChild(t);
   setTimeout(function () { t.style.transition = 'opacity .4s'; t.style.opacity = '0'; }, 2500);
   setTimeout(function () { t.remove(); }, 3000);
@@ -493,7 +494,7 @@ function setLang(code) {
   renderVOTD();
   renderList();
   renderTopics();
-  toast(pdT('label.language', code) + ': ' + pdLanguage(code).endonym, 'fa-language');
+  toast(pdT('label.language', code) + ': ' + pdLanguage(code).endonym, 'pd-i-languages');
 }
 
 function setMode(m) {
@@ -509,16 +510,16 @@ function renderVOTD() {
   if (!v) return;
   document.getElementById('votdWrap').innerHTML =
     '<div class="votd pd-reveal">' +
-      '<div class="label"><i class="fas fa-sun"></i> ' + esc(pdT('verse.of.day', lang)) + '</div>' +
+      '<div class="label"><i class="pd-i pd-i-sun"></i> ' + esc(pdT('verse.of.day', lang)) + '</div>' +
       '<div class="text" data-pd-no-auto>' + esc(v.text) + '</div>' +
       '<div class="ref">— ' + esc(v.ref) + '</div>' +
       (v.reviewed ? '' :
         '<div style="margin-top:12px;font-size:.7rem;opacity:.88;position:relative;z-index:2">' +
-        '<i class="fas fa-triangle-exclamation"></i> ' + esc(pdT('label.draft', lang)) + '</div>') +
+        '<i class="pd-i pd-i-triangle-alert"></i> ' + esc(pdT('label.draft', lang)) + '</div>') +
       '<div class="acts">' +
-        '<button onclick="speak(' + JSON.stringify(v.id) + ')"><i class="fas fa-volume-high"></i> ' + esc(pdT('action.listen', lang)) + '</button>' +
-        '<button onclick="copyVerse(' + JSON.stringify(v.id) + ')"><i class="fas fa-copy"></i> ' + esc(pdT('action.copy', lang)) + '</button>' +
-        '<button onclick="shareVerse(' + JSON.stringify(v.id) + ')"><i class="fas fa-share-nodes"></i> ' + esc(pdT('action.share', lang)) + '</button>' +
+        '<button onclick="speak(' + JSON.stringify(v.id) + ')"><i class="pd-i pd-i-volume-2"></i> ' + esc(pdT('action.listen', lang)) + '</button>' +
+        '<button onclick="copyVerse(' + JSON.stringify(v.id) + ')"><i class="pd-i pd-i-copy"></i> ' + esc(pdT('action.copy', lang)) + '</button>' +
+        '<button onclick="shareVerse(' + JSON.stringify(v.id) + ')"><i class="pd-i pd-i-share-2"></i> ' + esc(pdT('action.share', lang)) + '</button>' +
       '</div>' +
     '</div>';
   if (window.PDMotion) window.PDMotion.refresh(document.getElementById('votdWrap'));
@@ -555,7 +556,7 @@ function currentVerses() {
 function draftPill(reviewed) {
   return reviewed ? '' :
     '<span class="draft-pill" title="This rendering has not yet been checked by a fluent speaker">' +
-    '<i class="fas fa-pen-ruler"></i> Draft</span>';
+    '<i class="pd-i pd-i-pencil-ruler"></i> Draft</span>';
 }
 
 function singleHTML(v) {
@@ -566,15 +567,15 @@ function singleHTML(v) {
       '<span class="verse-ref">' + esc(r.ref) + '</span>' +
       '<span class="lang-pill">' + esc(l.endonym) + '</span>' +
       draftPill(r.reviewed) +
-      (r.fellBack ? '<span class="draft-pill"><i class="fas fa-circle-info"></i> English shown — no ' +
+      (r.fellBack ? '<span class="draft-pill"><i class="pd-i pd-i-info"></i> English shown — no ' +
                     esc(pdLanguage(lang).endonym) + ' text yet</span>' : '') +
     '</div>' +
     '<div class="verse-text" data-pd-no-auto>' + esc(r.text) + '</div>' +
     '<div class="verse-acts">' +
-      '<button class="vbtn" onclick="speak(' + JSON.stringify(v.id) + ')"><i class="fas fa-volume-high"></i> ' + esc(pdT('action.listen', lang)) + '</button>' +
-      '<button class="vbtn" onclick="copyVerse(' + JSON.stringify(v.id) + ')"><i class="fas fa-copy"></i> ' + esc(pdT('action.copy', lang)) + '</button>' +
-      '<button class="vbtn" onclick="shareVerse(' + JSON.stringify(v.id) + ')"><i class="fas fa-share-nodes"></i> ' + esc(pdT('action.share', lang)) + '</button>' +
-      '<button class="vbtn" onclick="showParallel(' + JSON.stringify(v.id) + ')"><i class="fas fa-table-columns"></i> Compare</button>' +
+      '<button class="vbtn" onclick="speak(' + JSON.stringify(v.id) + ')"><i class="pd-i pd-i-volume-2"></i> ' + esc(pdT('action.listen', lang)) + '</button>' +
+      '<button class="vbtn" onclick="copyVerse(' + JSON.stringify(v.id) + ')"><i class="pd-i pd-i-copy"></i> ' + esc(pdT('action.copy', lang)) + '</button>' +
+      '<button class="vbtn" onclick="shareVerse(' + JSON.stringify(v.id) + ')"><i class="pd-i pd-i-share-2"></i> ' + esc(pdT('action.share', lang)) + '</button>' +
+      '<button class="vbtn" onclick="showParallel(' + JSON.stringify(v.id) + ')"><i class="pd-i pd-i-columns-2"></i> Compare</button>' +
     '</div>' +
     '<div id="par-' + esc(v.id) + '"></div>' +
   '</article>';
@@ -587,7 +588,7 @@ function parallelCells(v) {
       '<span class="lang-pill">' + esc(l.endonym) + '</span> ' + draftPill(r.reviewed) +
       '<p data-pd-no-auto>' + esc(r.text) + '</p>' +
       '<button class="vbtn" style="margin-top:10px" onclick="speak(' + JSON.stringify(v.id) + ',\'' + l.code + '\')">' +
-        '<i class="fas fa-volume-high"></i> ' + esc(pdT('action.listen', l.code)) + '</button>' +
+        '<i class="pd-i pd-i-volume-2"></i> ' + esc(pdT('action.listen', l.code)) + '</button>' +
     '</div>';
   }).join('') + '</div>';
 }
@@ -645,7 +646,7 @@ function stopSpeech() {
 }
 
 function speak(id, forceLang) {
-  if (!synth) { toast('This browser cannot read aloud', 'fa-volume-xmark'); return; }
+  if (!synth) { toast('This browser cannot read aloud', 'pd-i-volume-x'); return; }
   const code = forceLang || lang;
   const r = pdRenderVerse(id, code);
   if (!r) return;
@@ -668,12 +669,12 @@ function speak(id, forceLang) {
     const exact = prefs.length && (vl === prefs[0].toLowerCase() ||
                                    vl.indexOf(prefs[0].toLowerCase() + '-') === 0);
     if (!exact && code !== 'en') {
-      toast('No ' + pdLanguage(code).endonym + ' voice here — using the closest available', 'fa-circle-info');
+      toast('No ' + pdLanguage(code).endonym + ' voice here — using the closest available', 'pd-i-info');
     }
   } else {
     u.lang = 'en-GB';
     if (code !== 'en') {
-      toast('No ' + pdLanguage(code).endonym + ' voice installed on this device', 'fa-circle-info');
+      toast('No ' + pdLanguage(code).endonym + ' voice installed on this device', 'pd-i-info');
     }
   }
 
@@ -697,10 +698,10 @@ function verseText(id, code) {
 }
 
 function copyVerse(id) {
-  if (!navigator.clipboard) { toast('Copying is not available here', 'fa-triangle-exclamation'); return; }
+  if (!navigator.clipboard) { toast('Copying is not available here', 'pd-i-triangle-alert'); return; }
   navigator.clipboard.writeText(verseText(id))
-    .then(function () { toast(pdT('action.copy', lang) + ' ✓'); })
-    .catch(function () { toast('Could not copy', 'fa-triangle-exclamation'); });
+    .then(function () { toast(pdT('action.copy', lang)); })
+    .catch(function () { toast('Could not copy', 'pd-i-triangle-alert'); });
 }
 
 function shareVerse(id) {

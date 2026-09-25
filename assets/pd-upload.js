@@ -109,16 +109,16 @@
         var previewHtml = '';
         if (isImg) previewHtml = '<div class="pdu-preview"><img alt="Selected image preview"></div>';
         else if (isVid) previewHtml = '<div class="pdu-preview"><video controls playsinline muted></video></div>';
-        else previewHtml = '<div class="pdu-preview"><i class="fas fa-file" style="font-size:2.4rem;color:#4DA3FF"></i></div>';
+        else previewHtml = '<div class="pdu-preview"><i class="pd-i pd-i-file" style="font-size:2.4rem;color:#4DA3FF"></i></div>';
 
         overlay.innerHTML =
             '<div class="pdu-card" role="dialog" aria-modal="true" aria-label="' + esc(opts.title || 'Upload') + '">'
             + '<div class="pdu-head"><img src="/assets/logo.png" alt=""><h3>' + esc(opts.title || 'Upload') + '</h3>'
-            + '<button class="pdu-close" type="button" aria-label="Close"><i class="fas fa-xmark"></i></button></div>'
+            + '<button class="pdu-close" type="button" aria-label="Close"><i class="pd-i pd-i-x"></i></button></div>'
             + '<div class="pdu-body">'
             + '<div class="pdu-error" id="pduError"></div>'
             + previewHtml
-            + '<div class="pdu-filemeta"><i class="fas ' + (isVid ? 'fa-film' : isImg ? 'fa-image' : 'fa-file-lines') + '"></i>'
+            + '<div class="pdu-filemeta"><i class="pd-i ' + (isVid ? 'pd-i-film' : isImg ? 'pd-i-image' : 'pd-i-file-text') + '"></i>'
             + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(file.name || 'Selected file') + '</span>'
             + '<span class="pdu-size">' + api._fmtBytes(file.size) + '</span></div>'
             + '<div class="pdu-progress"><div id="pduBar"></div></div>'
@@ -126,7 +126,7 @@
             + '</div>'
             + '<div class="pdu-actions">'
             + '<button class="pdu-btn pdu-btn-ghost" id="pduCancel" type="button">Cancel</button>'
-            + '<button class="pdu-btn pdu-btn-primary" id="pduGo" type="button"><i class="fas fa-cloud-arrow-up"></i> Upload</button>'
+            + '<button class="pdu-btn pdu-btn-primary" id="pduGo" type="button"><i class="pd-i pd-i-cloud-upload"></i> Upload</button>'
             + '</div>'
             + '<div class="pdu-brand"><img src="/assets/logo.png" style="width:14px;height:14px;border-radius:4px" alt=""> Prayer Dome</div>'
             + '</div>';
@@ -154,7 +154,7 @@
             errBox.textContent = msg;
             errBox.classList.add('show');
             state.textContent = 'Upload failed';
-            go.innerHTML = '<i class="fas fa-rotate-right"></i> Try Again';
+            go.innerHTML = '<i class="pd-i pd-i-rotate-cw"></i> Try Again';
             go.disabled = false;
             cancel.textContent = 'Cancel';
         }
@@ -178,7 +178,7 @@
         go.addEventListener('click', async function () {
             errBox.classList.remove('show');
             go.disabled = true;
-            go.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Uploading…';
+            go.innerHTML = '<i class="pd-i pd-i-loader-circle pd-i-spin"></i> Uploading…';
             state.textContent = 'Uploading — ' + Math.round(0) + '%';
             try {
                 var result = await api._uploadFile(file, {
@@ -209,7 +209,7 @@
         ensureStyles();
         var b = document.createElement('div');
         b.className = 'pdu-badge';
-        b.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> ' + esc(text);
+        b.innerHTML = '<i class="pd-i pd-i-loader-circle pd-i-spin"></i> ' + esc(text);
         document.body.appendChild(b);
         return function () { if (b.parentNode) b.parentNode.removeChild(b); };
     }

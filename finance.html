@@ -124,7 +124,8 @@
     </script>
     <!-- PD-SEO:END -->
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/pd-icons.css">
+    <script src="/assets/pd-icons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
@@ -695,14 +696,14 @@
             </div>
         </div>
         <div class="header-actions">
-            <a href="index.html" class="back-btn"><i class="fas fa-home"></i> Home</a>
+            <a href="index.html" class="back-btn"><i class="pd-i pd-i-house"></i> Home</a>
         </div>
     </header>
 
     <div class="main-container" id="mainContent">
         <!-- Access Denied Message -->
         <div id="accessDenied" class="access-denied" style="display: none;">
-            <i class="fas fa-lock"></i>
+            <i class="pd-i pd-i-lock"></i>
             <h2>Access Denied</h2>
             <p>This page is restricted to Finance Department personnel only.</p>
             <button class="btn btn-primary" onclick="window.location.href='index.html'" style="margin-top: 20px;">Return to Home</button>
@@ -716,9 +717,9 @@
 
                 <!-- Branch Selector -->
                 <div class="branch-selector">
-                    <button class="branch-btn active" data-branch="eswatini" onclick="selectBranch('eswatini')">🇸🇿 Eswatini</button>
-                    <button class="branch-btn" data-branch="zambia" onclick="selectBranch('zambia')">🇿🇲 Zambia</button>
-                    <button class="branch-btn" data-branch="ireland" onclick="selectBranch('ireland')">🇮🇪 Ireland</button>
+                    <button class="branch-btn active" data-branch="eswatini" onclick="selectBranch('eswatini')">Eswatini</button>
+                    <button class="branch-btn" data-branch="zambia" onclick="selectBranch('zambia')">Zambia</button>
+                    <button class="branch-btn" data-branch="ireland" onclick="selectBranch('ireland')">Ireland</button>
                 </div>
 
                 <!-- Date Selector -->
@@ -742,34 +743,34 @@
                         </thead>
                         <tbody>
                             <tr><td>Tithes</td><td><input type="number" id="tithes" class="income-input" step="0.01" value="0" onchange="calculateTotals()"></td>
-                                <td class="text-center"><i class="fas fa-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('tithes', 'Tithes')" title="Add notes"></i> <span id="desc_tithes_indicator"></span></td>
+                                <td class="text-center"><i class="pd-i pd-i-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('tithes', 'Tithes')" title="Add notes"></i> <span id="desc_tithes_indicator"></span></td>
                                 <td>Transport</td><td><input type="number" id="transport" class="expense-input" step="0.01" value="0" onchange="calculateTotals()"></td>
-                                <td><i class="fas fa-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('transport', 'Transport')" title="Add notes"></i> <span id="desc_transport_indicator"></span></td>
+                                <td><i class="pd-i pd-i-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('transport', 'Transport')" title="Add notes"></i> <span id="desc_transport_indicator"></span></td>
                             </tr>
                             <tr><td>Free Will Offering</td><td><input type="number" id="freewill" class="income-input" step="0.01" value="0" onchange="calculateTotals()"></td>
-                                <td><i class="fas fa-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('freewill', 'Free Will Offering')"></i> <span id="desc_freewill_indicator"></span></td>
+                                <td><i class="pd-i pd-i-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('freewill', 'Free Will Offering')"></i> <span id="desc_freewill_indicator"></span></td>
                                 <td>Electricity</td><td><input type="number" id="electricity" class="expense-input" step="0.01" value="0" onchange="calculateTotals()"></td>
-                                <td><i class="fas fa-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('electricity', 'Electricity')"></i> <span id="desc_electricity_indicator"></span></td>
+                                <td><i class="pd-i pd-i-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('electricity', 'Electricity')"></i> <span id="desc_electricity_indicator"></span></td>
                             </tr>
                             <tr><td>Sunday School Offering</td><td><input type="number" id="sundayschool" class="income-input" step="0.01" value="0" onchange="calculateTotals()"></td>
-                                <td><i class="fas fa-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('sundayschool', 'Sunday School Offering')"></i> <span id="desc_sundayschool_indicator"></span></td>
+                                <td><i class="pd-i pd-i-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('sundayschool', 'Sunday School Offering')"></i> <span id="desc_sundayschool_indicator"></span></td>
                                 <td>Building Material</td><td><input type="number" id="building" class="expense-input" step="0.01" value="0" onchange="calculateTotals()"></td>
-                                <td><i class="fas fa-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('building', 'Building Material')"></i> <span id="desc_building_indicator"></span></td>
+                                <td><i class="pd-i pd-i-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('building', 'Building Material')"></i> <span id="desc_building_indicator"></span></td>
                             </tr>
                             <tr><td>Thanksgiving Offering</td><td><input type="number" id="thanksgiving" class="income-input" step="0.01" value="0" onchange="calculateTotals()"></td>
-                                <td><i class="fas fa-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('thanksgiving', 'Thanksgiving Offering')"></i> <span id="desc_thanksgiving_indicator"></span></td>
+                                <td><i class="pd-i pd-i-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('thanksgiving', 'Thanksgiving Offering')"></i> <span id="desc_thanksgiving_indicator"></span></td>
                                 <td>Water</td><td><input type="number" id="water" class="expense-input" step="0.01" value="0" onchange="calculateTotals()"></td>
-                                <td><i class="fas fa-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('water', 'Water')"></i> <span id="desc_water_indicator"></span></td>
+                                <td><i class="pd-i pd-i-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('water', 'Water')"></i> <span id="desc_water_indicator"></span></td>
                             </tr>
                             <tr><td>Project Support</td><td><input type="number" id="project" class="income-input" step="0.01" value="0" onchange="calculateTotals()"></td>
-                                <td><i class="fas fa-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('project', 'Project Support')"></i> <span id="desc_project_indicator"></span></td>
+                                <td><i class="pd-i pd-i-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('project', 'Project Support')"></i> <span id="desc_project_indicator"></span></td>
                                 <td>Maintenance</td><td><input type="number" id="maintenance" class="expense-input" step="0.01" value="0" onchange="calculateTotals()"></td>
-                                <td><i class="fas fa-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('maintenance', 'Maintenance')"></i> <span id="desc_maintenance_indicator"></span></td>
+                                <td><i class="pd-i pd-i-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('maintenance', 'Maintenance')"></i> <span id="desc_maintenance_indicator"></span></td>
                             </tr>
                             <tr><td>Other Income</td><td><input type="number" id="other_income" class="income-input" step="0.01" value="0" onchange="calculateTotals()"></td>
-                                <td><i class="fas fa-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('other_income', 'Other Income')"></i> <span id="desc_other_income_indicator"></span></td>
+                                <td><i class="pd-i pd-i-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('other_income', 'Other Income')"></i> <span id="desc_other_income_indicator"></span></td>
                                 <td>Other Expenses</td><td><input type="number" id="other_expense" class="expense-input" step="0.01" value="0" onchange="calculateTotals()"></td>
-                                <td><i class="fas fa-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('other_expense', 'Other Expenses')"></i> <span id="desc_other_expense_indicator"></span></td>
+                                <td><i class="pd-i pd-i-pen" style="cursor: pointer; color: var(--accent-gold);" onclick="openDescriptionModal('other_expense', 'Other Expenses')"></i> <span id="desc_other_expense_indicator"></span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -832,13 +833,13 @@
                 <!-- Action Buttons -->
                 <div class="action-buttons">
                     <button class="btn btn-primary" onclick="saveReport()">
-                        <i class="fas fa-save"></i> Submit Report
+                        <i class="pd-i pd-i-save"></i> Submit Report
                     </button>
                     <button class="btn btn-secondary" onclick="resetForm()">
-                        <i class="fas fa-undo-alt"></i> Reset
+                        <i class="pd-i pd-i-undo-2"></i> Reset
                     </button>
                     <button class="btn btn-secondary" onclick="exportReport()">
-                        <i class="fas fa-download"></i> Export PDF
+                        <i class="pd-i pd-i-download"></i> Export PDF
                     </button>
                 </div>
             </div>
@@ -846,7 +847,7 @@
             <!-- Previous Reports History -->
             <div class="history-section">
                 <h2 style="margin-bottom: 20px; color: var(--accent-green); font-family: 'Playfair Display', serif;">
-                    <i class="fas fa-history"></i> Previous Reports
+                    <i class="pd-i pd-i-rotate-ccw-clock"></i> Previous Reports
                 </h2>
                 <div id="reportsHistory"></div>
             </div>
@@ -945,7 +946,7 @@
             items.forEach(item => {
                 const indicator = document.getElementById(`desc_${item}_indicator`);
                 if (indicator) {
-                    if (descriptions[item]) indicator.innerHTML = ' <i class="fas fa-check-circle" style="color: var(--accent-green); font-size: 12px;" title="Has notes"></i>';
+                    if (descriptions[item]) indicator.innerHTML = ' <i class="pd-i pd-i-circle-check" style="color: var(--accent-green); font-size: 12px;" title="Has notes"></i>';
                     else indicator.innerHTML = '';
                 }
             });
@@ -954,7 +955,7 @@
         window.openDescriptionModal = function(itemId, itemName) {
             currentDescriptionItem = itemId;
             currentDescriptionName = itemName;
-            document.getElementById('descModalTitle').innerHTML = `<i class="fas fa-edit"></i> ${itemName} Details`;
+            document.getElementById('descModalTitle').innerHTML = `<i class="pd-i pd-i-square-pen"></i> ${itemName} Details`;
             document.getElementById('descItemName').innerHTML = `<strong>${itemName}</strong> - Add specific details about this transaction`;
             document.getElementById('itemDescription').value = descriptions[itemId] || '';
             document.getElementById('descriptionModal').style.display = 'flex';
@@ -1040,9 +1041,9 @@
                 container.innerHTML = snapshot.docs.map((doc, idx) => {
                     const r = doc.data();
                     return `<div class="history-card" style="animation-delay: ${idx * 0.05}s" onclick="viewReport('${doc.id}')">
-                        <div class="history-header"><span class="history-date"><i class="far fa-calendar-alt"></i> ${moment(r.date).format('dddd, MMMM D, YYYY')}</span><span class="history-branch">${r.branch === 'eswatini' ? '🇸🇿 Eswatini' : r.branch === 'zambia' ? '🇿🇲 Zambia' : '🇮🇪 Ireland'}</span></div>
-                        <div class="history-totals"><span><i class="fas fa-money-bill-wave"></i> Income: E${(r.totalIncome || 0).toFixed(2)}</span><span><i class="fas fa-receipt"></i> Expense: E${(r.totalExpense || 0).toFixed(2)}</span><span><i class="fas fa-chart-line"></i> Surplus: E${(r.surplus || 0).toFixed(2)}</span></div>
-                        <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 8px;"><i class="fas fa-user-check"></i> Submitted by: ${r.userName || 'Finance Team'} | Approved: ${r.approvedBy}</div>
+                        <div class="history-header"><span class="history-date"><i class="pd-i pd-i-calendar-days"></i> ${moment(r.date).format('dddd, MMMM D, YYYY')}</span><span class="history-branch">${r.branch === 'eswatini' ? 'Eswatini' : r.branch === 'zambia' ? 'Zambia' : 'Ireland'}</span></div>
+                        <div class="history-totals"><span><i class="pd-i pd-i-banknote"></i> Income: E${(r.totalIncome || 0).toFixed(2)}</span><span><i class="pd-i pd-i-receipt"></i> Expense: E${(r.totalExpense || 0).toFixed(2)}</span><span><i class="pd-i pd-i-chart-line"></i> Surplus: E${(r.surplus || 0).toFixed(2)}</span></div>
+                        <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 8px;"><i class="pd-i pd-i-user-check"></i> Submitted by: ${r.userName || 'Finance Team'} | Approved: ${r.approvedBy}</div>
                     </div>`;
                 }).join('');
             } catch (error) { container.innerHTML = `<div style="text-align: center; padding: 40px; color: red;">Error: ${error.message}</div>`; }
@@ -1057,17 +1058,17 @@
             modalContent.innerHTML = `
                 <div style="background: var(--bg-primary); padding: 25px; border-radius: 20px;">
                     <h3 style="color: var(--accent-green); font-family: 'Playfair Display', serif;">Prayer Dome Financial Report</h3>
-                    <p><strong>Branch:</strong> ${r.branch === 'eswatini' ? '🇸🇿 Eswatini' : r.branch === 'zambia' ? '🇿🇲 Zambia' : '🇮🇪 Ireland'}</p>
+                    <p><strong>Branch:</strong> ${r.branch === 'eswatini' ? 'Eswatini' : r.branch === 'zambia' ? 'Zambia' : 'Ireland'}</p>
                     <p><strong>Date:</strong> ${moment(r.date).format('dddd, MMMM D, YYYY')}</p>
                     <hr style="margin: 15px 0;">
-                    <h4><i class="fas fa-chart-line"></i> INCOME</h4>
+                    <h4><i class="pd-i pd-i-chart-line"></i> INCOME</h4>
                     <table style="width:100%; margin-bottom:15px;"><tr><td>Tithes:</td><td style="text-align:right;">E${(r.income?.tithes || 0).toFixed(2)}</td></tr>
                     <tr><td>Free Will:</td><td style="text-align:right;">E${(r.income?.freewill || 0).toFixed(2)}</td></tr>
                     <tr><td>Sunday School:</td><td style="text-align:right;">E${(r.income?.sundayschool || 0).toFixed(2)}</td></tr>
                     <tr><td>Thanksgiving:</td><td style="text-align:right;">E${(r.income?.thanksgiving || 0).toFixed(2)}</td></tr>
                     <tr><td>Project Support:</td><td style="text-align:right;">E${(r.income?.project || 0).toFixed(2)}</td></tr>
                     <tr style="border-top:2px solid var(--border-color); font-weight:bold;"><td>Total Income:</td><td style="text-align:right;">E${(r.totalIncome || 0).toFixed(2)}</td></tr></table>
-                    <h4><i class="fas fa-chart-line"></i> EXPENDITURE</h4>
+                    <h4><i class="pd-i pd-i-chart-line"></i> EXPENDITURE</h4>
                     <table style="width:100%; margin-bottom:15px;"><tr><td>Transport:</td><td style="text-align:right;">E${(r.expenditure?.transport || 0).toFixed(2)}</td></tr>
                     <tr><td>Electricity:</td><td style="text-align:right;">E${(r.expenditure?.electricity || 0).toFixed(2)}</td></tr>
                     <tr><td>Building Material:</td><td style="text-align:right;">E${(r.expenditure?.building || 0).toFixed(2)}</td></tr>
@@ -1083,7 +1084,7 @@
                     <p><strong>Date:</strong> ${moment(r.timestamp?.toDate()).format('MMMM D, YYYY h:mm A')}</p>
                 </div>`;
             if (r.descriptions && Object.keys(r.descriptions).length > 0) {
-                modalContent.innerHTML += `<div style="margin-top: 20px; padding: 15px; background: rgba(212,175,55,0.1); border-radius: 15px;"><h4><i class="fas fa-sticky-note"></i> Transaction Notes</h4>${Object.entries(r.descriptions).map(([key, value]) => `<div style="margin-top: 8px; padding: 8px; background: var(--bg-card); border-radius: 8px;"><strong style="color: var(--accent-gold);">${key.replace(/_/g, ' ').toUpperCase()}:</strong><p style="margin-top: 4px; font-size: 0.85rem;">${value}</p></div>`).join('')}</div>`;
+                modalContent.innerHTML += `<div style="margin-top: 20px; padding: 15px; background: rgba(212,175,55,0.1); border-radius: 15px;"><h4><i class="pd-i pd-i-sticky-note"></i> Transaction Notes</h4>${Object.entries(r.descriptions).map(([key, value]) => `<div style="margin-top: 8px; padding: 8px; background: var(--bg-card); border-radius: 8px;"><strong style="color: var(--accent-gold);">${key.replace(/_/g, ' ').toUpperCase()}:</strong><p style="margin-top: 4px; font-size: 0.85rem;">${value}</p></div>`).join('')}</div>`;
             }
             document.getElementById('viewReportModal').style.display = 'flex';
         };
@@ -1117,7 +1118,7 @@
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = `toast ${type === 'error' ? 'error' : ''}`;
-            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            toast.innerHTML = `<i class="pd-i ${type === 'success' ? 'pd-i-circle-check' : 'pd-i-circle-alert'}"></i> ${message}`;
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 3500);
         }

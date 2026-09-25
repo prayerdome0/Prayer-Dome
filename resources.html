@@ -134,7 +134,8 @@
   <link rel="apple-touch-icon" href="/assets/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/assets/pd-icons.css">
+  <script src="/assets/pd-icons.js"></script>
   <link rel="stylesheet" href="/assets/pd-brand.css">
   <script src="/assets/pd-motion.js" defer></script><script src="/assets/pd-content-data.js" defer></script>
   <script src="/assets/pd-academy-data.js" defer></script><script src="/translation-data.js"></script>
@@ -147,40 +148,40 @@
 </head>
 <body class="pd-acad-page">
 <div class="pd-aurora" aria-hidden="true"><span></span></div>
-<aside class="pd-drawer" id="pdDrawer" aria-label="Main menu"><nav class="pd-drawer-nav"><a class="pd-drawer-link" href="/"><i class="fas fa-home"></i> Home</a><a class="pd-drawer-link" href="/lessons"><i class="fas fa-graduation-cap"></i> Teaching</a><a class="pd-drawer-link" href="/stories"><i class="fas fa-book-open-reader"></i> Stories</a><a class="pd-drawer-link" href="/quiz"><i class="fas fa-star"></i> Quizzes</a><a class="pd-drawer-link" href="/resources"><i class="fas fa-folder-open"></i> Resources</a></nav></aside>
+<aside class="pd-drawer" id="pdDrawer" aria-label="Main menu"><nav class="pd-drawer-nav"><a class="pd-drawer-link" href="/"><i class="pd-i pd-i-house"></i> Home</a><a class="pd-drawer-link" href="/lessons"><i class="pd-i pd-i-graduation-cap"></i> Teaching</a><a class="pd-drawer-link" href="/stories"><i class="pd-i pd-i-book-open-text"></i> Stories</a><a class="pd-drawer-link" href="/quiz"><i class="pd-i pd-i-star"></i> Quizzes</a><a class="pd-drawer-link" href="/resources"><i class="pd-i pd-i-folder-open"></i> Resources</a></nav></aside>
 <header class="pd-topbar">
-  <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+  <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="pd-i pd-i-menu"></i></button>
   <a href="/" class="pd-topbar-center">
     <div class="pd-topbar-logo"><img src="/assets/logo.png" alt="PD Logo"></div>
     <div class="pd-topbar-word">PRAYER DOME</div>
   </a>
   <div class="pd-topbar-right">
     <select class="pd-lang-select" aria-label="Language">
-      <option value="en">🇬🇧 English</option>
-      <option value="tum">🇲🇼 Tumbuka</option>
-      <option value="ssw">🇸🇿 siSwati</option>
-      <option value="bem">🇿🇲 Bemba</option>
-      <option value="nya">🇲🇼 Nyanja</option>
+      <option value="en">English</option>
+      <option value="tum">Tumbuka</option>
+      <option value="ssw">siSwati</option>
+      <option value="bem">Bemba</option>
+      <option value="nya">Nyanja</option>
     </select>
-    <button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="fas fa-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>
-    <button class="theme-toggle-btn" onclick="toggleDarkMode && toggleDarkMode()"><i class="fas fa-moon"></i></button>
+    <button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="pd-i pd-i-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>
+    <button class="theme-toggle-btn" onclick="toggleDarkMode && toggleDarkMode()" aria-label="Toggle dark mode"><i class="pd-i pd-i-moon"></i></button>
   </div>
 </header>
 <main class="pd-acad-wrap" data-page="resources">
   <section class="pd-acad-hero">
-    <span class="pd-acad-eyebrow"><i class="fas fa-folder-open"></i> Resource Library</span>
+    <span class="pd-acad-eyebrow"><i class="pd-i pd-i-folder-open"></i> Resource Library</span>
     <h1 data-pd-t="docs.title">Download important documents for reference and growth.</h1>
     <p>Access the statement of faith, discipleship guides, prayer tools and team handbooks as polished PDF documents, ready to read, print and share.</p>
-    <div class="pd-acad-hero-actions"><a class="pd-acad-btn pd-acad-btn-primary" href="#resourceGrid"><i class="fas fa-download"></i> Browse Downloads</a><a class="pd-acad-btn pd-acad-btn-secondary" href="/lessons"><i class="fas fa-graduation-cap"></i> Continue Learning</a></div>
+    <div class="pd-acad-hero-actions"><a class="pd-acad-btn pd-acad-btn-primary" href="#resourceGrid"><i class="pd-i pd-i-download"></i> Browse Downloads</a><a class="pd-acad-btn pd-acad-btn-secondary" href="/lessons"><i class="pd-i pd-i-graduation-cap"></i> Continue Learning</a></div>
   </section>
   <section class="pd-acad-grid pd-acad-grid-3 pd-acad-stats"><div class="pd-acad-stat"><strong data-acad-resource-count>0</strong><span>Downloadable documents</span></div><div class="pd-acad-stat"><strong>PDF</strong><span>Print-ready format</span></div><div class="pd-acad-stat"><strong>2026</strong><span>Current edition</span></div></section>
   <section class="pd-acad-grid" id="resourceGrid"></section>
   <!-- ADMIN: Resource Management (administrators only) -->
   <section id="resourceAdminPanel" class="pd-acad-card" style="display:none; margin-top:24px; border:1px solid rgba(10,77,155,.25);">
     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-      <h3 style="margin:0;"><i class="fas fa-folder-plus" style="color:var(--pd-acad-blue)"></i> Resource Management</h3>
+      <h3 style="margin:0;"><i class="pd-i pd-i-folder-plus" style="color:var(--pd-acad-blue)"></i> Resource Management</h3>
       <span style="font-size:.62rem; font-weight:800; letter-spacing:.6px; background:rgba(10,77,155,.12); color:var(--pd-acad-blue); border-radius:50px; padding:4px 12px;">ADMIN</span>
-      <button class="pd-acad-btn pd-acad-btn-primary" style="margin-left:auto;" onclick="openResourceEditor()"><i class="fas fa-plus"></i> Add Resource</button>
+      <button class="pd-acad-btn pd-acad-btn-primary" style="margin-left:auto;" onclick="openResourceEditor()"><i class="pd-i pd-i-plus"></i> Add Resource</button>
     </div>
     <p style="font-size:.78rem; color:var(--pd-acad-muted); margin:8px 0 14px;">Published resources appear above for every member. Files open the device picker and upload in the background.</p>
     <div id="resourceAdminList" style="display:grid; gap:10px;"></div>
@@ -192,7 +193,7 @@
       <div style="display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border-color,#e5eaf2); position:sticky; top:0; background:var(--bg-primary,#fff); border-radius:22px 22px 0 0;">
         <img src="/assets/logo.png" alt="" style="width:30px;height:30px;border-radius:8px;object-fit:contain;">
         <h3 id="resourceEditorTitle" style="margin:0; font-size:1rem; color:#0A4D9B; flex:1;">Add Resource</h3>
-        <button onclick="closeResourceEditor()" style="border:0;background:var(--bg-card,#f1f4f9);width:32px;height:32px;border-radius:50%;cursor:pointer;color:inherit;"><i class="fas fa-xmark"></i></button>
+        <button onclick="closeResourceEditor()" style="border:0;background:var(--bg-card,#f1f4f9);width:32px;height:32px;border-radius:50%;cursor:pointer;color:inherit;" aria-label="Close"><i class="pd-i pd-i-x"></i></button>
       </div>
       <div style="padding:18px 20px; display:grid; gap:12px;">
         <label style="display:grid;gap:5px;font-size:.78rem;font-weight:700;">Resource name<input id="resName" maxlength="120" style="margin-top:4px;padding:11px 12px;border-radius:12px;border:1px solid var(--border-color,#d7dee9);background:var(--bg-card,#fff);color:inherit;font:inherit;"></label>
@@ -213,23 +214,23 @@
           <label style="display:grid;gap:5px;font-size:.78rem;font-weight:700;">Edition / Date<input id="resVersion" maxlength="40" placeholder="e.g. 2026 edition" style="margin-top:4px;padding:11px 12px;border-radius:12px;border:1px solid var(--border-color,#d7dee9);background:var(--bg-card,#fff);color:inherit;font:inherit;"></label>
         </div>
         <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
-          <button type="button" class="pd-acad-btn pd-acad-btn-secondary" onclick="pickResourceFile()"><i class="fas fa-file-arrow-up"></i> Choose File (PDF, document, image)</button>
+          <button type="button" class="pd-acad-btn pd-acad-btn-secondary" onclick="pickResourceFile()"><i class="pd-i pd-i-file-up"></i> Choose File (PDF, document, image)</button>
           <div id="resFileState" style="font-size:.75rem;color:var(--pd-acad-muted);">Required — opens your device picker</div>
         </div>
         <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
-          <button type="button" class="pd-acad-btn pd-acad-btn-secondary" onclick="pickResourceThumb()"><i class="fas fa-image"></i> Thumbnail (optional)</button>
+          <button type="button" class="pd-acad-btn pd-acad-btn-secondary" onclick="pickResourceThumb()"><i class="pd-i pd-i-image"></i> Thumbnail (optional)</button>
           <img id="resThumbPreview" src="/assets/logo.png" alt="" style="width:56px;height:56px;border-radius:12px;object-fit:cover;background:#eef2f8;">
         </div>
         <div id="resourceEditorError" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:12px;padding:10px 12px;font-size:.8rem;"></div>
       </div>
       <div style="display:flex; gap:10px; padding:0 20px 20px;">
         <button class="pd-acad-btn pd-acad-btn-secondary" style="flex:1; justify-content:center;" onclick="closeResourceEditor()">Cancel</button>
-        <button class="pd-acad-btn pd-acad-btn-primary" id="resourceEditorSave" style="flex:1; justify-content:center;" onclick="saveResource()"><i class="fas fa-cloud-arrow-up"></i> Publish Resource</button>
+        <button class="pd-acad-btn pd-acad-btn-primary" id="resourceEditorSave" style="flex:1; justify-content:center;" onclick="saveResource()"><i class="pd-i pd-i-cloud-upload"></i> Publish Resource</button>
       </div>
     </div>
   </div>
 
-  <div class="pd-acad-card" style="margin-top:24px"><h3><i class="fas fa-envelope" style="color:var(--pd-acad-gold)"></i> Need another format?</h3><p>Contact the ministry team if you need a document in another language, printable format or large-print edition.</p><p style="margin-top:14px"><a class="pd-acad-btn pd-acad-btn-primary" href="mailto:info@prayerdome.net"><i class="fas fa-envelope"></i> info@prayerdome.net</a></p></div>
+  <div class="pd-acad-card" style="margin-top:24px"><h3><i class="pd-i pd-i-mail" style="color:var(--pd-acad-gold)"></i> Need another format?</h3><p>Contact the ministry team if you need a document in another language, printable format or large-print edition.</p><p style="margin-top:14px"><a class="pd-acad-btn pd-acad-btn-primary" href="mailto:info@prayerdome.net"><i class="pd-i pd-i-mail"></i> info@prayerdome.net</a></p></div>
 </main>
 <footer style="text-align:center;padding:30px;color:var(--pd-acad-muted)"><strong style="color:var(--pd-acad-blue)">Prayer Dome</strong> · Resources for every member and team.</footer>
 
@@ -250,26 +251,26 @@
 
   function iconFor(item) {
     var f = (item.format || '').toUpperCase();
-    if (f.indexOf('PDF') >= 0) return 'fa-file-pdf';
-    if (/^image\//.test(item.fileType || '') || f.indexOf('IMAGE') >= 0) return 'fa-file-image';
-    if (/^video\//.test(item.fileType || '') || f.indexOf('VIDEO') >= 0) return 'fa-file-video';
-    if (/^audio\//.test(item.fileType || '') || f.indexOf('AUDIO') >= 0) return 'fa-file-audio';
-    return 'fa-file-lines';
+    if (f.indexOf('PDF') >= 0) return 'pd-i-file-text';
+    if (/^image\//.test(item.fileType || '') || f.indexOf('IMAGE') >= 0) return 'pd-i-file-image';
+    if (/^video\//.test(item.fileType || '') || f.indexOf('VIDEO') >= 0) return 'pd-i-file-video-camera';
+    if (/^audio\//.test(item.fileType || '') || f.indexOf('AUDIO') >= 0) return 'pd-i-file-music';
+    return 'pd-i-file-text';
   }
 
   function cardHtml(r, index) {
     var isDoc = String(r.url || '').startsWith('/');
     var dlLabel = isDoc ? 'Download' : 'Save offline';
     return '<article class="pd-acad-card pd-lift pd-acad-resource" style="animation:pdFadeUp .4s ease both;animation-delay:' + (index * 0.04) + 's">'
-      + '<div class="pd-acad-icon gold"><i class="fas ' + iconFor(r) + '"></i></div>'
+      + '<div class="pd-acad-icon gold"><i class="pd-i ' + iconFor(r) + '"></i></div>'
       + '<div style="flex:1"><h3>' + esc(r.title) + '</h3><p>' + esc(r.description || '') + '</p>'
       + '<div class="pd-acad-meta"><span class="pd-acad-chip">' + esc(r.category || 'Resource') + '</span>'
       + '<span class="pd-acad-chip gold">' + esc(r.format || 'FILE') + '</span>'
       + (r.version ? '<span class="pd-acad-chip">' + esc(r.version) + '</span>' : '')
       + (r.size ? '<span class="pd-acad-chip">' + esc(r.size) + '</span>' : '') + '</div></div>'
       + '<div style="display:flex;gap:8px;flex-wrap:wrap">'
-      + '<a class="pd-acad-btn pd-acad-btn-secondary" href="' + esc(r.url) + '" target="_blank" rel="noopener"><i class="fas fa-eye"></i> Open</a>'
-      + '<a class="pd-acad-btn pd-acad-btn-primary" href="' + esc(r.downloadUrl || r.url) + '" download onclick="markSaved(this)"><i class="fas fa-download"></i> ' + dlLabel + '</a>'
+      + '<a class="pd-acad-btn pd-acad-btn-secondary" href="' + esc(r.url) + '" target="_blank" rel="noopener"><i class="pd-i pd-i-eye"></i> Open</a>'
+      + '<a class="pd-acad-btn pd-acad-btn-primary" href="' + esc(r.downloadUrl || r.url) + '" download onclick="markSaved(this)"><i class="pd-i pd-i-download"></i> ' + dlLabel + '</a>'
       + '</div></article>';
   }
 
@@ -311,9 +312,9 @@
         + '<div style="flex:1;min-width:180px;"><div style="font-weight:800;font-size:.85rem;">' + esc(r.title) + ' ' + (r.archived ? '<span style="font-size:.62rem;background:#fef3c7;color:#92400e;border-radius:50px;padding:2px 8px;font-weight:800;">ARCHIVED</span>' : '') + '</div>'
         + '<div style="font-size:.72rem;color:var(--pd-acad-muted);">' + esc(r.category || '') + ' · ' + esc(r.format || '') + '</div></div>'
         + (r.archived
-          ? '<button class="pd-acad-btn pd-acad-btn-secondary" onclick="restoreResource(\'' + r.id + '\')"><i class="fas fa-rotate-left"></i> Restore</button>'
-          : '<button class="pd-acad-btn pd-acad-btn-secondary" onclick="openResourceEditor(\'' + r.id + '\')"><i class="fas fa-pen"></i> Edit</button>'
-            + '<button class="pd-acad-btn pd-acad-btn-secondary" onclick="archiveResource(\'' + r.id + '\')"><i class="fas fa-box-archive"></i> Archive</button>')
+          ? '<button class="pd-acad-btn pd-acad-btn-secondary" onclick="restoreResource(\'' + r.id + '\')"><i class="pd-i pd-i-rotate-ccw"></i> Restore</button>'
+          : '<button class="pd-acad-btn pd-acad-btn-secondary" onclick="openResourceEditor(\'' + r.id + '\')"><i class="pd-i pd-i-pen"></i> Edit</button>'
+            + '<button class="pd-acad-btn pd-acad-btn-secondary" onclick="archiveResource(\'' + r.id + '\')"><i class="pd-i pd-i-archive"></i> Archive</button>')
         + '</div>';
     }).join('');
   }
@@ -331,7 +332,7 @@
     document.getElementById('resDescription').value = item ? item.description || '' : '';
     document.getElementById('resCategory').value = item ? (item.category || 'Other') : 'Other';
     document.getElementById('resVersion').value = item ? item.version || '' : '';
-    document.getElementById('resFileState').textContent = EDIT.fileUrl ? 'Attached ✓ ' + EDIT.fileMeta : 'Required — opens your device picker';
+    document.getElementById('resFileState').textContent = EDIT.fileUrl ? 'Attached · ' + EDIT.fileMeta : 'Required — opens your device picker';
     document.getElementById('resThumbPreview').src = EDIT.thumbUrl || '/assets/logo.png';
     document.getElementById('resourceEditorError').style.display = 'none';
     document.getElementById('resourceEditorOverlay').style.display = 'flex';
@@ -358,7 +359,7 @@
     var f = res.files[0];
     EDIT.fileUrl = f.url;
     EDIT.fileMeta = (f.format || 'file').toUpperCase();
-    document.getElementById('resFileState').textContent = 'Attached ✓ ' + EDIT.fileMeta + ' · ' + fmtBytes(f.bytes);
+    document.getElementById('resFileState').textContent = 'Attached · ' + EDIT.fileMeta + ' · ' + fmtBytes(f.bytes);
   };
 
   window.pickResourceThumb = async function () {
@@ -380,7 +381,7 @@
     if (!name) return resError('Please give the resource a name.');
     if (!EDIT.fileUrl) return resError('Please choose the resource file.');
     var btn = document.getElementById('resourceEditorSave');
-    btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Publishing…';
+    btn.disabled = true; btn.innerHTML = '<i class="pd-i pd-i-loader-circle pd-i-spin"></i> Publishing…';
     try {
       var data = {
         title: name,
@@ -404,7 +405,7 @@
       }
       window.closeResourceEditor();
       await loadLive();
-      window.showToast && window.showToast(wasEdit ? 'Resource updated ✓' : 'Resource published ✓', 'success');
+      window.showToast && window.showToast(wasEdit ? 'Resource updated' : 'Resource published', 'success');
       if (!wasEdit) notifyNewResource(name, data.category);
     } catch (e) {
       console.error(e);
@@ -412,7 +413,7 @@
         ? 'Your account does not have permission to manage resources.'
         : 'Could not publish right now. Please try again.');
     } finally {
-      btn.disabled = false; btn.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> Publish Resource';
+      btn.disabled = false; btn.innerHTML = '<i class="pd-i pd-i-cloud-upload"></i> Publish Resource';
     }
   };
 
@@ -437,7 +438,7 @@
       var tokens = await db.tokens();
       if (!tokens.length) return;
       await db.addDoc('notifications', {
-        title: '📚 New resource available',
+        title: 'New resource available',
         message: '"' + title + '"' + (category ? ' (' + category + ')' : '') + ' has been added to the Resource Library.',
         type: 'resources',
         tokens: tokens,
