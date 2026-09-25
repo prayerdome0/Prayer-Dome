@@ -163,7 +163,7 @@
 
     <link rel="stylesheet" href="/assets/pd-icons.css">
     <script src="/assets/pd-icons.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <style>
@@ -216,7 +216,7 @@
         }
         .offline-hero::after { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 70% 30%, rgba(212,175,55,.35), transparent 60%); pointer-events:none; }
         .offline-hero > .pd-i { font-size:3rem; color:var(--pd-gold); margin-bottom:14px; position:relative; z-index:1; }
-        .offline-hero h1 { font-family:'Playfair Display',serif; font-size:1.6rem; margin-bottom:8px; position:relative; z-index:1; }
+        .offline-hero h1 { font-family:'Poppins',serif; font-size:1.6rem; margin-bottom:8px; position:relative; z-index:1; }
         .offline-hero p { opacity:.9; font-size:.9rem; max-width:440px; margin:0 auto; position:relative; z-index:1; }
 
         /* ===== PLAYER LAYOUT ===== */
@@ -606,7 +606,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-    const fb = { db, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, orderBy, limit, onSnapshot, serverTimestamp, increment, getDocs, deleteDoc, writeBatch, where };
+    const fb = { db, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, orderBy, limit, onSnapshot, serverTimestamp, increment, getDocs, deleteDoc, writeBatch, where, auth };
     if (window.PDApp) PDApp.setFirestore(fb);
 
     /* ---------- state ---------- */

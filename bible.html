@@ -136,7 +136,7 @@
     <!-- PD-SEO:END -->
     <link rel="stylesheet" href="/assets/pd-icons.css">
     <script src="/assets/pd-icons.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 
@@ -159,7 +159,7 @@
         body.dark-mode { --bg-primary: #0f172a; --bg-card: #1e293b; --text-primary: #f8fafc; --text-secondary: #cbd5e1; --border-color: #334155; }
 
         /* Luxury Font */
-        .luxury-font, h1, h2, .chapter-title { font-family: 'Playfair Display', serif; }
+        .luxury-font, h1, h2, .chapter-title { font-family: 'Poppins', serif; }
 
         /* Header with Logo */
         .bible-header { 
@@ -207,7 +207,7 @@
             font-size: 1.3rem; 
             font-weight: 900; 
             letter-spacing: 1px;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Poppins', serif;
         }
         .brand-text p { 
             font-size: 0.6rem; 
@@ -425,7 +425,7 @@
 
         <!-- PROGRESS TAB -->
         <div id="tab-progress" class="tab-content">
-            <h2 style="margin-bottom: 20px; color: var(--accent-green); font-family: 'Playfair Display', serif;">
+            <h2 style="margin-bottom: 20px; color: var(--accent-green); font-family: 'Poppins', serif;">
                 <i class="pd-i pd-i-chart-line"></i> Reading Progress by Book
             </h2>
             <div id="readingPlanGrid" class="reading-plan-grid"></div>
@@ -434,7 +434,7 @@
         <!-- NOTEBOOK TAB -->
         <div id="tab-notebook" class="tab-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="color: var(--accent-green); font-family: 'Playfair Display', serif;"><i class="pd-i pd-i-bookmark"></i> My Notes & Favorites</h2>
+                <h2 style="color: var(--accent-green); font-family: 'Poppins', serif;"><i class="pd-i pd-i-bookmark"></i> My Notes & Favorites</h2>
                 <button class="btn-read" style="padding: 8px 20px;" onclick="openNoteModal(true)"><i class="pd-i pd-i-plus"></i> New Note</button>
             </div>
             <div id="notebookList"></div>
@@ -482,7 +482,7 @@
     <!-- Note Modal -->
     <div class="modal" id="noteModal">
         <div class="modal-content">
-            <h3 style="color: var(--accent-green); font-family: 'Playfair Display', serif;"><i class="pd-i pd-i-pen-line"></i> Add Note</h3>
+            <h3 style="color: var(--accent-green); font-family: 'Poppins', serif;"><i class="pd-i pd-i-pen-line"></i> Add Note</h3>
             <p id="noteRef" style="color: var(--accent-gold); margin: 10px 0;"></p>
             <textarea id="noteText" placeholder="Write your thoughts, insights, or prayer points..."></textarea>
             <div style="display: flex; gap: 12px;">
@@ -1026,7 +1026,12 @@
             if (tab === 'progress') renderReadingPlan();
         };
 
-        window.toggleDarkMode = () => document.body.classList.toggle('dark-mode');
+window.toggleDarkMode = function() {
+    var dark = (window.PDApp && PDApp.theme ? PDApp.theme.isDark() : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
+    document.body.classList.toggle('dark-mode', dark);
+    document.documentElement.classList.toggle('dark-mode', dark);
+    try { var b = document.querySelector('[data-pd-theme-toggle] .pd-i') || document.querySelector('.theme-toggle-btn .pd-i'); if (b) b.className = dark ? 'pd-i pd-i-sun' : 'pd-i pd-i-moon'; } catch (e) {}
+};
         window.closeModal = (id) => document.getElementById(id).style.display = 'none';
 
         function escapeHtml(str) {

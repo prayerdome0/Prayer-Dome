@@ -127,7 +127,7 @@
     
     <link rel="stylesheet" href="/assets/pd-icons.css">
     <script src="/assets/pd-icons.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
@@ -162,7 +162,7 @@
         body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-main); line-height: 1.6; transition: 0.4s; padding-bottom: 40px; overflow-x: hidden;}
 
         /* Luxury Font */
-        .luxury-font, h1, h2, .level-box, .score-box { font-family: 'Playfair Display', serif; }
+        .luxury-font, h1, h2, .level-box, .score-box { font-family: 'Poppins', serif; }
 
         /* Header with Logo */
         header {
@@ -209,7 +209,7 @@
             font-size: 1.2rem; 
             font-weight: 900; 
             letter-spacing: 1px;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Poppins', serif;
         }
         .brand-text p { 
             font-size: 0.6rem; 
@@ -536,7 +536,7 @@
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         footer { padding: 40px 20px; text-align: center; background: transparent; margin-top: 40px; }
-        .footer-logo { font-size: 1.3rem; font-weight: 900; color: var(--accent-green); margin-bottom: 10px; font-family: 'Playfair Display', serif; }
+        .footer-logo { font-size: 1.3rem; font-weight: 900; color: var(--accent-green); margin-bottom: 10px; font-family: 'Poppins', serif; }
         .copyright { font-size: 11px; color: var(--text-sub); font-weight: 500; letter-spacing: 0.5px; }
 
         @media (max-width: 768px) {
@@ -606,7 +606,7 @@
         <section class="pd-acad-card" style="margin-bottom:26px">
             <div class="pd-acad-section-head" style="margin-top:0">
                 <div>
-                    <h2 class="quiz-accent" style="font-family:Playfair Display,serif"><i class="pd-i pd-i-graduation-cap"></i> Teaching Quizzes & Certificates</h2>
+                    <h2 class="quiz-accent" style="font-family:Poppins,sans-serif"><i class="pd-i pd-i-graduation-cap"></i> Teaching Quizzes & Certificates</h2>
                     <p>Complete a lesson in the Academy, then pass its 6-question quiz with 80% or higher to unlock a printable certificate.</p>
                 </div>
                 <a class="btn-modern" href="/lessons.html" style="background:var(--accent-green);color:white"><i class="pd-i pd-i-book-open"></i> Open Lessons</a>
@@ -616,7 +616,7 @@
 
         <!-- Level Map Grid -->
         <div id="levelMap" style="display: block;">
-            <h2 class="quiz-accent" style="margin-bottom: 20px; font-weight: 800; font-family: 'Playfair Display', serif;"><i class="pd-i pd-i-signpost"></i> Journey Map</h2>
+            <h2 class="quiz-accent" style="margin-bottom: 20px; font-weight: 800; font-family: 'Poppins', serif;"><i class="pd-i pd-i-signpost"></i> Journey Map</h2>
             <div class="level-grid" id="levelGrid"></div>
         </div>
 
@@ -655,7 +655,7 @@
         <!-- Leaderboard -->
         <div class="leaderboard-card" id="leaderboardSection">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h2 style="color: var(--accent-gold); font-weight: 800; font-family: 'Playfair Display', serif;"><i class="pd-i pd-i-globe"></i> Global Top 10</h2>
+                <h2 style="color: var(--accent-gold); font-weight: 800; font-family: 'Poppins', serif;"><i class="pd-i pd-i-globe"></i> Global Top 10</h2>
                 <button class="btn-modern" style="padding: 8px 16px; font-size: 0.8rem; background: var(--bg-primary); color: var(--text-main); border: 1px solid var(--border-color); box-shadow: none;" onclick="loadLeaderboard()" aria-label="Refresh leaderboard"><i class="pd-i pd-i-refresh-cw"></i></button>
             </div>
             <div id="leaderboardList">
@@ -688,7 +688,7 @@
             <div style="display:flex;justify-content:space-between;gap:12px;align-items:start;margin-bottom:16px">
                 <div>
                     <span class="pd-acad-chip gold" id="academyModalTrack">Teaching</span>
-                    <h2 id="academyModalTitle" style="font-family:Playfair Display,serif;color:var(--accent-green);margin:10px 0">Quiz</h2>
+                    <h2 id="academyModalTitle" style="font-family:Poppins,sans-serif;color:var(--accent-green);margin:10px 0">Quiz</h2>
                     <p style="color:var(--text-sub)" id="academyModalDesc"></p>
                 </div>
                 <button class="btn-modern" style="padding:8px 12px;background:var(--bg-primary);color:var(--text-main);border:1px solid var(--border-color);box-shadow:none" onclick="closeAcademyQuiz()" aria-label="Close"><i class="pd-i pd-i-x"></i></button>
@@ -1199,8 +1199,10 @@
         };
 
         window.toggleDarkMode = function() {
-            document.body.classList.toggle('dark-mode');
-            showToast(document.body.classList.contains('dark-mode') ? 'Dark Mode ON' : 'Light Mode ON');
+            var dark = (window.PDApp && PDApp.theme ? PDApp.theme.isDark() : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
+            document.body.classList.toggle('dark-mode', dark);
+            document.documentElement.classList.toggle('dark-mode', dark);
+            showToast(dark ? 'Dark Mode ON' : 'Light Mode ON');
         };
 
         window.resetProgress = function() {

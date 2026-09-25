@@ -126,7 +126,7 @@
     
     <link rel="stylesheet" href="/assets/pd-icons.css">
     <script src="/assets/pd-icons.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
     
@@ -171,7 +171,7 @@
         }
 
         /* Luxury Font */
-        .luxury-font, h1, h2, h3, .report-title, .total-amount, .stat-number, .branch-btn { font-family: 'Playfair Display', serif; }
+        .luxury-font, h1, h2, h3, .report-title, .total-amount, .stat-number, .branch-btn { font-family: 'Poppins', serif; }
 
         /* Header with Logo - Increased Size */
         .report-header {
@@ -219,7 +219,7 @@
             font-size: 1.4rem; 
             font-weight: 900; 
             letter-spacing: 1px;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Poppins', serif;
         }
         .brand-text p { 
             font-size: 0.65rem; 
@@ -636,7 +636,7 @@
         .description-modal-header h3 {
             color: var(--accent-green);
             font-size: 1.3rem;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Poppins', serif;
         }
 
         .description-close {
@@ -846,7 +846,7 @@
 
             <!-- Previous Reports History -->
             <div class="history-section">
-                <h2 style="margin-bottom: 20px; color: var(--accent-green); font-family: 'Playfair Display', serif;">
+                <h2 style="margin-bottom: 20px; color: var(--accent-green); font-family: 'Poppins', serif;">
                     <i class="pd-i pd-i-rotate-ccw-clock"></i> Previous Reports
                 </h2>
                 <div id="reportsHistory"></div>
@@ -860,7 +860,7 @@
     <div id="viewReportModal" class="modal">
         <div class="modal-content">
             <div class="modal-header" style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                <h2 style="font-family: 'Playfair Display', serif; color: var(--accent-green);">Report Details</h2>
+                <h2 style="font-family: 'Poppins', serif; color: var(--accent-green);">Report Details</h2>
                 <button class="modal-close" onclick="closeModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
             </div>
             <div id="modalReportContent"></div>
@@ -1057,7 +1057,7 @@
             const modalContent = document.getElementById('modalReportContent');
             modalContent.innerHTML = `
                 <div style="background: var(--bg-primary); padding: 25px; border-radius: 20px;">
-                    <h3 style="color: var(--accent-green); font-family: 'Playfair Display', serif;">Prayer Dome Financial Report</h3>
+                    <h3 style="color: var(--accent-green); font-family: 'Poppins', serif;">Prayer Dome Financial Report</h3>
                     <p><strong>Branch:</strong> ${r.branch === 'eswatini' ? 'Eswatini' : r.branch === 'zambia' ? 'Zambia' : 'Ireland'}</p>
                     <p><strong>Date:</strong> ${moment(r.date).format('dddd, MMMM D, YYYY')}</p>
                     <hr style="margin: 15px 0;">
@@ -1124,8 +1124,10 @@
         }
 
         window.toggleDarkMode = function() {
-            document.body.classList.toggle('dark-mode');
-        };
+              var dark = (window.PDApp && PDApp.theme ? PDApp.theme.isDark() : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
+              document.body.classList.toggle('dark-mode', dark);
+              document.documentElement.classList.toggle('dark-mode', dark);
+            };
     </script>
 </body>
 </html>

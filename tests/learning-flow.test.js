@@ -32,11 +32,13 @@ t('lessons page loads confetti for quiz celebrations', html.includes('canvas-con
 t('lessons page renders the student dashboard', html.includes('id="studentDashboard"') && html.includes('id="dashStreak"'));
 t('lessons page has a modal root for the quiz flow', html.includes('id="pdLessonModalRoot"'));
 t('runtime implements the quiz gate', academyJs.includes('renderQuizGate') && academyJs.includes('pd-acad-take-quiz-cta'));
-t('runtime implements pass/fail result screen', academyJs.includes('renderQuizResult') && academyJs.includes('Status: PASSED'));
-t('runtime implements answer review screen', academyJs.includes('renderQuizReview'));
+t('runtime implements grading result screen', academyJs.includes('renderQuizGrading') && academyJs.includes('Status: PASSED'));
+t('runtime implements pre-submit review screen', academyJs.includes('renderQuizReview') && academyJs.includes('Confirm submission'));
+t('runtime implements post-grading answer review', academyJs.includes('renderQuizGradedReview'));
 t('runtime computes learning streak', academyJs.includes('computeStreak'));
 t('runtime renders student dashboard', academyJs.includes('renderStudentDashboard'));
-t('runtime samples 10 questions per attempt', academyJs.includes('sampleQuizQuestions(q, 10)'));
+t('runtime samples 10 questions per attempt, topic-only', academyJs.includes('topicQuizQuestions(lesson, q, 10)'));
+t('runtime draws questions from the studied topic only', academyJs.includes('TOPIC_QUESTION_POOL') && academyJs.includes('DATA.TOPIC_QUESTION_POOL'));
 t('runtime supports ?lesson= deep links for sharing', academyJs.includes("params.get('lesson')"));
 
 // The question bank must give every lesson 30+ unique questions.
@@ -60,6 +62,10 @@ t('runtime supports ?lesson= deep links for sharing', academyJs.includes("params
   t('question bank file defines per-lesson extra questions', extras === 1);
   const lessonKeys = (academyQuestions.match(/^\s+l\d{2}:\s*\[/gm) || []).length;
   t('question bank covers all 18 lessons', lessonKeys === 18, lessonKeys);
+  const topicPool = DATA.TOPIC_QUESTION_POOL || {};
+  const topicKeys = Object.keys(topicPool);
+  t('every lesson exposes a topic-only question pool', topicKeys.length === 18);
+  t('every topic pool has 30+ unique questions', topicKeys.length === 18 && topicKeys.every(k => topicPool[k].length >= 30));
 })();
 
 // ---------------------------------------------------------------- jsdom runtime
@@ -112,9 +118,9 @@ function seededRandom(seed) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
-// Mirrors sampleQuizQuestions() in pd-academy.js exactly (same shuffle order)
+// Mirrors topicQuizQuestions() in pd-academy.js exactly (same shuffle order)
 // so the test can compute the correct option index for every rendered question.
-function replicateSample(quiz, seed, count) {
+function replicateTopicPool(lessonId, seed, count) {
   const rand = seededRandom(seed);
   function shuffle(arr) {
     const a = arr.slice();
@@ -124,20 +130,19 @@ function replicateSample(quiz, seed, count) {
     }
     return a;
   }
-  const pool = quiz.questions.map((raw, i) => ({ raw: raw, id: i }));
+  const pool = (window.PD_ACADEMY.DATA.TOPIC_QUESTION_POOL && window.PD_ACADEMY.DATA.TOPIC_QUESTION_POOL[lessonId]) || [];
   const picked = shuffle(pool).slice(0, Math.min(count, pool.length));
-  return picked.map(p => {
-    const isTF = p.raw.length === 4 && p.raw[1] === 'True' && p.raw[2] === 'False';
+  return picked.map((raw, i) => {
+    const isTF = raw.length === 4 && raw[1] === 'True' && raw[2] === 'False';
     const options = isTF
-      ? shuffle([{ t: 'True', correct: p.raw[3] === 0 }, { t: 'False', correct: p.raw[3] === 1 }])
-      : shuffle([{ t: p.raw[1], correct: p.raw[5] === 0 }, { t: p.raw[2], correct: p.raw[5] === 1 }, { t: p.raw[3], correct: p.raw[5] === 2 }, { t: p.raw[4], correct: p.raw[5] === 3 }]);
-    return { id: p.id, text: p.raw[0], tf: isTF, options };
+      ? shuffle([{ t: 'True', correct: raw[3] === 0 }, { t: 'False', correct: raw[3] === 1 }])
+      : shuffle([{ t: raw[1], correct: raw[5] === 0 }, { t: raw[2], correct: raw[5] === 1 }, { t: raw[3], correct: raw[5] === 2 }, { t: raw[4], correct: raw[5] === 3 }]);
+    return { id: i, text: raw[0], tf: isTF, options };
   });
 }
 
 const SEED = 1337;
-const quizData = window.PD_ACADEMY.DATA.quizzes.filter(q => q.id === 'quiz-l01')[0];
-const expected = replicateSample(quizData, SEED, 10);
+const expected = replicateTopicPool('l01', SEED, 10);
 
 function clickCorrectOption(q) {
   const correctIdx = q.options.findIndex(o => o.correct);
@@ -180,16 +185,25 @@ function clickWrongOption(q) {
     const renderedText = (doc.querySelector('.pd-acad-quiz-question h4') || {}).textContent || '';
     if (renderedText.indexOf(currentQ.text.slice(0, 30)) !== 0) allCorrect = false;
     clickCorrectOption(currentQ);
-    const fb = doc.querySelector('.pd-acad-quiz-feedback');
-    t('question ' + (i + 1) + ' sampled question matches seeded pool and correct answer accepted',
-      renderedText.indexOf(currentQ.text.slice(0, 30)) === 0 && fb && fb.classList.contains('correct'),
-      fb ? fb.className : 'no feedback');
+    // Selecting drafts an answer; correctness is NOT revealed before submission.
+    const draftSelected = doc.querySelector('#quizOptions .pd-acad-quiz-option.is-draft') !== null;
+    t('question ' + (i + 1) + ' sampled question matches seeded pool and drafts an answer without grading',
+      renderedText.indexOf(currentQ.text.slice(0, 30)) === 0 && draftSelected,
+      renderedText.slice(0, 30));
     const next = doc.getElementById('quizNextBtn');
     if (next && !next.disabled) next.click();
   }
 
+  // After the last question the learner lands on the submission review screen.
+  t('submission review appears after the last question', doc.querySelector('.pd-acad-quiz-review.is-confirm') !== null);
+  t('review lists all 10 questions with choices', doc.querySelectorAll('.pd-acad-quiz-review-list .pd-acad-quiz-review-item').length === expected.length);
+  t('review shows confirm-submission button', doc.getElementById('quizConfirmSubmitBtn') !== null);
+  t('review shows go-back button', doc.getElementById('quizConfirmBackBtn') !== null);
+
+  // Confirm submission → grading reveals the score.
+  doc.getElementById('quizConfirmSubmitBtn').click();
   const result = doc.querySelector('.pd-acad-quiz-result');
-  t('result screen appears after 10 questions', result !== null);
+  t('result screen appears after confirming submission', result !== null);
   t('perfect run is a pass', result && result.classList.contains('is-pass'));
   t('score shows 100%', result && (doc.querySelector('.pd-acad-result-score').textContent || '').includes('100%'));
   t('status chip says PASSED', result && result.innerHTML.includes('Status: PASSED'));
@@ -198,20 +212,22 @@ function clickWrongOption(q) {
   t('pass persisted in local progress', !!(saved.passedQuizzes && saved.passedQuizzes['quiz-l01']));
   t('certificate recorded locally', Array.isArray(saved.certificates) && saved.certificates.length === 1 && /PD-L01-/.test(saved.certificates[0].id));
   t('lesson marked complete', saved.completedLessons && saved.completedLessons.indexOf('l01') >= 0);
+  t('next lesson unlocked after passing', Array.isArray(saved.unlockedLessons) && saved.unlockedLessons.indexOf('l02') >= 0);
 
   t('download certificate button bound on pass', doc.getElementById('quizDownloadCertBtn') !== null);
   const continueBtn = doc.getElementById('quizContinueBtn');
-  t('continue-to-next-lesson shown after passing', continueBtn !== null && continueBtn.getAttribute('href').indexOf('l02') >= 0);
+  t('next-topic button shown after passing', continueBtn !== null && continueBtn.getAttribute('href').indexOf('l02') >= 0);
 
-  // ---------------------------------------------------------------- review screen
+  // ---------------------------------------------------------------- graded review screen
   const reviewBtn = doc.getElementById('quizReviewBtn');
   if (reviewBtn) {
     reviewBtn.click();
     const items = doc.querySelectorAll('.pd-acad-quiz-review-item');
-    t('review screen lists every question', items.length === expected.length, items.length);
-    t('review shows all-correct for a perfect run', Array.from(items).every(el => el.classList.contains('is-correct')));
+    t('graded review lists every question', items.length === expected.length, items.length);
+    t('graded review shows all-correct for a perfect run', Array.from(items).every(el => el.classList.contains('is-correct')));
+    t('graded review can return to result', doc.getElementById('quizReviewBackBtn') !== null);
   } else {
-    t('review screen reachable', false);
+    t('graded review screen reachable', false);
   }
 
   // ---------------------------------------------------------------- fail run: retake with wrong answers
@@ -229,6 +245,8 @@ function clickWrongOption(q) {
     const next = doc.getElementById('quizNextBtn');
     if (next && !next.disabled) next.click();
   }
+  t('fail run reaches submission review', doc.querySelector('.pd-acad-quiz-review.is-confirm') !== null);
+  doc.getElementById('quizConfirmSubmitBtn').click();
   const failResult = doc.querySelector('.pd-acad-quiz-result');
   t('all-wrong run is a fail', failResult && failResult.classList.contains('is-fail'));
   t('fail screen shows retake action', doc.getElementById('quizRetakeBtn') !== null);
