@@ -20,12 +20,14 @@
 !robots.txt
 !sitemap.xml
 !package.json
+!package-lock.json
 !vercel.json
 
 # api/share.js reuses this dependency-free handler. The rest of the Firebase
 # Functions package is not needed by Vercel.
 functions/*
 !functions/share.js
+!functions/translate.js
 
 # Only the public-bundle builder and the postinstall hook are needed during
 # the Vercel build. Vercel still runs `npm install` for the deployment even

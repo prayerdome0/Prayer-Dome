@@ -6,7 +6,7 @@ lives in `README.md` and the website user guide.
 ## Local development
 
 ```bash
-npm install          # install dependencies
+npm ci               # install locked dependencies
 npm run verify:all   # lint + full test suite + Cloud Functions verify + Vercel bundle
 npm run dev          # local preview server (http://localhost:8000)
 npm test             # the test suite alone
@@ -44,6 +44,9 @@ From then on every push to `main`:
 | `GOOGLE_SERVICES_JSON` (base64) | Enables native Firebase Cloud Messaging push inside the Android app |
 
 ## Production deployment
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the tested checklist, configuration,
+security launch gates and outstanding verification.
 
 - **Website** — deploy the repository root with the Vercel preset
   (`vercel.json`, `npm run build:vercel` builds the public bundle).

@@ -88,6 +88,16 @@ function send(res, status, payload) {
 }
 
 function readBody(req, limit) {
+  // Firebase/Express and Vercel may consume the stream before invoking us.
+  // Re-reading that stream would wait forever for an already-fired end event.
+  const parsed = req.rawBody !== undefined ? req.rawBody : req.body;
+  if (parsed !== undefined) {
+    const raw = Buffer.isBuffer(parsed) ? parsed.toString('utf8') :
+      typeof parsed === 'string' ? parsed : JSON.stringify(parsed);
+    if (Buffer.byteLength(raw) > limit) return Promise.reject(new Error('payload too large'));
+    return Promise.resolve(raw);
+  }
+  if (req.readableEnded) return Promise.resolve('');
   return new Promise((resolve, reject) => {
     let size = 0;
     const chunks = [];

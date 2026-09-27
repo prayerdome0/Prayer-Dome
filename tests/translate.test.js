@@ -144,6 +144,24 @@ async function main() {
       `${fetchCalls.length} upstream call(s)`);
   }
 
+  // Hosted platforms provide pre-parsed bodies with an already-consumed stream.
+  for (const [label, fields] of [
+    ['Vercel JSON', { body: { lang: 'tum', texts: ['parsed platform body'] } }],
+    ['Firebase rawBody', { rawBody: Buffer.from(JSON.stringify({ lang: 'tum', texts: ['raw platform body'] })) }],
+    ['string body', { body: JSON.stringify({ lang: 'tum', texts: ['string platform body'] }) }]
+  ]) {
+    const req = { method: 'POST', headers: {}, ...fields };
+    const res = mockRes();
+    await handler(req, res);
+    t(label + ' translates without re-reading the consumed stream',
+      res.statusCode === 200 && JSON.parse(res.body).results[0].startsWith('M'));
+  }
+  {
+    const res = mockRes();
+    await handler({ method: 'POST', headers: {}, rawBody: Buffer.alloc(65537) }, res);
+    t('pre-parsed platform bodies still enforce the size limit', res.statusCode === 400);
+  }
+
   /* ---- upstream failure -------------------------------------------------- */
   {
     global.fetch = async () => ({ ok: false, json: async () => ({}) });
