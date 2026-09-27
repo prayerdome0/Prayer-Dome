@@ -46,3 +46,15 @@ jobs:
 
       - name: Build the Vercel bundle
         run: npm run build:vercel
+
+      - name: Use Java 21 for Firestore emulator
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Test Firestore authorization
+        run: npm run test:rules
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=moderate && npm --prefix functions audit --audit-level=moderate

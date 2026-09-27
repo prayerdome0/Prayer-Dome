@@ -6,7 +6,9 @@ const admin = require('firebase-admin');
 const shareHandler = require('./share');
 const translateHandler = require('./translate');
 const facebookCampaign = require('./facebookCampaign');
-const crypto = require('crypto');
+const { defineSecret } = require('firebase-functions/params');
+const { signUpload } = require('./cloudinary');
+const cloudinaryApiSecret = defineSecret('CLOUDINARY_API_SECRET');
 
 if (!admin.getApps().length) {
   admin.initializeApp();
@@ -26,7 +28,7 @@ exports.translate = functions.https.onRequest((req, res) => translateHandler(req
 // ==========================================
 // Call this from the client to get a secure upload signature.
 // The API secret never leaves the server.
-exports.getCloudinarySignature = functions.https.onCall((data, context) => {
+exports.getCloudinarySignature = functions.runWith({ secrets: [cloudinaryApiSecret] }).https.onCall((data, context) => {
   if (!context.auth) {
     throw new functions.https.HttpsError(
       'unauthenticated',
@@ -34,34 +36,24 @@ exports.getCloudinarySignature = functions.https.onCall((data, context) => {
     );
   }
 
-  const cloudName = functions.config().cloudinary?.cloud_name || 'prayerdome';
-  const apiKey = functions.config().cloudinary?.api_key;
-  const apiSecret = functions.config().cloudinary?.api_secret;
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = cloudinaryApiSecret.value();
 
-  if (!apiKey || !apiSecret) {
+  if (!cloudName || !apiKey || !apiSecret) {
     throw new functions.https.HttpsError(
-      'failed-precondition',
-      'Cloudinary is not configured. Ask an admin to set firebase functions:config:set cloudinary.api_key=... cloudinary.api_secret=...'
+      'failed-precondition', 'Media uploads are not configured. Contact an administrator.'
     );
   }
 
-  const timestamp = Math.round((new Date()).getTime() / 1000);
+  // Never sign caller-supplied folders or presets: that would let members
+  // upload into administrator-controlled namespaces or use privileged presets.
   const params = {
-    timestamp: timestamp,
-    upload_preset: data.upload_preset || 'live_streams',
-    folder: data.folder || 'user_uploads'
+    timestamp: Math.floor(Date.now() / 1000),
+    upload_preset: process.env.CLOUDINARY_UPLOAD_PRESET || 'live_streams',
+    folder: `user_uploads/${context.auth.uid}`
   };
-
-  const signature = crypto.createHash('sha1')
-    .update(JSON.stringify(params) + apiSecret)
-    .digest('hex');
-
-  return {
-    signature: signature,
-    timestamp: timestamp,
-    apiKey: apiKey,
-    cloudName: cloudName
-  };
+  return { ...params, signature: signUpload(params, apiSecret), apiKey, cloudName };
 });
 
 // ==========================================

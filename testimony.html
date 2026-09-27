@@ -1041,6 +1041,7 @@
         
         try {
             await addDoc(collection(db, "testimonies"), {
+                status: 'pending',
                 userId: currentUser.uid,
                 userEmail: currentUser.email,
                 author: author,

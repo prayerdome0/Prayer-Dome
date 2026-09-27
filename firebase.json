@@ -2,11 +2,12 @@
   "functions": [
     {
       "source": "functions",
-      "codebase": "default"
+      "codebase": "default",
+      "runtime": "nodejs22"
     }
   ],
   "hosting": {
-    "public": ".",
+    "public": "dist",
     "ignore": [
       "firebase.json",
       "vercel.json",
@@ -343,6 +344,21 @@
           }
         ]
       }
+    ],
+    "predeploy": [
+      "npm run build:vercel"
     ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "emulators": {
+    "firestore": {
+      "port": 8080
+    },
+    "ui": {
+      "enabled": false
+    },
+    "singleProjectMode": true
   }
 }

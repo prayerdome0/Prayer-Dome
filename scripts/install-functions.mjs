@@ -25,13 +25,13 @@ if (!existsSync(functionsManifest)) {
   process.exit(0);
 }
 
-const result = spawnSync('npm', ['--prefix', 'functions', 'install', '--no-audit', '--no-fund'], {
+const result = spawnSync('npm', ['--prefix', 'functions', 'ci', '--no-audit', '--no-fund'], {
   stdio: 'inherit',
   shell: process.platform === 'win32'
 });
 
 if (result.error) {
-  console.error(`postinstall: failed to run npm install in functions/: ${result.error.message}`);
+  console.error(`postinstall: failed to run npm ci in functions/: ${result.error.message}`);
   process.exit(1);
 }
 process.exit(result.status === null ? 1 : result.status);
