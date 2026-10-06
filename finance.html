@@ -704,9 +704,10 @@
         <!-- Access Denied Message -->
         <div id="accessDenied" class="access-denied" style="display: none;">
             <i class="pd-i pd-i-lock"></i>
-            <h2>Access Denied</h2>
-            <p>This page is restricted to Finance Department personnel only.</p>
+            <h2 id="accessDeniedTitle">Access Denied</h2>
+            <p id="accessDeniedMessage">This page is restricted to Finance Department personnel only.</p>
             <button class="btn btn-primary" onclick="window.location.href='index.html'" style="margin-top: 20px;">Return to Home</button>
+            <button class="btn btn-outline" id="accessRetryBtn" onclick="recheckFinanceAccess()" style="margin-top: 12px;"><i class="pd-i pd-i-refresh-cw"></i> Check again</button>
         </div>
 
         <!-- Main Report Content -->
@@ -871,7 +872,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, Timestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo",
@@ -885,6 +886,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        // One durable Firebase session for the whole platform: signing in once
+        // on the site (or in the admin console) also covers the finance portal,
+        // including after a reload.
+        try { await setPersistence(auth, browserLocalPersistence); } catch (e) { console.warn('Auth persistence:', e); }
 
         let currentUser = null;
         let isFinanceRole = false;
@@ -893,16 +898,58 @@
         let currentDescriptionName = null;
         let descriptions = {};
 
-        async function checkFinanceRole(user) {
-            if (!user) return false;
+        // The portal was previously denied whenever a single Firestore read
+        // failed, which looked like "no need to log in again, but I am locked
+        // out anyway". The role now comes from the same two documents the
+        // security rules use, retried, and the confirmed result is remembered
+        // for this device so a reload or a short outage keeps the portal open.
+        const FINANCE_SESSION_KEY = 'pd_finance_session';
+        const FINANCE_SESSION_TTL = 7 * 24 * 60 * 60 * 1000;
+
+        function readFinanceSession() {
             try {
-                const memberDoc = await getDoc(doc(db, "memberships", user.uid));
-                const userData = memberDoc.data();
-                return userData?.role === 'finance' || userData?.role === 'admin';
-            } catch (error) {
-                console.error("Error checking role:", error);
-                return false;
+                const session = JSON.parse(localStorage.getItem(FINANCE_SESSION_KEY) || 'null');
+                if (!session || !session.uid) return null;
+                if ((Date.now() - Number(session.timestamp || 0)) > FINANCE_SESSION_TTL) return null;
+                return session;
+            } catch (e) { return null; }
+        }
+        function writeFinanceSession(user, role, profile) {
+            try {
+                localStorage.setItem(FINANCE_SESSION_KEY, JSON.stringify({
+                    version: 1, uid: user.uid, email: user.email || '', role,
+                    name: (profile && profile.fullName) || '', timestamp: Date.now()
+                }));
+            } catch (e) {}
+        }
+        function clearFinanceSession() {
+            try { localStorage.removeItem(FINANCE_SESSION_KEY); } catch (e) {}
+        }
+        function financeRoleFromSnap(snap) {
+            if (!snap || !snap.exists()) return '';
+            const role = (snap.data() || {}).role;
+            return (role === 'finance' || role === 'admin') ? role : '';
+        }
+        const financeSleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+        // 'finance' | 'none' | 'unknown' (Firestore unreachable)
+        async function checkFinanceRole(user, attempts = 3) {
+            if (!user) return 'none';
+            for (let attempt = 0; attempt < attempts; attempt++) {
+                try {
+                    const memberSnap = await getDoc(doc(db, "memberships", user.uid));
+                    const byMembership = financeRoleFromSnap(memberSnap);
+                    if (byMembership) return byMembership;
+                    const userSnap = await getDoc(doc(db, "users", user.uid));
+                    const byUser = financeRoleFromSnap(userSnap);
+                    if (byUser) return byUser;
+                    return 'none';
+                } catch (error) {
+                    console.error("Error checking role:", error);
+                    await financeSleep(500 * (attempt + 1));
+                }
             }
+            return 'unknown';
         }
 
         window.calculateTotals = function() {
@@ -1095,23 +1142,107 @@
         document.getElementById('reportDate').value = moment().format('YYYY-MM-DD');
         document.getElementById('signatureDate').value = moment().format('YYYY-MM-DD');
 
+        /* ---------- access ---------- */
+        let portalReady = false;
+
+        function showPortal() {
+            document.getElementById('reportContent').style.display = 'block';
+            document.getElementById('accessDenied').style.display = 'none';
+            if (portalReady) return;
+            portalReady = true;
+            calculateTotals();
+            loadPreviousReports();
+        }
+
+        // `blocked` distinguishes "not allowed" from "could not check yet".
+        function showAccessCard(message, blocked) {
+            document.getElementById('reportContent').style.display = 'none';
+            document.getElementById('accessDenied').style.display = 'block';
+            const title = document.getElementById('accessDeniedTitle');
+            const body = document.getElementById('accessDeniedMessage');
+            const retry = document.getElementById('accessRetryBtn');
+            if (title) title.textContent = blocked ? 'Access Denied' : 'Verifying finance access…';
+            if (body) body.textContent = message;
+            if (retry) retry.style.display = blocked ? 'none' : 'inline-flex';
+        }
+
+        let lastFinanceCheck = 0;
+        window.recheckFinanceAccess = async () => {
+            if (Date.now() - lastFinanceCheck < 4000) return;
+            lastFinanceCheck = Date.now();
+            const user = auth.currentUser;
+            if (!user) {
+                clearFinanceSession();
+                isFinanceRole = false;
+                showAccessCard('Sign in on Prayer Dome first — one sign-in covers the finance portal.', true);
+                return;
+            }
+            showAccessCard('Checking your finance access with Prayer Dome…', false);
+            const role = await checkFinanceRole(user);
+            if (role === 'finance' || role === 'admin') {
+                isFinanceRole = true;
+                writeFinanceSession(user, role, {});
+                showPortal();
+                return;
+            }
+            const session = readFinanceSession();
+            if (role === 'unknown' && session && session.uid === user.uid) {
+                // Firestore is unreachable but this device already proved the
+                // role: keep the portal open instead of denying access.
+                isFinanceRole = true;
+                showPortal();
+                showToast('Firestore is unreachable — showing the portal from your verified session.', 'error');
+                return;
+            }
+            isFinanceRole = false;
+            clearFinanceSession();
+            showAccessCard(role === 'unknown'
+                ? 'We could not reach Prayer Dome to confirm your finance role. Check your connection and press “Check again”.'
+                : 'This page is restricted to Finance Department personnel only.', role !== 'unknown');
+        };
+
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
-            if (user) {
-                isFinanceRole = await checkFinanceRole(user);
-                if (isFinanceRole) {
-                    document.getElementById('reportContent').style.display = 'block';
-                    document.getElementById('accessDenied').style.display = 'none';
-                    calculateTotals();
-                    loadPreviousReports();
-                } else {
-                    document.getElementById('reportContent').style.display = 'none';
-                    document.getElementById('accessDenied').style.display = 'block';
-                }
-            } else {
-                document.getElementById('reportContent').style.display = 'none';
-                document.getElementById('accessDenied').style.display = 'block';
+            if (!user) {
+                clearFinanceSession();
+                isFinanceRole = false;
+                showAccessCard('Sign in on Prayer Dome first — one sign-in covers the finance portal.', true);
+                return;
             }
+            // A device that already had the role confirmed shows the portal
+            // immediately; the check below corrects it if the role changed.
+            const session = readFinanceSession();
+            if (session && session.uid === user.uid) {
+                isFinanceRole = true;
+                showPortal();
+            } else {
+                showAccessCard('Checking your finance access with Prayer Dome…', false);
+            }
+            const role = await checkFinanceRole(user);
+            if (role === 'finance' || role === 'admin') {
+                isFinanceRole = true;
+                writeFinanceSession(user, role, {});
+                showPortal();
+                return;
+            }
+            if (role === 'unknown' && session && session.uid === user.uid) {
+                isFinanceRole = true;
+                showPortal();
+                return;
+            }
+            isFinanceRole = false;
+            clearFinanceSession();
+            showAccessCard(role === 'unknown'
+                ? 'We could not reach Prayer Dome to confirm your finance role. Check your connection and press “Check again”.'
+                : 'This page is restricted to Finance Department personnel only.', role !== 'unknown');
+        });
+
+        // Returning to the tab, or signing in elsewhere, re-checks quietly.
+        window.addEventListener('focus', () => {
+            if (auth.currentUser && !isFinanceRole) window.recheckFinanceAccess();
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && auth.currentUser && !isFinanceRole) window.recheckFinanceAccess();
         });
 
         function showToast(message, type = 'success') {

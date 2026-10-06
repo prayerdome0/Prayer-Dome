@@ -632,6 +632,9 @@
     let viewersPresenceUnsub = null;
 
     const $ = id => document.getElementById(id);
+    /* Inline handlers and the onerror fallbacks in generated markup run in the
+     * global scope, so the module-scoped helpers below are published on window. */
+    window.esc = esc;
     function esc(s) { const d=document.createElement('div'); d.textContent = s==null?'':String(s); return d.innerHTML; }
     function toast(msg, type) {
         const t = document.createElement('div');
@@ -655,6 +658,8 @@
         return d.toLocaleDateString();
     }
     function openModal(id) { $(id).classList.add('open'); }
+    window.openModal = openModal;
+    window.closeModal = closeModal;
     function closeModal(id) { $(id).classList.remove('open'); }
 
     /* ---------- theme ---------- */
@@ -663,6 +668,7 @@
         document.body.classList.toggle('light-mode', isLight);
         const icon = $('themeIcon'); if (icon) icon.className = isLight ? 'pd-i pd-i-moon' : 'pd-i pd-i-sun';
     }
+    window.toggleDark = toggleDark;
     function toggleDark() {
         if (localStorage.getItem('pd-theme') === 'dark') localStorage.setItem('pd-theme','light');
         else localStorage.setItem('pd-theme','dark');

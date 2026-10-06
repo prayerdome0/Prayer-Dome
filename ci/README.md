@@ -27,3 +27,12 @@ git push
 
 After that, every push to `main` verifies the project and the Android build
 attaches installable APK/AAB artifacts to the workflow run.
+
+## Codemagic
+
+`codemagic.yaml` in the repository root configures the same checks (and the
+Android builds) on Codemagic — `web-verify`, `android-debug` and
+`android-release`. It needs no activation step: add the repository as a
+Codemagic application and the workflows are picked up. See
+**[mobile/CODEMAGIC.md](../mobile/CODEMAGIC.md)** for the secure variables and
+release steps.

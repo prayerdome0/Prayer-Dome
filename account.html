@@ -743,6 +743,17 @@
                         <button class="btn btn-outline" style="width:auto;" id="notifPermissionBtn" onclick="requestAppNotifications()"><i class="pd-i pd-i-bell"></i> Allow Notifications</button>
                     </div>
 
+                    <!-- Install-to-home-screen row: shown only when the
+                         browser offers an install prompt (or on iOS, where the
+                         prompt has to be done manually from the Share menu). -->
+                    <div id="installAppRow" style="display:none; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; background: var(--bg-card); border:1px solid var(--border-color); border-radius:14px; padding:12px 14px; margin-bottom:14px;">
+                        <div style="min-width:0;">
+                            <strong style="font-size:.88rem;"><i class="pd-i pd-i-download"></i> Prayer Dome app</strong><br>
+                            <small id="installAppState" style="font-size:.72rem; color: var(--text-sub);">Add Prayer Dome to your home screen for one-tap access and offline reading.</small>
+                        </div>
+                        <button class="btn btn-outline" style="width:auto;" id="installAppBtn" onclick="installPrayerDomeApp()"><i class="pd-i pd-i-download"></i> Install app</button>
+                    </div>
+
                     <!-- Daily Bible verse scheduler renders here -->
                     <div data-pd-verse-settings></div>
                 </div>
@@ -1278,11 +1289,19 @@
                 const photoUrl = data.photoURL || user.photoURL || "/assets/avatar-default.svg";
                 currentPhotoUrl = photoUrl;
 
-                // Show Admin / Finance dashboard access for leadership roles.
-                const memberSnap2 = await getDoc(doc(db, "memberships", user.uid));
-                const role = memberSnap2.exists() ? memberSnap2.data().role : null;
+                // Leadership Access (Admin / Finance links). The shared role
+                // layer paints from the durable session this device already
+                // proved, then confirms it against memberships/<uid> and
+                // users/<uid> with retries — so the card never disappears on a
+                // slow connection and a member never sees it.
                 const adminCard = document.getElementById('adminDashboardCard');
-                if (adminCard) adminCard.style.display = (role === 'admin' || role === 'finance') ? 'block' : 'none';
+                if (adminCard && window.PDApp && PDApp.roles) {
+                    adminCard.style.display = PDApp.roles.remembered(user) ? 'block' : 'none';
+                    PDApp.roles.finance(user).then((role) => {
+                        if (role === 'unknown') return; // unreachable Firestore: keep what we know
+                        adminCard.style.display = (role === 'finance' || role === 'admin') ? 'block' : 'none';
+                    });
+                }
                 
                 document.getElementById('pNameDisplay').innerText = data.fullName || (data.email?.split('@')[0] || 'Member').charAt(0).toUpperCase();
                 document.getElementById('pRoleDisplay').innerText = data.ministry?.toUpperCase() || "MEMBER";
@@ -1538,6 +1557,31 @@
             uploadPhoto('profile');
         };
         
+        /* The admin console sends members here with ?next=admin. As soon as the
+         * signed-in account is confirmed as an administrator we hand them
+         * straight over — one Prayer Dome sign-in covers the whole platform, so
+         * the console never has to ask for credentials of its own. */
+        async function continueToAdminConsoleIfRequested() {
+            let requested = '';
+            try { requested = new URLSearchParams(window.location.search).get('next') || ''; } catch (e) {}
+            if (requested !== 'admin') return false;
+            const user = auth.currentUser;
+            if (!user) return false;
+            // The shared role layer checks memberships/<uid> then users/<uid>
+            // with retries, and a device that already proved the role keeps it
+            // through an outage, so a leader is never stranded here with a
+            // false "no admin role" message.
+            if (!window.PDApp || !PDApp.roles) return false;
+            const status = await PDApp.roles.admin(user);
+            const trustedOffline = status === 'unknown' && PDApp.roles.remembered(user) === 'admin';
+            if (status !== 'admin' && !trustedOffline) {
+                showToast('Signed in. This account has no admin role yet — use the admin console “Check again” once a lead grants it.', 'info');
+                return false;
+            }
+            window.location.replace('admin.html');
+            return true;
+        }
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 // Let the shared app layer write this device's push token, so
@@ -1562,6 +1606,7 @@
                     showToast('You are signed in, but we could not load your profile yet. Please refresh.', 'error');
                 }
                 await handleEmailVerificationLink().catch(error => console.error('Verification link error:', error));
+                await continueToAdminConsoleIfRequested();
             } else {
                 document.getElementById('authTabs').style.display = 'flex';
                 document.getElementById('profileSection').style.display = 'none';
@@ -1619,6 +1664,47 @@
             refreshNotifPermissionUI();
             if (perm === 'granted' && window.PDApp) PDApp.toast('Notifications are on', 'success');
         };
+
+        /* ---------------- install to home screen ---------------- */
+        // PDApp.pwa (assets/pd-app.js) registers the service worker and keeps
+        // the browser's install prompt; this just exposes it.
+        function refreshInstallAppUI() {
+            const row = document.getElementById('installAppRow');
+            const state = document.getElementById('installAppState');
+            const button = document.getElementById('installAppBtn');
+            if (!row || !window.PDApp || !PDApp.pwa) return;
+            if (PDApp.pwa.installed()) { row.style.display = 'none'; return; }
+            const deferred = PDApp.pwa.installPrompt();
+            const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent || '') ||
+                (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1);
+            if (deferred) {
+                row.style.display = 'flex';
+                if (state) state.textContent = 'Add Prayer Dome to your home screen for one-tap access and offline reading.';
+                if (button) button.style.display = 'inline-flex';
+            } else if (iOS) {
+                // Safari never fires beforeinstallprompt: explain the manual step.
+                row.style.display = 'flex';
+                if (state) state.textContent = 'On iPhone or iPad: tap the Share button, then “Add to Home Screen”.';
+                if (button) button.style.display = 'none';
+            } else {
+                row.style.display = 'none';
+            }
+        }
+
+        window.installPrayerDomeApp = async () => {
+            if (!window.PDApp || !PDApp.pwa) return;
+            const installed = await PDApp.pwa.promptInstall();
+            refreshInstallAppUI();
+            if (window.PDApp && PDApp.toast) {
+                PDApp.toast(installed ? 'Installing Prayer Dome…' : 'Install cancelled — you can add it later from your browser menu.', installed ? 'success' : 'info');
+            }
+        };
+
+        document.addEventListener('pd:installready', refreshInstallAppUI);
+        document.addEventListener('pd:installed', refreshInstallAppUI);
+        refreshInstallAppUI();
+        document.addEventListener('DOMContentLoaded', refreshInstallAppUI);
+        window.addEventListener('load', refreshInstallAppUI);
 
         refreshNotifPermissionUI();
         document.addEventListener('DOMContentLoaded', refreshNotifPermissionUI);

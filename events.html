@@ -913,6 +913,9 @@
         function showAddEventModal() { document.getElementById('addEventModal').style.display = 'flex'; document.getElementById('eventDateTime').value = moment().add(1, 'days').format('YYYY-MM-DDTHH:mm'); }
         function closeAddEventModal() { document.getElementById('addEventModal').style.display = 'none'; document.getElementById('eventForm').reset(); }
         function closeEventModal() { document.getElementById('eventModal').style.display = 'none'; }
+        // Inline handlers (onclick="…") are evaluated in the global scope, so the
+        // module-scoped helper must be published on window to stay clickable.
+        window.showLoginPrompt = showLoginPrompt;
         function showLoginPrompt() { showToast('Please login to RSVP', 'error'); }
         function showToast(message, type = 'success') { const container = document.getElementById('toastContainer'); const toast = document.createElement('div'); toast.className = `toast ${type === 'error' ? 'error' : ''}`; toast.innerHTML = `<i class="pd-i ${type === 'success' ? 'pd-i-circle-check' : 'pd-i-circle-alert'}"></i> ${message}`; container.appendChild(toast); setTimeout(() => toast.remove(), 3500); }
         function toggleDarkMode() { var dark = (window.PDApp && PDApp.theme ? PDApp.theme.isDark() : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)); document.body.classList.toggle('dark-mode', dark); document.documentElement.classList.toggle('dark-mode', dark); }

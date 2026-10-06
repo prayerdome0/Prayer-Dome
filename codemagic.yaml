@@ -1,0 +1,232 @@
+# ==========================================================================
+# Codemagic CI/CD — Prayer Dome
+# --------------------------------------------------------------------------
+# Codemagic looks for this file in the repository root. Add the repository as an
+# application in Codemagic (Android app type) and every workflow below becomes
+# available; triggers decide when each one runs by itself.
+#
+#   web-verify       lint + full test suite + Cloud Functions + public bundle
+#   android-debug    installable debug APK plus unsigned release APK/AAB
+#   android-release  signed release APK/AAB built from a version tag (v1.2.3)
+#
+# The website lives at the repository root and Capacitor serves the generated
+# bundle from mobile/www (scripts/prepare-mobile.mjs), so each Android workflow
+# runs exactly what a local build runs:
+#
+#     npm ci                 # Capacitor + tooling
+#     npm run mobile:sync    # rebuild mobile/www and sync it into android/
+#
+# Optional secure variables (Codemagic → Application → Environment variables,
+# application-level so every workflow can read them). They use the same names as
+# the GitHub Actions secrets, so the values only have to be collected once:
+#
+#     GOOGLE_SERVICES_JSON      base64 of android/app/google-services.json
+#     ANDROID_KEYSTORE_BASE64   base64 of the release keystore (.jks/.keystore)
+#     ANDROID_KEYSTORE_PASSWORD
+#     ANDROID_KEY_ALIAS
+#     ANDROID_KEY_PASSWORD
+#
+# Without GOOGLE_SERVICES_JSON the app still builds and uses web push delivery;
+# without the keystore the release outputs are unsigned (debug APKs always work).
+# Docs: mobile/CODEMAGIC.md
+# ==========================================================================
+
+workflows:
+
+  # ------------------------------------------------------------------ website
+  web-verify:
+    name: Website verification and public bundle
+    max_build_duration: 60
+    instance_type: linux_x2
+    environment:
+      node: 22
+      vars:
+        CI: 'true'
+        NPM_CONFIG_AUDIT: 'false'
+        NPM_CONFIG_FUND: 'false'
+    cache:
+      cache_paths:
+        - $HOME/.npm
+    triggering:
+      events:
+        - push
+        - pull_request
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+        - pattern: 'arena/*'
+          include: true
+          source: true
+    scripts:
+      - name: Install website dependencies
+        script: npm ci --no-audit --no-fund
+      - name: Production lint (icons, publish allowlist, managed SEO)
+        script: npm run lint
+      - name: Full test suite
+        script: npm test
+      - name: Cloud Functions install and verification
+        script: npm run functions:verify
+      - name: Build the public bundle published by Vercel/Firebase
+        script: npm run build:vercel
+
+  # ------------------------------------------------------------ android debug
+  android-debug:
+    name: Android debug APK
+    max_build_duration: 60
+    instance_type: linux_x2
+    environment:
+      node: 22
+      java: 21
+      vars:
+        GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx3g'
+        NPM_CONFIG_AUDIT: 'false'
+        NPM_CONFIG_FUND: 'false'
+    cache:
+      cache_paths:
+        - $HOME/.gradle/caches
+        - $HOME/.gradle/wrapper
+        - $HOME/.npm
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+        - pattern: 'arena/*'
+          include: true
+          source: true
+      cancel_previous_builds: true
+    scripts:
+      - name: Install JavaScript dependencies
+        script: npm ci --no-audit --no-fund
+      - name: Prepare and sync Capacitor
+        script: npm run mobile:sync
+      - name: Ensure Android SDK platform 36
+        script: |
+          if command -v sdkmanager >/dev/null 2>&1; then
+            yes | sdkmanager --licenses >/dev/null 2>&1 || true
+            sdkmanager "platforms;android-36" >/dev/null || true
+          fi
+      - name: Add google-services.json when the variable is configured
+        script: |
+          if [ -n "${GOOGLE_SERVICES_JSON:-}" ]; then
+            printf '%s' "$GOOGLE_SERVICES_JSON" | base64 --decode > android/app/google-services.json
+            echo "google-services.json added — native push notifications are enabled."
+          else
+            echo "No GOOGLE_SERVICES_JSON variable; the app keeps web push delivery."
+          fi
+      - name: Configure release signing when the keystore is configured
+        script: |
+          if [ -n "${ANDROID_KEYSTORE_BASE64:-}" ]; then
+            printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/release.keystore
+            cat > android/keystore.properties <<EOF
+          storeFile=release.keystore
+          storePassword=${ANDROID_KEYSTORE_PASSWORD}
+          keyAlias=${ANDROID_KEY_ALIAS}
+          keyPassword=${ANDROID_KEY_PASSWORD}
+          EOF
+            echo "Release signing configured."
+          else
+            echo "No keystore variables; release outputs will be unsigned."
+          fi
+      - name: Build debug APK and release outputs
+        script: |
+          cd android
+          ./gradlew --no-daemon assembleDebug bundleRelease assembleRelease
+    artifacts:
+      - android/app/build/outputs/apk/debug/*.apk
+      - android/app/build/outputs/apk/release/*.apk
+      - android/app/build/outputs/bundle/release/*.aab
+      - android/app/build/outputs/mapping/release/*
+    # Build outputs are attached to the build page. To also receive them by
+    # email, add   publishing: → email: → recipients:  with real addresses.
+
+  # ---------------------------------------------------------- android release
+  android-release:
+    name: Android release APK and AAB (version tag)
+    max_build_duration: 90
+    instance_type: linux_x2
+    environment:
+      node: 22
+      java: 21
+      vars:
+        GRADLE_OPTS: '-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx3g'
+        NPM_CONFIG_AUDIT: 'false'
+        NPM_CONFIG_FUND: 'false'
+    cache:
+      cache_paths:
+        - $HOME/.gradle/caches
+        - $HOME/.gradle/wrapper
+        - $HOME/.npm
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: 'v*'
+          include: true
+    scripts:
+      - name: Install JavaScript dependencies
+        script: npm ci --no-audit --no-fund
+      - name: Verify the website before shipping the app
+        script: npm run verify:all
+      - name: Prepare and sync Capacitor
+        script: npm run mobile:sync
+      - name: Ensure Android SDK platform 36
+        script: |
+          if command -v sdkmanager >/dev/null 2>&1; then
+            yes | sdkmanager --licenses >/dev/null 2>&1 || true
+            sdkmanager "platforms;android-36" >/dev/null || true
+          fi
+      - name: Add google-services.json when the variable is configured
+        script: |
+          if [ -n "${GOOGLE_SERVICES_JSON:-}" ]; then
+            printf '%s' "$GOOGLE_SERVICES_JSON" | base64 --decode > android/app/google-services.json
+            echo "google-services.json added — native push notifications are enabled."
+          else
+            echo "No GOOGLE_SERVICES_JSON variable; the app keeps web push delivery."
+          fi
+      - name: Require release signing for a tag build
+        script: |
+          if [ -z "${ANDROID_KEYSTORE_BASE64:-}" ]; then
+            echo "ANDROID_KEYSTORE_BASE64 is required to publish a release."
+            echo "Add the keystore variables (see mobile/CODEMAGIC.md) and retry."
+            exit 1
+          fi
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/release.keystore
+          cat > android/keystore.properties <<EOF
+          storeFile=release.keystore
+          storePassword=${ANDROID_KEYSTORE_PASSWORD}
+          keyAlias=${ANDROID_KEY_ALIAS}
+          keyPassword=${ANDROID_KEY_PASSWORD}
+          EOF
+          echo "Release signing configured from secure variables."
+      - name: Build signed release APK and AAB
+        script: |
+          cd android
+          ./gradlew --no-daemon clean bundleRelease assembleRelease
+      - name: Verify the AAB/APK signatures
+        script: |
+          APK=$(find android/app/build/outputs/apk/release -name '*.apk' | head -n 1)
+          AAB=$(find android/app/build/outputs/bundle/release -name '*.aab' | head -n 1)
+          echo "APK: $APK"
+          echo "AAB: $AAB"
+          if command -v apksigner >/dev/null 2>&1 && [ -n "$APK" ]; then
+            apksigner verify --print-certs "$APK" | head -n 5
+          fi
+          if command -v jarsigner >/dev/null 2>&1 && [ -n "$AAB" ]; then
+            jarsigner -verify "$AAB" | head -n 5
+          fi
+    artifacts:
+      - android/app/build/outputs/apk/release/*.apk
+      - android/app/build/outputs/bundle/release/*.aab
+      - android/app/build/outputs/mapping/release/*
+    # Google Play upload stays opt-in: connect Play in
+    # Codemagic → Teams → Integrations, then add
+    #   publishing:
+    #     google_play:
+    #       credentials: <integration name>
+    #       track: internal
+    #       submit_as_draft: true
+    # Email delivery can be added under the same key with real recipients.

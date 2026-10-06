@@ -50,6 +50,12 @@
   ],
   "shortcuts": [
     {
+      "name": "Admin Console",
+      "short_name": "Admin",
+      "description": "Prayer Dome administrator control hub",
+      "url": "/admin.html?source=shortcut"
+    },
+    {
       "name": "Read the Bible",
       "short_name": "Bible",
       "description": "Open the Bible reader",
@@ -107,7 +113,7 @@
   "screenshots": [
     {
       "src": "/assets/hero-worship.jpg",
-      "sizes": "1280x720",
+      "sizes": "1672x941",
       "type": "image/jpeg",
       "form_factor": "wide",
       "label": "Prayer Dome \u2014 Worship and Prayer"

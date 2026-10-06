@@ -3,7 +3,7 @@
 // shade) even when the app is closed — see /assets/pd-verse-data.js.
 try { importScripts('/assets/pd-verse-data.js'); } catch (e) { /* verses unavailable offline */ }
 // Bump CACHE_NAME whenever the precache list changes.
-const CACHE_NAME = 'prayer-dome-v22';
+const CACHE_NAME = 'prayer-dome-v24';
 
 // Shell assets worth having available offline.
 const PRECACHE = [
@@ -111,6 +111,17 @@ self.addEventListener('activate', event => {
 //   * Firebase & APIs     -> always network; never cached.
 //   * Everything else     -> stale-while-revalidate.
 // ---------------------------------------------------------------------------
+/* The administrator console must always come from the network. It is never
+ * precached, never stored and never replayed from the cache: a role change or a
+ * sign-out has to be visible on the very next load, and an offline console is
+ * useless anyway (every panel reads Firestore). */
+const NETWORK_ONLY_PATHS = ['/admin', '/admin.html'];
+function isNetworkOnlyPage(url) {
+    if (url.origin !== self.location.origin) return false;
+    const path = (url.pathname || '/').replace(/\/+$/, '') || '/';
+    return NETWORK_ONLY_PATHS.includes(path);
+}
+
 const NEVER_CACHE = [
     'firestore.googleapis.com',
     'identitytoolkit.googleapis.com',
@@ -131,6 +142,7 @@ self.addEventListener('fetch', event => {
 
     if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
     if (NEVER_CACHE.some(host => url.hostname.includes(host))) return;
+    if (isNetworkOnlyPage(url)) return;
     // Range requests (audio/video seeking) must go straight to the network.
     if (req.headers.has('range')) return;
 
