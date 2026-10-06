@@ -274,6 +274,39 @@ const javaIds = new Set([...javaAll.matchAll(/\bR\.id\.([A-Za-z0-9_]+)/g)].map((
 t('the card layout and the renderer agree on every view id',
   [...javaIds].every((id) => layoutIds.has(id)) && layoutIds.size >= 6,
   `java: ${[...javaIds].join(',')} | layout: ${[...layoutIds].join(',')}`);
+const compactLayout = read(ANDROID + '/res/layout/verse_widget_compact.xml');
+const layoutIdsOf = (source) => new Set([...source.matchAll(/@\+id\/([A-Za-z0-9_]+)/g)].map((match) => match[1]));
+const fullIds = layoutIdsOf(layout);
+const compactIds = layoutIdsOf(compactLayout);
+t('a compact card exists for small cells and the lock screen column',
+  compactIds.has('widgetCard') && compactIds.has('widgetVerse') && compactIds.has('widgetReference'));
+t('the compact card drops the greeting and brand rows but keeps the shared ids',
+  !compactIds.has('widgetGreeting') && !compactIds.has('widgetBrandRow') &&
+  [...compactIds].every((id) => fullIds.has(id)));
+t('the compact card shows fewer lines at a smaller type size',
+  /android:maxLines="5"/.test(compactLayout) && /android:textSize="14sp"/.test(compactLayout) &&
+  !/android:maxLines="8"/.test(compactLayout));
+const rendererJava = java['VerseWidgetRenderer.java'];
+t('the renderer chooses the layout from the cell size',
+  rendererJava.includes('OPTION_APPWIDGET_MIN_WIDTH') && rendererJava.includes('OPTION_APPWIDGET_MIN_HEIGHT') &&
+  /COMPACT_MIN_WIDTH_DP = 220/.test(rendererJava) && /COMPACT_MIN_HEIGHT_DP = 90/.test(rendererJava) &&
+  rendererJava.includes('compact ? R.layout.verse_widget_compact : R.layout.verse_widget'));
+t('only the full card touches the greeting, refresh and brand views',
+  (function () {
+    // The full-card-only ids must appear inside the `if (!compact)` guard and
+    // nowhere else (the compact layout has no such views to update).
+    const start = rendererJava.indexOf('if (!compact) {');
+    const guard = rendererJava.slice(start, rendererJava.indexOf('\n        }', start));
+    const guarded = ['widgetGreeting', 'widgetBrandRow', 'widgetBrandText', 'widgetBrandIcon', 'widgetRefresh'];
+    const count = (haystack, id) => (haystack.match(new RegExp('R\\.id\\.' + id, 'g')) || []).length;
+    return start > 0 &&
+      guarded.every((id) => count(guard, id) > 0 && count(rendererJava, id) === count(guard, id));
+  })());
+t('the provider rebuilds each widget with its own cell size',
+  /getAppWidgetOptions\(appWidgetId\)/.test(java['VerseWidgetProvider.java']) &&
+  /getAppWidgetOptions\(id\)/.test(rendererJava) &&
+  /onAppWidgetOptionsChanged[\s\S]*?build\(context, VerseWidgetStore\.get\(context\), Calendar\.getInstance\(\), options\)/.test(java['VerseWidgetProvider.java']));
+
 t('the card uses only RemoteViews-safe view types',
   ['LinearLayout', 'TextView', 'ImageView'].every((type) => layout.includes(type)) &&
   !/(WebView|RecyclerView|ConstraintLayout)/.test(layout));

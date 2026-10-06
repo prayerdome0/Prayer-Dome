@@ -159,7 +159,7 @@ t('the app identity stays net.prayerdome.app with a clean label',
 const pkg = JSON.parse(read('package.json'));
 t('the native push plugin ships with the app', pkg.dependencies['@capacitor/push-notifications'] !== undefined);
 const gradle = read('android/app/build.gradle');
-t('the release train is versioned for Play', gradle.includes('versionCode 2') && gradle.includes('versionName "1.1.0"'));
+t('the release train is versioned for Play', gradle.includes('versionCode 3') && gradle.includes('versionName "1.2.0"'));
 
 /* -------------------------------------------------------- summary */
 console.log(`\n${passed} passed, ${failed} failed`);

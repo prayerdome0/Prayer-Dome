@@ -60,6 +60,7 @@ Google Play upload can also be automated: connect Play in Codemagic and add the
 | Requirement | Where it comes from |
 | --- | --- |
 | App icon 512 × 512 PNG | `assets/logo.png` (exactly 512 × 512) |
+| Feature copy | Name the **Daily Verse widget** in the short description: it is the one feature members can see without opening the app (home screen and, on Android 16 QPR1+, the lock screen), and `/widgets.html` shows the same card for screenshots |
 | Feature graphic 1024 × 500 | render from `assets/hero-worship.jpg` or `assets/logo-master.png` |
 | Phone screenshots (2–8) | capture from the app or `https://prayerdome.net` |
 | App name (30 chars) | Prayer Dome |

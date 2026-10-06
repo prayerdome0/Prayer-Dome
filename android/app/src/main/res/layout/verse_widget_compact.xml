@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Prayer Dome Daily Verse widget — compact card.
+
+     The launcher (and the lock screen, whose widget area is a single narrow
+     column on phones) can size a widget smaller than the 4x2 the app declares
+     as its default. VerseWidgetRenderer picks this layout whenever the placed
+     cell is short or narrow, so a small card shows the Scripture and the
+     reference without the greeting line and the brand row, and without trying
+     to fit eight lines into four.
+
+     It keeps the same ids for the views it shares with verse_widget.xml
+     (widgetCard, widgetVerse, widgetReference), so one renderer drives both. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widgetCard"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_verse_background"
+    android:orientation="vertical"
+    android:padding="13dp">
+
+    <TextView
+        android:id="@+id/widgetVerse"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:lineSpacingExtra="2dp"
+        android:maxLines="5"
+        android:textColor="@color/pd_white"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/widgetReference"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/pd_gold_soft"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+</LinearLayout>
