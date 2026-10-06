@@ -680,6 +680,12 @@
         widget().state().then(function (native) {
             state.prefs = native.preferences || widget().preferences();
             applyPrefsToControls(state.prefs);
+            // The phone is the authority: show the verse the widget is holding
+            // (a pinned verse is not in the rotation) until the member previews
+            // a different time of day.
+            if (native.verse && native.verse.text && !state.previewVerse) {
+                state.previewVerse = native.verse;
+            }
             renderPreview();
             if (native.placed > 0) {
                 setStatus('Your verse widget is on this phone' +

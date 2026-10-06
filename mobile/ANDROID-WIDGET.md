@@ -108,5 +108,14 @@ John 3:16 means the packaged data failed its checkpoint self-check.
   (layout, ids, drawables, strings, colours, raw data) exist;
 * the studio page renders, styles, pins and drafts wallpapers with the shared
   theme model, and degrades with a clear message where canvas is unavailable;
+* the studio inside the app drives the plugin the way the member does (preview
+  the phone's verse, save preferences, pin, unpin, refresh, add the widget) and
+  follows the route a widget tap came in on;
 * the service worker, hosting rewrites, sitemap and SEO metadata all point at
   `/widgets`.
+
+Because CI has no Android SDK, the suite also stands in for the compiler on the
+mistakes that only show up on a device: every method called on a sibling widget
+class must be declared, every import must resolve, and every JSON key the Java
+reads must exist in the generated library. A real Gradle build still runs on
+Codemagic/GitHub Actions before a release.

@@ -56,6 +56,55 @@ const javaFiles = fs.readdirSync(JAVA_DIR).filter((name) => name.endsWith('.java
 const java = Object.fromEntries(javaFiles.map((name) => [name, read(path.join(ANDROID, 'java/net/prayerdome/app', name))]));
 const javaAll = Object.values(java).join('\n');
 
+/* --------------------------------------- Java cross-file sanity (no SDK) */
+/* The Android build cannot run in this repository's CI image, so these checks
+   stand in for the compiler where the dangerous mistakes live: a method called
+   on a sibling class that does not exist, an import that points nowhere, and a
+   JSON key read by Java that the generator never wrote. */
+function declaredMethods(source) {
+  const names = new Set();
+  // `public void foo(`, `private static long bar(`, `Verse bazz(` …
+  for (const match of source.matchAll(/\b(?:public|private|protected|static)\s+(?:static\s+|final\s+)*[A-Za-z_$][\w$<>\[\],. ]*\s+([a-z_$][\w$]*)\s*\(/g)) {
+    names.add(match[1]);
+  }
+  return names;
+}
+const ourClasses = {};
+for (const [file, source] of Object.entries(java)) {
+  for (const match of source.matchAll(/\bclass\s+([A-Za-z_$][\w$]*)/g)) {
+    ourClasses[match[1]] = { file: file, methods: declaredMethods(source), source: source };
+  }
+}
+
+const methodTypos = [];
+for (const [name, info] of Object.entries(ourClasses)) {
+  for (const match of javaAll.matchAll(new RegExp('\\b' + name + '\\.([a-z_$][\\w$]*)\\s*\\(', 'g'))) {
+    if (!info.methods.has(match[1])) methodTypos.push(`${name}.${match[1]}`);
+  }
+}
+t('every method called on a sibling widget class is declared on it',
+  methodTypos.length === 0, [...new Set(methodTypos)].join(', '));
+
+const missingClasses = [];
+for (const match of javaAll.matchAll(/\bnew\s+([A-Z][\w$]*)\s*\(/g)) {
+  const name = match[1];
+  if (ourClasses[name]) continue;
+  if (/^(String|JSONObject|JSONArray|ArrayList|ByteArrayOutputStream|Intent|PendingIntent|ComponentName|Calendar|RemoteViews|JSObject|JSArray|Object|Exception|RuntimeException)$/.test(name)) continue;
+  missingClasses.push(name);
+}
+t('no widget class is used before it exists', missingClasses.length === 0, [...new Set(missingClasses)].join(', '));
+
+const strayImports = [];
+for (const match of javaAll.matchAll(/^import\s+([\w.]+);/gm)) {
+  const imported = match[1];
+  const simple = imported.split('.').pop();
+  if (ourClasses[simple]) continue;
+  if (/^(java|javax|android|org\.json|com\.getcapacitor|androidx)\b/.test(imported)) continue;
+  strayImports.push(imported);
+}
+t('every Java import resolves to a JDK, Android, Capacitor or widget class',
+  strayImports.length === 0, strayImports.join(', '));
+
 /* ===================================================== 1. verse parity === */
 
 const library = require(path.join(ROOT, 'assets/pd-verse-data.js'));
@@ -74,6 +123,24 @@ t('every verse, reference and slot reaches the widget unchanged',
   siteVerses.length === widgetVerses.length && siteVerses.every((verse, index) => verse === widgetVerses[index]),
   `${siteVerses.length} site verses, ${widgetVerses.length} packaged`);
 t('the widget data is King James Version only', widgetData.translation.includes('King James'));
+
+/* The JSON keys Java reads must exist in the generated data — a renamed key
+   would only surface as a blank widget on a phone. */
+const jsonKeys = new Set();
+(function collect(node) {
+  if (Array.isArray(node)) node.forEach(collect);
+  else if (node && typeof node === 'object') {
+    Object.keys(node).forEach((key) => { jsonKeys.add(key); collect(node[key]); });
+  }
+})(widgetData);
+const readKeys = new Set();
+for (const match of java['VerseWidgetData.java'].matchAll(/opt(?:String|Int|Boolean|Double|JSONObject|JSONArray)\(\s*"([A-Za-z0-9_]+)"/g)) readKeys.add(match[1]);
+const unknownKeys = [...readKeys].filter((key) => !jsonKeys.has(key));
+t('every JSON key the widget reads exists in the packaged library',
+  unknownKeys.length === 0, unknownKeys.join(', '));
+t('the widget reads the verse text, the reference and the checkpoint dates',
+  readKeys.has('ref') && readKeys.has('text') && readKeys.has('date') && readKeys.has('slot'));
+
 
 /* The real parity test: the packaged checkpoints are replayed through the site
    library. If a verse is edited or a slot reordered, these fail before a user
@@ -267,6 +334,27 @@ t('the four themes are identical in the studio and on the phone',
 t('every studio theme has a matching native background drawable',
   bridge.THEMES.every((theme) => exists(`${ANDROID}/res/drawable/widget_verse_background${theme.id === 'midnight' ? '' : '_' + theme.id}.xml`)));
 
+/* Record the wallpaper drawing calls: jsdom has no 2D context, and a fake one
+   lets the studio's real canvas code run — line wrapping included. */
+function installCanvasStub(window, sink) {
+  window.HTMLCanvasElement.prototype.getContext = function (kind) {
+    if (kind !== '2d') return null;
+    const context = {
+      canvas: this,
+      font: '500 40px sans-serif',
+      fillStyle: '', strokeStyle: '', lineWidth: 0, globalAlpha: 1, textAlign: 'center',
+      createLinearGradient: () => ({ addColorStop: (stop, colour) => sink.push(['gradient', stop, colour]) }),
+      createRadialGradient: () => ({ addColorStop: () => {} }),
+      fillRect: () => {}, strokeRect: () => {},
+      beginPath: () => {}, moveTo: () => {}, lineTo: () => {}, quadraticCurveTo: () => {}, closePath: () => {},
+      fill: () => {}, stroke: () => sink.push(['stroke', context.strokeStyle]),
+      fillText: (value, x, y) => sink.push(['text', context.font, String(value), x, y]),
+      measureText: (value) => ({ width: value.length * (Number((context.font.match(/(\d+)px/) || [0, 40])[1]) * 0.5) })
+    };
+    return context;
+  };
+}
+
 /* The page itself, booted in jsdom with the real assets. */
 (async () => {
   const virtualConsole = new VirtualConsole();
@@ -279,26 +367,8 @@ t('every studio theme has a matching native background drawable',
   });
   const w = dom.window;
 
-  /* Record the wallpaper drawing calls: jsdom has no 2D context, and a fake one
-     lets the studio's real canvas code run — line wrapping included. */
   const drawCalls = [];
-  w.HTMLCanvasElement.prototype.getContext = function (kind) {
-    if (kind !== '2d') return null;
-    const context = {
-      canvas: this,
-      font: '500 40px sans-serif',
-      fillStyle: '', strokeStyle: '', lineWidth: 0, globalAlpha: 1, textAlign: 'center',
-      createLinearGradient: () => ({ addColorStop: (stop, colour) => drawCalls.push(['gradient', stop, colour]) }),
-      createRadialGradient: () => ({ addColorStop: () => {} }),
-      fillRect: () => {}, strokeRect: () => {},
-      beginPath: () => {}, moveTo: () => {}, lineTo: () => {}, quadraticCurveTo: () => {}, closePath: () => {},
-      fill: () => {}, stroke: () => drawCalls.push(['stroke', context.strokeStyle]),
-      fillText: (value, x, y) => drawCalls.push(['text', context.font, String(value), x, y]),
-      measureText: (value) => ({ width: value.length * (Number((context.font.match(/(\d+)px/) || [0, 40])[1]) * 0.5) })
-    };
-    return context;
-  };
-
+  installCanvasStub(w, drawCalls);
   w.PD_VERSES = verseLibrary;
   w.eval(bridgeSource);
   const inline = [...w.document.querySelectorAll('script:not([src]):not([type])')].map((node) => node.textContent).join('\n');
@@ -396,6 +466,88 @@ t('every studio theme has a matching native background drawable',
       return /cannot draw the wallpaper/.test(message);
     })(),
     'jsdom reported: ' + (canvasMissing ? 'no canvas' : 'canvas stub in use'));
+
+  /* ================================= 3b. inside the app (native bridge) == */
+  /* The Capacitor plugin is Java, so the contract these checks hold is the
+     other half: with a native widget present the studio must render the phone's
+     own preferences, save through the plugin, pin/unpin through it, ask it to
+     place the widget, and read the route a widget tap came in on. */
+  const nativeCalls = [];
+  const nativeDom = new JSDOM(studio, { runScripts: 'outside-only', url: 'https://prayerdome.net/widgets.html' });
+  const nw = nativeDom.window;
+  const nativePreferences = {
+    theme: 'dome', textScale: 1.15, showGreeting: false, showReference: true, showBrand: true,
+    mode: 'auto', pinnedReference: '', pinnedText: '', pinnedLabel: '', themes: ['midnight', 'dome', 'dawn', 'paper']
+  };
+  nw.Capacitor = {
+    Plugins: {
+      VerseWidget: {
+        getState: () => Promise.resolve({
+          available: true, placed: 1, canPin: true, verified: true,
+          preferences: nativePreferences,
+          verse: { reference: 'Psalm 23:1', text: 'The LORD is my shepherd; I shall not want.',
+            slot: 'morning', slotLabel: 'Morning Verse', greeting: 'Good morning', translation: 'KJV' },
+          slots: []
+        }),
+        setPreferences: (payload) => { nativeCalls.push(['setPreferences', payload]); return Promise.resolve({}); },
+        pinVerse: (payload) => { nativeCalls.push(['pinVerse', payload]); return Promise.resolve({}); },
+        clearPin: () => { nativeCalls.push(['clearPin']); return Promise.resolve({}); },
+        refresh: () => { nativeCalls.push(['refresh']); return Promise.resolve({}); },
+        requestPin: () => { nativeCalls.push(['requestPin']); return Promise.resolve({ requested: true }); },
+        pendingRoute: () => { nativeCalls.push(['pendingRoute']); return Promise.resolve({ route: '/widgets.html' }); }
+      }
+    }
+  };
+  installCanvasStub(nw, nativeCalls);
+  nw.PD_VERSES = verseLibrary;
+  nw.eval(bridgeSource);
+  const nativeInline = [...nw.document.querySelectorAll('script:not([src]):not([type])')].map((node) => node.textContent).join('\n');
+  try { nw.eval(nativeInline); } catch (error) { console.error('native studio script error:', error.message); }
+  if (nw.document.readyState === 'loading') nw.document.dispatchEvent(new nw.Event('DOMContentLoaded'));
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  const nd = nw.document;
+
+  t('inside the app the studio knows the widget is placed and verified',
+    /on this phone/.test(nd.getElementById('vwStatusText').textContent) &&
+    !/website/.test(nd.getElementById('vwStatusText').textContent),
+    nd.getElementById('vwStatusText').textContent);
+  t('the phone\u2019s own preferences fill the studio controls',
+    nd.getElementById('vwTheme').value === 'dome' &&
+    Math.abs(Number(nd.getElementById('vwScale').value) - 1.15) < 1e-9 &&
+    nd.getElementById('vwGreeting').checked === false);
+  t('the widget card shows the verse the phone is displaying',
+    nd.getElementById('pdWidgetPreview').textContent.includes('Psalm 23:1'));
+
+  nd.getElementById('vwReference').checked = false;
+  nd.getElementById('vwSave').dispatchEvent(new nw.Event('click'));
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  const saved = nativeCalls.find((call) => call[0] === 'setPreferences');
+  t('saving sends the theme, size and toggles to the native widget',
+    !!saved && saved[1].theme === 'dome' && saved[1].showReference === false &&
+    typeof saved[1].textScale === 'number',
+    saved ? JSON.stringify(saved[1]) : 'no call');
+
+  nd.querySelector('#vwVerseList .vw-verse-item').dispatchEvent(new nw.Event('click', { bubbles: true }));
+  nd.getElementById('vwPinSelected').dispatchEvent(new nw.Event('click'));
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  const pinned = nativeCalls.find((call) => call[0] === 'pinVerse');
+  t('pinning hands the chosen verse to the widget',
+    !!pinned && !!pinned[1].reference && pinned[1].text.length > 10,
+    pinned ? pinned[1].reference : 'no call');
+
+  nd.getElementById('vwUnpin').dispatchEvent(new nw.Event('click'));
+  nd.getElementById('vwRefresh').dispatchEvent(new nw.Event('click'));
+  nd.getElementById('vwAddWidget').dispatchEvent(new nw.Event('click'));
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  t('unpin, refresh and add-widget every reach the plugin',
+    nativeCalls.some((call) => call[0] === 'clearPin') &&
+    nativeCalls.some((call) => call[0] === 'refresh') &&
+    nativeCalls.some((call) => call[0] === 'requestPin'));
+  t('the studio reports that Android is placing the widget',
+    /asking where to place/.test(nd.getElementById('vwStatusText').textContent),
+    nd.getElementById('vwStatusText').textContent);
+  t('a widget tap brings its route into the app',
+    (await nw.PDVerseWidget.pendingRoute()) === '/widgets.html');
 
   /* ============================================ 4. plumbing ============== */
   const sw = read('sw.js');
