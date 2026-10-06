@@ -36,6 +36,11 @@ From then on every push to `main`:
    and `bundleRelease`, and attaches the APK/AAB artifacts to the run
    (`mobile/android-build.yml`).
 
+Codemagic can build the same app without GitHub Actions:
+`codemagic.yaml` provides `web-verify`, `android-debug` and `android-release`
+(signed APK/AAB from a `v*` tag). See **[mobile/CODEMAGIC.md](mobile/CODEMAGIC.md)**
+for the secure variables, the one-time application setup and the release steps.
+
 ### Optional repository secrets
 
 | Secret | Purpose |

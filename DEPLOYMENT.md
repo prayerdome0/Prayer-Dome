@@ -32,6 +32,13 @@ dependency checks. As described in DEVELOPMENT.md, a maintainer must activate it
 with `node scripts/install-workflows.mjs` if `.github/workflows/` is absent.
 Require a passing Verify check before merging into the production branch.
 
+The same verification and Android builds also run on Codemagic: `codemagic.yaml`
+defines `web-verify`, `android-debug` (debug APK plus release outputs on every
+push) and `android-release` (signed APK/AAB from a `v*` tag). The secure
+variables and the one-time application setup are documented in
+**[mobile/CODEMAGIC.md](mobile/CODEMAGIC.md)**; `tests/codemagic.test.js` keeps
+that configuration valid on every `npm test` run.
+
 ## Vercel website
 
 1. Import this repository using the existing `vercel.json` (Other framework,

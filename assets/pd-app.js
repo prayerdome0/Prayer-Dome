@@ -1012,9 +1012,16 @@
 
       notifications._registering = (async function () {
         try {
-          var reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
-          // Also ensure main PWA service worker is registered for installability & offline
-          try { await navigator.serviceWorker.register('/sw.js', { scope: '/' }); } catch(e){}
+          // Only one worker may own the '/' scope. /sw.js (registered on every
+          // page by PDApp.pwa) already renders branded notifications and routes
+          // clicks, so reuse whatever registration exists instead of swapping
+          // the root worker back and forth — that swap is what used to drop
+          // push subscriptions. /firebase-messaging-sw.js is the fallback for
+          // devices that have no root worker yet.
+          var reg = typeof navigator.serviceWorker.getRegistration === 'function'
+            ? await navigator.serviceWorker.getRegistration('/')
+            : null;
+          if (!reg) reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
           var appMod = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js');
           var msgMod = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js');
           if (!(await msgMod.isSupported())) return null;
@@ -1862,7 +1869,30 @@
       + '<div class="pd-footer-logo"><img src="/assets/logo.png" alt="Prayer Dome"><span class="pd-footer-brand">PRAYER DOME</span></div>'
       + '<div class="pd-footer-nav"><a href="/">Home</a><a href="/lessons">Teaching</a><a href="/quiz">Quiz</a><a href="/game">Games</a><a href="/prayer">Prayer</a><a href="/account">Account</a></div>'
       + '<p class="pd-footer-copy">© 2018 PRAYER DOME MINISTRY. ALL RIGHTS RESERVED. · A House of Prayer for All Nations</p>',
+    /* Full-screen application shells run their own chrome.
+     *
+     * The admin console is a horizontal flex row (`body { display:flex }`:
+     * sidebar + content). Injecting the marketing header/drawer/footer there
+     * added a second navigation column and a second hamburger menu, which
+     * pushed the console content off-screen and made menu clicks land on the
+     * wrong menu. Any such shell opts out with <html data-pd-layout="none">
+     * (`data-pd-sw="off"` skips only the service worker) and the shared layer
+     * stays out of its way. Marketing pages keep the header, drawer and footer
+     * they always had. */
+    enabled: function(){
+      try {
+        var root = document.documentElement;
+        var body = document.body;
+        if (root && root.getAttribute('data-pd-layout') === 'none') return false;
+        if (body && body.getAttribute('data-pd-layout') === 'none') return false;
+        if (body && body.classList.contains('pd-app-shell')) return false;
+        // Defensive path check: /admin and /admin.html are the console.
+        if (/\/admin(\.html)?$/i.test((location.pathname || '').replace(/\/+$/, ''))) return false;
+      } catch (e) {}
+      return true;
+    },
     ensure: function(){
+      if (!layout.enabled()) return;
       try {
         // Ensure topbar exists
         var topbar = document.querySelector('.pd-topbar');
@@ -1919,6 +1949,79 @@
     init: function(){ layout.ensure(); }
   };
 
+  /* --------------------------------------------------------------- PWA glue
+   * One place that keeps the installable-app contract working on *every*
+   * page (the marketing pages, the member account and the admin console):
+   *   • registers the offline worker (/sw.js) that precaches the shell,
+   *   • caches the install prompt so a page can offer "Install app",
+   *   • reports the installed state so pages can hide install buttons.
+   * Registration is idempotent and harmless when service workers, the install
+   * prompt or the whole API are unavailable (older WebViews, jsdom, private
+   * windows). Pages can opt out with <html data-pd-sw="off">.
+   * --------------------------------------------------------------- */
+  var pwa = {
+    _deferred: null,
+    supported: function () {
+      try { return typeof navigator !== 'undefined' && 'serviceWorker' in navigator; }
+      catch (e) { return false; }
+    },
+    // The packaged Android app already ships every asset locally, so it has
+    // nothing to gain from a worker — and a worker must never sit between the
+    // WebView and the Capacitor bridge.
+    isNativeApp: function () {
+      try {
+        var cap = window.Capacitor;
+        if (!cap) return false;
+        if (typeof cap.isNativePlatform === 'function') return cap.isNativePlatform();
+        return cap.isNative === true || (cap.platform && cap.platform !== 'web');
+      } catch (e) { return false; }
+    },
+    installed: function () {
+      try {
+        if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true;
+        if (window.matchMedia && window.matchMedia('(display-mode: minimal-ui)').matches) return true;
+        return navigator.standalone === true;
+      } catch (e) { return false; }
+    },
+    register: function () {
+      try {
+        if (!pwa.supported()) return Promise.resolve(null);
+        var root = document.documentElement;
+        if (root && root.getAttribute('data-pd-sw') === 'off') return Promise.resolve(null);
+        if (pwa.isNativeApp()) return Promise.resolve(null);
+        // Only http(s) origins can own a service worker (file:// cannot).
+        if (!/^https?:$/.test(location.protocol)) return Promise.resolve(null);
+        return navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function () { return null; });
+      } catch (e) { return Promise.resolve(null); }
+    },
+    installPrompt: function () { return pwa._deferred; },
+    promptInstall: function () {
+      var deferred = pwa._deferred;
+      if (!deferred) return Promise.resolve(false);
+      pwa._deferred = null;
+      try {
+        deferred.prompt();
+        return deferred.userChoice.then(function (choice) {
+          return !!(choice && choice.outcome === 'accepted');
+        }).catch(function () { return false; });
+      } catch (e) { return Promise.resolve(false); }
+    },
+    init: function () {
+      pwa.register();
+      try {
+        window.addEventListener('beforeinstallprompt', function (e) {
+          e.preventDefault();
+          pwa._deferred = e;
+          document.dispatchEvent(new CustomEvent('pd:installready'));
+        });
+        window.addEventListener('appinstalled', function () {
+          pwa._deferred = null;
+          document.dispatchEvent(new CustomEvent('pd:installed'));
+        });
+      } catch (e) {}
+    }
+  };
+
   /* ---------------------------------------------------------------- public */
   window.PDApp = {
     version: VERSION,
@@ -1937,6 +2040,7 @@
     live: live,
     news: news,
     layout: layout,
+    pwa: pwa,
     academyNav: academyNav,
     scripture: scripture,
     radio: radio,
@@ -1948,6 +2052,7 @@
       // Each module is isolated: one failure must never break the rest.
       var modules = [
         ['layout', layout.init],
+        ['pwa', pwa.init],
         ['ui', ui.init], ['i18n', i18n.init], ['location', location.init],
         ['announcements', announcements.init], ['notifications', notifications.init],
         ['banners', banners.init], ['stats', stats.init], ['live', live.init],

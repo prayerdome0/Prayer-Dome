@@ -1538,6 +1538,35 @@
             uploadPhoto('profile');
         };
         
+        /* The admin console sends members here with ?next=admin. As soon as the
+         * signed-in account is confirmed as an administrator we hand them
+         * straight over — one Prayer Dome sign-in covers the whole platform, so
+         * the console never has to ask for credentials of its own. */
+        async function continueToAdminConsoleIfRequested() {
+            let requested = '';
+            try { requested = new URLSearchParams(window.location.search).get('next') || ''; } catch (e) {}
+            if (requested !== 'admin') return false;
+            const user = auth.currentUser;
+            if (!user) return false;
+            try {
+                const memberSnap = await getDoc(doc(db, 'memberships', user.uid));
+                let role = memberSnap.exists() ? memberSnap.data().role : '';
+                if (role !== 'admin') {
+                    const userSnap = await getDoc(doc(db, 'users', user.uid));
+                    if (userSnap.exists() && userSnap.data().role === 'admin') role = 'admin';
+                }
+                if (role !== 'admin') {
+                    showToast('Signed in. This account has no admin role yet — use the admin console “Check again” once a lead grants it.', 'info');
+                    return false;
+                }
+                window.location.replace('admin.html');
+                return true;
+            } catch (error) {
+                console.warn('Admin console hand-off failed:', error);
+                return false;
+            }
+        }
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 // Let the shared app layer write this device's push token, so
@@ -1562,6 +1591,7 @@
                     showToast('You are signed in, but we could not load your profile yet. Please refresh.', 'error');
                 }
                 await handleEmailVerificationLink().catch(error => console.error('Verification link error:', error));
+                await continueToAdminConsoleIfRequested();
             } else {
                 document.getElementById('authTabs').style.display = 'flex';
                 document.getElementById('profileSection').style.display = 'none';

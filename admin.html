@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- data-pd-layout="none" tells the shared app layer (assets/pd-app.js) that
+     this full-screen console runs its own header, sidebar and navigation. The
+     marketing topbar/drawer/footer must never be injected here: a second menu
+     next to the admin sidebar made clicks land on the wrong navigation. -->
+<html lang="en" data-pd-layout="none">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
@@ -208,6 +212,10 @@
         .nav-item:hover { background: var(--sidebar-hover); color: white; }
         .nav-item.active { background: linear-gradient(135deg, #0A4D9B, #0A4D9B); color: white; box-shadow: 0 4px 12px rgba(10,77,155,0.35); }
         .nav-item .live-nav-dot { width: 8px; height: 8px; border-radius: 50%; background: #64748b; display: inline-block; margin-left: auto; }
+        /* Mobile: tap the page (or Esc) to close the console menu. The scrim
+           also keeps a single menu usable — no second navigation layer. */
+        .sidebar-scrim { position: fixed; inset: 0; background: rgba(2,6,23,.45); backdrop-filter: blur(2px); z-index: 99; opacity: 0; pointer-events: none; transition: opacity .25s; }
+        body.sidebar-open .sidebar-scrim { opacity: 1; pointer-events: auto; }
         .nav-item .live-nav-dot.on { background: #ef4444; box-shadow: 0 0 0 0 rgba(239,68,68,.7); animation: livePulse 1.5s infinite; }
         @keyframes livePulse { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,.55); } 70% { box-shadow: 0 0 0 10px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
         .live-status-card { background: linear-gradient(145deg, #07244d 0%, #0A4D9B 55%, #0A4D9B 100%); color: #fff; border-radius: 24px; padding: 28px; margin-bottom: 24px; position: relative; overflow: hidden; border: 1px solid rgba(212,175,55,.35); }
@@ -620,33 +628,33 @@
             <button class="mobile-toggle" onclick="toggleSidebar()" style="margin-left: auto; color: white;" id="closeSidebarBtn" aria-label="Close menu"><i class="pd-i pd-i-x"></i></button>
         </div>
         <div class="nav-menu">
-            <div class="nav-item active" onclick="switchView('dashboard', this)"><i class="pd-i pd-i-chart-pie"></i> Dashboard</div>
-            <div class="nav-item" onclick="switchView('live', this)"><i class="pd-i pd-i-radio"></i> Live Control Room <span class="live-nav-dot" id="navLiveDot"></span></div>
-            <div class="nav-item" onclick="switchView('live-analytics', this)"><i class="pd-i pd-i-chart-line"></i> Live Analytics</div>
-            <div class="nav-item" onclick="switchView('live-schedule', this)"><i class="pd-i pd-i-calendar-clock"></i> Schedule Live</div>
-            <div class="nav-item" onclick="switchView('members', this)"><i class="pd-i pd-i-users"></i> Members CRM</div>
-            <div class="nav-item" onclick="openTeamManagement()"><i class="pd-i pd-i-user-star"></i> Team Management</div>
-            <div class="nav-item" onclick="switchView('announcements', this)"><i class="pd-i pd-i-megaphone"></i> Notices</div>
-            <div class="nav-item" onclick="switchView('care', this)"><i class="pd-i pd-i-hand-heart"></i> Member Care</div>
-            <div class="nav-item" onclick="switchView('gallery', this)"><i class="pd-i pd-i-images"></i> Gallery Management</div>
-            <div class="nav-item" onclick="switchView('finance', this)"><i class="pd-i pd-i-coins"></i> Financials</div>
-            <div class="nav-item" onclick="switchView('support', this)"><i class="pd-i pd-i-hand-heart"></i> Support Claims</div>
-            <div class="nav-item" onclick="switchView('financial_reports', this)"><i class="pd-i pd-i-file-text"></i> Financial Reports</div>
-            <div class="nav-item" onclick="switchView('events', this)"><i class="pd-i pd-i-calendar-days"></i> Events & Cal</div>
-            <div class="nav-item" onclick="switchView('devotionals', this)"><i class="pd-i pd-i-book-open"></i> Devotionals</div>
-            <div class="nav-item" onclick="switchView('verses', this)"><i class="pd-i pd-i-book"></i> Daily Verses</div>
-            <div class="nav-item" onclick="switchView('aivideo', this)"><i class="pd-i pd-i-wand-sparkles"></i> AI Video Studio</div>
-            <div class="nav-item" onclick="switchView('media', this)"><i class="pd-i pd-i-camera"></i> Media Upload</div>
-            <div class="nav-item" onclick="switchView('content', this)"><i class="pd-i pd-i-message-circle-more"></i> Prayers & Testimonies</div>
-            <div class="nav-item" onclick="switchView('news', this)"><i class="pd-i pd-i-newspaper"></i> News Center</div>
-            <div class="nav-item" onclick="switchView('sermons', this)"><i class="pd-i pd-i-mic"></i> Sermon Center</div>
-            <div class="nav-item" onclick="switchView('banners', this)"><i class="pd-i pd-i-images"></i> Hero Banners</div>
-            <div class="nav-item" onclick="switchView('languages', this)"><i class="pd-i pd-i-languages"></i> Languages</div>
-            <div class="nav-item" onclick="switchView('translations', this)"><i class="pd-i pd-i-languages"></i> Translation Review</div>
-            <div class="nav-item" onclick="switchView('notifications', this)"><i class="pd-i pd-i-bell"></i> Notifications</div>
-            <div class="nav-item" onclick="switchView('facebook', this)"><i class="pd-i pd-i-brand-facebook"></i> Facebook Campaign</div>
-            <div class="nav-item" onclick="switchView('contacts', this)"><i class="pd-i pd-i-mail"></i> Contact Messages</div>
-            <div class="nav-item" onclick="switchView('certificates', this)"><i class="pd-i pd-i-award"></i> Certificates</div>
+            <div class="nav-item active" data-view="dashboard" onclick="switchView('dashboard', this)"><i class="pd-i pd-i-chart-pie"></i> Dashboard</div>
+            <div class="nav-item" data-view="live" onclick="switchView('live', this)"><i class="pd-i pd-i-radio"></i> Live Control Room <span class="live-nav-dot" id="navLiveDot"></span></div>
+            <div class="nav-item" data-view="live-analytics" onclick="switchView('live-analytics', this)"><i class="pd-i pd-i-chart-line"></i> Live Analytics</div>
+            <div class="nav-item" data-view="live-schedule" onclick="switchView('live-schedule', this)"><i class="pd-i pd-i-calendar-clock"></i> Schedule Live</div>
+            <div class="nav-item" data-view="members" onclick="switchView('members', this)"><i class="pd-i pd-i-users"></i> Members CRM</div>
+            <div class="nav-item" data-view="team" onclick="openTeamManagement(this)"><i class="pd-i pd-i-user-star"></i> Team Management</div>
+            <div class="nav-item" data-view="announcements" onclick="switchView('announcements', this)"><i class="pd-i pd-i-megaphone"></i> Notices</div>
+            <div class="nav-item" data-view="care" onclick="switchView('care', this)"><i class="pd-i pd-i-hand-heart"></i> Member Care</div>
+            <div class="nav-item" data-view="gallery" onclick="switchView('gallery', this)"><i class="pd-i pd-i-images"></i> Gallery Management</div>
+            <div class="nav-item" data-view="finance" onclick="switchView('finance', this)"><i class="pd-i pd-i-coins"></i> Financials</div>
+            <div class="nav-item" data-view="support" onclick="switchView('support', this)"><i class="pd-i pd-i-hand-heart"></i> Support Claims</div>
+            <div class="nav-item" data-view="financial_reports" onclick="switchView('financial_reports', this)"><i class="pd-i pd-i-file-text"></i> Financial Reports</div>
+            <div class="nav-item" data-view="events" onclick="switchView('events', this)"><i class="pd-i pd-i-calendar-days"></i> Events & Cal</div>
+            <div class="nav-item" data-view="devotionals" onclick="switchView('devotionals', this)"><i class="pd-i pd-i-book-open"></i> Devotionals</div>
+            <div class="nav-item" data-view="verses" onclick="switchView('verses', this)"><i class="pd-i pd-i-book"></i> Daily Verses</div>
+            <div class="nav-item" data-view="aivideo" onclick="switchView('aivideo', this)"><i class="pd-i pd-i-wand-sparkles"></i> AI Video Studio</div>
+            <div class="nav-item" data-view="media" onclick="switchView('media', this)"><i class="pd-i pd-i-camera"></i> Media Upload</div>
+            <div class="nav-item" data-view="content" onclick="switchView('content', this)"><i class="pd-i pd-i-message-circle-more"></i> Prayers & Testimonies</div>
+            <div class="nav-item" data-view="news" onclick="switchView('news', this)"><i class="pd-i pd-i-newspaper"></i> News Center</div>
+            <div class="nav-item" data-view="sermons" onclick="switchView('sermons', this)"><i class="pd-i pd-i-mic"></i> Sermon Center</div>
+            <div class="nav-item" data-view="banners" onclick="switchView('banners', this)"><i class="pd-i pd-i-images"></i> Hero Banners</div>
+            <div class="nav-item" data-view="languages" onclick="switchView('languages', this)"><i class="pd-i pd-i-languages"></i> Languages</div>
+            <div class="nav-item" data-view="translations" onclick="switchView('translations', this)"><i class="pd-i pd-i-languages"></i> Translation Review</div>
+            <div class="nav-item" data-view="notifications" onclick="switchView('notifications', this)"><i class="pd-i pd-i-bell"></i> Notifications</div>
+            <div class="nav-item" data-view="facebook" onclick="switchView('facebook', this)"><i class="pd-i pd-i-brand-facebook"></i> Facebook Campaign</div>
+            <div class="nav-item" data-view="contacts" onclick="switchView('contacts', this)"><i class="pd-i pd-i-mail"></i> Contact Messages</div>
+            <div class="nav-item" data-view="certificates" onclick="switchView('certificates', this)"><i class="pd-i pd-i-award"></i> Certificates</div>
         </div>
         <div class="sidebar-footer">
             <button class="btn btn-outline" style="width: 100%; color: #ef4444; border-color: rgba(239,68,68,0.3);" onclick="logoutAdmin()">
@@ -654,6 +662,7 @@
             </button>
         </div>
     </nav>
+    <div class="sidebar-scrim" id="sidebarScrim" onclick="toggleSidebar(false)" aria-hidden="true"></div>
 
     <!-- MAIN CONTENT AREA -->
     <main class="main-content">
@@ -689,8 +698,8 @@
                             <div style="margin-top:6px; font-size:.8rem; color:rgba(255,255,255,.85);">Mark 7:37 — the primary scripture across the Prayer Dome platform</div>
                         </div>
                         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <button class="btn btn-primary btn-sm" style="background:#d4af37; border-color:#d4af37; color:#fff;" onclick="switchView('live', document.querySelectorAll('.nav-item')[1])"><i class="pd-i pd-i-radio"></i> Go Live</button>
-                            <button class="btn btn-primary btn-sm" style="background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.3);" onclick="switchView('news', document.querySelectorAll('.nav-item')[13])"><i class="pd-i pd-i-newspaper"></i> Publish News</button>
+                            <button class="btn btn-primary btn-sm" style="background:#d4af37; border-color:#d4af37; color:#fff;" onclick="switchView('live', pdNavFor('live'))"><i class="pd-i pd-i-radio"></i> Go Live</button>
+                            <button class="btn btn-primary btn-sm" style="background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.3);" onclick="switchView('news', pdNavFor('news'))"><i class="pd-i pd-i-newspaper"></i> Publish News</button>
                         </div>
                     </div>
                 </div>
@@ -729,7 +738,7 @@
                     </section>
                 </div>
                 <div class="panel-card">
-                    <div class="panel-header"><h3><i class="pd-i pd-i-user-plus"></i> Recent Membership Applications</h3><button class="btn btn-outline btn-sm" onclick="switchView('members', document.querySelectorAll('.nav-item')[1])">View All</button></div>
+                    <div class="panel-header"><h3><i class="pd-i pd-i-user-plus"></i> Recent Membership Applications</h3><button class="btn btn-outline btn-sm" onclick="switchView('members', pdNavFor('members'))">View All</button></div>
                     <div class="table-responsive"><table><thead> <tr><th>Applicant</th><th>Branch</th><th>Date</th><th>Status</th><th>Action</th> </tr></thead><tbody id="dashPendingMembers"> <tr><td colspan="5" style="text-align: center;"><div class="spinner" style="width:30px;height:30px;"></div></td></tr> </tbody> </table> </div>
                 </div>
             </div>
@@ -740,8 +749,8 @@
                     <span><i class="pd-i pd-i-radio"></i> Live Control Room</span>
                     <div style="display:flex; gap:8px;">
                         <a href="/live.html" target="_blank" class="btn btn-outline btn-sm"><i class="pd-i pd-i-external-link"></i> Viewer Page</a>
-                        <button class="btn btn-outline btn-sm" onclick="switchView('live-analytics', document.querySelectorAll('.nav-item')[0]); loadLiveAnalytics()"><i class="pd-i pd-i-chart-line"></i> Analytics</button>
-                        <button class="btn btn-outline btn-sm" onclick="switchView('live-schedule', document.querySelectorAll('.nav-item')[0]); loadScheduledLives()"><i class="pd-i pd-i-calendar"></i> Schedule</button>
+                        <button class="btn btn-outline btn-sm" onclick="switchView('live-analytics', pdNavFor('live-analytics')); loadLiveAnalytics()"><i class="pd-i pd-i-chart-line"></i> Analytics</button>
+                        <button class="btn btn-outline btn-sm" onclick="switchView('live-schedule', pdNavFor('live-schedule')); loadScheduledLives()"><i class="pd-i pd-i-calendar"></i> Schedule</button>
                     </div>
                 </div>
 
@@ -973,7 +982,7 @@
             <div id="view-live-analytics" class="section-view">
                 <div class="page-title">
                     <span><i class="pd-i pd-i-chart-line"></i> Live Analytics</span>
-                    <button class="btn btn-outline btn-sm" onclick="switchView('live', document.querySelectorAll('.nav-item')[1])"><i class="pd-i pd-i-arrow-left"></i> Back to Control Room</button>
+                    <button class="btn btn-outline btn-sm" onclick="switchView('live', pdNavFor('live'))"><i class="pd-i pd-i-arrow-left"></i> Back to Control Room</button>
                 </div>
                 <div class="kpi-grid">
                     <div class="kpi-card"><div class="kpi-icon gold"><i class="pd-i pd-i-clock"></i></div><div class="kpi-details"><h3 id="anDuration">—</h3><p>Duration</p></div></div>
@@ -1000,7 +1009,7 @@
             <div id="view-live-schedule" class="section-view">
                 <div class="page-title">
                     <span><i class="pd-i pd-i-calendar-clock"></i> Schedule a Live</span>
-                    <button class="btn btn-outline btn-sm" onclick="switchView('live', document.querySelectorAll('.nav-item')[1])"><i class="pd-i pd-i-arrow-left"></i> Back to Control Room</button>
+                    <button class="btn btn-outline btn-sm" onclick="switchView('live', pdNavFor('live'))"><i class="pd-i pd-i-arrow-left"></i> Back to Control Room</button>
                 </div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
                     <div class="panel-card">
@@ -1556,11 +1565,12 @@
 
     <!-- MODALS -->
     <div id="loginModal" class="modal-overlay" style="display: none;">
-        <div class="modal-card" style="max-width: 400px; text-align: center; padding: 40px;">
+        <div class="modal-card" style="max-width: 420px; text-align: center; padding: 40px;">
             <div class="sidebar-logo" style="margin: 0 auto 20px;"><img src="/assets/logo.png" alt="Logo"></div>
             <h2 style="margin-bottom: 10px; font-family: 'Poppins', serif; color: var(--accent-green);">Admin Access Only</h2>
-            <p style="color: var(--text-sub); margin-bottom: 25px; font-size: 0.9rem;">Admin access uses your existing PrayerDome account session. Sign in on the main site, then return here.</p>
-            <a class="btn btn-primary" style="display:block; width:100%; padding:14px; text-decoration:none;" href="index.html?next=admin">Continue to PrayerDome</a>
+            <p id="loginHint" style="color: var(--text-sub); margin-bottom: 25px; font-size: 0.9rem;">No Prayer Dome session is active on this device. Sign in once and the console opens automatically from then on.</p>
+            <a class="btn btn-primary" style="display:block; width:100%; padding:14px; text-decoration:none;" href="account.html?next=admin">Sign in &amp; open the Admin Console</a>
+            <button class="btn btn-outline" type="button" style="display:block; width:100%; padding:14px; margin-top:12px;" onclick="recheckAdminAccess()"><i class="pd-i pd-i-refresh-cw"></i> Check again</button>
             <a href="index.html" style="display:block; margin-top:20px; color:var(--text-sub); text-decoration:none;">Return to Main Site</a>
         </div>
     </div>
@@ -1837,17 +1847,30 @@
     <input type="hidden" id="editMemberId">
 
     <!-- Keep a failed CDN/Firebase module from leaving the administrator behind
-         an infinite spinner, especially inside the Capacitor WebView. -->
+         an infinite spinner, especially inside the Capacitor WebView. A tab
+         whose admin role Firestore already confirmed is never sent back to a
+         sign-in card — the console shell stays open instead. -->
     <script>
-        window.setTimeout(() => {
-            const loader = document.getElementById('globalLoader');
-            if (!loader || loader.style.display === 'none') return;
-            loader.style.display = 'none';
-            const login = document.getElementById('loginModal');
-            if (login) login.style.display = 'flex';
-            const message = loader.querySelector('h3');
-            if (message) message.textContent = 'Admin sign-in could not be loaded. Check your connection and refresh.';
-        }, 8000);
+        (function () {
+            function sessionIsTrusted() {
+                try {
+                    const session = JSON.parse(localStorage.getItem('pd_admin_session') || 'null');
+                    if (!session || !session.uid || session.role !== 'admin') return false;
+                    return (Date.now() - Number(session.timestamp || 0)) < 7 * 24 * 60 * 60 * 1000;
+                } catch (e) { return false; }
+            }
+            window.setTimeout(function () {
+                const loader = document.getElementById('globalLoader');
+                if (!loader || loader.style.display === 'none') return;
+                loader.style.display = 'none';
+                // Firestore-confirmed tab: keep the console, never re-ask.
+                if (sessionIsTrusted()) return;
+                const login = document.getElementById('loginModal');
+                if (login) login.style.display = 'flex';
+                const message = loader.querySelector('h3');
+                if (message) message.textContent = 'Admin sign-in could not be loaded. Check your connection and refresh.';
+            }, 8000);
+        })();
     </script>
 
     <script type="module">
@@ -1868,14 +1891,54 @@
             await setPersistence(auth, browserLocalPersistence);
         } catch(e) { console.warn('Auth persistence setup:', e); }
 
+        /* ==================== CONSOLE NAVIGATION ====================
+         * The sidebar is the single menu for this page. Every item carries
+         * data-view="<view id>" and nothing looks a menu item up by its
+         * position any more, so a click always highlights and opens exactly the
+         * view it names (the dashboard shortcuts used to point at the wrong
+         * item after the menu grew, which looked like two menus fighting).
+         * Switching views happens in place: no reload, no scroll jump, and the
+         * view is reflected in the URL hash so back/forward work too. */
+        window.pdNavFor = (viewOrElement) => {
+            if (viewOrElement && viewOrElement.classList && viewOrElement.classList.contains('nav-item')) return viewOrElement;
+            const id = typeof viewOrElement === 'string' ? viewOrElement.trim() : '';
+            if (!id) return null;
+            try { return document.querySelector(`.nav-item[data-view="${id}"]`); } catch (e) { return null; }
+        };
+        window.toggleSidebar = (force) => {
+            const sb = document.getElementById('sidebar');
+            if (!sb) return;
+            const open = typeof force === 'boolean' ? force : !sb.classList.contains('open');
+            sb.classList.toggle('open', open);
+            // Keep the legacy inline value in step with the class.
+            sb.style.left = open ? '0px' : '';
+            document.body.classList.toggle('sidebar-open', open);
+            const btn = document.querySelector('.topbar .mobile-toggle');
+            if (btn) btn.setAttribute('aria-expanded', String(open));
+        };
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') window.toggleSidebar(false);
+        });
+
         // Session management helpers
         const ADMIN_SESSION_KEY = 'pd_admin_session';
-        function saveAdminSession(user) {
+        // How long a Firestore-confirmed admin session keeps this device signed
+        // in without asking again, and how long it survives a network outage.
+        const ADMIN_SESSION_TTL = 7 * 24 * 60 * 60 * 1000;
+        const ADMIN_SESSION_GRACE = 24 * 60 * 60 * 1000;
+        function saveAdminSession(user, extra = {}) {
             try {
+                const previous = getAdminSession();
                 localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({
+                    version: 2,
                     uid: user.uid,
-                    email: user.email,
-                    timestamp: Date.now()
+                    email: user.email || '',
+                    name: extra.name || (previous && previous.name) || user.displayName || '',
+                    role: 'admin',
+                    source: extra.source || (previous && previous.source) || 'memberships',
+                    timestamp: Date.now(),
+                    verifiedAt: Date.now(),
+                    seenAt: Date.now()
                 }));
             } catch(e) {}
         }
@@ -1885,17 +1948,44 @@
         function getAdminSession() {
             try {
                 const raw = localStorage.getItem(ADMIN_SESSION_KEY);
-                return raw ? JSON.parse(raw) : null;
+                if (!raw) return null;
+                const session = JSON.parse(raw);
+                if (!session || !session.uid) return null;
+                const age = Date.now() - Number(session.timestamp || 0);
+                if (!Number.isFinite(age) || age > ADMIN_SESSION_TTL) return null;
+                return session;
             } catch(e) { return null; }
         }
-        // Restore UI immediately if valid session exists — no login prompt flash
+        // A session that Firestore confirmed at least once on this device.
+        function trustedSessionFor(user) {
+            const session = getAdminSession();
+            if (!session || !user || session.uid !== user.uid) return null;
+            if (session.role !== 'admin') return null;
+            const verified = Date.now() - Number(session.verifiedAt || session.timestamp || 0);
+            return verified <= ADMIN_SESSION_TTL ? session : null;
+        }
+        function noteSessionActivity(user) {
+            const session = getAdminSession();
+            if (!session || !user || session.uid !== user.uid) return;
+            session.seenAt = Date.now();
+            try { localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(session)); } catch(e) {}
+        }
+        // The session may only be trusted while Firestore keeps agreeing; if it
+        // has not been confirmed for a full day the console re-asks Firestore
+        // before letting anybody in offline.
+        function sessionIsFresh(session) {
+            if (!session) return false;
+            return (Date.now() - Number(session.verifiedAt || session.timestamp || 0)) <= ADMIN_SESSION_GRACE;
+        }
+        // A remembered session keeps the loader up (never the sign-in card)
+        // while Firestore re-confirms the role in the background.
         (function restoreAdminUi() {
             const sess = getAdminSession();
-            if (sess && (Date.now() - sess.timestamp) < 7*24*60*60*1000) {
-                const lm = document.getElementById('loginModal');
-                const gl = document.getElementById('globalLoader');
-                if (gl) gl.style.display = 'flex';
-            }
+            if (!sess) return;
+            const login = document.getElementById('loginModal');
+            if (login) login.style.display = 'none';
+            const loader = document.getElementById('globalLoader');
+            if (loader) loader.style.display = 'flex';
         })();
 
         // Hand Firestore to the shared premium layer (pd-app.js) so banners,
@@ -1933,7 +2023,8 @@
             setTimeout(() => toast.remove(), 8000);
         };
         
-        window.toggleSidebar = () => { const sb = document.getElementById('sidebar'); if(sb.style.left === '0px') sb.style.left = '-280px'; else sb.style.left = '0px'; };
+        // toggleSidebar is defined with the navigation helpers above (class
+        // based, keeps the scrim and aria-expanded in step).
 window.toggleDarkMode = function() {
     var dark = (window.PDApp && PDApp.theme ? PDApp.theme.isDark() : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
     document.body.classList.toggle('dark-mode', dark);
@@ -5046,13 +5137,13 @@ window.toggleDarkMode = function() {
                     c.classList.toggle('active', c.dataset.cat === crSelectedCategory);
                 });
                 // Switch to live view and start
-                switchView('live', document.querySelectorAll('.nav-item')[1]);
+                switchView('live', pdNavFor('live'));
                 toast('Title pre-filled — press "OPEN CAMERA & GO LIVE" to start', 'info');
             } catch(e) { toast('Error: ' + e.message, 'error'); }
         };
 
         window.openScheduleLiveModal = function() {
-            switchView('live-schedule', document.querySelectorAll('.nav-item')[2]);
+            switchView('live-schedule', pdNavFor('live-schedule'));
             loadScheduledLives();
         };
 
@@ -5593,29 +5684,44 @@ window.toggleDarkMode = function() {
             finally { hideLoading(); }
         };
 
-        /* ===== Update switchView to include new views ===== */
-        const _origSwitchView = window.switchView;
+        /* ===== View switching — one menu, no reloads, no scroll jumps ===== */
+        const ADMIN_VIEW_TITLES = {
+            'live': 'Live Control Room', 'live-analytics': 'Live Analytics', 'live-schedule': 'Schedule a Live',
+            'dashboard': 'Dashboard', 'members': 'Members CRM', 'announcements': 'Notices',
+            'care': 'Member Care', 'gallery': 'Gallery', 'finance': 'Financials',
+            'support': 'Support Claims', 'financial_reports': 'Financial Reports',
+            'events': 'Events', 'devotionals': 'Devotionals', 'verses': 'Daily Verses',
+            'aivideo': 'AI Video Studio', 'media': 'Media Upload', 'content': 'Prayers & Testimonies',
+            'news': 'News Center', 'sermons': 'Sermon Center', 'banners': 'Hero Banners',
+            'languages': 'Languages', 'translations': 'Translation Review',
+            'notifications': 'Notifications', 'facebook': 'Facebook Campaign',
+            'contacts': 'Contact Messages', 'certificates': 'Certificates'
+        };
+        let activeAdminView = null;
+
         window.switchView = async (viewId, navElement) => {
-            document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             const target = document.getElementById(`view-${viewId}`);
-            if (target) target.classList.add('active');
-            if (navElement) navElement.classList.add('active');
+            if (!target) { console.warn('Admin console: unknown view', viewId); return; }
+            activeAdminView = viewId;
+            // Exactly one view and one menu item stay active.
+            document.querySelectorAll('.section-view').forEach(el => el.classList.toggle('active', el === target));
+            const nav = window.pdNavFor(navElement) || window.pdNavFor(viewId);
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', !!nav && el === nav));
             // Set mobile header title
             const mobileTitle = $('mobileHeaderTitle');
-            const titles = {
-                'live': 'Live Control Room', 'live-analytics': 'Live Analytics', 'live-schedule': 'Schedule a Live',
-                'dashboard': 'Dashboard', 'members': 'Members CRM', 'announcements': 'Notices',
-                'care': 'Member Care', 'gallery': 'Gallery', 'finance': 'Financials',
-                'support': 'Support Claims', 'financial_reports': 'Financial Reports',
-                'events': 'Events', 'devotionals': 'Devotionals', 'verses': 'Daily Verses',
-                'aivideo': 'AI Video Studio', 'media': 'Media Upload', 'content': 'Prayers & Testimonies',
-                'news': 'News Center', 'sermons': 'Sermon Center', 'banners': 'Hero Banners',
-                'languages': 'Languages', 'translations': 'Translation Review',
-                'notifications': 'Notifications', 'facebook': 'Facebook Campaign', 'contacts': 'Contact Messages', 'certificates': 'Certificates'
-            };
-            if (mobileTitle) mobileTitle.textContent = titles[viewId] || viewId;
-            if (window.innerWidth <= 992) document.getElementById('sidebar').style.left = '-280px';
+            if (mobileTitle) mobileTitle.textContent = ADMIN_VIEW_TITLES[viewId] || viewId;
+            // Close the mobile menu and scroll the panel, not the page: the
+            // sidebar and header must not move when a view changes.
+            window.toggleSidebar(false);
+            const content = document.querySelector('.content-area');
+            if (content) content.scrollTop = 0;
+            if (window.scrollY) window.scrollTo(0, 0);
+            // Reflection in the URL keeps back/forward and deep links working
+            // without ever reloading the console (or dropping the session).
+            try {
+                const hash = `#${viewId}`;
+                if (window.location.hash !== hash) history.replaceState(null, '', hash);
+            } catch (e) {}
             try {
                 if (viewId === 'dashboard') await loadDashboardPerformance();
                 else if (viewId === 'live') { watchLiveStatus(); await loadLiveRecordings(); populateDeviceSelects(); }
@@ -5645,6 +5751,17 @@ window.toggleDarkMode = function() {
             } catch(e) { console.error(`Error loading ${viewId}:`, e); toast(`Error loading ${viewId} data`, 'error'); }
         };
 
+        // Deep links (#members) and the browser's back/forward buttons drive the
+        // same in-place switch — the console never reloads into a signed-out state.
+        function viewFromHash() {
+            const id = (window.location.hash || '').replace(/^#\/?/, '').trim();
+            return document.getElementById(`view-${id}`) ? id : null;
+        }
+        window.addEventListener('hashchange', () => {
+            const id = viewFromHash();
+            if (id && id !== activeAdminView) window.switchView(id, window.pdNavFor(id));
+        });
+
         /* ===== Initialize CR UI when DOM is ready ===== */
         function initCRUI() {
             initCRChips();
@@ -5660,52 +5777,239 @@ window.toggleDarkMode = function() {
         }
 
 
-        onAuthStateChanged(auth, async (user) => {
-            showLoading();
-            if (user) {
+        /* ==================== ADMIN ACCESS (Firestore is the authority) ====================
+         * Sign in once on PrayerDome (account.html) and this console opens
+         * itself from then on. Firebase keeps the shared session on the device
+         * (browserLocalPersistence) and Firestore decides who is an admin:
+         *   memberships/<uid>.role == 'admin'   (primary)
+         *   users/<uid>.role       == 'admin'   (same fallback the security
+         *                                        rules use for isAdmin())
+         * The confirmed result is mirrored in localStorage as a trusted tab
+         * session, so a reload, a new tab or a short outage shows the console
+         * straight away instead of asking for a sign-in that already happened.
+         * A live listener re-checks Firestore and revokes the console the
+         * moment the role is removed, or when the session is signed out in
+         * another tab.
+         */
+
+        // Accept both Firestore locations the security rules accept, so an
+        // administrator whose membership document is the users record still
+        // gets in without a second sign-in.
+        function adminRoleFromSnap(snap) {
+            if (!snap || !snap.exists()) return false;
+            return snap.data().role === 'admin';
+        }
+
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        // Read the role from Firestore with retries: a flaky connection must
+        // never be mistaken for "not an administrator".
+        async function verifyAdminRole(user, attempts = 3) {
+            if (!user) return { admin: false, reason: 'signed-out' };
+            let lastError = null;
+            for (let attempt = 0; attempt < attempts; attempt++) {
                 try {
-                    const snap = await getDoc(doc(db, "memberships", user.uid));
-                    if (snap.exists() && snap.data().role === 'admin') {
-                        adminUser = user;
-                        saveAdminSession(user);
-                        // Register this device for push so "Send test notification"
-                        // and "Send to all" have a token to reach.
-                        window.PD_UID = user.uid;
-                        if (window.PDApp) {
-                            PDApp.setFirestore({ db, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, orderBy, limit, getDocs, serverTimestamp, Timestamp, onSnapshot, auth });
-                            PDApp.notifications.registerDevice(user.uid);
-                        }
-                        document.getElementById('topbarName').innerText = snap.data().fullName || 'Admin';
-                        document.getElementById('topbarAvatar').innerText = (snap.data().fullName || 'A')[0];
-                        document.getElementById('loginModal').style.display = 'none';
-                        document.getElementById('globalLoader').style.display = 'none';
-                        await loadDashboardPerformance();
-                        setupAdminRealtimeListeners();
-                        watchLiveStatus();
-                        // Keep session alive — refresh timestamp periodically
-                        setInterval(() => saveAdminSession(user), 5*60*1000);
-                    } else {
-                        clearAdminSession();
-                        document.getElementById('loginModal').style.display = 'flex';
-                        document.getElementById('globalLoader').style.display = 'none';
-                        toast('This account does not have administrator privileges.', 'error');
+                    const membershipSnap = await getDoc(doc(db, "memberships", user.uid));
+                    if (adminRoleFromSnap(membershipSnap)) {
+                        return { admin: true, source: 'memberships', profile: membershipSnap.data() || {} };
                     }
-                } catch(e) { 
-                    console.error("Auth check error:", e); 
-                    // Don't immediately sign out on transient network error — keep session
-                    const sess = getAdminSession();
-                    if (!sess) document.getElementById('loginModal').style.display = 'flex';
-                    document.getElementById('globalLoader').style.display = 'none';
+                    const userSnap = await getDoc(doc(db, "users", user.uid));
+                    if (adminRoleFromSnap(userSnap)) {
+                        return { admin: true, source: 'users', profile: userSnap.data() || {} };
+                    }
+                    return { admin: false, reason: 'not-admin', profile: (membershipSnap.data && membershipSnap.data()) || {} };
+                } catch (error) {
+                    lastError = error;
+                    await sleep(500 * (attempt + 1));
                 }
-            } else {
+            }
+            return { admin: false, reason: 'error', error: lastError };
+        }
+
+        let adminConsoleReady = false;
+        let adminRoleUnsubscribe = null;
+
+        function showAdminLoader(message) {
+            const loader = document.getElementById('globalLoader');
+            const text = loader && loader.querySelector('h3');
+            if (text && message) text.textContent = message;
+            if (loader) loader.style.display = 'flex';
+        }
+
+        function hideAdminOverlays() {
+            const loader = document.getElementById('globalLoader');
+            if (loader) loader.style.display = 'none';
+            const login = document.getElementById('loginModal');
+            if (login) login.style.display = 'none';
+        }
+
+        // Open the console for a confirmed administrator.
+        async function openAdminConsole(user, profile = {}, options = {}) {
+            adminUser = user;
+            saveAdminSession(user, { name: profile.fullName || '', source: options.source });
+            window.PD_UID = user.uid;
+            if (window.PDApp) {
+                PDApp.setFirestore({ db, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, orderBy, limit, getDocs, serverTimestamp, Timestamp, onSnapshot, auth });
+                // Push registration is best-effort; never let it break sign-in.
+                try { Promise.resolve(PDApp.notifications.registerDevice(user.uid)).catch(() => {}); } catch (e) {}
+            }
+            const name = profile.fullName || user.displayName || 'Admin';
+            const nameEl = document.getElementById('topbarName');
+            const avatarEl = document.getElementById('topbarAvatar');
+            if (nameEl) nameEl.innerText = name;
+            if (avatarEl) avatarEl.innerText = (name || 'A')[0].toUpperCase();
+            hideAdminOverlays();
+            watchAdminRole(user);
+            if (!adminConsoleReady) {
+                adminConsoleReady = true;
+                try { await loadDashboardPerformance(); } catch (e) { console.warn('Dashboard load:', e); }
+                try { setupAdminRealtimeListeners(); } catch (e) { console.warn('Realtime listeners:', e); }
+                try { watchLiveStatus(); } catch (e) { console.warn('Live status watch:', e); }
+                // Deep link (#members, #finance, …) opens straight on that view.
+                const deepLink = viewFromHash();
+                if (deepLink && deepLink !== 'dashboard') window.switchView(deepLink, window.pdNavFor(deepLink));
+            }
+            if (options.offline) {
+                toast('Firestore is unreachable — showing the console from your verified session.', 'warning');
+            }
+        }
+
+        // Only ever shown when Firestore definitely does not report an admin
+        // role (or nobody is signed in).
+        function showAdminSignIn(reason) {
+            adminUser = null;
+            clearAdminSession();
+            stopAdminRoleWatch();
+            const loader = document.getElementById('globalLoader');
+            if (loader) loader.style.display = 'none';
+            const login = document.getElementById('loginModal');
+            if (login) login.style.display = 'flex';
+            const hint = document.getElementById('loginHint');
+            const hints = {
+                'signed-out': 'No Prayer Dome session is active on this device. Sign in once and the console opens automatically from then on.',
+                'not-admin': 'This account is signed in but does not have administrator privileges. Ask a ministry lead to grant the admin role, then press “Check again”.',
+                'error': 'We could not reach Firestore to confirm your administrator role. Check your connection and press “Check again”.'
+            };
+            if (hint) hint.textContent = hints[reason] || hints['signed-out'];
+        }
+
+        // Live re-check: as long as Firestore reports the admin role the tab
+        // stays signed in. Losing the role (or the account) closes the console
+        // immediately, without waiting for a reload.
+        function watchAdminRole(user) {
+            stopAdminRoleWatch();
+            try {
+                adminRoleUnsubscribe = onSnapshot(doc(db, "memberships", user.uid), (snap) => {
+                    if (adminRoleFromSnap(snap)) { noteSessionActivity(user); return; }
+                    // The membership document is missing or demoted — the users
+                    // document may still carry the admin role.
+                    verifyAdminRole(user, 2).then((verdict) => {
+                        if (verdict.admin) { saveAdminSession(user, { source: verdict.source, name: (verdict.profile || {}).fullName || '' }); return; }
+                        if (verdict.reason === 'error') return;   // offline: keep the verified session
+                        if (adminUser) {
+                            toast('Administrator access was removed for this account.', 'error');
+                            showAdminSignIn('not-admin');
+                        }
+                    });
+                }, (error) => { console.warn('Admin role watch:', error && error.message); });
+            } catch (e) { console.warn('Admin role watch unavailable:', e); }
+        }
+        function stopAdminRoleWatch() {
+            if (typeof adminRoleUnsubscribe === 'function') {
+                try { adminRoleUnsubscribe(); } catch (e) {}
+            }
+            adminRoleUnsubscribe = null;
+        }
+
+        // Re-check on demand (the "Check again" button, or when the tab is
+        // focused after signing in somewhere else).
+        let lastRecheckAt = 0;
+        window.recheckAdminAccess = async (silent = false) => {
+            if (Date.now() - lastRecheckAt < 4000) return;
+            lastRecheckAt = Date.now();
+            const user = auth.currentUser;
+            if (!user) { if (!silent) showAdminSignIn('signed-out'); return; }
+            if (!silent) showAdminLoader('Checking administrator access…');
+            const verdict = await verifyAdminRole(user);
+            if (verdict.admin) {
+                await openAdminConsole(user, verdict.profile || {}, { source: verdict.source });
+                if (!silent) toast('Administrator access confirmed.');
+                return;
+            }
+            const trusted = trustedSessionFor(user);
+            if (verdict.reason === 'error' && trusted && sessionIsFresh(trusted)) {
+                await openAdminConsole(user, { fullName: trusted.name }, { offline: true });
+                return;
+            }
+            if (!silent) showAdminSignIn(verdict.reason);
+        };
+
+        // A second tab signing out (or a fresh sign-in) must be reflected here.
+        window.addEventListener('storage', (event) => {
+            if (event.key !== ADMIN_SESSION_KEY) return;
+            if (!event.newValue) {
+                // The session was cleared in another tab: this tab signs out too
+                // instead of silently re-opening the console.
+                if (adminUser) showAdminSignIn('signed-out');
+                signOut(auth).catch(() => {});
+                return;
+            }
+            if (!adminUser && auth.currentUser) window.recheckAdminAccess(true);
+        });
+
+        // Coming back to the tab (for example after signing in on the main
+        // site in another tab) re-checks quietly — no full reload needed.
+        window.addEventListener('focus', () => { if (!adminUser) window.recheckAdminAccess(true); });
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && !adminUser) window.recheckAdminAccess(true);
+        });
+
+        // Keep the verified session warm so the tab is recognised next time.
+        setInterval(() => { if (adminUser) noteSessionActivity(adminUser); }, 5 * 60 * 1000);
+
+        // Watchdog: a trusted tab must never be pushed back to a sign-in card
+        // just because the network is slow. The console shell is already in the
+        // page, so reveal it and let verification finish in the background.
+        setTimeout(() => {
+            if (adminUser) return;
+            const loader = document.getElementById('globalLoader');
+            if (!loader || loader.style.display === 'none') return;
+            const session = getAdminSession();
+            if (session && session.role === 'admin' && session.uid) {
+                hideAdminOverlays();
+                toast('Reconnecting to Prayer Dome — restoring your admin session…', 'warning');
+                window.recheckAdminAccess(true);
+            }
+        }, 9000);
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
                 // Firebase is the authority: never trust the local UI hint as an
                 // authentication credential. Return unauthenticated visitors to
                 // the single sign-in experience on the main PrayerDome site.
-                clearAdminSession();
-                document.getElementById('globalLoader').style.display = 'none';
-                document.getElementById('loginModal').style.display = 'flex';
+                showAdminSignIn('signed-out');
+                return;
             }
-            hideLoading();
+            const trusted = trustedSessionFor(user);
+            // A device that already had its admin role confirmed by Firestore
+            // gets straight into the console while the re-check runs.
+            if (trusted) {
+                await openAdminConsole(user, { fullName: trusted.name }, { source: trusted.source });
+            } else {
+                showAdminLoader('Verifying administrator access…');
+            }
+            const verdict = await verifyAdminRole(user);
+            if (verdict.admin) {
+                await openAdminConsole(user, verdict.profile || {}, { source: verdict.source });
+                return;
+            }
+            if (verdict.reason === 'error' && trusted && sessionIsFresh(trusted)) {
+                // Firestore unreachable but this tab's role was already proven
+                // today: keep the console instead of asking to sign in again.
+                await openAdminConsole(user, { fullName: trusted.name }, { offline: true });
+                return;
+            }
+            showAdminSignIn(verdict.reason);
         });
 
         window.adminUpdateActiveSettings = async function() {
@@ -5733,14 +6037,14 @@ window.toggleDarkMode = function() {
             }
         };
 
-        window.logoutAdmin = async () => { 
+        window.logoutAdmin = async () => {
             clearAdminSession();
-            await signOut(auth); 
+            stopAdminRoleWatch();
+            adminUser = null;
+            try { await signOut(auth); } catch (e) { console.warn('Sign-out:', e); }
             // Preserve app preferences and cached learning progress on logout.
-            window.location.href = 'index.html'; 
+            window.location.href = 'index.html';
         };
-        
-        setTimeout(() => { if(!adminUser) document.getElementById('globalLoader').style.display = 'none'; }, 5000);
     </script>
 </body>
 </html>

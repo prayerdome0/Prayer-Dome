@@ -14,6 +14,7 @@ const excludedDirectories = new Set([
   '.idea',
   '.next',
   '.vercel',
+  'ci',
   'dist',
   'android',
   'api',
@@ -28,6 +29,8 @@ const excludedDirectories = new Set([
 
 const excludedFiles = new Set([
   '.gitignore',
+  'CODEMAGIC.md',
+  'codemagic.yaml',
   'BRAND-AND-CONTENT.md',
   'ICON-SYSTEM-REPORT.md',
   'README.md',
