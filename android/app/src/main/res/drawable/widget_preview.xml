@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fallback preview image (widget pickers before Android 12): the card's deep
+     navy face and gold rule, at the widget's default 4x2 size. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <size
+                android:width="250dp"
+                android:height="110dp" />
+            <gradient
+                android:angle="315"
+                android:endColor="@color/pd_navy_deep"
+                android:startColor="@color/pd_navy_dark" />
+            <corners android:radius="22dp" />
+            <stroke
+                android:width="1.5dp"
+                android:color="@color/pd_gold" />
+        </shape>
+    </item>
+    <item
+        android:bottom="14dp"
+        android:left="16dp"
+        android:right="16dp"
+        android:top="14dp">
+        <shape android:shape="rectangle">
+            <size
+                android:width="218dp"
+                android:height="82dp" />
+            <corners android:radius="12dp" />
+            <solid android:color="#14FFFFFF" />
+        </shape>
+    </item>
+</layer-list>

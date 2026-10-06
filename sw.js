@@ -3,7 +3,7 @@
 // shade) even when the app is closed — see /assets/pd-verse-data.js.
 try { importScripts('/assets/pd-verse-data.js'); } catch (e) { /* verses unavailable offline */ }
 // Bump CACHE_NAME whenever the precache list changes.
-const CACHE_NAME = 'prayer-dome-v24';
+const CACHE_NAME = 'prayer-dome-v25';
 
 // Shell assets worth having available offline.
 const PRECACHE = [
@@ -66,6 +66,10 @@ const PRECACHE = [
     '/assets/pd-upload.js',
     '/assets/pd-verse-data.js',
     '/assets/pd-verse-alerts.js',
+    // The lock-screen verse studio and its native widget bridge — a member
+    // who installs the app from the website should find them offline too.
+    '/widgets.html',
+    '/assets/pd-widget.js',
     '/assets/pd-content-data.js',
     '/assets/hero-worship.jpg',
     '/assets/testimonies/hero-praise.jpg',

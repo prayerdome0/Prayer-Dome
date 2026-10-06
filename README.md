@@ -24,6 +24,7 @@ Prayer Dome is a Christian community website for prayer, Bible study, disciplesh
 - **Community Chat** — respectful conversation for signed-in members.
 - **Membership, Giving and Support** — membership applications, giving options and member care requests.
 - **Documents** — statement of faith, discipleship guides, prayer tools, handbooks and the website user guide.
+- **Daily Verse widget** — the verse of the moment on your home screen and lock screen, outside the app: `widgets.html` sets up the Android widget, pins a verse and generates a lock-screen verse wallpaper for iPhone.
 
 ## How to use Prayer Dome
 

@@ -34,6 +34,25 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
+
+        <!-- Daily Verse widget: God's Word on the home screen and, where Android
+             shows widgets there (Android 15 QPR1+ tablets, Android 16 QPR1+
+             phones), on the lock screen without opening the app. The receiver
+             also re-arms its verse alarm after a restart, when the app updates
+             and when the device boots. See VerseWidgetProvider.java. -->
+        <receiver
+            android:name=".VerseWidgetProvider"
+            android:exported="false"
+            android:label="@string/verse_widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/verse_widget_info" />
+        </receiver>
     </application>
 
     <!-- Permissions -->
@@ -56,6 +75,9 @@
     <!-- Push notifications (Android 13+ requires the runtime permission). -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- The verse widget re-arms its four daily refresh alarms after a restart. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- Media picking (photos/videos/documents) through the native chooser.
          Android 13+ uses the granular media permissions; older releases use

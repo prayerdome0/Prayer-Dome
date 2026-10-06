@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- What the Android widget picker shows on Android 12 and later, before the
+     widget is placed. It mirrors the real card (same background, same type
+     scale) with a representative verse. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_verse_background"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/verse_widget_name"
+        android:textColor="@color/pd_gold"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:lineSpacingExtra="3dp"
+        android:maxLines="4"
+        android:text="Be still, and know that I am God: I will be exalted among the heathen, I will be exalted in the earth."
+        android:textColor="@color/pd_white"
+        android:textSize="15sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="— Psalm 46:10 (KJV)"
+        android:textColor="@color/pd_gold_soft"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:letterSpacing="0.08"
+        android:text="@string/verse_widget_brand"
+        android:textColor="@color/pd_blue_light"
+        android:textSize="9sp" />
+</LinearLayout>

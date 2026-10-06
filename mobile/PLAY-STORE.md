@@ -77,10 +77,12 @@ Answers must match the permissions the bundle requests
 (`android/app/src/main/AndroidManifest.xml`): internet and network state,
 camera and microphone (live audio/video calls, voice notes, profile photo),
 media read access (upload the member's own photos/videos/audio),
-`POST_NOTIFICATIONS` (announcements, prayer reminders, daily verse) and
-`WAKE_LOCK` (background verse delivery). All of them are optional in the
-product: only a member who places a call, records a voice note or enables
-notifications sees the prompt.
+`POST_NOTIFICATIONS` (announcements, prayer reminders, daily verse),
+`WAKE_LOCK` (background verse delivery) and `RECEIVE_BOOT_COMPLETED` (the
+home-screen/lock-screen Daily Verse widget re-arms its four daily verse
+refreshes after a restart; it is not a notification and needs no prompt). All of
+them are optional in the product: only a member who places a call, records a
+voice note, enables notifications or places the widget sees the prompt.
 
 ## 4. Before the first production release
 

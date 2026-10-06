@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Deep Navy — the default Prayer Dome verse widget theme. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="315"
+        android:endColor="@color/pd_navy_deep"
+        android:startColor="@color/pd_navy_dark" />
+    <corners android:radius="22dp" />
+    <stroke
+        android:width="1.5dp"
+        android:color="@color/pd_gold" />
+</shape>

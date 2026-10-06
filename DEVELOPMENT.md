@@ -16,6 +16,15 @@ npm run lint         # icon build check + production validation + managed SEO ch
 The test suite (`tests/*.test.js`) runs in CI on every push. New production
 behaviour should ship with regression tests the same way.
 
+### The Daily Verse widget
+
+The Android home-screen / lock-screen verse widget is generated from the same
+verse library as the website: `node scripts/build-widget-verses.mjs` (part of
+`npm run mobile:sync`, checked by `npm run lint`) writes
+`android/app/src/main/res/raw/pd_widget_verses.json`, and `tests/widgets.test.js`
+holds the two in step. See **[mobile/ANDROID-WIDGET.md](mobile/ANDROID-WIDGET.md)**
+for the native classes, the lock-screen support matrix and device testing.
+
 ## Android builds through GitHub Actions
 
 The Android app (`net.prayerdome.app`, version 1.1.0) is built entirely on

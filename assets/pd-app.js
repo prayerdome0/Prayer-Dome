@@ -2020,11 +2020,12 @@
       {href:'/resources', icon:'pd-i-folder-open', label:'Resources'},
       {href:'/sermons', icon:'pd-i-mic', label:'Sermons'},
       {href:'/prayer', icon:'pd-i-hands-praying', label:'Prayer Wall'},
+      {href:'/widgets', icon:'pd-i-smartphone', label:'Verse Widget'},
       {href:'/account', icon:'pd-i-circle-user', label:'Account'},
     ],
     FOOTER_HTML: ''
       + '<div class="pd-footer-logo"><img src="/assets/logo.png" alt="Prayer Dome"><span class="pd-footer-brand">PRAYER DOME</span></div>'
-      + '<div class="pd-footer-nav"><a href="/">Home</a><a href="/lessons">Teaching</a><a href="/quiz">Quiz</a><a href="/game">Games</a><a href="/prayer">Prayer</a><a href="/account">Account</a></div>'
+      + '<div class="pd-footer-nav"><a href="/">Home</a><a href="/lessons">Teaching</a><a href="/quiz">Quiz</a><a href="/game">Games</a><a href="/prayer">Prayer</a><a href="/widgets">Verse Widget</a><a href="/account">Account</a></div>'
       + '<p class="pd-footer-copy">© 2018 PRAYER DOME MINISTRY. ALL RIGHTS RESERVED. · A House of Prayer for All Nations</p>',
     /* Full-screen application shells run their own chrome.
      *
@@ -2098,7 +2099,7 @@
           // Normalize footer nav if missing games link or inconsistent
           var navF = footer.querySelector('.pd-footer-nav');
           if(navF && navF.children.length < 5){
-            navF.innerHTML = '<a href="/">Home</a><a href="/lessons">Teaching</a><a href="/quiz">Quiz</a><a href="/game">Games</a><a href="/prayer">Prayer</a><a href="/account">Account</a>';
+            navF.innerHTML = '<a href="/">Home</a><a href="/lessons">Teaching</a><a href="/quiz">Quiz</a><a href="/game">Games</a><a href="/prayer">Prayer</a><a href="/widgets">Verse Widget</a><a href="/account">Account</a>';
           }
         }
       } catch(e){}
