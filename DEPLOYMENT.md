@@ -37,7 +37,11 @@ defines `web-verify`, `android-debug` (debug APK plus release outputs on every
 push) and `android-release` (signed APK/AAB from a `v*` tag). The secure
 variables and the one-time application setup are documented in
 **[mobile/CODEMAGIC.md](mobile/CODEMAGIC.md)**; `tests/codemagic.test.js` keeps
-that configuration valid on every `npm test` run.
+that configuration valid on every `npm test` run. Play accepts a bundle only
+when it carries the upload key certificate registered for the app: set
+`PLAY_UPLOAD_KEY_SHA1` so a wrong-key bundle fails the release instead of the
+upload, and follow **[mobile/PLAY-UPLOAD-KEY.md](mobile/PLAY-UPLOAD-KEY.md)**
+when Play reports "signed with the wrong key".
 
 ## Vercel website
 

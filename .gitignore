@@ -9,6 +9,14 @@ dist/
 android/keystore.properties
 android/*.jks
 android/*.keystore
+android/*.p12
+android/*.pfx
+android/*.pepk
+upload_certificate.pem
+
+# Built app bundles (uploaded to Play, never committed)
+*.aab
+*.apk
 
 # Firebase
 .firebase/
