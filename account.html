@@ -743,6 +743,17 @@
                         <button class="btn btn-outline" style="width:auto;" id="notifPermissionBtn" onclick="requestAppNotifications()"><i class="pd-i pd-i-bell"></i> Allow Notifications</button>
                     </div>
 
+                    <!-- Install-to-home-screen row: shown only when the
+                         browser offers an install prompt (or on iOS, where the
+                         prompt has to be done manually from the Share menu). -->
+                    <div id="installAppRow" style="display:none; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; background: var(--bg-card); border:1px solid var(--border-color); border-radius:14px; padding:12px 14px; margin-bottom:14px;">
+                        <div style="min-width:0;">
+                            <strong style="font-size:.88rem;"><i class="pd-i pd-i-download"></i> Prayer Dome app</strong><br>
+                            <small id="installAppState" style="font-size:.72rem; color: var(--text-sub);">Add Prayer Dome to your home screen for one-tap access and offline reading.</small>
+                        </div>
+                        <button class="btn btn-outline" style="width:auto;" id="installAppBtn" onclick="installPrayerDomeApp()"><i class="pd-i pd-i-download"></i> Install app</button>
+                    </div>
+
                     <!-- Daily Bible verse scheduler renders here -->
                     <div data-pd-verse-settings></div>
                 </div>
@@ -1649,6 +1660,47 @@
             refreshNotifPermissionUI();
             if (perm === 'granted' && window.PDApp) PDApp.toast('Notifications are on', 'success');
         };
+
+        /* ---------------- install to home screen ---------------- */
+        // PDApp.pwa (assets/pd-app.js) registers the service worker and keeps
+        // the browser's install prompt; this just exposes it.
+        function refreshInstallAppUI() {
+            const row = document.getElementById('installAppRow');
+            const state = document.getElementById('installAppState');
+            const button = document.getElementById('installAppBtn');
+            if (!row || !window.PDApp || !PDApp.pwa) return;
+            if (PDApp.pwa.installed()) { row.style.display = 'none'; return; }
+            const deferred = PDApp.pwa.installPrompt();
+            const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent || '') ||
+                (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1);
+            if (deferred) {
+                row.style.display = 'flex';
+                if (state) state.textContent = 'Add Prayer Dome to your home screen for one-tap access and offline reading.';
+                if (button) button.style.display = 'inline-flex';
+            } else if (iOS) {
+                // Safari never fires beforeinstallprompt: explain the manual step.
+                row.style.display = 'flex';
+                if (state) state.textContent = 'On iPhone or iPad: tap the Share button, then “Add to Home Screen”.';
+                if (button) button.style.display = 'none';
+            } else {
+                row.style.display = 'none';
+            }
+        }
+
+        window.installPrayerDomeApp = async () => {
+            if (!window.PDApp || !PDApp.pwa) return;
+            const installed = await PDApp.pwa.promptInstall();
+            refreshInstallAppUI();
+            if (window.PDApp && PDApp.toast) {
+                PDApp.toast(installed ? 'Installing Prayer Dome…' : 'Install cancelled — you can add it later from your browser menu.', installed ? 'success' : 'info');
+            }
+        };
+
+        document.addEventListener('pd:installready', refreshInstallAppUI);
+        document.addEventListener('pd:installed', refreshInstallAppUI);
+        refreshInstallAppUI();
+        document.addEventListener('DOMContentLoaded', refreshInstallAppUI);
+        window.addEventListener('load', refreshInstallAppUI);
 
         refreshNotifPermissionUI();
         document.addEventListener('DOMContentLoaded', refreshNotifPermissionUI);

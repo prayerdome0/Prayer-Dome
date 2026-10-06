@@ -172,4 +172,96 @@ t('the offline shell exists and is precached',
 const manifestKb = zlib.gzipSync(manifestText, { level: 9 }).length / 1024;
 t(`manifest.json stays small (${manifestKb.toFixed(2)} KB gzip, limit 8 KB)`, manifestKb <= 8);
 
-console.log(`\nPWA contract checks passed (${passed} assertions).`);
+
+/* --------------------------------------------------- install affordance */
+const accountHtml = read('account.html');
+t('the account page offers an install row wired to the shared PWA layer',
+  accountHtml.includes('id="installAppRow"') && accountHtml.includes('installPrayerDomeApp()') &&
+  accountHtml.includes('PDApp.pwa.promptInstall()'));
+t('the install row is hidden until the browser offers the prompt',
+  /id="installAppRow" style="display:none/.test(accountHtml) &&
+  accountHtml.includes("document.addEventListener('pd:installready', refreshInstallAppUI)"));
+t('iOS visitors get the manual “Add to Home Screen” instruction',
+  /Add to Home Screen/.test(accountHtml) && /navigator\.maxTouchPoints/.test(accountHtml));
+t('the row hides itself once the app is installed',
+  accountHtml.includes('PDApp.pwa.installed()') &&
+  accountHtml.includes("document.addEventListener('pd:installed', refreshInstallAppUI)"));
+
+/* --------------------------- finance portal shares the admin session rules */
+const financeHtml = read('finance.html');
+t('the finance portal reuses the shared Firebase session',
+  financeHtml.includes('setPersistence(auth, browserLocalPersistence)'));
+t('finance access is read from memberships/<uid> and users/<uid>',
+  financeHtml.includes('doc(db, "memberships", user.uid)') && financeHtml.includes('doc(db, "users", user.uid)'));
+t('finance access accepts the admin role as well as the finance role',
+  /role === 'finance' \|\| role === 'admin'/.test(financeHtml));
+t('a network failure is not reported as “Access Denied”',
+  financeHtml.includes("'unknown'") && /could not reach Prayer Dome to confirm your finance role/.test(financeHtml) &&
+  financeHtml.includes('recheckFinanceAccess'));
+t('a confirmed finance session is remembered on the device',
+  financeHtml.includes('FINANCE_SESSION_KEY') && financeHtml.includes('readFinanceSession()'));
+t('the retry button exists and is only shown while the check is unresolved',
+  financeHtml.includes('id="accessRetryBtn"') && financeHtml.includes('retry.style.display = blocked'));
+
+/* ------------------------------- install prompt behaviour (jsdom, optional) */
+// Runs the real shared layer and drives a synthetic install prompt, so the
+// account page's “Install app” row is backed by behaviour, not just markup.
+(async () => {
+  let JSDOM;
+  try { ({ JSDOM } = require('jsdom')); }
+  catch (error) {
+    console.log('SKIP  install prompt behaviour needs jsdom — run: npm install --no-save jsdom');
+    return;
+  }
+
+  const dom = new JSDOM(read('index.html'), {
+    url: 'https://prayerdome.net/',
+    runScripts: 'outside-only',
+    pretendToBeVisual: true,
+    beforeParse(window) {
+      window.matchMedia = window.matchMedia || (() => ({
+        matches: false, addListener() {}, removeListener() {},
+        addEventListener() {}, removeEventListener() {}
+      }));
+      window.scrollTo = () => {};
+    }
+  });
+  const { window } = dom;
+  window.eval(read('assets/pd-content-data.js'));
+  window.eval(read('assets/pd-app.js'));
+
+  t('the shared layer exposes the install API',
+    typeof window.PDApp.pwa.promptInstall === 'function' &&
+    typeof window.PDApp.pwa.installed === 'function' &&
+    typeof window.PDApp.pwa.register === 'function');
+  t('nothing is installable before the browser offers the prompt',
+    window.PDApp.pwa.installPrompt() === null);
+  t('promptInstall() resolves false (never throws) when there is no prompt',
+    (await window.PDApp.pwa.promptInstall()) === false);
+
+  let prompted = 0;
+  let readyEvents = 0;
+  window.document.addEventListener('pd:installready', () => { readyEvents += 1; });
+  const installEvent = new window.Event('beforeinstallprompt');
+  installEvent.preventDefault = () => {};
+  installEvent.prompt = () => { prompted += 1; };
+  installEvent.userChoice = Promise.resolve({ outcome: 'accepted' });
+  window.dispatchEvent(installEvent);
+  t('the browser prompt is captured instead of appearing by surprise',
+    !!window.PDApp.pwa.installPrompt() && readyEvents === 1);
+
+  const accepted = await window.PDApp.pwa.promptInstall();
+  t('promptInstall() forwards to the browser prompt and reports acceptance',
+    accepted === true && prompted === 1);
+  t('the captured prompt is cleared once used', window.PDApp.pwa.installPrompt() === null);
+  t('a second promptInstall() resolves false instead of throwing',
+    (await window.PDApp.pwa.promptInstall()) === false);
+
+  window.dispatchEvent(new window.Event('appinstalled'));
+  t('the installed event clears any pending prompt', window.PDApp.pwa.installPrompt() === null);
+  window.close();
+})()
+  .catch((error) => { console.error('FAIL  install prompt behaviour:', error); process.exitCode = 1; })
+  .finally(() => {
+    console.log(`\nPWA contract checks passed (${passed} assertions).`);
+  });
