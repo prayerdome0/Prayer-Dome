@@ -16,7 +16,8 @@ Prayer Dome is a Christian community website for prayer, Bible study, disciplesh
 - **Prayer Wall** — share requests, pray with others and celebrate answered prayer.
 - **Bible** — read Scripture, search passages, write notes and follow reading progress.
 - **Prayer Dome Academy** — lessons, Bible stories, quizzes, resources and completion certificates.
-- **Live Services** — current broadcasts, upcoming services, live conversation and prayer responses.
+- **Faith Journey game** — Bible challenges, memory verses, trivia, badges and streaks, led by **Domey**: a cartoon host who speaks, asks questions and listens to your answers.
+- **Live Services** — current broadcasts, upcoming services, live conversation and prayer responses, plus the **Prayer Lounge**: Domey, a talking cartoon host, greets you out loud, prays with you and reads today's verse while you wait for the service.
 - **Sermons** — teachings and Bible stories with Scripture, reflection, prayer and narration.
 - **Radio and Media** — gospel radio, podcasts, worship video and other Christian content.
 - **News and Events** — ministry updates, Christian news and gathering information.

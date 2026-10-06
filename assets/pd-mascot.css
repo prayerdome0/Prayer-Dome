@@ -1,0 +1,691 @@
+/*!
+ * Prayer Dome — Cartoon Host ("Domey") styles
+ * ---------------------------------------------------------------------------
+ * One shared, self-contained cartoon character used by the Faith Journey game
+ * (game.html) and the Live page waiting room (live.html). Everything here is
+ * drawn with CSS + inline SVG so it works offline, on a cold start, on a slow
+ * phone, and inside the Android WebView without a single image download.
+ *
+ *   .pd-mascot                 root scope (all tokens live here)
+ *   .pdm-stage / .pdm-char     the cartoon stage and the animated character
+ *   .pdm-bubble                speech bubble + captions (aria-live)
+ *   .pdm-chips / .pdm-answer   quick replies and typed answers
+ *   .pdm-bar                   voice / mic / repeat controls
+ *   .pdm-hud                   round + score display
+ *
+ * Character states are set with `data-pdm-state` on the root:
+ *   idle | speaking | listening | thinking | happy | celebrating |
+ *   encouraging | praying
+ *
+ * Motion respects `prefers-reduced-motion`; the character simply stops
+ * animating (expressions and captions still change) for members who ask the
+ * operating system for less movement.
+ */
+
+.pd-mascot {
+  --pdm-skin: #f2c69a;
+  --pdm-skin-shade: #dda878;
+  --pdm-hair: #38251c;
+  --pdm-robe: #0A4D9B;
+  --pdm-robe-deep: #07244d;
+  --pdm-gold: #d4af37;
+  --pdm-gold-soft: #f6df8a;
+  --pdm-ink: #16233b;
+  --pdm-cheek: #f2958c;
+  --pdm-stage-1: #123a6c;
+  --pdm-stage-2: #061a33;
+  --pdm-stage-3: #0A4D9B;
+  --pdm-bubble-bg: #ffffff;
+  --pdm-bubble-fg: #12233c;
+  --pdm-bubble-line: rgba(15, 42, 82, .12);
+  --pdm-surface: rgba(255, 255, 255, .07);
+  --pdm-surface-line: rgba(255, 255, 255, .16);
+  --pdm-surface-fg: #eaf2ff;
+  --pdm-focus: #f0d060;
+
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(180px, 260px) minmax(0, 1fr);
+  gap: clamp(12px, 2.4vw, 26px);
+  align-items: center;
+  width: 100%;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--pdm-surface-fg);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body.dark-mode .pd-mascot,
+html[data-pd-theme="dark"] .pd-mascot {
+  --pdm-stage-1: #0d2a52;
+  --pdm-stage-2: #04101f;
+  --pdm-bubble-bg: #101d33;
+  --pdm-bubble-fg: #eaf2ff;
+  --pdm-bubble-line: rgba(148, 163, 184, .24);
+}
+
+body.light-mode .pd-mascot {
+  --pdm-surface: rgba(10, 77, 155, .06);
+  --pdm-surface-line: rgba(10, 77, 155, .16);
+  --pdm-surface-fg: #12233c;
+  --pdm-bubble-bg: #ffffff;
+  --pdm-bubble-fg: #12233c;
+}
+
+/* ============================== STAGE ==================================== */
+
+.pdm-stage {
+  position: relative;
+  aspect-ratio: 11 / 13;
+  width: 100%;
+  border-radius: 26px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 22%, rgba(212, 175, 55, .35), transparent 62%),
+    linear-gradient(168deg, var(--pdm-stage-1) 0%, var(--pdm-stage-2) 78%);
+  box-shadow: 0 22px 60px rgba(5, 18, 40, .34), inset 0 0 0 1px rgba(255, 255, 255, .07);
+  isolation: isolate;
+}
+
+.pdm-stage::before {
+  /* Curtains: two vertical folds, kept behind the character. */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, rgba(4, 14, 30, .55) 0 10px, rgba(10, 34, 66, .25) 10px 26px),
+    linear-gradient(180deg, rgba(4, 14, 30, .78), transparent 62%);
+  clip-path: polygon(0 0, 22% 0, 16% 100%, 0 100%);
+  opacity: .9;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.pdm-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, rgba(4, 14, 30, .55) 0 10px, rgba(10, 34, 66, .25) 10px 26px),
+    linear-gradient(180deg, rgba(4, 14, 30, .78), transparent 62%);
+  clip-path: polygon(78% 0, 100% 0, 100% 100%, 84% 100%);
+  opacity: .9;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.pdm-floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 26%;
+  background:
+    radial-gradient(ellipse 60% 90% at 50% 0%, rgba(212, 175, 55, .30), transparent 70%),
+    linear-gradient(180deg, rgba(4, 16, 34, .05), rgba(3, 12, 26, .82));
+  z-index: 2;
+}
+
+.pdm-spot {
+  position: absolute;
+  left: 50%;
+  top: -14%;
+  width: 82%;
+  height: 86%;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse 50% 60% at 50% 40%, rgba(255, 236, 176, .30), rgba(255, 236, 176, .06) 55%, transparent 72%);
+  filter: blur(2px);
+  animation: pdm-spot-sway 9s ease-in-out infinite;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.pdm-halo {
+  position: absolute;
+  left: 50%;
+  top: 9%;
+  width: 62%;
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  border: 2px dashed rgba(246, 223, 138, .5);
+  background: radial-gradient(circle at 50% 60%, rgba(246, 223, 138, .22), transparent 68%);
+  animation: pdm-halo-spin 26s linear infinite;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.pdm-listen-ring {
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  width: 46%;
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  border: 3px solid rgba(246, 223, 138, .0);
+  opacity: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.pd-mascot[data-pdm-state="listening"] .pdm-listen-ring {
+  opacity: 1;
+  animation: pdm-ring 1.5s ease-out infinite;
+}
+
+.pdm-hud {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  z-index: 6;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+
+.pdm-hud[hidden] { display: none; }
+
+.pdm-hud-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(4, 16, 34, .62);
+  border: 1px solid rgba(246, 223, 138, .32);
+  color: #f6df8a;
+  backdrop-filter: blur(6px);
+}
+
+.pdm-hud-chip.good { color: #b9f6ca; border-color: rgba(185, 246, 202, .42); }
+.pdm-hud-chip.warn { color: #ffd8a8; border-color: rgba(255, 216, 168, .42); }
+
+.pdm-dots {
+  display: flex;
+  gap: 5px;
+  margin-left: auto;
+}
+
+.pdm-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .26);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18);
+  transition: transform .25s ease, background .25s ease;
+}
+
+.pdm-dot.is-correct { background: #4ade80; transform: scale(1.22); }
+.pdm-dot.is-wrong { background: #fb923c; transform: scale(1.22); }
+.pdm-dot.is-current { background: #f6df8a; animation: pdm-pulse 1.4s ease-in-out infinite; }
+
+/* ============================ CHARACTER ================================== */
+
+.pdm-char-wrap {
+  position: absolute;
+  left: 50%;
+  bottom: 2%;
+  width: 84%;
+  transform: translateX(-50%);
+  z-index: 3;
+  animation: pdm-float 4.4s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+
+.pdm-char {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 16px 26px rgba(3, 11, 24, .42));
+}
+
+.pdm-shadow { fill: rgba(3, 11, 24, .34); animation: pdm-shadow 4.4s ease-in-out infinite; }
+
+.pdm-robe { fill: url(#pdmRobe); }
+.pdm-robe-trim { fill: none; stroke: var(--pdm-gold); stroke-width: 3.5; stroke-linejoin: round; }
+.pdm-sash { fill: var(--pdm-gold); opacity: .92; }
+.pdm-leg { fill: #1b3a63; }
+.pdm-shoe { fill: #101d33; }
+.pdm-skin { fill: var(--pdm-skin); }
+.pdm-skin-shade { fill: var(--pdm-skin-shade); }
+.pdm-hair { fill: var(--pdm-hair); }
+.pdm-face { fill: var(--pdm-skin); }
+.pdm-ear { fill: var(--pdm-skin-shade); }
+.pdm-eye-white { fill: #ffffff; }
+.pdm-pupil { fill: #1b2436; }
+.pdm-glint { fill: #ffffff; opacity: .92; }
+.pdm-lid { fill: var(--pdm-skin); opacity: 0; }
+.pdm-brow { fill: none; stroke: var(--pdm-hair); stroke-width: 5; stroke-linecap: round; }
+.pdm-cheek { fill: var(--pdm-cheek); opacity: .32; }
+.pdm-mouth { fill: none; stroke: #7b2f2a; stroke-width: 5; stroke-linecap: round; }
+.pdm-mouth-fill { fill: #7b2f2a; stroke: none; }
+.pdm-book-cover { fill: #7b2f2a; }
+.pdm-book-page { fill: #fdf6e3; }
+.pdm-book-cross { fill: none; stroke: var(--pdm-gold-soft); stroke-width: 4; stroke-linecap: round; }
+.pdm-emblem { fill: none; stroke: var(--pdm-gold); stroke-width: 3.4; stroke-linecap: round; }
+.pdm-hand { fill: var(--pdm-skin); }
+.pdm-sparkle { fill: var(--pdm-gold-soft); opacity: 0; transform-origin: center; }
+
+.pdm-arm-r,
+.pdm-arm-l { transform-box: fill-box; transform-origin: 84% 10%; }
+.pdm-arm-l { transform-origin: 16% 10%; }
+
+.pdm-head,
+.pdm-hair-group,
+.pdm-brows,
+.pdm-mouths,
+.pdm-eyes { transform-box: fill-box; }
+
+.pdm-head { transform-origin: 50% 90%; }
+
+/* --- expressions: one mouth / brow shape at a time --- */
+.pdm-mouths .pdm-mouth { opacity: 0; transition: opacity .16s ease; }
+.pd-mascot[data-pdm-state="idle"] .pdm-mouth-smile,
+.pd-mascot[data-pdm-state="listening"] .pdm-mouth-smile,
+.pd-mascot[data-pdm-state="happy"] .pdm-mouth-smile,
+.pd-mascot[data-pdm-state="celebrating"] .pdm-mouth-smile,
+.pd-mascot[data-pdm-state="encouraging"] .pdm-mouth-smile { opacity: 1; }
+
+.pd-mascot[data-pdm-state="speaking"] .pdm-mouth-open { opacity: 1; }
+.pd-mascot[data-pdm-state="thinking"] .pdm-mouth-think { opacity: 1; }
+.pd-mascot[data-pdm-state="praying"] .pdm-mouth-pray { opacity: 1; }
+
+.pd-mascot[data-pdm-state="happy"] .pdm-cheek,
+.pd-mascot[data-pdm-state="celebrating"] .pdm-cheek { opacity: .55; }
+
+/* --- speaking: lip-sync flap + a lively little bounce --- */
+.pd-mascot[data-pdm-state="speaking"] .pdm-mouth-open {
+  transform-box: fill-box;
+  transform-origin: 50% 20%;
+  animation: pdm-talk var(--pdm-talk-speed, .17s) steps(2, end) infinite;
+}
+.pd-mascot[data-pdm-state="speaking"] .pdm-head { animation: pdm-head-talk .5s ease-in-out infinite; }
+.pd-mascot[data-pdm-state="speaking"] .pdm-char-wrap { animation: pdm-float-talk 1.1s ease-in-out infinite; }
+
+/* --- thinking: eyes up, one brow raised --- */
+.pd-mascot[data-pdm-state="thinking"] .pdm-eyes { transform: translateY(-3px); }
+.pd-mascot[data-pdm-state="thinking"] .pdm-brow-r { transform: translateY(-4px); }
+.pd-mascot[data-pdm-state="thinking"] .pdm-head { transform: rotate(-3deg); }
+
+/* --- listening: head tilt + brows up, warm attention --- */
+.pd-mascot[data-pdm-state="listening"] .pdm-head { transform: rotate(4deg); }
+.pd-mascot[data-pdm-state="listening"] .pdm-brows { transform: translateY(-3px); }
+.pd-mascot[data-pdm-state="listening"] .pdm-brow-r { transform: translateY(-2px); }
+
+/* --- celebrating: arms up, jump, sparkles --- */
+.pd-mascot[data-pdm-state="celebrating"] .pdm-arm-l { animation: pdm-arm-up-l .6s ease-in-out infinite alternate; }
+.pd-mascot[data-pdm-state="celebrating"] .pdm-arm-r { animation: pdm-arm-up-r .6s ease-in-out infinite alternate; }
+.pd-mascot[data-pdm-state="celebrating"] .pdm-char-wrap { animation: pdm-jump .62s ease-in-out infinite; }
+.pd-mascot[data-pdm-state="celebrating"] .pdm-sparkle { animation: pdm-sparkle 1.05s ease-in-out infinite; }
+.pd-mascot[data-pdm-state="celebrating"] .pdm-sparkle:nth-child(2) { animation-delay: .22s; }
+.pd-mascot[data-pdm-state="celebrating"] .pdm-sparkle:nth-child(3) { animation-delay: .44s; }
+.pd-mascot[data-pdm-state="celebrating"] .pdm-sparkle:nth-child(4) { animation-delay: .66s; }
+
+/* --- happy: gentle wave hello --- */
+.pd-mascot[data-pdm-state="happy"] .pdm-arm-r { animation: pdm-wave .95s ease-in-out infinite; }
+
+/* --- encouraging: soft nod, hand of comfort --- */
+.pd-mascot[data-pdm-state="encouraging"] .pdm-head { animation: pdm-nod 2.6s ease-in-out infinite; }
+.pd-mascot[data-pdm-state="encouraging"] .pdm-arm-l { animation: pdm-comfort 3.2s ease-in-out infinite; }
+
+/* --- praying: hands together, still head --- */
+.pd-mascot[data-pdm-state="praying"] .pdm-arm-l { transform: rotate(-26deg) translate(6px, -2px); }
+.pd-mascot[data-pdm-state="praying"] .pdm-arm-r { transform: rotate(26deg) translate(-6px, -2px); }
+.pd-mascot[data-pdm-state="praying"] .pdm-char-wrap { animation: pdm-float 6s ease-in-out infinite; }
+
+/* --- idle blink loop (all states except closed-eye praying) --- */
+.pdm-eyes .pdm-lid { animation: pdm-blink 5.4s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 0; }
+.pd-mascot[data-pdm-state="praying"] .pdm-eyes .pdm-lid { opacity: 1; animation: none; }
+.pd-mascot[data-pdm-state="celebrating"] .pdm-eyes .pdm-lid { animation-duration: 3.2s; }
+
+/* ============================== BUBBLE =================================== */
+
+.pdm-dialog {
+  position: relative;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pdm-bubble {
+  position: relative;
+  background: var(--pdm-bubble-bg);
+  color: var(--pdm-bubble-fg);
+  border-radius: 20px;
+  padding: 16px 18px;
+  border: 1px solid var(--pdm-bubble-line);
+  box-shadow: 0 16px 40px rgba(6, 22, 46, .18);
+  min-height: 92px;
+}
+
+.pdm-bubble::before {
+  content: '';
+  position: absolute;
+  left: -9px;
+  top: 34px;
+  width: 18px;
+  height: 18px;
+  background: var(--pdm-bubble-bg);
+  border-left: 1px solid var(--pdm-bubble-line);
+  border-bottom: 1px solid var(--pdm-bubble-line);
+  transform: rotate(45deg);
+  border-bottom-left-radius: 5px;
+}
+
+.pdm-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .68rem;
+  font-weight: 900;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--pdm-gold);
+}
+
+.pdm-text {
+  margin: 6px 0 0;
+  font-size: clamp(.98rem, 2.4vw, 1.12rem);
+  line-height: 1.55;
+  font-weight: 500;
+  min-height: 1.55em;
+}
+
+.pdm-text .pdm-word { opacity: 0; transition: opacity .18s ease; }
+.pdm-text .pdm-word.shown { opacity: 1; }
+
+.pdm-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+  font-size: .74rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.pdm-status .pdm-pip {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #94a3b8;
+}
+
+.pd-mascot[data-pdm-state="speaking"] .pdm-status .pdm-pip { background: #22c55e; animation: pdm-pulse 1s ease-in-out infinite; }
+.pd-mascot[data-pdm-state="listening"] .pdm-status .pdm-pip { background: #ef4444; animation: pdm-pulse .8s ease-in-out infinite; }
+.pd-mascot[data-pdm-state="thinking"] .pdm-status .pdm-pip { background: #f59e0b; animation: pdm-pulse 1.2s ease-in-out infinite; }
+
+/* =========================== ANSWER CONTROLS ============================= */
+
+.pdm-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pdm-chip {
+  appearance: none;
+  border: 1.5px solid var(--pdm-surface-line);
+  background: var(--pdm-surface);
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  font-size: .84rem;
+  padding: 10px 15px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform .15s ease, background .2s ease, border-color .2s ease;
+  text-align: left;
+}
+
+.pdm-chip:hover { transform: translateY(-1px); border-color: var(--pdm-gold); }
+.pdm-chip:focus-visible { outline: 3px solid var(--pdm-focus); outline-offset: 2px; }
+.pdm-chip[disabled] { opacity: .5; cursor: default; transform: none; }
+.pdm-chip.is-picked { border-color: var(--pdm-gold); background: rgba(212, 175, 55, .18); }
+.pdm-chip.is-correct { border-color: #22c55e; background: rgba(34, 197, 94, .18); }
+.pdm-chip.is-wrong { border-color: #f97316; background: rgba(249, 115, 22, .16); }
+
+.pdm-answer {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.pdm-answer[hidden] { display: none; }
+
+.pdm-answer input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: .92rem;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--pdm-surface-line);
+  background: var(--pdm-surface);
+  color: inherit;
+}
+
+.pdm-answer input::placeholder { color: #8fa0b8; }
+.pdm-answer input:focus-visible { outline: 3px solid var(--pdm-focus); outline-offset: 1px; }
+
+.pdm-send {
+  appearance: none;
+  border: none;
+  border-radius: 14px;
+  padding: 0 16px;
+  background: linear-gradient(135deg, var(--pdm-gold), #b8941f);
+  color: #201a05;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pdm-send:focus-visible { outline: 3px solid var(--pdm-focus); outline-offset: 2px; }
+
+.pdm-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.pdm-btn {
+  appearance: none;
+  border: 1.5px solid var(--pdm-surface-line);
+  background: var(--pdm-surface);
+  color: inherit;
+  font: inherit;
+  font-size: .8rem;
+  font-weight: 800;
+  padding: 9px 13px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: transform .15s ease, border-color .2s ease, background .2s ease;
+}
+
+.pdm-btn:hover { transform: translateY(-1px); border-color: var(--pdm-gold); }
+.pdm-btn:focus-visible { outline: 3px solid var(--pdm-focus); outline-offset: 2px; }
+.pdm-btn[aria-pressed="true"] { border-color: var(--pdm-gold); background: rgba(212, 175, 55, .2); }
+.pdm-btn[disabled] { opacity: .45; cursor: default; transform: none; }
+.pdm-btn.is-live { border-color: #ef4444; background: rgba(239, 68, 68, .16); color: #ffe4e6; }
+
+.pdm-hint {
+  font-size: .74rem;
+  color: #93a5bd;
+  line-height: 1.5;
+}
+
+.pdm-enable-voice {
+  appearance: none;
+  border: none;
+  width: 100%;
+  border-radius: 16px;
+  padding: 13px 16px;
+  font: inherit;
+  font-weight: 900;
+  font-size: .9rem;
+  cursor: pointer;
+  color: #201a05;
+  background: linear-gradient(120deg, #f6df8a, var(--pdm-gold));
+  box-shadow: 0 12px 26px rgba(212, 175, 55, .28);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pdm-enable-voice[hidden] { display: none; }
+.pd-mascot[data-pdm-state="speaking"] .pdm-enable-voice { box-shadow: 0 0 0 4px rgba(212, 175, 55, .18); }
+
+/* ============================== LAYOUTS ================================== */
+
+/* Compact: character beside a short bubble (used in the Live waiting room). */
+.pd-mascot.pdm-compact { grid-template-columns: minmax(130px, 200px) minmax(0, 1fr); }
+
+/* Stacked: character above the dialogue (phones). */
+@media (max-width: 640px) {
+  .pd-mascot,
+  .pd-mascot.pdm-compact {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    text-align: left;
+  }
+  .pd-mascot .pdm-stage { max-width: 260px; }
+  .pd-mascot .pdm-dialog { width: 100%; }
+  .pdm-bubble::before { display: none; }
+}
+
+/* ============================= KEYFRAMES ================================= */
+
+@keyframes pdm-float {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -7px); }
+}
+@keyframes pdm-float-talk {
+  0%, 100% { transform: translate(-50%, 0) scale(1); }
+  50% { transform: translate(-50%, -5px) scale(1.012); }
+}
+@keyframes pdm-shadow {
+  0%, 100% { transform: scale(1); opacity: .34; }
+  50% { transform: scale(.92); opacity: .24; }
+}
+@keyframes pdm-talk {
+  0% { transform: scaleY(.42) scaleX(.94); }
+  100% { transform: scaleY(1.08) scaleX(1.02); }
+}
+@keyframes pdm-head-talk {
+  0%, 100% { transform: rotate(-1.5deg) translateY(0); }
+  50% { transform: rotate(1.5deg) translateY(-2px); }
+}
+@keyframes pdm-wave {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(34deg); }
+}
+@keyframes pdm-arm-up-l {
+  from { transform: rotate(-8deg); }
+  to { transform: rotate(-58deg); }
+}
+@keyframes pdm-arm-up-r {
+  from { transform: rotate(8deg); }
+  to { transform: rotate(58deg); }
+}
+@keyframes pdm-jump {
+  0%, 100% { transform: translate(-50%, 0) scale(1); }
+  40% { transform: translate(-50%, -18px) scale(1.03); }
+}
+@keyframes pdm-nod {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  30% { transform: rotate(2deg) translateY(3px); }
+  60% { transform: rotate(-1deg) translateY(-2px); }
+}
+@keyframes pdm-comfort {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-16deg); }
+}
+@keyframes pdm-blink {
+  0%, 92%, 100% { opacity: 0; transform: translateY(-2px); }
+  94%, 98% { opacity: 1; transform: translateY(0); }
+}
+@keyframes pdm-sparkle {
+  0% { opacity: 0; transform: scale(.5) rotate(0deg); }
+  45% { opacity: 1; transform: scale(1.15) rotate(16deg); }
+  100% { opacity: 0; transform: scale(.6) rotate(0deg); }
+}
+@keyframes pdm-halo-spin {
+  from { transform: translateX(-50%) rotate(0deg); }
+  to { transform: translateX(-50%) rotate(360deg); }
+}
+@keyframes pdm-spot-sway {
+  0%, 100% { transform: translateX(-50%) rotate(-2deg); opacity: .9; }
+  50% { transform: translateX(-50%) rotate(2deg); opacity: 1; }
+}
+@keyframes pdm-ring {
+  0% { transform: translateX(-50%) scale(.7); border-color: rgba(246, 223, 138, .55); }
+  100% { transform: translateX(-50%) scale(1.25); border-color: rgba(246, 223, 138, 0); }
+}
+@keyframes pdm-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .42; }
+}
+
+/* ============================ OTHER PIECES =============================== */
+
+/* Small "Domey says" strip for pages that only need a nudge, not the stage. */
+.pdm-note {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--pd-grad-glass, rgba(10, 77, 155, .06));
+  border: 1px solid rgba(212, 175, 55, .28);
+  font-size: .86rem;
+  line-height: 1.5;
+}
+
+.pdm-note .pd-i { color: var(--pd-gold, #d4af37); font-size: 1.15rem; margin-top: 2px; }
+
+.pdm-note strong { display: block; font-size: .72rem; letter-spacing: 1px; text-transform: uppercase; color: var(--pd-gold-deep, #a67c00); }
+
+/* Talking badge shown while Domey is listening (mic permission state). */
+.pdm-mic-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .72rem;
+  font-weight: 800;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(239, 68, 68, .14);
+  color: #fecdd3;
+  border: 1px solid rgba(239, 68, 68, .34);
+}
+
+.pdm-mic-badge[hidden] { display: none; }
+
+/* ========================== REDUCED MOTION =============================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .pd-mascot *,
+  .pd-mascot *::before,
+  .pd-mascot *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .05ms !important;
+  }
+  .pdm-char-wrap { animation: none !important; transform: translateX(-50%) !important; }
+  .pd-mascot[data-pdm-state="speaking"] .pdm-mouth-open { opacity: 1 !important; }
+}
