@@ -3,10 +3,9 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "co.median.android.bnlqmnb",
+      "package_name": "co.median.android.qdoxnjx",
       "sha256_cert_fingerprints": [
-        "79:26:05:48:7D:22:58:7F:8A:44:50:CE:97:01:FA:55:22:C3:07:CA:A4:EC:A9:7E:B5:AE:61:D5:4F:3C:43:18",
-        "8B:E6:D7:60:86:D1:75:E0:D4:75:DA:64:4B:E5:A3:D0:5D:8F:B8:92:9E:58:32:3E:94:C6:F7:00:87:A1:6F:B4"
+        "40:9D:FC:AF:E0:C9:6F:71:EF:01:20:3E:92:F6:B3:6C:22:CF:93:70:22:F5:F9:2E:4B:78:DD:8A:92:46:70:E8"
       ]
     }
   }
