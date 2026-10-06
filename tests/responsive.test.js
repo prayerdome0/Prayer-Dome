@@ -61,3 +61,21 @@ assert.match(live, /height:\s*min\(42dvh,\s*360px\)/,
   'Live chat should size to the dynamic viewport while retaining a usable minimum height');
 
 console.log(`Responsive viewport and scroll-safety checks passed for ${htmlFiles.length} HTML pages and all full-screen views.`);
+
+// Mobile polish stays scoped away from full-screen chat/live/admin shells.
+const brand = fs.readFileSync(path.join(ROOT, 'assets/pd-brand.css'), 'utf8');
+const home = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+assert.match(brand, /body\.pd-bottom-nav-page\s*\{\s*padding-bottom:\s*calc\(100px \+ env\(safe-area-inset-bottom/);
+assert.match(brand, /\.pd-challenge-days\s*\{[^}]*grid-auto-columns:\s*132px;[^}]*overflow-x:\s*auto/);
+assert.match(brand, /\.pd-challenge-day-tip\s*\{[^}]*display:\s*block;[^}]*overflow:\s*visible/);
+assert.doesNotMatch(brand, /animation:\s*(ribbonSheen|ringFloat)/);
+assert.match(home, /<button type="button" class="pd-challenge-share"/);
+assert.match(home, /id="challengeDays" tabindex="0" role="region"/);
+assert.equal((home.match(/<footer\b/g) || []).length, 1);
+assert.match(home, /<footer class="pd-footer pd-home-footer">/);
+for (const name of ['index.html', 'ai-prayer.html', 'news.html', 'radio.html']) {
+  const page = fs.readFileSync(path.join(ROOT, name), 'utf8');
+  assert.match(page, /<body class="[^"]*pd-bottom-nav-page/);
+  assert.match(page, /viewport-fit=cover/);
+}
+console.log('Mobile shell, daily-task readability and homepage semantics checks passed.');
