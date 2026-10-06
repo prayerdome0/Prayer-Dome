@@ -105,6 +105,22 @@ jobs:
         working-directory: android
         run: ./gradlew --no-daemon assembleDebug bundleRelease assembleRelease
 
+      - name: Verify the App Bundle carries the upload key Play expects
+        env:
+          PLAY_UPLOAD_KEY_SHA1: ${{ secrets.PLAY_UPLOAD_KEY_SHA1 }}
+        run: |
+          BUNDLE=$(find android/app/build/outputs/bundle/release -name '*.aab' | head -n 1)
+          echo "Bundle: $BUNDLE"
+          if [ -z "${PLAY_UPLOAD_KEY_SHA1:-}" ]; then
+            node scripts/play-signing.mjs --bundle "$BUNDLE" || true
+            echo "PLAY_UPLOAD_KEY_SHA1 secret is not set — the report above is for review only."
+            echo "Add it (SHA-1 of the upload key certificate in Play Console → App integrity)"
+            echo "and this step fails a wrong-key bundle before it reaches Play Console."
+            echo "See mobile/PLAY-UPLOAD-KEY.md."
+          else
+            node scripts/play-signing.mjs --bundle "$BUNDLE" --expect-sha1 "$PLAY_UPLOAD_KEY_SHA1"
+          fi
+
       - name: Upload Android artifacts
         uses: actions/upload-artifact@v4
         with:

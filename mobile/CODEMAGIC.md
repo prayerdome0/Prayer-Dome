@@ -42,6 +42,7 @@ website at the repository root stays the single source of truth.
 | `ANDROID_KEYSTORE_PASSWORD` | signed releases | keystore password |
 | `ANDROID_KEY_ALIAS` | signed releases | key alias |
 | `ANDROID_KEY_PASSWORD` | signed releases | key password |
+| `PLAY_UPLOAD_KEY_SHA1` | wrong-key gate | SHA-1 of the upload key certificate (Play Console → **App integrity → Play app signing**). When set, `android-release` fails a bundle signed with any other key instead of letting Play reject the upload later. Without it the workflow still prints the bundle's fingerprint for review. |
 
 Create the base64 values on any machine:
 
@@ -66,8 +67,11 @@ git push origin v1.2.0
 ```
 
 Codemagic then runs `npm run verify:all`, builds the signed APK/AAB, verifies
-the signatures with `apksigner`/`jarsigner` and attaches both files to the build
-page.
+the signatures with `apksigner`/`jarsigner`, checks the bundle with
+`scripts/play-signing.mjs` against `PLAY_UPLOAD_KEY_SHA1` (the fingerprint of
+the upload key certificate Play has on file) and attaches both files to the
+build page. The "wrong key" failure Play reports for a mismatch is explained in
+**[PLAY-UPLOAD-KEY.md](PLAY-UPLOAD-KEY.md)**.
 
 The Play Console side of the release — listing assets, the policy forms and
 the checklist before the first production upload — is in

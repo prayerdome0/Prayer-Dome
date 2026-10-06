@@ -30,7 +30,10 @@ Bundle is built by CI. This page is the Play Console side of that path —
 
    Keep the keystore and its passwords outside the repository — losing them
    means a new upload key (Play Console → App integrity → Request upload key
-   reset).
+   reset). Play rejects any bundle signed with another key
+   ("Your Android App Bundle is signed with the wrong key");
+   **[PLAY-UPLOAD-KEY.md](PLAY-UPLOAD-KEY.md)** covers the recovery paths, the
+   reset request and the App Links fingerprint that changes with it.
 4. Fill in **Store settings** and the policy forms in section 3 below.
 
 ## 2. Publishing a build
@@ -45,7 +48,18 @@ git tag v1.2.0 && git push origin v1.2.0
 Codemagic runs `npm run verify:all`, builds and signature-checks the signed APK
 and AAB, and attaches both to the build page (`android-release` deliberately
 fails without the keystore secrets, so an unsigned bundle can never be
-published). Upload the `.aab`:
+published). With `PLAY_UPLOAD_KEY_SHA1` set, the release also fails when the
+bundle is signed with a key Play does not have on file.
+
+Check the upload key before handing the file to Play, and again with the
+fingerprint Play lists under **App integrity → Play app signing**:
+
+```sh
+npm run signing:check -- --bundle android/app/build/outputs/bundle/release/app-release.aab \
+  --expect-sha1 <upload key certificate SHA-1 from Play Console>
+```
+
+Upload the `.aab`:
 
 - **Testing → Internal testing → Create new release** for the first smoke test
   with the ministry team (fast review, no production impact),
