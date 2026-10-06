@@ -2918,6 +2918,9 @@ window.toggleDarkMode = function() {
             }
         };
 
+        // Inline handlers run in the global scope, so the gallery controls
+        // (Refresh, status and category filters) must reach this helper.
+        window.loadGallery = loadGallery;
         async function loadGallery() {
             const statusFilter = document.getElementById('galleryStatusFilter')?.value || 'all';
             const categoryFilter = document.getElementById('galleryCategoryFilter')?.value || 'all';

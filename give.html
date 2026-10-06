@@ -791,6 +791,9 @@
         const BASE_CURRENCY = "USD";
 
         // Fetch real-time exchange rates
+        // Inline handlers (onclick="…") are evaluated in the global scope, so the
+        // module-scoped helper must be published on window to stay clickable.
+        window.fetchExchangeRates = fetchExchangeRates;
         async function fetchExchangeRates() {
             const rateDisplay = document.getElementById('rateDisplay');
             const lastUpdatedSpan = document.getElementById('lastUpdated');

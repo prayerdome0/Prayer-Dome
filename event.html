@@ -1310,6 +1310,9 @@
         initializeDefaultEvents();
         loadEvents();
         
+        // Inline handlers (onclick="…") are evaluated in the global scope, so the
+        // module-scoped helper must be published on window to stay clickable.
+        window.loadMyEvents = loadMyEvents;
         async function loadMyEvents() {
     if (!currentUser) {
         document.getElementById('myEventsList').innerHTML = `

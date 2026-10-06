@@ -1391,6 +1391,9 @@
         document.getElementById('testimonyContent').focus();
     }
 
+    // Inline handlers (onclick="…") are evaluated in the global scope, so the
+    // module-scoped helper must be published on window to stay clickable.
+    window.scrollToGrid = scrollToGrid;
     function scrollToGrid() {
         const grid = document.getElementById('testimoniesGrid');
         if (grid) grid.scrollIntoView({ behavior: 'smooth' });
