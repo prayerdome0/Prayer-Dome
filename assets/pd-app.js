@@ -144,6 +144,163 @@
     }, function () {});
   }
 
+  /* ---------------------------------------------------------------- roles
+   * One answer to "which leadership tools does this account get?" for every
+   * page, so an administrator never loses the console to a flicker:
+   *
+   *   • the durable device session the console (pd_admin_session) and the
+   *     finance portal (pd_finance_session) write is read first — a reload, a
+   *     new tab or a short outage keeps the tools in place;
+   *   • Firestore stays the truth: memberships/<uid> first, then users/<uid>
+   *     (the two documents firestore.rules trusts), retried so a flaky
+   *     connection is never mistaken for "not an administrator";
+   *   • only a definite answer drops a remembered role.
+   *
+   *   await PDApp.roles.admin(user)   -> 'admin' | 'none' | 'unknown'
+   *   await PDApp.roles.finance(user) -> 'finance' | 'admin' | 'none' | 'unknown'
+   *   PDApp.roles.remembered(user)    -> 'admin' | 'finance' | null   (no I/O)
+   *   PDApp.roles.watch(user, fn)     -> unsubscribe | null
+   *   PDApp.roles.forget()            -> forget both remembered roles
+   * Each resolution dispatches `pd:role` on document.
+   * --------------------------------------------------------------- */
+  var roles = (function () {
+    var ADMIN_KEY = 'pd_admin_session';
+    var FINANCE_KEY = 'pd_finance_session';
+    var TTL = 7 * 24 * 60 * 60 * 1000; // same window the console and portal keep
+    var LEADERSHIP = { admin: true, finance: true };
+
+    function readSession(key, user) {
+      var session = lsGet(key, null);
+      if (!session || !session.uid || !LEADERSHIP[session.role]) return null;
+      if (user && session.uid !== user.uid) return null;
+      var age = Date.now() - Number(session.timestamp || 0);
+      if (!isFinite(age) || age > TTL) return null;
+      return session;
+    }
+    /* What this device already proved, without asking Firestore. A
+       signed-out visitor has no role on this device, so nothing is kept. */
+    function remembered(user) {
+      if (!user) return null;
+      var session = readSession(ADMIN_KEY, user) || readSession(FINANCE_KEY, user);
+      return session ? session.role : null;
+    }
+    function writeSession(key, version, user, role, source, name) {
+      try {
+        localStorage.setItem(key, JSON.stringify({
+          version: version, uid: user.uid, email: user.email || '',
+          name: name || user.displayName || '', role: role, source: source || '',
+          timestamp: Date.now(), verifiedAt: Date.now(), seenAt: Date.now()
+        }));
+      } catch (e) { /* private window or full storage */ }
+    }
+    function remember(user, role, source, name) {
+      if (!user) return;
+      if (role === 'admin') writeSession(ADMIN_KEY, 2, user, 'admin', source, name);
+      if (role === 'admin' || role === 'finance') writeSession(FINANCE_KEY, 1, user, role, source, name);
+    }
+    function forget() {
+      try { localStorage.removeItem(ADMIN_KEY); } catch (e) {}
+      try { localStorage.removeItem(FINANCE_KEY); } catch (e) {}
+    }
+    function roleFromSnap(snap) {
+      var role = snap && snap.exists() ? (snap.data() || {}).role : '';
+      return LEADERSHIP[role] ? role : '';
+    }
+    function refFor(collectionName, uid) {
+      try { return fb && fb.doc && fb.db ? fb.doc(fb.db, collectionName, uid) : null; }
+      catch (e) { return null; }
+    }
+    /* { status: 'confirmed' | 'unknown' | 'signed-out', role, source } */
+    function readRole(user, attempts) {
+      if (!user) return Promise.resolve({ status: 'signed-out', role: '', source: '' });
+      var membershipRef = refFor('memberships', user.uid);
+      var userRef = refFor('users', user.uid);
+      if (!fb || !fb.getDoc || !membershipRef || !userRef) {
+        return Promise.resolve({ status: 'unknown', role: '', source: '' });
+      }
+      var tries = attempts || 3;
+      var attempt = 0;
+      function once() {
+        return Promise.all([fb.getDoc(membershipRef), fb.getDoc(userRef)]).then(function (snaps) {
+          var byMembership = roleFromSnap(snaps[0]);
+          var byUser = roleFromSnap(snaps[1]);
+          return {
+            status: 'confirmed', role: byMembership || byUser,
+            source: byMembership ? 'memberships' : (byUser ? 'users' : '')
+          };
+        }, function () {
+          attempt += 1;
+          if (attempt >= tries) return { status: 'unknown', role: '', source: '' };
+          return new Promise(function (resolve) { setTimeout(resolve, 500 * attempt); }).then(once);
+        });
+      }
+      return once();
+    }
+    function publish(user, answer, wanted) {
+      var detail = {
+        uid: user ? user.uid : null, role: answer.role, status: answer.status,
+        admin: answer.role === 'admin',
+        finance: answer.role === 'admin' || answer.role === 'finance',
+        source: answer.source,
+        granted: answer.role === 'admin' || answer.role === wanted
+      };
+      try { document.dispatchEvent(new CustomEvent('pd:role', { detail: detail })); } catch (e) {}
+      return detail;
+    }
+    function view(wanted, user, options) {
+      options = options || {};
+      return readRole(user, options.attempts).then(function (answer) {
+        if (answer.status === 'confirmed') {
+          if (answer.role) remember(user, answer.role, answer.source, options.name);
+          else forget(); // Firestore says this account has no leadership role
+        }
+        publish(user, answer, wanted);
+        if (answer.status === 'signed-out') return 'none';
+        if (answer.status !== 'confirmed') return 'unknown';
+        if (answer.role === wanted) return wanted;
+        if (wanted === 'finance' && answer.role === 'admin') return 'admin';
+        return 'none';
+      });
+    }
+    /* Live watch on the membership document: the page hears the moment the
+       role is granted or removed. Returns null when listening is unavailable
+       (the caller can re-check on focus instead). */
+    function watch(user, onChange) {
+      if (!user || !fb || !fb.onSnapshot) return null;
+      var ref = refFor('memberships', user.uid);
+      if (!ref) return null;
+      try {
+        return fb.onSnapshot(ref, function (snap) {
+          var role = roleFromSnap(snap);
+          if (role) {
+            remember(user, role, 'memberships');
+            publish(user, { status: 'confirmed', role: role, source: 'memberships' }, 'admin');
+            if (onChange) onChange(role);
+            return;
+          }
+          // memberships no longer grants a role — users/<uid> may still do so,
+          // and one missing document must never strip the tools on its own.
+          readRole(user, 1).then(function (answer) {
+            if (answer.status === 'confirmed') {
+              if (answer.role) remember(user, answer.role, answer.source);
+              else forget();
+            }
+            if (onChange) onChange(answer.status === 'confirmed' ? (answer.role || 'none') : 'unknown');
+          });
+        }, function () { /* offline — the focus re-check covers it */ });
+      } catch (e) { return null; }
+    }
+    return {
+      admin: function (user, options) { return view('admin', user, options); },
+      finance: function (user, options) { return view('finance', user, options); },
+      remembered: remembered,
+      watch: watch,
+      forget: forget,
+      keys: { admin: ADMIN_KEY, finance: FINANCE_KEY },
+      ttl: TTL
+    };
+  })();
+
   /* ------------------------------------------------------------- storage */
   var store = {
     get: function (key, seedKey) {
@@ -1995,6 +2152,76 @@
       } catch (e) { return Promise.resolve(null); }
     },
     installPrompt: function () { return pwa._deferred; },
+    /* A dismissible "Add Prayer Dome to your home screen" card for pages that
+       reserve the slot with <div data-pd-install-banner></div>. Chrome, Edge
+       and Android offer an install prompt; iOS Safari never does, so the
+       Share → Add to Home Screen step is explained there instead. Dismissing
+       the card is remembered on the device and an installed app never shows
+       it, so a first visit is the only time it asks. */
+    installBanner: function () {
+      var mount = $('[data-pd-install-banner]');
+      if (!mount || mount.dataset.pdInstallBanner === 'ready') return;
+      mount.dataset.pdInstallBanner = 'ready';
+      var DISMISS_KEY = 'pd_install_banner_dismissed';
+      function dismissed() { return lsGet(DISMISS_KEY, false) === true; }
+      function isIOS() {
+        try {
+          return /iPad|iPhone|iPod/.test(navigator.userAgent || '') ||
+            (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1);
+        } catch (e) { return false; }
+      }
+      function hide() { mount.style.display = 'none'; mount.innerHTML = ''; mount.dataset.pdInstallShown = ''; }
+      function dismiss() { lsSet(DISMISS_KEY, true); hide(); }
+      function render() {
+        if (pwa.installed() || dismissed()) { hide(); return; }
+        var deferred = pwa.installPrompt();
+        var ios = isIOS();
+        var mode = deferred ? 'prompt' : (ios ? 'ios' : '');
+        if (!mode) { hide(); return; }
+        if (mount.dataset.pdInstallShown === mode) { mount.style.display = ''; return; }
+        mount.dataset.pdInstallShown = mode;
+        mount.style.display = '';
+        var hint = deferred
+          ? 'One-tap access, offline Bible reading and prayer reminders — right from your home screen.'
+          : 'On iPhone or iPad: tap the Share button, then “Add to Home Screen”.';
+        mount.innerHTML = '<div id="pdInstallCard" role="note" style="display:flex;align-items:center;gap:14px;'
+          + 'flex-wrap:wrap;margin:18px 16px 0;padding:14px 16px;border-radius:18px;'
+          + 'border:1px solid var(--border-color,#e2e8f0);background:linear-gradient(135deg,rgba(10,77,155,.08),rgba(212,175,55,.14));'
+          + 'box-shadow:var(--shadow,0 10px 30px rgba(0,0,0,.05));">'
+          + '<img src="' + BRAND_LOGO + '" alt="" width="40" height="40" style="border-radius:12px;background:#fff;padding:4px;flex-shrink:0;">'
+          + '<div style="flex:1;min-width:170px;"><strong style="display:block;font-weight:700;font-size:.92rem;line-height:1.35;font-family:Poppins,Inter,sans-serif;">'
+          + 'Install the Prayer Dome app</strong><small style="color:var(--text-sub,#64748b);font-size:.76rem;">'
+          + esc(hint) + '</small></div></div>';
+        var card = mount.firstChild;
+        if (deferred) {
+          var install = document.createElement('button');
+          install.type = 'button';
+          install.id = 'pdInstallBtn';
+          install.style.cssText = 'width:auto;padding:10px 18px;border-radius:30px;border:none;cursor:pointer;'
+            + 'background:var(--accent-green,#0A4D9B);color:#fff;font-weight:700;font-size:.8rem;font-family:Inter,sans-serif;';
+          install.innerHTML = '<i class="pd-i pd-i-download"></i> Install app';
+          install.addEventListener('click', function () {
+            pwa.promptInstall().then(function (accepted) {
+              if (accepted) { hide(); toast('Installing Prayer Dome — look for the icon on your home screen.', 'success'); }
+              else { toast('Install cancelled — you can add it any time from your browser menu.', 'info'); }
+            });
+          });
+          card.appendChild(install);
+        }
+        var later = document.createElement('button');
+        later.type = 'button';
+        later.id = 'pdInstallDismiss';
+        later.style.cssText = 'background:none;border:none;cursor:pointer;padding:8px;color:var(--text-sub,#64748b);'
+          + 'font-weight:600;font-size:.78rem;font-family:Inter,sans-serif;';
+        later.textContent = 'Not now';
+        later.addEventListener('click', dismiss);
+        card.appendChild(later);
+      }
+      render();
+      document.addEventListener('pd:installready', render);
+      document.addEventListener('pd:installed', render);
+      window.addEventListener('load', render);
+    },
     promptInstall: function () {
       var deferred = pwa._deferred;
       if (!deferred) return Promise.resolve(false);
@@ -2019,6 +2246,7 @@
           document.dispatchEvent(new CustomEvent('pd:installed'));
         });
       } catch (e) {}
+      pwa.installBanner();
     }
   };
 
@@ -2041,6 +2269,7 @@
     news: news,
     layout: layout,
     pwa: pwa,
+    roles: roles,
     academyNav: academyNav,
     scripture: scripture,
     radio: radio,

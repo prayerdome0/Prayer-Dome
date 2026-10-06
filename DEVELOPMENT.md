@@ -68,6 +68,21 @@ security launch gates and outstanding verification.
   `assets/pd-app.js` (app shell, notifications, i18n), `assets/pd-brand.css`
   (brand system), `assets/pd-icons.css` + `assets/pd-icons.js` (icon system,
   see below) and `assets/pd-motion.js` (reduced-motion-aware animation).
+- **Leadership roles** — `PDApp.roles` (in `assets/pd-app.js`) is the single
+  answer to "is this account an admin or finance?" for every page: it reads the
+  durable device session the admin console and finance portal write
+  (`pd_admin_session`, `pd_finance_session`, 7 days) and confirms it against
+  `memberships/{uid}` and then `users/{uid}` — the two documents
+  `firestore.rules` trusts — with retries. `PDApp.roles.admin(user)` resolves
+  `'admin' | 'none' | 'unknown'`; `'unknown'` (Firestore unreachable) means
+  "keep what the device already proved", so a flaky connection never hides an
+  admin tool or shows a false denial, while a definite answer clears the
+  remembered session. `PDApp.roles.watch(user, fn)` reports a role change live.
+- **Install banner** — a page that reserves `<div data-pd-install-banner></div>`
+  gets the dismissible "Install the Prayer Dome app" card from
+  `PDApp.pwa.installBanner()`: shown when the browser offers an install prompt,
+  replaced by the iOS *Share → Add to Home Screen* hint on Safari, hidden once
+  installed, and never shown twice after "Not now".
 - **Live streaming** — `assets/pd-live-webrtc.js`: WebRTC one-to-many with
   Firestore signaling, TURN relays for carrier NAT, optional WHIP/WHEP media
   server via `assets/pd-live-server-config.js`, Cloudinary rolling recording.

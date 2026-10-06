@@ -1839,9 +1839,19 @@
         let pendingMedia = null;
         let isRecording = false;
         let isAdmin = false;
+        let adminRoleConfirmed = false;   // Firestore has answered for this session
+        let adminRoleUnsubscribe = null;
+        let lastRenderedMessages = [];
         let typingTimeout = null;
         let currentStatusId = null;
         let callPeer = null, activeCall = null, callStream = null;
+
+        // Hand Firestore to the shared app layer so PDApp.roles can confirm the
+        // administrator role from the same two documents every other page
+        // uses (memberships/<uid>, then users/<uid>).
+        if (window.PDApp && PDApp.setFirestore) {
+            PDApp.setFirestore({ db, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, orderBy, getDocs, onSnapshot, serverTimestamp, auth });
+        }
 
         function initCallPeer() {
             if (!window.Peer || !currentUser || callPeer) return;
@@ -1917,6 +1927,10 @@
             if (user) {
                 currentUser = user;
                 initCallPeer();
+                // Paint the role this device already proved, then let Firestore
+                // confirm it below — the moderation tools never blink.
+                adminRoleConfirmed = false;
+                if (window.PDApp && PDApp.roles) applyAdminRole(PDApp.roles.remembered(user) || 'none');
                 await checkAdminStatus();
                 await loadUserProfile();
                 await loadPrivateChats();
@@ -1930,22 +1944,92 @@
                 // Set up presence listener
                 setInterval(() => updateUserOnlineStatus(true), 30000);
             } else {
+                // A signed-out visitor no longer has a role on this device.
+                if (adminRoleUnsubscribe) { adminRoleUnsubscribe(); adminRoleUnsubscribe = null; }
+                if (currentUser && window.PDApp && PDApp.roles) PDApp.roles.forget();
+                currentUser = null;
+                isAdmin = false;
                 window.location.href = 'account.html';
             }
         });
-        
-        async function checkAdminStatus() {
-            try {
-                const memberDoc = await getDoc(doc(db, "memberships", currentUser.uid));
-                isAdmin = memberDoc.exists() && (memberDoc.data().role === 'admin');
-                if (isAdmin) {
-                    const actionsDiv = document.getElementById('chatActions');
-                    if (actionsDiv) {
-                        actionsDiv.insertAdjacentHTML('beforeend', '<button class="header-btn" onclick="showAdminPanel()" style="background: var(--accent-gold); color: black;"><i class="pd-i pd-i-shield"></i> Admin</button>');
-                    }
+
+        /* Moderation tools follow the shared role layer (PDApp.roles).
+         *
+         * A single Firestore read used to decide this: a hiccup removed the
+         * Admin button and every Delete action, and a reload asked again even
+         * though this device had already been verified. The role is now read
+         * from the durable session first (the same one the admin console
+         * writes, good for 7 days) and confirmed against memberships/<uid>
+         * then users/<uid> with retries, so moderation survives a slow
+         * connection while a revoked role still removes it at once. */
+        function applyAdminRole(role) {
+            const next = role === 'admin';
+            const changed = isAdmin !== next;
+            isAdmin = next;
+            const actionsDiv = document.getElementById('chatActions');
+            if (actionsDiv) {
+                const existing = document.getElementById('chatAdminBtn');
+                if (isAdmin && !existing) {
+                    const button = document.createElement('button');
+                    button.className = 'header-btn';
+                    button.id = 'chatAdminBtn';
+                    button.title = 'Admin tools';
+                    button.style.background = 'var(--accent-gold)';
+                    button.style.color = 'black';
+                    button.innerHTML = '<i class="pd-i pd-i-shield"></i> Admin';
+                    button.addEventListener('click', () => window.showAdminPanel());
+                    actionsDiv.appendChild(button);
+                } else if (!isAdmin && existing) {
+                    existing.remove();
                 }
-            } catch(e) { console.error(e); }
+            }
+            if (changed && lastRenderedMessages.length) renderMessages(lastRenderedMessages);
         }
+
+        async function checkAdminStatus() {
+            const user = currentUser;
+            if (!user || !window.PDApp || !PDApp.roles) return;
+            const status = await PDApp.roles.admin(user);
+            if (currentUser !== user) return; // signed out while checking
+            if (status === 'unknown') {
+                // Firestore is unreachable: keep whatever this device proved
+                // before and try again when the tab comes back into focus.
+                applyAdminRole(PDApp.roles.remembered(user) || 'none');
+            } else {
+                adminRoleConfirmed = true;
+                applyAdminRole(status);
+            }
+            watchAdminRole(user);
+        }
+
+        function watchAdminRole(user) {
+            if (adminRoleUnsubscribe) { adminRoleUnsubscribe(); adminRoleUnsubscribe = null; }
+            if (!user || !window.PDApp || !PDApp.roles) return;
+            adminRoleUnsubscribe = PDApp.roles.watch(user, (role) => {
+                if (currentUser !== user || role === 'unknown') return;
+                adminRoleConfirmed = true;
+                applyAdminRole(role);
+            });
+        }
+
+        function refreshAdminRole() {
+            if (!currentUser || adminRoleConfirmed) return;
+            checkAdminStatus();
+        }
+        window.addEventListener('focus', refreshAdminRole);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') refreshAdminRole();
+        });
+        // Another tab signing in (or out) of the console must move these tools
+        // with it instead of waiting for a reload.
+        window.addEventListener('storage', (event) => {
+            if (event.key !== 'pd_admin_session' || !currentUser || !window.PDApp || !PDApp.roles) return;
+            // Paint from the session the other tab just wrote, then confirm it
+            // with Firestore so a stale removal cannot hide the tools.
+            applyAdminRole(PDApp.roles.remembered(currentUser) || 'none');
+            adminRoleConfirmed = false;
+            checkAdminStatus();
+        });
         
         window.showAdminPanel = () => {
             alert("Admin Panel\n\nFeatures:\n• Delete any message (long press)\n• Remove users\n• Moderate chat rooms");
@@ -2142,6 +2226,9 @@
             messagesUnsubscribe = onSnapshot(q, (snapshot) => {
                 const messages = [];
                 snapshot.forEach(doc => messages.push({ id: doc.id, ...doc.data() }));
+                // Kept so a role change can re-paint the Delete badges without
+                // waiting for the next incoming message.
+                lastRenderedMessages = messages;
                 renderMessages(messages);
                 
                 // Mark messages as delivered
@@ -2317,7 +2404,10 @@
         };
         
         window.deleteMessage = async (messageId) => {
-            if (!isAdmin && !confirm("Delete this message?")) return;
+            // Moderation is administrator-only (the badge is only rendered for
+            // admins, and firestore.rules only let an admin delete).
+            if (!isAdmin) { showToast("Only administrators can delete messages", "error"); return; }
+            if (!confirm("Delete this message?")) return;
             const collectionPath = currentChatType === 'group' ? `groupMessages_${currentRoom}` : `privateMessages_${currentRoom}`;
             await deleteDoc(doc(db, collectionPath, currentRoom, "messages", messageId));
             showToast("Message deleted", "success");
@@ -3269,7 +3359,7 @@
             const newest=messages[messages.length-1];
             if(newest && newest.userId!==currentUser.uid && !newest._notified){
               newest._notified=true;
-              if(Notification && Notification.permission==='granted' && document.hidden){
+              if(window.Notification && Notification.permission==='granted' && document.hidden){
                 new Notification(newest.userName||'New message', {body: newest.text?.slice(0,80)||'New message in '+currentRoom, icon:'/assets/logo.png'});
               }
               // sound

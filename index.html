@@ -633,6 +633,12 @@
     </div>
 </div>
 
+<!-- Install prompt. assets/pd-app.js fills this the moment the browser offers
+     an install prompt (Chrome/Edge/Android) or explains the iOS Share → Add to
+     Home Screen step; dismissing it is remembered on the device, so only a
+     first visit asks. -->
+<div data-pd-install-banner></div>
+
 <main>
     <!-- Featured Scripture — Mark 7:37 (permanent theme) -->
     <section style="margin: 26px 16px 0;" data-pd-scripture aria-label="Featured scripture"></section>
@@ -1431,26 +1437,42 @@
 
     // ==================== AUTH AND ROLE CHECKS ====================
     
+    // Admin and Finance links follow the role this device proved (the shared
+    // durable session) and then the role Firestore reports — memberships/<uid>
+    // first, then users/<uid>, retried. A slow connection therefore never
+    // hides a leader's own shortcuts.
+    function applyLeadership(role) {
+        const isAdmin = role === 'admin';
+        const isFinance = isAdmin || role === 'finance';
+        const navBar = document.getElementById('mainNavBar');
+        const existingAdminLink = document.getElementById('nav-admin-link');
+        if (isAdmin && !existingAdminLink && navBar) {
+            const adminLink = document.createElement('a');
+            adminLink.href = "admin.html";
+            adminLink.id = "nav-admin-link";
+            adminLink.className = "nav-link";
+            adminLink.innerHTML = '<i class="pd-i pd-i-shield" style="color:var(--accent-red);"></i><span style="color:var(--accent-red);">Admin</span>';
+            navBar.appendChild(adminLink);
+        } else if (!isAdmin && existingAdminLink) {
+            existingAdminLink.remove();
+        }
+        const btnAdmin = document.getElementById('btn-admin');
+        if (btnAdmin) btnAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
+        const btnFinance = document.getElementById('btn-finance');
+        if (btnFinance) btnFinance.style.display = isFinance ? 'inline-flex' : 'none';
+    }
+
     async function checkAndShowAdminTab(user) {
         if (!user) return;
-        try {
-            const memberDoc = await getDoc(doc(db, "memberships", user.uid));
-            const isAdmin = memberDoc.data()?.role === 'admin';
-            const navBar = document.getElementById('mainNavBar');
-            const existingAdminLink = document.getElementById('nav-admin-link');
-            if (isAdmin && !existingAdminLink) {
-                const adminLink = document.createElement('a');
-                adminLink.href = "admin.html";
-                adminLink.id = "nav-admin-link";
-                adminLink.className = "nav-link";
-                adminLink.innerHTML = '<i class="pd-i pd-i-shield" style="color:var(--accent-red);"></i><span style="color:var(--accent-red);">Admin</span>';
-                navBar.appendChild(adminLink);
-                const btnAdmin = document.getElementById('btn-admin');
-                if (btnAdmin) btnAdmin.style.display = 'inline-flex';
-            }
-            const btnFinance = document.getElementById('btn-finance');
-            if (btnFinance && (memberDoc.data()?.role === 'finance' || isAdmin)) btnFinance.style.display = 'inline-flex';
-        } catch (error) { console.error("Error checking admin status:", error); }
+        if (!window.PDApp || !PDApp.roles) return;
+        // Paint from the remembered session, then let Firestore confirm it.
+        applyLeadership(PDApp.roles.remembered(user) || 'none');
+        const role = await PDApp.roles.finance(user);
+        if (role === 'unknown') return; // unreachable Firestore keeps the remembered view
+        applyLeadership(role);
+        PDApp.roles.watch(user, (watched) => {
+            if (watched !== 'unknown') applyLeadership(watched);
+        });
     }
 
     // ==================== UTILITY FUNCTIONS ====================
@@ -1632,7 +1654,10 @@
             // the phone even when Prayer Dome is closed.
             window.PD_UID = user.uid;
             if (window.PDApp) PDApp.notifications.registerDevice(user.uid);
-            await checkAndShowAdminTab(user);
+            // Not awaited: the links are painted from the remembered role at
+            // once and Firestore confirms in the background, so a slow role
+            // check never delays the rest of the home page.
+            checkAndShowAdminTab(user);
             await loadNotifications();
             if (window.PDChallenge && PDChallenge.weekKey) PDChallenge.syncFromCloud();
         }

@@ -187,6 +187,16 @@ t('the row hides itself once the app is installed',
   accountHtml.includes('PDApp.pwa.installed()') &&
   accountHtml.includes("document.addEventListener('pd:installed', refreshInstallAppUI)"));
 
+/* --------------------------------------------------- home-page install banner */
+const indexHtml = read('index.html');
+t('the home page reserves the install-banner slot',
+  indexHtml.includes('<div data-pd-install-banner></div>'));
+t('the shared layer renders the banner and remembers a dismissal',
+  appJs.includes('installBanner: function') && appJs.includes('pd_install_banner_dismissed') &&
+  appJs.includes("addEventListener('pd:installready', render)"));
+t('iOS visitors are told the manual “Add to Home Screen” step instead of a button',
+  appJs.includes('On iPhone or iPad: tap the Share button, then “Add to Home Screen”.'));
+
 /* --------------------------- finance portal shares the admin session rules */
 const financeHtml = read('finance.html');
 t('the finance portal reuses the shared Firebase session',
@@ -239,6 +249,11 @@ t('the retry button exists and is only shown while the check is unresolved',
   t('promptInstall() resolves false (never throws) when there is no prompt',
     (await window.PDApp.pwa.promptInstall()) === false);
 
+  const bannerButton = () => window.document.getElementById('pdInstallBtn');
+  t('the install banner stays hidden until the browser offers the prompt',
+    !!window.document.querySelector('[data-pd-install-banner]') &&
+    !bannerButton() && !window.document.getElementById('pdInstallDismiss'));
+
   let prompted = 0;
   let readyEvents = 0;
   window.document.addEventListener('pd:installready', () => { readyEvents += 1; });
@@ -249,16 +264,47 @@ t('the retry button exists and is only shown while the check is unresolved',
   window.dispatchEvent(installEvent);
   t('the browser prompt is captured instead of appearing by surprise',
     !!window.PDApp.pwa.installPrompt() && readyEvents === 1);
+  t('the install banner appears with an Install button once the prompt exists',
+    !!bannerButton() && !!window.document.getElementById('pdInstallDismiss'));
 
+  bannerButton().click();
+  await new Promise((resolve) => setTimeout(resolve, 30));
+  t('the banner Install button forwards to the browser prompt and reports acceptance',
+    prompted === 1 && !bannerButton());
+
+  // A fresh prompt so the API path is covered directly as well.
+  const secondPrompt = new window.Event('beforeinstallprompt');
+  secondPrompt.preventDefault = () => {};
+  secondPrompt.prompt = () => { prompted += 1; };
+  secondPrompt.userChoice = Promise.resolve({ outcome: 'accepted' });
+  window.dispatchEvent(secondPrompt);
   const accepted = await window.PDApp.pwa.promptInstall();
   t('promptInstall() forwards to the browser prompt and reports acceptance',
-    accepted === true && prompted === 1);
+    accepted === true && prompted === 2);
   t('the captured prompt is cleared once used', window.PDApp.pwa.installPrompt() === null);
   t('a second promptInstall() resolves false instead of throwing',
     (await window.PDApp.pwa.promptInstall()) === false);
 
+  // “Not now” must be remembered, so a first visit is the last time it asks.
+  const thirdPrompt = new window.Event('beforeinstallprompt');
+  thirdPrompt.preventDefault = () => {};
+  thirdPrompt.prompt = () => {};
+  thirdPrompt.userChoice = Promise.resolve({ outcome: 'dismissed' });
+  window.dispatchEvent(thirdPrompt);
+  t('a later prompt brings the banner back until it is dismissed', !!bannerButton());
+  window.document.getElementById('pdInstallDismiss').click();
+  t('“Not now” hides the banner and remembers the choice',
+    !bannerButton() && window.localStorage.getItem('pd_install_banner_dismissed') === 'true');
+  const fourthPrompt = new window.Event('beforeinstallprompt');
+  fourthPrompt.preventDefault = () => {};
+  fourthPrompt.prompt = () => {};
+  fourthPrompt.userChoice = Promise.resolve({ outcome: 'accepted' });
+  window.dispatchEvent(fourthPrompt);
+  t('a dismissed visitor is not asked again', !bannerButton());
+
   window.dispatchEvent(new window.Event('appinstalled'));
   t('the installed event clears any pending prompt', window.PDApp.pwa.installPrompt() === null);
+  t('installing the app removes the banner for good', !bannerButton());
   window.close();
 })()
   .catch((error) => { console.error('FAIL  install prompt behaviour:', error); process.exitCode = 1; })
