@@ -96,6 +96,11 @@ function invoke(modulePath, method = 'GET') {
   test('the Vercel bundle contains PWA and SEO files',
     ['manifest.json', 'sw.js', 'firebase-messaging-sw.js', 'robots.txt', 'sitemap.xml']
       .every(name => fs.existsSync(path.join(output, name))));
+  test('the Vercel bundle contains the Android assetlinks verification file',
+    fs.existsSync(path.join(output, '.well-known', 'assetlinks.json')));
+  test('Vercel serves assetlinks.json as JSON',
+    (config.headers || []).some(rule => rule.source === '/.well-known/assetlinks.json' &&
+      rule.headers.some(header => header.key === 'Content-Type' && header.value === 'application/json')));
   test('private repository files are not published',
     ['README.md', 'package.json', 'firebase.json', 'firestore.rules', 'tests', 'android', 'scripts']
       .every(name => !fs.existsSync(path.join(output, name))));
