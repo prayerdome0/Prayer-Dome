@@ -97,6 +97,31 @@ security launch gates and outstanding verification.
 - **Live streaming** — `assets/pd-live-webrtc.js`: WebRTC one-to-many with
   Firestore signaling, TURN relays for carrier NAT, optional WHIP/WHEP media
   server via `assets/pd-live-server-config.js`, Cloudinary rolling recording.
+  A viewer of an *encoder* broadcast (OBS, Larix, a WHIP server — anything with
+  `source` other than `webrtc`) does not offer a WebRTC call that nobody will
+  answer: `Viewer.waitForBroadcast()` watches for the HLS playlist and starts
+  playing by itself the moment the encoder publishes, and `live.html` says so
+  on screen instead of leaving a black player. The admin console stamps
+  `liveStatus.updatedAt` while an external broadcast is running, which is what
+  lets the member page tell "still running" apart from "left behind" and offer
+  the lounge instead of a dead stream.
+  Signaling listeners must never be ordered: Firestore's `orderBy()` also
+  filters for the field's existence, so an ordered `join` listener made the
+  broadcaster blind to every member who joined (the watch document carried
+  `joinedAt`, not `createdAt`) and the live video never started. `Signal.onCol`
+  therefore subscribes to the collection directly, every signaling write stamps
+  `createdAt` for older installed clients, and each viewer join clears its own
+  stale ICE candidates so a second connection in the same tab starts clean.
+- **Cartoon host (Domey)** — `assets/pd-mascot.js` + `assets/pd-mascot.css`:
+  one shared character that greets members out loud, asks questions and listens
+  to the answers. It is drawn entirely with inline SVG (no image downloads),
+  speaks through `speechSynthesis`, listens through `SpeechRecognition`, and
+  synthesises every sound with WebAudio. Answers can always be spoken, tapped
+  or typed, captions play even when the browser blocks autoplay, and
+  `stop()`/`destroy()` cancel every pending utterance, question and timer.
+  `game.html` uses it as the *Talk with Domey* Bible show (XP, badges, streak
+  strip); `live.html` uses it as the Prayer Lounge that takes a prayer request
+  while the member waits for the next service.
 - **Uploads** — `assets/pd-upload.js`: native device picker → preview →
   background upload with progress/retry to the ministry's media buckets.
 - **Certificates** — `assets/pd-certificate.js` renders certificates on

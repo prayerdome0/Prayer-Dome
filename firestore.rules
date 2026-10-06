@@ -118,6 +118,21 @@ service cloud.firestore {
     // chat mirror, events, viewer presence). Public read/write because
     // viewer identity is not required to watch, and the data is transient
     // (admin wipes stale signals on start; next broadcast overwrites).
+    //
+    // A signed-out viewer must also be able to clear its own presence and
+    // per-viewer signaling documents when it leaves the page: without this a
+    // guest's seat stayed in "watching now" for ever, and a stale offer was
+    // replayed to the next broadcast. The docs created here are per-viewer and
+    // already world-writable, so removing them grants nothing new.
+    match /liveSignals/{liveId}/viewers/{viewerId}/{document=**} {
+      allow read, create, update, delete: if true;
+    }
+    match /liveSignals/{liveId}/viewers/{viewerId} {
+      allow read, create, update, delete: if true;
+    }
+    match /liveSignals/{liveId}/join/{viewerId} {
+      allow read, create, update, delete: if true;
+    }
     match /liveSignals/{liveId}/{document=**} {
       allow read: if true;
       allow create: if true;

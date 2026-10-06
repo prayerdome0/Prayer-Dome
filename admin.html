@@ -3896,6 +3896,7 @@ window.toggleDarkMode = function() {
         let crCommentsEnabled = true;
         let crChatMessages = []; // cache for moderation
         let crLiveDuration = 0;
+        let crHeartbeatInterval = null;
 
         function $(id) { return document.getElementById(id); }
 
@@ -4101,6 +4102,23 @@ window.toggleDarkMode = function() {
             if (crReactionUnsub) { crReactionUnsub(); crReactionUnsub = null; }
             if (crViewerUnsub) { crViewerUnsub(); crViewerUnsub = null; }
             if (crTimerInterval) { clearInterval(crTimerInterval); crTimerInterval = null; }
+            if (crHeartbeatInterval) { clearInterval(crHeartbeatInterval); crHeartbeatInterval = null; }
+        }
+
+        /* External (OBS / Larix / RTMP) broadcasts have no device stream keeping
+           time for them, so the live document is stamped while this console is
+           open. That timestamp is what lets the member page tell "the service is
+           still running" apart from "an old broadcast left behind", instead of
+           showing a dead player for ever. */
+        function startCRHeartbeat() {
+            if (crHeartbeatInterval) return;
+            const beat = () => {
+                if (!currentLiveData || !currentLiveData.isLive) return;
+                if ((currentLiveData.source || '') === 'webrtc') return;   // the broadcaster stamps its own
+                updateDoc(doc(db, 'liveStatus', 'current'), { updatedAt: Date.now() }).catch(() => {});
+            };
+            beat();
+            crHeartbeatInterval = setInterval(beat, 45000);
         }
 
         function startCRSubscriptions() {
@@ -4540,6 +4558,8 @@ window.toggleDarkMode = function() {
                 }).catch(()=>{});
 
                 await logAdminActivity('live_started_rtmp', { title, streamId });
+                currentLiveData = { isLive: true, source: 'admin-dashboard', title, startedBy: adminUser.email || adminUser.uid };
+                startCRHeartbeat();
                 hideRTMPanel();
                 // Show stream info in the panel for copying
                 showRTMPanel();

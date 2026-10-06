@@ -166,6 +166,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
+    <!-- Domey, the talking cartoon host for the Prayer Lounge waiting room. -->
+    <link rel="stylesheet" href="/assets/pd-mascot.css">
+    <script src="/assets/pd-mascot.js" defer></script>
+    <script src="/assets/pd-verse-data.js" defer></script>
+
     <style>
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         :root {
@@ -220,6 +225,30 @@
         .offline-hero h1 { font-family:'Poppins',serif; font-size:1.6rem; margin-bottom:8px; position:relative; z-index:1; }
         .offline-hero p { opacity:.9; font-size:.9rem; max-width:440px; margin:0 auto; position:relative; z-index:1; }
 
+        /* ===== PRAYER LOUNGE (cartoon host between services) ===== */
+        .pdm-lounge-card {
+            background:linear-gradient(155deg, #07244d 0%, #0A4D9B 62%, #0a3d7a 100%);
+            border-radius:22px; padding:clamp(14px,2.4vw,22px); color:#fff;
+            box-shadow:var(--shadow); border:1px solid rgba(212,175,55,.28);
+        }
+        .pdm-lounge-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; }
+        .pdm-lounge-actions .action-chip { background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.18); color:#eaf2ff; }
+        .pdm-lounge-actions .action-chip.gold { background:var(--pd-gold); border-color:var(--pd-gold); color:#201a05; }
+        .pdm-lounge-note { margin-top:12px; font-size:.78rem; color:#c7d7ee; line-height:1.55; }
+        .pdm-lounge-note .pd-i { color:var(--pd-gold); }
+
+        /* Waiting for a broadcast that is announced but not streaming yet. */
+        .waiting-banner {
+            display:none; align-items:center; gap:12px;
+            background:linear-gradient(135deg, rgba(212,175,55,.18), rgba(10,77,155,.10));
+            border:1px solid rgba(212,175,55,.45); border-radius:18px; padding:14px 16px;
+        }
+        .waiting-banner.show { display:flex; }
+        .waiting-banner > .pd-i { font-size:1.5rem; color:var(--pd-gold); }
+        .waiting-banner strong { display:block; font-size:.9rem; }
+        .waiting-banner small { color:var(--text-dim); font-size:.78rem; line-height:1.5; }
+        .waiting-banner .action-chip { margin-left:auto; }
+
         /* ===== PLAYER LAYOUT ===== */
         .live-layout { flex:1; min-width:0; min-height:0; display:grid; grid-template-columns:minmax(0,1fr) 360px; overflow:hidden; }
         @media (max-width:860px) {
@@ -254,6 +283,15 @@
         .unreachable-box i { font-size:2rem; color:var(--pd-gold); }
         .unreachable-box p { font-size:.9rem; color:#dbe7f7; max-width:340px; }
         .unreachable-box button { background:var(--pd-gold); border:0; color:#07244d; font-weight:800; padding:11px 26px; border-radius:50px; font-size:.88rem; cursor:pointer; }
+        /* Waiting for the stream: the page never shows a dead player. */
+        .player-waiting { position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; gap:12px; background:linear-gradient(160deg, rgba(2,10,26,.94), rgba(10,77,155,.86)); color:#fff; text-align:center; padding:22px; z-index:8; }
+        .player-waiting.show { display:flex; }
+        .player-waiting .pd-i { font-size:2.2rem; color:var(--pd-gold); }
+        .player-waiting strong { font-size:1rem; }
+        .player-waiting p { font-size:.84rem; color:#cbd9ef; max-width:360px; line-height:1.55; }
+        .player-waiting .row { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+        .player-waiting .row button { border:0; cursor:pointer; font-family:inherit; font-weight:800; font-size:.82rem; padding:10px 18px; border-radius:50px; background:var(--pd-gold); color:#07244d; display:inline-flex; align-items:center; gap:7px; }
+        .player-waiting .row button.ghost { background:rgba(255,255,255,.12); color:#eaf2ff; }
         @keyframes spin { to { transform:rotate(360deg); } }
         .viewer-count-badge { position:absolute; top:12px; right:12px; background:rgba(0,0,0,.6); color:#fff; padding:6px 12px; border-radius:20px; font-size:.75rem; font-weight:800; display:flex; align-items:center; gap:7px; backdrop-filter:blur(8px); }
         .reactions-layer { position:absolute; bottom:70px; left:0; right:0; height:200px; pointer-events:none; overflow:hidden; }
@@ -424,6 +462,16 @@
 
 <!-- OFFLINE STATE (default shown) -->
 <div class="offline" id="offlineView">
+    <!-- Shown when a broadcast is announced but has not reached this device yet. -->
+    <div class="waiting-banner" id="waitingBanner" role="status">
+        <i class="pd-i pd-i-satellite-dish pd-i-spin" aria-hidden="true"></i>
+        <div>
+            <strong id="waitingBannerTitle">The service is starting</strong>
+            <small id="waitingBannerText">We are waiting for the broadcast to come through. This page updates by itself the moment it arrives.</small>
+        </div>
+        <button class="action-chip gold" type="button" onclick="retryPlayback()"><i class="pd-i pd-i-refresh-cw"></i> Try again</button>
+    </div>
+
     <div class="offline-hero">
         <i class="pd-i pd-i-radio"></i>
         <h1>No Live Broadcast Right Now</h1>
@@ -433,6 +481,22 @@
             <a href="/sermons.html" class="action-chip"><i class="pd-i pd-i-mic"></i> Sermons</a>
         </div>
     </div>
+
+    <!-- PRAYER LOUNGE — Domey the cartoon host keeps the page alive -->
+    <div class="section" style="padding:0;">
+        <div class="section-title"><i class="pd-i pd-i-mic-vocal" style="color:var(--pd-gold);"></i> Prayer Lounge with Domey</div>
+        <div class="pdm-lounge-card">
+            <div id="liveDomeyStage" aria-label="Domey, the Prayer Dome cartoon host"></div>
+            <div class="pdm-lounge-actions">
+                <button class="action-chip gold" id="domeyTalkBtn" type="button"><i class="pd-i pd-i-play"></i> Talk with Domey</button>
+                <button class="action-chip" id="domeyPrayBtn" type="button"><i class="pd-i pd-i-hands-praying"></i> Pray with me</button>
+                <button class="action-chip" id="domeyVerseBtn" type="button"><i class="pd-i pd-i-book-open"></i> Verse for today</button>
+                <button class="action-chip" id="domeyStopBtn" type="button"><i class="pd-i pd-i-square"></i> Stop</button>
+            </div>
+            <p class="pdm-lounge-note"><i class="pd-i pd-i-sparkles"></i> Domey is a real talking host: he greets you out loud, prays with you, reads today's verse, and listens when you answer. Tap the microphone button to speak your answer instead of typing it.</p>
+        </div>
+    </div>
+
     <div class="section" style="padding:0; margin-top:8px;">
         <div class="section-title"><i class="pd-i pd-i-calendar-clock" style="color:var(--pd-gold);"></i> Upcoming Lives</div>
         <div id="upcomingList"></div>
@@ -467,6 +531,18 @@
                         <p>Your connection to the live stream was interrupted. Check your internet and try again.</p>
                     </div>
                     <button onclick="retryLive()"><i class="pd-i pd-i-rotate-cw"></i> Try Again</button>
+                </div>
+                <!-- Never leave a black player on screen: while we wait for the
+                     stream we explain, keep retrying and offer real actions. -->
+                <div class="player-waiting" id="playerWaiting" role="status">
+                    <i class="pd-i pd-i-satellite-dish pd-i-spin" aria-hidden="true"></i>
+                    <strong id="playerWaitingTitle">Connecting you to the service…</strong>
+                    <p id="playerWaitingText">The service is live and we are bringing the stream to your phone. This usually takes a few seconds.</p>
+                    <div class="row">
+                        <button type="button" onclick="retryPlayback()"><i class="pd-i pd-i-refresh-cw"></i> Try again now</button>
+                        <button type="button" class="ghost" onclick="watchLastService()"><i class="pd-i pd-i-circle-play"></i> Watch last service</button>
+                        <button type="button" class="ghost" onclick="showPrayerLounge()"><i class="pd-i pd-i-hands-praying"></i> Pray while I wait</button>
+                    </div>
                 </div>
                 <div class="connection-pill good" id="connectionPill"><span class="dot"></span> <span id="connectionText">Connection: Good</span></div>
                 <div class="duration-pill" id="durationPill">00:00</div>
@@ -630,6 +706,12 @@
     let liveUnsub = null;
     let chatUnsub = null;
     let viewersPresenceUnsub = null;
+    let streamWatchdog = null;      // keeps an eye on the player after joining
+    let countingViewer = false;     // true once we are really watching (counts +1)
+    let nextServiceText = '';       // filled by loadUpcoming(), used by Domey
+    let domeyHost = null;
+    let domeySession = null;
+    let domeyBusy = false;
 
     const $ = id => document.getElementById(id);
     /* Inline handlers and the onerror fallbacks in generated markup run in the
@@ -698,6 +780,8 @@
             $('durationPill').textContent = fmtDuration(sec);
         }, 1000);
 
+        showPlayerWaiting('Connecting you to the service…', 'Bringing the Prayer Dome live stream to your phone…');
+        startPlaybackWatchdog();
         joinAsViewer();
         subscribeChat();
         subscribeViewers();
@@ -708,15 +792,102 @@
         $('offlineView').style.display = 'flex';
         $('liveView').style.display = 'none';
         $('topLivePill').style.display = 'none';
+        hidePlayerWaiting();
+        stopPlaybackWatchdog();
+        stopViewerCount();
+        updateWaitingBanner();
         if (durTimer) { clearInterval(durTimer); durTimer = null; }
-        if (viewer) { viewer.leave(); viewer = null; }
+        // Tear the stream down *before* dropping the viewer reference: the old
+        // order nulled `viewer` first, so an HLS instance was never destroyed
+        // and kept downloading a dead playlist in the background.
+        if (viewer) {
+            if (window.Hls && viewer.hls) { try { viewer.hls.destroy(); } catch(e){} }
+            viewer.leave();
+            viewer = null;
+        }
         if (chatUnsub) { chatUnsub(); chatUnsub = null; }
         if (viewersPresenceUnsub) { viewersPresenceUnsub(); viewersPresenceUnsub = null; }
         const v = $('liveVideo');
         if (v) { try { v.pause(); } catch(e){} v.srcObject = null; v.removeAttribute('src'); }
-        if (window.Hls && viewer && viewer.hls) { try { viewer.hls.destroy(); } catch(e){} }
         loadOfflineArchive();
         loadUpcoming();
+    }
+
+    /* ---------- the player must never look dead ---------- */
+    function showPlayerWaiting(title, text) {
+        const box = $('playerWaiting');
+        if (!box) return;
+        if (title) $('playerWaitingTitle').textContent = title;
+        if (text) $('playerWaitingText').textContent = text;
+        box.classList.add('show');
+    }
+    function hidePlayerWaiting() {
+        const box = $('playerWaiting');
+        if (box) box.classList.remove('show');
+    }
+    function isStreamPlaying() {
+        const v = $('liveVideo');
+        if (!v) return false;
+        if (v.srcObject && v.readyState >= 2 && !v.paused) return true;
+        if (v.currentSrc && !v.paused && v.readyState >= 2 && v.currentTime > 0) return true;
+        return false;
+    }
+    function startPlaybackWatchdog() {
+        stopPlaybackWatchdog();
+        const began = Date.now();
+        // A broadcast document can survive a crash or a closed admin tab. If
+        // nothing has played after a reasonable wait, explain the situation and
+        // offer the lounge instead of leaving a black rectangle on screen.
+        streamWatchdog = setInterval(() => {
+            if (!currentLive.isLive) { stopPlaybackWatchdog(); return; }
+            const waited = Date.now() - began;
+            if (isStreamPlaying()) {
+                hidePlayerWaiting();
+                if (waited > 2000) stopPlaybackWatchdog();
+                return;
+            }
+            if (waited > 6000) {
+                showPlayerWaiting('Connecting you to the service…',
+                    'The service is live and we are bringing the stream to your phone. This usually takes a few seconds.');
+            }
+            if (waited > 30000) {
+                showPlayerWaiting('Still trying to reach the broadcast…',
+                    'Your internet looks fine, so the stream may not have started yet. We keep trying automatically — you can pray with Domey while you wait.');
+            }
+            if (waited > 90000 && broadcastLooksStale(currentLive)) {
+                // The live document is hours old and nothing ever arrived:
+                // treat the broadcast as finished instead of trapping viewers.
+                toast('That broadcast has already ended');
+                leaveLiveView();
+            }
+        }, 2000);
+    }
+    function stopPlaybackWatchdog() {
+        if (streamWatchdog) { clearInterval(streamWatchdog); streamWatchdog = null; }
+    }
+    function broadcastLooksStale(data) {
+        if (!data) return false;
+        const stamp = data.updatedAt || (data.startTime && data.startTime.toDate ? data.startTime.toDate().getTime() : data.startTime) || 0;
+        if (!stamp) return false;
+        return (Date.now() - Number(stamp)) > 5 * 60 * 60 * 1000;   // five hours
+    }
+
+    /* ---------- honest viewer counts ---------- */
+    // A viewer is counted when the stream actually reaches the phone, not when
+    // the page loads — that keeps "watching now" truthful when a member can
+    // never connect.
+    function startViewerCount() {
+        if (countingViewer || !currentLive.isLive) return;
+        countingViewer = true;
+        updateDoc(doc(db,'liveStatus','current'), { totalViews: increment(1), viewers: increment(1) })
+            .catch(() => { countingViewer = false; });
+        window.addEventListener('pagehide', stopViewerCount, { once: true });
+        window.addEventListener('beforeunload', stopViewerCount, { once: true });
+    }
+    function stopViewerCount() {
+        if (!countingViewer) return;
+        countingViewer = false;
+        updateDoc(doc(db,'liveStatus','current'), { viewers: increment(-1) }).catch(() => {});
     }
 
     function updateViewerStats() {
@@ -775,12 +946,23 @@
             const pill = $('connectionPill');
             pill.className = 'connection-pill ' + (s.connectionQuality || 'good');
             const txt = s.status === 'reconnecting' ? 'Reconnecting…' :
+                        s.status === 'waiting' ? 'Waiting for the stream…' :
                         s.connectionQuality === 'unstable' ? 'Connection: Unstable' : 'Connection: Good';
             $('connectionText').textContent = txt;
             $('reconnectBanner').classList.toggle('show', s.status === 'reconnecting');
             // Lost the broadcast entirely — offer a real retry action.
             const unreach = $('unreachableBox');
             if (unreach) unreach.classList.toggle('show', s.status === 'unreachable');
+            if (s.status === 'connected' || isStreamPlaying()) {
+                hidePlayerWaiting();
+                startViewerCount();
+            } else if (s.status === 'waiting') {
+                showPlayerWaiting('Waiting for the broadcast to start…',
+                    'The service is announced and the page is watching for the stream. It will start playing here by itself the moment it goes live — no need to reload.');
+            } else if (s.status === 'unreachable') {
+                showPlayerWaiting('We could not reach the broadcast',
+                    'Your internet looks fine. The service may have ended, or the stream may still be starting — try again, or pray with Domey while you wait.');
+            }
             if (s.status === 'connected') {
                 const v = $('liveVideo');
                 const uo = $('unmuteOverlay');
@@ -814,6 +996,12 @@
         });
         viewer.on('stream', () => {
             toast('Connected — watching live');
+            hidePlayerWaiting();
+            startViewerCount();
+        });
+        viewer.on('waiting', () => {
+            showPlayerWaiting('Waiting for the broadcast…',
+                'The service is announced and we are watching for the stream to appear. It will start playing here the moment it goes live.');
         });
         try {
             const ok = await viewer.join();
@@ -1218,6 +1406,11 @@
                 if (t && t > Date.now()) upcoming.push({id:d.id, ...s});
             });
             if (!upcoming.length) { list.innerHTML = '<div class="upcoming-card"><div class="upcoming-icon"><i class="pd-i pd-i-calendar"></i></div><div class="upcoming-body"><strong>No upcoming lives scheduled</strong><small>Check back soon or enable notifications</small></div></div>'; return; }
+            nextServiceText = upcoming.map(s => {
+                const d = s.scheduledFor.toDate();
+                return (s.title || 'Live service') + ' on ' + d.toLocaleDateString([], { weekday:'long', month:'short', day:'numeric' }) +
+                    ' at ' + d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+            }).slice(0, 2).join(', and ');
             list.innerHTML = upcoming.map(s => {
                 const d = s.scheduledFor.toDate();
                 const dateStr = d.toLocaleDateString([],{weekday:'short',month:'short',day:'numeric'})+' · '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
@@ -1234,11 +1427,169 @@
         toast('Reminder set');
     };
 
+    /* ---------- Prayer Lounge: Domey, the talking cartoon host ---------- */
+    function todayVerse() {
+        try {
+            if (window.PD_VERSES && PD_VERSES.verseFor) {
+                const slot = PD_VERSES.currentSlot ? PD_VERSES.currentSlot() : 'morning';
+                const verse = PD_VERSES.verseFor(slot);
+                return { ref: verse.reference || verse.ref, text: verse.text };
+            }
+        } catch (e) { /* fall through to the default promise */ }
+        return { ref: 'Psalm 23:1', text: 'The LORD is my shepherd; I shall not want.' };
+    }
+
+    function ensureDomey() {
+        if (domeyHost || !window.PDMascot) return domeyHost;
+        const stage = $('liveDomeyStage');
+        if (!stage) return null;
+        domeyHost = PDMascot.mount(stage, {
+            name: 'Domey',
+            compact: true,
+            lang: (navigator.language || 'en').slice(0, 2),
+            placeholder: 'Type what you would like prayer for…'
+        });
+        return domeyHost;
+    }
+
+    function loungeSession() {
+        const host = ensureDomey();
+        if (!host) return null;
+        const session = PDMascot.loungeSession(host, {
+            verse: todayVerse,
+            nextService: () => nextServiceText,
+            onName: name => {
+                guestName = name;
+                try { localStorage.setItem('pd_guest_name', name); } catch (e) {}
+            },
+            onPrayer: request => postPrayerRequest(request)
+        });
+        domeySession = session;
+        return { host, session };
+    }
+
+    // A prayer shared with Domey is kept, so the prayer team sees it too.
+    function postPrayerRequest(request) {
+        const message = (request && request.text ? request.text : '').trim();
+        if (!message) return;
+        const name = (request && request.name) || guestName || (currentUser && currentUser.displayName) || 'Guest';
+        addDoc(collection(db,'liveChat'), {
+            liveId: currentLive.liveId || null,
+            userId: currentUser ? currentUser.uid : null,
+            name: name,
+            avatar: currentUser ? (currentUser.photoURL || null) : null,
+            message: message,
+            category: 'Prayer Lounge',
+            source: 'domey',
+            topic: request.topic || 'general',
+            isPrayer: true,
+            pinned: false,
+            hidden: false,
+            timestamp: serverTimestamp()
+        }).catch(() => {});
+        // Signed-in members also add it to the moderated prayer wall.
+        if (currentUser) {
+            addDoc(collection(db,'prayers'), {
+                userId: currentUser.uid,
+                name: name,
+                text: message,
+                category: request.topic || 'general',
+                source: 'domey-lounge',
+                status: 'pending',
+                createdAt: serverTimestamp()
+            }).catch(() => {});
+        }
+        toast('Your prayer was shared with the Prayer Dome team');
+    }
+
+    function setDomeyButtons(busy) {
+        ['domeyTalkBtn','domeyPrayBtn','domeyVerseBtn'].forEach(id => {
+            const btn = $(id);
+            if (btn) btn.disabled = busy;
+        });
+    }
+
+    async function runDomeyFlow(kind) {
+        const parts = loungeSession();
+        if (!parts) return;
+        const { host, session } = parts;
+        if (domeyBusy) { host.hurry(); return; }
+        domeyBusy = true;
+        setDomeyButtons(true);
+        try {
+            if (kind === 'talk') await session.main();
+            else if (kind === 'verse') await session.verseFlow();
+            else {
+                if (!host.name) await session.askName();
+                await session.prayerFlow();
+            }
+        } catch (e) {
+            console.warn('[Domey] lounge flow failed', e);
+        } finally {
+            domeyBusy = false;
+            setDomeyButtons(false);
+        }
+    }
+
+    window.domeyStop = function () {
+        if (!domeyHost) return;
+        if (domeySession) domeySession.cancel();
+        domeyHost.stop();
+        domeyBusy = false;
+        setDomeyButtons(false);
+    };
+
+    // "Pray while I wait" from the player overlay: leave the player, open the lounge.
+    window.showPrayerLounge = function () {
+        leaveLiveView();
+        const card = $('liveDomeyStage');
+        if (card) card.scrollIntoView({ behavior:'smooth', block:'center' });
+        runDomeyFlow('talk');
+    };
+
+    window.retryPlayback = function () {
+        hidePlayerWaiting();
+        if (!currentLive.isLive) { loadOfflineArchive(); loadUpcoming(); return; }
+        if (!viewer) { enterLiveView(currentLive); return; }   // re-join after leaving
+        if (window.retryLive) window.retryLive();
+        showPlayerWaiting('Trying again…', 'Reconnecting to the Prayer Dome live stream…');
+    };
+
+    // The offline view explains a broadcast that is announced but has not
+    // reached this device, so "Pray while I wait" never looks like a dead end.
+    function updateWaitingBanner() {
+        const banner = $('waitingBanner');
+        if (!banner) return;
+        const live = !!(currentLive && currentLive.isLive);
+        banner.classList.toggle('show', live);
+        if (!live) return;
+        const title = $('waitingBannerTitle');
+        const text = $('waitingBannerText');
+        if (broadcastLooksStale(currentLive)) {
+            if (title) title.textContent = 'That service has finished';
+            if (text) text.textContent = 'The broadcast has ended. Browse the archive below, or pray with Domey while you wait for the next service.';
+        } else {
+            if (title) title.textContent = 'The service is live right now';
+            if (text) text.textContent = 'We are still bringing the stream to your device. Tap Try again — or pray with Domey while you wait. It starts playing by itself as soon as it arrives.';
+        }
+    }
+    window.watchLastService = function () {
+        const grid = $('archiveGrid');
+        leaveLiveView();
+        if (grid) grid.scrollIntoView({ behavior:'smooth', block:'center' });
+    };
+
     /* ---------- watch live status ---------- */
     function watchLiveStatus() {
         liveUnsub = onSnapshot(doc(db,'liveStatus','current'), snap => {
             const data = snap.exists ? snap.data() : null;
             const isLive = !!(data && data.isLive);
+            if (isLive && broadcastLooksStale(data) && !isStreamPlaying()) {
+                // A broadcast document left behind by a crash or a closed admin
+                // tab used to keep the whole page on a dead player for ever.
+                if (currentLive.isLive) { leaveLiveView(); toast('That broadcast has already ended'); }
+                return;
+            }
             if (isLive && !currentLive.isLive) {
                 // Just went live
                 currentLive = data;
@@ -1266,6 +1617,7 @@
                 leaveLiveView();
             } else if (!isLive) {
                 // was already offline
+                updateWaitingBanner();
                 loadOfflineArchive();
                 loadUpcoming();
             }
@@ -1290,15 +1642,23 @@
     loadOfflineArchive();
     loadUpcoming();
 
-    // increment viewer count when we actually watch
-    document.addEventListener('click', function once() {
-        if (currentLive.isLive && viewer) {
-            try { updateDoc(doc(db,'liveStatus','current'),{ totalViews: increment(1), viewers: increment(1) });
-              window.addEventListener('pagehide', () => updateDoc(doc(db,'liveStatus','current'),{viewers: increment(-1)}).catch(()=>{}), {once:true});
-            } catch(e){}
-            document.removeEventListener('click', once);
-        }
-    }, { once: true });
+    // Domey's lounge buttons (the player waiting overlay has its own).
+    ['domeyTalkBtn','domeyPrayBtn','domeyVerseBtn','domeyStopBtn'].forEach(id => {
+        const btn = $(id);
+        if (!btn) return;
+        btn.addEventListener('click', () => {
+            if (id === 'domeyStopBtn') return window.domeyStop();
+            BandUnlock();
+            runDomeyFlow(id === 'domeyTalkBtn' ? 'talk' : id === 'domeyVerseBtn' ? 'verse' : 'prayer');
+        });
+    });
+    // The member's tap is also the moment Domey is allowed to speak on mobile.
+    function BandUnlock() {
+        if (window.PDMascot && PDMascot.band) PDMascot.band.unlock();
+    }
+
+    // Viewer counts and total views are handled by startViewerCount(), which
+    // only runs once the stream really reaches this device (see above).
 
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
 </script>

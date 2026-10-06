@@ -139,6 +139,25 @@
     Signal.prototype.del = async function (path) {
         await this.fb.deleteDoc(this.ref(path));
     };
+    /**
+     * Best-effort removal of every document in a signaling subcollection.
+     *
+     * A viewer keeps the same `pd_viewer_id` for the whole tab session, so a
+     * previous connection can leave ICE candidates behind. Those stale
+     * candidates were then replayed into the *next* peer connection, which is
+     * one of the ways "it worked once, then never again" happened. Clearing
+     * before every join and after every leave makes each connection start
+     * clean.
+     */
+    Signal.prototype.clearCol = async function (path) {
+        var fb = this.fb;
+        try {
+            var snap = await fb.getDocs(this.col(path));
+            var jobs = [];
+            snap.forEach(function (d) { jobs.push(fb.deleteDoc(d.ref).catch(function () {})); });
+            await Promise.all(jobs);
+        } catch (e) { /* best effort — never block playback on cleanup */ }
+    };
     Signal.prototype.onDoc = function (path, cb) {
         var fb = this.fb;
         var unsub = fb.onSnapshot(this.ref(path), function (snap) {
@@ -147,16 +166,26 @@
         this.unsubs.push(unsub);
         return unsub;
     };
+    /**
+     * Watch a signaling subcollection.
+     *
+     * Deliberately NOT ordered. Cloud Firestore omits any document that does not
+     * contain the field named in `orderBy`, so the previous
+     * `orderBy('createdAt')` query silently ignored every write that only
+     * carried `joinedAt` or `at` — which included the viewer's join document.
+     * The result: the broadcaster never learned a member had joined, created no
+     * peer connection, and the live video never started. Ordering is irrelevant
+     * here because every consumer reacts only to `added` events; each write also
+     * carries `createdAt` now, so an older cached client still works.
+     */
     Signal.prototype.onCol = function (path, cb) {
         var fb = this.fb;
         var colRef = this.col(path);
-        var q = fb.query(colRef, fb.orderBy('createdAt', 'asc'));
-        var self = this;
-        var unsub = fb.onSnapshot(q, function (snap) {
+        var unsub = fb.onSnapshot(colRef, function (snap) {
             snap.docChanges().forEach(function (change) {
                 if (change.type === 'added') cb({ id: change.doc.id, data: change.doc.data() });
             });
-        });
+        }, function (err) { warn('signal listener failed for', path, err); });
         this.unsubs.push(unsub);
         return unsub;
     };
@@ -659,7 +688,7 @@
     Broadcaster.prototype.deleteComment = async function (commentId) {
         if (!commentId) return;
         await this.fb.deleteDoc(this.fb.doc(this.fb.db, 'liveChat', commentId)).catch(function () {});
-        this.signal.set('moderation/' + uid('mod'), { action: 'delete', commentId: commentId, at: Date.now() });
+        this.signal.set('moderation/' + uid('mod'), { action: 'delete', commentId: commentId, at: Date.now(), createdAt: this.fb.serverTimestamp() });
     };
     Broadcaster.prototype.pinComment = async function (commentId, pinned) {
         await this.fb.updateDoc(this.fb.doc(this.fb.db, 'liveChat', commentId), { pinned: pinned !== false }).catch(function () {});
@@ -668,7 +697,7 @@
     Broadcaster.prototype.setCommentsEnabled = async function (on) {
         this.state.commentsEnabled = !!on;
         await this.fb.updateDoc(this.fb.doc(this.fb.db, 'liveStatus', 'current'), { commentsEnabled: !!on });
-        this.signal.set('moderation/' + uid('mod'), { action: 'comments', enabled: !!on, at: Date.now() });
+        this.signal.set('moderation/' + uid('mod'), { action: 'comments', enabled: !!on, at: Date.now(), createdAt: this.fb.serverTimestamp() });
         this.broadcastState();
     };
     Broadcaster.prototype.muteUser = async function (userId, mute) {
@@ -817,6 +846,8 @@
             tickerText: '',
             commentsEnabled: true,
             mode: 'webrtc', // webrtc | whep | hls
+            source: 'webrtc',  // broadcast source: webrtc | media-server | admin-dashboard
+            waiting: false,    // true while an encoder broadcast has not published yet
             hlsUrl: null,
             reactions: {},
             pinnedCommentId: null
@@ -856,30 +887,43 @@
 
         this.signal = new Signal(this.fb, status.liveId);
 
+        // Start every join from a clean slate: leftovers from a previous
+        // connection (same tab, same viewer id) must not leak into this one.
+        await this.signal.clearCol('viewers/' + this.state.viewerId + '/candidates');
+        await this.signal.clearCol('viewers/' + this.state.viewerId + '/broadcasterCandidates');
+
         // Decide mode. A configured media server gives true one-to-many WHEP
         // playback; the WebRTC mesh is the standard path. HLS is only used
         // when a playlist genuinely exists (verified with a probe) — a blind
         // switch used to leave members staring at a dead player.
-        var useWhep = status.source === 'media-server' && this.mediaServer && this.mediaServer.whepEndpoint;
-        var useWebRTC = !useWhep && status.source === 'webrtc';
+        // Older broadcasts were written before `source` existed; those were
+        // always browser (WebRTC) broadcasts, so treat a missing source as one.
+        var source = status.source || 'webrtc';
+        this.state.source = source;
+        var useWhep = source === 'media-server' && this.mediaServer && this.mediaServer.whepEndpoint;
+        var useWebRTC = !useWhep && source === 'webrtc';
         this.state.mode = useWhep ? 'whep' : (useWebRTC ? 'webrtc' : 'hls');
 
         // Register presence (write top-level doc so admin collection listeners see it).
         var userInfo = opts_userInfo(this.opts) || {};
         await this.signal.set('viewers/' + this.state.viewerId, {
             joinedAt: this.fb.serverTimestamp(),
+            createdAt: this.fb.serverTimestamp(),
             name: userInfo.name || 'Guest',
             avatar: userInfo.avatar || null,
             userId: userInfo.uid || null,
             heartbeat: { t: Date.now() }
         });
+        // `createdAt` matters: it is what an already-installed older client
+        // orders by, and without it this join is invisible to that broadcaster.
         await this.signal.set('join/' + this.state.viewerId, {
             joined: true,
             viewerId: this.state.viewerId,
             name: userInfo.name || 'Guest',
             avatar: userInfo.avatar || null,
             userId: userInfo.uid || null,
-            joinedAt: this.fb.serverTimestamp()
+            joinedAt: this.fb.serverTimestamp(),
+            createdAt: this.fb.serverTimestamp()
         });
         this.state.joined = true;
 
@@ -888,11 +932,14 @@
         } else if (useWebRTC) {
             await this.connectWebRTC();
         } else {
-            // Only play HLS if the playlist is really there; otherwise the
-            // broadcast is a browser stream — use WebRTC instead.
+            // Only play HLS if the playlist is really there. A browser
+            // broadcast falls back to WebRTC; an encoder broadcast (OBS, a
+            // media server) has no peer to answer an offer, so it waits for the
+            // playlist to appear and then starts playing on its own.
             var hlsReady = await probeHls(this.state.hlsUrl);
             if (hlsReady) this.connectHLS();
-            else { this.state.mode = 'webrtc'; await this.connectWebRTC(); }
+            else if (useWebRTC || source === 'webrtc') { this.state.mode = 'webrtc'; await this.connectWebRTC(); }
+            else this.waitForBroadcast();
         }
 
         // Listen for state updates.
@@ -960,6 +1007,7 @@
         this.state.viewerCount = Number(d.viewers) || 0;
         this.state.commentsEnabled = d.commentsEnabled !== false;
         this.state.pinnedCommentId = d.pinnedCommentId || null;
+        if (d.source) this.state.source = d.source;
         if (d.status) this.state.status = d.status;
     };
 
@@ -1093,6 +1141,13 @@
         // would replace a reconnecting video with a permanently dead one.
         probeHls(this.state.hlsUrl).then(function (ok) {
             if (!ok) {
+                // An encoder broadcast (OBS / media server / the admin RTMP
+                // panel) simply has not started publishing yet: keep watching
+                // for the playlist and start playing the second it exists.
+                if (self.state.source && self.state.source !== 'webrtc') {
+                    self.waitForBroadcast();
+                    return;
+                }
                 warn('HLS playlist not available; staying on WebRTC');
                 if (self.reconnectAttempts >= 4) {
                     self.state.status = 'unreachable';
@@ -1149,6 +1204,50 @@
         }
     };
 
+    /**
+     * Wait for an encoder broadcast (OBS, Larix, a WHIP media server) to start
+     * publishing. Before this existed, a member who opened the page while the
+     * admin was still setting up saw "Unable to reach the broadcast" and had to
+     * reload once the stream finally appeared. Now the page watches for the
+     * playlist and starts playing by itself, and the UI can explain that we are
+     * waiting rather than show a dead player.
+     */
+    Viewer.prototype.waitForBroadcast = function () {
+        var self = this;
+        if (this._waitTimer || !this.state.isLive) return;
+        this.state.waiting = true;
+        this.state.status = 'waiting';
+        this.emit('state', this.state);
+        this.emit('waiting');
+        var attempt = 0;
+        var delays = [4000, 5000, 7000, 9000, 12000, 15000];
+        function tick() {
+            self._waitTimer = null;
+            if (!self.state.isLive) return;
+            attempt++;
+            var url = self.state.hlsUrl;
+            if (!url) { schedule(); return; }
+            probeHls(url).then(function (ok) {
+                if (!self.state.isLive) return;
+                if (ok) {
+                    self.state.waiting = false;
+                    self.state.mode = 'hls';
+                    self.state.status = 'connecting';
+                    self.emit('state', self.state);
+                    self.connectHLS();
+                    return;
+                }
+                schedule();
+            });
+        }
+        function schedule() {
+            if (!self.state.isLive) return;
+            var delay = delays[Math.min(attempt, delays.length - 1)];
+            self._waitTimer = setTimeout(tick, delay);
+        }
+        schedule();
+    };
+
     Viewer.prototype.attemptReconnect = function () {
         var self = this;
         this.reconnectAttempts++;
@@ -1172,15 +1271,27 @@
 
     // Manual retry from the viewer UI after an 'unreachable' state.
     Viewer.prototype.retry = function () {
+        var self = this;
         this.reconnectAttempts = 0;
         this.state.status = 'reconnecting';
         this.emit('state', this.state);
-        var self = this;
         if (self.pc) { try { self.pc.close(); } catch (e) {} self.pc = null; }
+        // Encoder broadcasts never had a peer to answer an offer — retrying them
+        // means looking for the playlist again instead of offering WebRTC.
+        if (this.state.source && this.state.source !== 'webrtc' && this.state.mode !== 'whep') {
+            if (this._waitTimer) { clearTimeout(this._waitTimer); this._waitTimer = null; }
+            return probeHls(this.state.hlsUrl).then(function (ok) {
+                if (ok) { self.state.mode = 'hls'; self.state.waiting = false; self.connectHLS(); return true; }
+                self.waitForBroadcast();
+                return false;
+            });
+        }
         return self.connectWebRTC().catch(function () { self.switchToHLS(); });
     };
 
     Viewer.prototype.leave = function () {
+        if (this._waitTimer) { clearTimeout(this._waitTimer); this._waitTimer = null; }
+        this.state.waiting = false;
         if (!this.state.joined) return;
         this.state.joined = false;
         clearInterval(this._heartbeat);
@@ -1192,8 +1303,16 @@
         if (this.hls) { try { this.hls.destroy(); } catch (e) {} this.hls = null; }
         if (this.videoEl) { try { this.videoEl.pause(); this.videoEl.srcObject = null; this.videoEl.removeAttribute('src'); } catch (e) {} }
         if (this.signal) {
-            this.signal.del('viewers/' + this.state.viewerId).catch(function () {});
-            this.signal.detach();
+            var signal = this.signal;
+            var viewerId = this.state.viewerId;
+            // Remove our presence, our join marker and our candidates: a guest
+            // who closes the page must not keep a "watching now" seat, and the
+            // next connection in this tab must not inherit these candidates.
+            signal.del('viewers/' + viewerId).catch(function () {});
+            signal.del('join/' + viewerId).catch(function () {});
+            signal.clearCol('viewers/' + viewerId + '/candidates');
+            signal.clearCol('viewers/' + viewerId + '/broadcasterCandidates');
+            signal.detach();
         }
         this.unsubs.forEach(function (u) { try { u(); } catch (e) {} });
         this.unsubs = [];
@@ -1218,7 +1337,8 @@
             avatar: info.avatar || null,
             userId: info.uid || null,
             isPrayer: !!(opts && opts.isPrayer),
-            at: Date.now()
+            at: Date.now(),
+            createdAt: this.fb.serverTimestamp()
         };
         this.signal.col('chat').add ? null : null;
         return this.fb.addDoc(this.signal.col('chat'), msg);
@@ -1227,13 +1347,17 @@
     Viewer.prototype.sendReaction = function (emoji) {
         if (!this.state.joined || !this.signal) return;
         return this.fb.addDoc(this.signal.col('reactions'), {
-            emoji: emoji, viewerId: this.state.viewerId, at: Date.now()
+            emoji: emoji, viewerId: this.state.viewerId, at: Date.now(),
+            createdAt: this.fb.serverTimestamp()
         });
     };
 
     Viewer.prototype.sendEvent = function (type, data) {
         if (!this.state.joined || !this.signal) return;
-        return this.fb.addDoc(this.signal.col('events'), Object.assign({ type: type, at: Date.now(), viewerId: this.state.viewerId }, data || {}));
+        return this.fb.addDoc(this.signal.col('events'), Object.assign({
+            type: type, at: Date.now(), viewerId: this.state.viewerId,
+            createdAt: this.fb.serverTimestamp()
+        }, data || {}));
     };
 
     function opts_userInfo(o) {
