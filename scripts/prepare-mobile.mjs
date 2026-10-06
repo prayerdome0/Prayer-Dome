@@ -14,6 +14,7 @@ const excludedDirectories = new Set([
   '.idea',
   '.next',
   '.vercel',
+  'dist',
   'android',
   'api',
   'docs',

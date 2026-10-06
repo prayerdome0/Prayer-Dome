@@ -40,6 +40,12 @@ function makeWindow(fetchImpl, urls) {
     runScripts: 'outside-only'
   });
   const w = dom.window;
+  // pd-app.js watches the document for late-rendered images and schedules a
+  // branding sweep with requestAnimationFrame. jsdom has no animation-frame
+  // clock by default, so provide a deterministic browser-like stub to keep
+  // those observer callbacks from surfacing noisy ReferenceErrors in tests.
+  w.requestAnimationFrame = callback => { callback(w.performance.now()); return 1; };
+  w.cancelAnimationFrame = () => {};
   w.fetch = function (url) {
     if (urls[String(url)] !== undefined) return Promise.resolve({ ok: true, json: () => Promise.resolve(urls[String(url)]) });
     return fetchImpl ? fetchImpl(String(url)) : Promise.reject(new Error('unexpected fetch ' + url));
