@@ -174,6 +174,7 @@
             color: var(--text-main);
             transition: background 0.3s, color 0.3s;
             height: 100vh;
+            height: 100dvh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -315,8 +316,8 @@
         .main-tab.active i { animation: tabIconPop 0.4s var(--ease-spring); }
 
         /* Tab Content */
-        .tab-content { display: none; flex: 1; overflow: hidden; }
-        .tab-content.active { display: flex; flex-direction: column; animation: contentIn 0.35s var(--ease-smooth); }
+        .tab-content { display: none; flex: 1; min-width: 0; min-height: 0; overflow: hidden; }
+        .tab-content.active { display: flex; flex-direction: column; min-width: 0; min-height: 0; animation: contentIn 0.35s var(--ease-smooth); }
 
         /* CHATS TAB */
         .chats-container {
@@ -324,6 +325,8 @@
             width: 100%;
             height: 100%;
             flex: 1;
+            min-width: 0;
+            min-height: 0;
             overflow: hidden;
         }
         .rooms-sidebar {
@@ -500,6 +503,8 @@
         /* Chat Area */
         .chat-area {
             flex: 1;
+            min-width: 0;
+            min-height: 0;
             display: flex;
             flex-direction: column;
             background: var(--bg-primary);
@@ -556,7 +561,9 @@
 
         .messages-area {
             flex: 1;
+            min-height: 0;
             overflow-y: auto;
+            overscroll-behavior-y: contain;
             padding: 22px;
             background:
                 radial-gradient(circle at 15% 15%, rgba(59,130,246,0.05), transparent 38%),
@@ -893,7 +900,9 @@
         /* STATUS TAB */
         .status-container {
             flex: 1;
+            min-height: 0;
             overflow-y: auto;
+            overscroll-behavior-y: contain;
             padding: 18px;
         }
         .my-status-card {
@@ -987,7 +996,9 @@
         /* SETTINGS TAB */
         .settings-container {
             flex: 1;
+            min-height: 0;
             overflow-y: auto;
+            overscroll-behavior-y: contain;
             padding: 18px;
             max-width: 560px;
             margin: 0 auto;
@@ -1069,7 +1080,8 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 100vh;
+            height: 100dvh;
             background: rgba(0, 0, 0, 0.85);
             display: none;
             align-items: center;
@@ -1086,7 +1098,9 @@
             max-width: 480px;
             width: 90%;
             max-height: 90vh;
+            max-height: min(90vh, calc(100dvh - 2rem));
             overflow-y: auto;
+            overscroll-behavior-y: contain;
             box-shadow: var(--shadow-lg);
             animation: modalPop 0.4s var(--ease-spring);
         }
@@ -1106,10 +1120,10 @@
 
         .status-view-modal {
             position: fixed;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100%;
-            height: 100%;
+            height: 100vh;
+            height: 100dvh;
             background: #000;
             display: none;
             flex-direction: column;
@@ -1136,6 +1150,7 @@
         .status-view-media img, .status-view-media video {
             max-width: 100%;
             max-height: 80vh;
+            max-height: min(80vh, calc(100dvh - 8rem));
             border-radius: 18px;
             animation: modalPop 0.4s var(--ease-spring);
         }

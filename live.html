@@ -180,8 +180,9 @@
             --text:#0f172a; --text-dim:#475569; --text-mute:#94a3b8;
             --border:rgba(0,0,0,0.08); --shadow:0 10px 30px rgba(0,0,0,0.06);
         }
-        html,body { height:100%; }
+        html,body { height:100%; min-height:100%; }
         body {
+            height:100vh; height:100dvh; min-height:0;
             font-family:'Inter',sans-serif;
             background:var(--bg); color:var(--text);
             display:flex; flex-direction:column;
@@ -206,7 +207,7 @@
 
         /* ===== OFFLINE VIEW ===== */
         .offline {
-            flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:16px;
+            flex:1; min-height:0; overflow-y:auto; overscroll-behavior-y:contain; padding:20px; display:flex; flex-direction:column; gap:16px;
             max-width:720px; margin:0 auto; width:100%;
         }
         .offline-hero {
@@ -220,16 +221,21 @@
         .offline-hero p { opacity:.9; font-size:.9rem; max-width:440px; margin:0 auto; position:relative; z-index:1; }
 
         /* ===== PLAYER LAYOUT ===== */
-        .live-layout { flex:1; display:grid; grid-template-columns:1fr 360px; overflow:hidden; }
-        @media (max-width:860px) { .live-layout { grid-template-columns:1fr; grid-template-rows:auto 1fr; } }
-        .player-pane { display:flex; flex-direction:column; overflow-y:auto; position:relative; }
+        .live-layout { flex:1; min-width:0; min-height:0; display:grid; grid-template-columns:minmax(0,1fr) 360px; overflow:hidden; }
+        @media (max-width:860px) {
+            /* On phones the player, details and chat can be taller than the
+               remaining viewport. Let this view scroll instead of clipping
+               its second grid row below the bottom edge. */
+            .live-layout { grid-template-columns:minmax(0,1fr); grid-template-rows:auto auto; align-content:start; overflow-x:hidden; overflow-y:auto; overscroll-behavior-y:contain; }
+        }
+        .player-pane { min-width:0; min-height:0; display:flex; flex-direction:column; overflow-y:auto; position:relative; }
         .chat-pane { display:flex; flex-direction:column; border-left:1px solid var(--border); background:var(--bg-card); min-height:0; }
         @media (max-width:860px) {
-            .chat-pane { border-left:none; border-top:1px solid var(--border); height:42vh; }
+            .chat-pane { border-left:none; border-top:1px solid var(--border); height:42vh; height:min(42dvh, 360px); min-height:220px; flex:none; }
             .player-pane { overflow-y:visible; }
         }
 
-        .player-wrap { position:relative; background:#000; aspect-ratio:16/9; width:100%; max-height:70vh; }
+        .player-wrap { position:relative; background:#000; aspect-ratio:16/9; width:100%; max-height:70vh; max-height:70dvh; }
         .player-wrap.fullscreen { position:fixed; inset:0; z-index:100; max-height:none; aspect-ratio:auto; }
         .player-wrap video { width:100%; height:100%; object-fit:contain; background:#000; }
         .player-overlay { position:absolute; inset:0; pointer-events:none; }

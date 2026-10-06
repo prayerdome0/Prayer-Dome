@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
+const { JSDOM } = require('jsdom');
 
 const ROOT = path.join(__dirname, '..');
 let passed = 0;
@@ -98,6 +99,35 @@ function invoke(modulePath, method = 'GET') {
   test('private repository files are not published',
     ['README.md', 'package.json', 'firebase.json', 'firestore.rules', 'tests', 'android', 'scripts']
       .every(name => !fs.existsSync(path.join(output, name))));
+
+  const bundledHtml = [];
+  function collectHtml(directory) {
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const file = path.join(directory, entry.name);
+      if (entry.isDirectory()) collectHtml(file);
+      else if (entry.name.endsWith('.html')) bundledHtml.push(file);
+    }
+  }
+  collectHtml(output);
+  const missingAssetReferences = [];
+  for (const file of bundledHtml) {
+    const document = new JSDOM(fs.readFileSync(file, 'utf8')).window.document;
+    for (const element of document.querySelectorAll(
+      'script[src], link[href], img[src], source[src], audio[src], video[src], video[poster]')) {
+      const reference = (element.getAttribute('src') || element.getAttribute('href') ||
+        element.getAttribute('poster') || '').trim();
+      if (!reference || /^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/i.test(reference)) continue;
+      const assetPath = decodeURIComponent(reference.split(/[?#]/, 1)[0]);
+      if (assetPath.startsWith('/api/')) continue; // serverless handlers are outside dist/
+      const asset = path.resolve(assetPath.startsWith('/') ? output : path.dirname(file),
+        assetPath.startsWith('/') ? `.${assetPath}` : assetPath);
+      if (!asset.startsWith(output + path.sep) || !fs.existsSync(asset)) {
+        missingAssetReferences.push(`${path.relative(output, file)} -> ${reference}`);
+      }
+    }
+  }
+  test('every local page, script, style, image and media reference ships in the bundle',
+    missingAssetReferences.length === 0, missingAssetReferences.join(', '));
 
   const news = await invoke('api/news.js');
   test('/api/news returns a successful non-empty payload',

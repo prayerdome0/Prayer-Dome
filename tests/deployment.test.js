@@ -18,6 +18,9 @@ for (const file of ['functions/share.js', 'functions/translate.js', 'scripts/bui
 assert.equal(signUpload({ timestamp: 1315060510, public_id: 'sample_image' }, 'abcd'),
   'b4ad47fb4e25c7bf5f92a20089f9db59bc302313');
 assert.equal(signUpload({ b: 'two', a: 'one' }, 'secret'), signUpload({ a: 'one', b: 'two' }, 'secret'));
+const mobilePreparer = fs.readFileSync('scripts/prepare-mobile.mjs', 'utf8');
+assert.match(mobilePreparer, /excludedDirectories[\s\S]*['"]dist['"]/,
+  'The generated Vercel dist bundle must not be duplicated inside the Android web bundle');
 const functionsSource = fs.readFileSync('functions/index.js', 'utf8');
 assert(!functionsSource.includes('functions.config()'), 'Retired Runtime Config API must not return');
 assert(functionsSource.includes('secrets: [cloudinaryApiSecret]'));

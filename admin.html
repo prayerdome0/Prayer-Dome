@@ -172,7 +172,7 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { display: flex; height: 100vh; overflow: hidden; background: var(--bg-main); color: var(--text-main); transition: 0.3s; }
+        body { display: flex; height: 100vh; height: 100dvh; overflow: hidden; background: var(--bg-main); color: var(--text-main); transition: 0.3s; }
 
         /* Luxury Font */
         .luxury-font, .sidebar-title, .page-title, .kpi-details h3, .panel-header h3, .modal-header h2 { font-family: 'Poppins', serif; }
@@ -232,7 +232,7 @@
         .sidebar-footer { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
         
         /* --- MAIN CONTENT --- */
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .main-content { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
         
         .topbar { background: var(--bg-panel); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); z-index: 10; }
         .mobile-toggle { display: none; background: none; border: none; font-size: 1.5rem; color: var(--text-main); cursor: pointer; }
@@ -242,7 +242,7 @@
         .admin-profile { display: flex; align-items: center; gap: 10px; padding: 5px 15px 5px 5px; background: var(--bg-main); border-radius: 30px; border: 1px solid var(--border); cursor: pointer; }
         .admin-avatar { width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent-green), var(--accent-gold)); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
-        .content-area { flex: 1; padding: 30px; overflow-y: auto; }
+        .content-area { flex: 1; min-width: 0; min-height: 0; padding: 30px; overflow-y: auto; overscroll-behavior-y: contain; }
         .section-view { display: none; animation: fadeIn 0.3s ease; }
         .section-view.active { display: block; }
 
@@ -334,8 +334,8 @@
         select.form-control { cursor: pointer; }
 
         /* --- MODALS --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; }
-        .modal-card { background: var(--bg-panel); border-radius: 28px; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); animation: modalIn 0.3s ease; }
+        .modal-overlay { position: fixed; inset: 0; width: 100%; height: 100vh; height: 100dvh; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+        .modal-card { background: var(--bg-panel); border-radius: 28px; width: 90%; max-width: 700px; max-height: 90vh; max-height: min(90vh, calc(100dvh - 2rem)); overflow-y: auto; overscroll-behavior-y: contain; box-shadow: var(--shadow-lg); animation: modalIn 0.3s ease; }
         .modal-header { padding: 20px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
         .modal-header h2 { font-size: 1.3rem; font-weight: 800; color: var(--accent-green); }
         .modal-close { background: none; border: none; font-size: 1.5rem; color: var(--text-sub); cursor: pointer; transition: 0.2s; }
