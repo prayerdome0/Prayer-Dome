@@ -1,5 +1,6 @@
 /*
- * Dead-control audit for every page's inline handlers.
+ * Page wiring audit — the "the page loaded but the control does nothing" class
+ * of bug, checked statically for every HTML page:
  *
  * Inline attributes (`onclick="loadGallery()"`, `onchange="…"`) are compiled by
  * the browser into a function whose scope chain ends at the global object —
@@ -9,7 +10,7 @@
  * stopped responding (the click threw a ReferenceError and nothing else
  * happened) — the same symptom as "I click and no page moves".
  *
- * Two audits live here, both about "the page loads but the control does nothing":
+ * Three audits live here:
  *
  *   1. every call made from an inline handler must be reachable — published on
  *      window/self/globalThis, declared in a classic script, provided by a
@@ -20,6 +21,9 @@
  *   2. every `window.<name> = <value>;` publish must resolve that value, so the
  *      module cannot throw a ReferenceError part-way through loading and leave
  *      everything after it unexecuted.
+ *   3. no page re-uses a static element id, so `getElementById` always reaches
+ *      the element the code means (duplicates silently bind listeners and
+ *      styles to the wrong node).
  */
 'use strict';
 
@@ -292,4 +296,34 @@ for (const [page, needle, label] of [
   t(`${page} publishes ${label}`, fs.readFileSync(path.join(ROOT, page), 'utf8').includes(needle));
 }
 
-console.log(`\nInline handler audit passed (${passed} assertions).`);
+/* ---------------------------------------------------------- 3. DOM conflicts */
+const duplicateIds = [];
+for (const page of fs.readdirSync(ROOT).filter((name) => name.endsWith('.html') && !IGNORED_PAGES.has(name))) {
+  const html = fs.readFileSync(path.join(ROOT, page), 'utf8');
+  // Markup only: ids inside <script>/<style> are templates or selectors.
+  const markup = html
+    .replace(/<script[\s\S]*?<\/script>/g, '<script></script>')
+    .replace(/<style[\s\S]*?<\/style>/g, '');
+  const seen = new Map();
+  for (const match of markup.matchAll(/\sid\s*=\s*["']([^"']+)["']/g)) {
+    seen.set(match[1], (seen.get(match[1]) || 0) + 1);
+  }
+  for (const [id, count] of seen) {
+    if (count > 1) duplicateIds.push(`${page}: #${id} appears ${count} times`);
+  }
+}
+t('no page declares the same element id twice', duplicateIds.length === 0,
+  '\n     ' + duplicateIds.join('\n     '));
+
+// The console is the page where a wrong lookup is most visible: every view,
+// modal and control id must be unique so handlers bind to the intended node.
+const adminMarkup = fs.readFileSync(path.join(ROOT, 'admin.html'), 'utf8')
+  .replace(/<script[\s\S]*?<\/script>/g, '<script></script>');
+const adminIds = [...adminMarkup.matchAll(/\sid\s*=\s*["']([^"']+)["']/g)].map((match) => match[1]);
+t(`the admin console's ${adminIds.length} element ids are unique`,
+  new Set(adminIds).size === adminIds.length);
+t('every admin view panel has a matching sidebar entry',
+  [...adminMarkup.matchAll(/data-view="([a-z_-]+)"/g)]
+    .every((match) => match[1] === 'team' || adminMarkup.includes(`id="view-${match[1]}"`)));
+
+console.log(`\nPage wiring audit passed (${passed} assertions).`);
