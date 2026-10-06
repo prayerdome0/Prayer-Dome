@@ -69,6 +69,10 @@ Codemagic then runs `npm run verify:all`, builds the signed APK/AAB, verifies
 the signatures with `apksigner`/`jarsigner` and attaches both files to the build
 page.
 
+The Play Console side of the release — listing assets, the policy forms and
+the checklist before the first production upload — is in
+**[PLAY-STORE.md](PLAY-STORE.md)**.
+
 Google Play upload is opt-in. Connect Play under
 **Codemagic → Teams → Integrations**, then add to the `android-release`
 workflow:

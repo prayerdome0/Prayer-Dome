@@ -39,7 +39,9 @@ From then on every push to `main`:
 Codemagic can build the same app without GitHub Actions:
 `codemagic.yaml` provides `web-verify`, `android-debug` and `android-release`
 (signed APK/AAB from a `v*` tag). See **[mobile/CODEMAGIC.md](mobile/CODEMAGIC.md)**
-for the secure variables, the one-time application setup and the release steps.
+for the secure variables, the one-time application setup and the release steps,
+and **[mobile/PLAY-STORE.md](mobile/PLAY-STORE.md)** for the Play Console
+listing, policy forms and pre-release checklist.
 
 ### Optional repository secrets
 
