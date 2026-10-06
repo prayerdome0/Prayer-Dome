@@ -47,16 +47,18 @@ public class VerseWidgetProvider extends AppWidgetProvider {
         VerseWidgetStore store = VerseWidgetStore.get(context);
         Calendar now = Calendar.getInstance();
         for (int appWidgetId : appWidgetIds) {
-            manager.updateAppWidget(appWidgetId, VerseWidgetRenderer.build(context, store, now));
+            manager.updateAppWidget(appWidgetId,
+                    VerseWidgetRenderer.build(context, store, now, manager.getAppWidgetOptions(appWidgetId)));
         }
         VerseWidgetScheduler.schedule(context);
     }
 
     @Override
     public void onAppWidgetOptionsChanged(Context context, AppWidgetManager manager, int appWidgetId, Bundle options) {
-        // A resize is a redraw: the card re-wraps the Scripture text.
+        // A resize is a redraw: the card re-wraps the Scripture text, and a cell
+        // that has become small enough switches to the compact card.
         manager.updateAppWidget(appWidgetId,
-                VerseWidgetRenderer.build(context, VerseWidgetStore.get(context), Calendar.getInstance()));
+                VerseWidgetRenderer.build(context, VerseWidgetStore.get(context), Calendar.getInstance(), options));
     }
 
     @Override

@@ -148,6 +148,16 @@ For the best experience:
 - use Wi-Fi for live video and larger downloads;
 - close unused media when sound continues in the background.
 
+## 13a. The Verse Widget and Your Lock Screen
+
+Prayer Dome can show a verse on your phone even when the app is closed. The **Daily Verse widget** shows the verse for the time of day — morning, midday, afternoon or evening — with its reference, and it changes by itself through the day.
+
+To add it on Android, touch and hold an empty space on your home screen, choose **Widgets**, then find **Prayer Dome** and touch **Daily Verse**. On Android 16 (and on Android 15 tablets) the same card can also sit on your lock screen: turn on **Show widgets on lock screen** in your phone's lock-screen settings, then add **Daily Verse** there.
+
+If your phone does not show widgets on the lock screen, open **Verse Widget** from the main menu. That page lets you choose a card style and text size, search the verse library, keep one verse in front of you for as long as you like, and make a **lock-screen wallpaper** with today's verse sized for your phone. Save it, then set it as your lock screen wallpaper.
+
+You can turn any of this off at any time: remove the widget from your home screen, or switch daily verses off under **My Account → Notification Settings**.
+
 ## 14. Accessibility and Reading Tips
 
 Use browser zoom or your device text-size setting if text is too small. Dark mode can reduce glare in low light. Buttons include icons and text to make actions easier to recognise. Audio narration is available in selected areas.

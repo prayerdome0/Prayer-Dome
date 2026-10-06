@@ -97,9 +97,30 @@ Troubleshooting: a card that never changes means the alarm was killed by a
 battery manager (`adb shell dumpsys alarm | grep prayerdome`); a card showing
 John 3:16 means the packaged data failed its checkpoint self-check.
 
+## Delivery to the lock screen (notifications)
+
+The widget is the always-on half of the feature; `assets/pd-verse-alerts.js` is
+the other half, delivering a verse four times a day as a notification with the
+Prayer Dome logo and a branded verse card, even with the app closed. Both halves
+read the same verse library and honour the same slot times, and the settings card
+on `/account` links members to the studio.
+
+`checkDue()` is deliberately non-reentrant: `lastSent` is only written once a
+verse has been handed to the notification system, so two overlapping checks (the
+timer's first tick while a page is starting, or a settings change while an
+earlier check is still fetching an administrator's special verse and building the
+card) used to deliver the same verse twice. A second check now waits for the
+first, and `tests/verse-alerts.test.js` holds that behaviour.
+
 ## Where it is covered by tests
 
-`tests/widgets.test.js` runs without an Android SDK and asserts:
+`tests/verse-alerts.test.js` (40 checks) covers the notification side in jsdom
+with stubbed browser APIs: the branded notification (reference, logo, verse card,
+tag, actions), one delivery per slot per day, the three-hour catch-up window,
+skipped slots, the administrator's special verse override, permission refusal, and
+the settings card the member actually uses.
+
+`tests/widgets.test.js` (79 checks) runs without an Android SDK and asserts:
 
 * the packaged library is exactly what the build script generates from the site
   library, and every checkpoint replays correctly;

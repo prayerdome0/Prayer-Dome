@@ -27,7 +27,7 @@ for the native classes, the lock-screen support matrix and device testing.
 
 ## Android builds through GitHub Actions
 
-The Android app (`net.prayerdome.app`, version 1.1.0) is built entirely on
+The Android app (`net.prayerdome.app`, version 1.2.0) is built entirely on
 GitHub's servers — no local Android Studio is required. The workflow files are
 staged at `mobile/android-build.yml` (Android) and `ci/verify.yml` (verification)
 because the integration that pushes this branch cannot create files under

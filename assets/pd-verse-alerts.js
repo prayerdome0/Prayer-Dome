@@ -248,8 +248,27 @@
 
     /* --------------------------------------------------------- in-app timer */
     var timer = null;
+    /* Delivery is idempotent per slot and day, but only through `lastSent`,
+       which is written AFTER a verse has been handed to the notification
+       system. Two overlapping runs — the timer's first tick while the app is
+       still starting, or a settings change while a previous check is waiting on
+       the admin-override fetch and the branded card — would therefore both pass
+       the "already sent today" test and deliver the same verse twice. The guard
+       makes a check non-reentrant: a second call while one is in flight is a
+       no-op, so a member never sees the same verse twice on the lock screen. */
+    var checking = false;
 
     async function checkDue(force) {
+        if (checking) return;
+        checking = true;
+        try {
+            await deliverDue(force);
+        } finally {
+            checking = false;
+        }
+    }
+
+    async function deliverDue(force) {
         var settings = read();
         if (!settings.enabled) return;
         var now = new Date();
