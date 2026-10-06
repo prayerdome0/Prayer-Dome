@@ -21,6 +21,7 @@ import { dirname, extname, join, relative } from 'node:path';
 const ROOT = process.cwd();
 const OUTPUT = join(ROOT, 'dist');
 const PUBLIC_DIRECTORIES = ['assets', 'documents'];
+const PUBLIC_WELL_KNOWN_FILES = ['assetlinks.json'];
 const PUBLIC_ROOT_FILES = [
   'Prayer-Dome-User-Guide.pdf',
   'ai-prayer-data.js',
@@ -58,6 +59,11 @@ for (const name of readdirSync(ROOT)) {
 
 for (const name of PUBLIC_ROOT_FILES) {
   copyRequired(join(ROOT, name), join(OUTPUT, name));
+}
+
+// Android App Links verification must be served from /.well-known/assetlinks.json.
+for (const name of PUBLIC_WELL_KNOWN_FILES) {
+  copyRequired(join(ROOT, '.well-known', name), join(OUTPUT, '.well-known', name));
 }
 
 for (const directory of PUBLIC_DIRECTORIES) {

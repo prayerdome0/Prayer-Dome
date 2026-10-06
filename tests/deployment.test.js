@@ -11,7 +11,8 @@ assert.equal(firebase.functions[0].runtime, 'nodejs22');
 
 // Test upload-filter behavior, rather than merely looking for strings.
 for (const file of ['functions/share.js', 'functions/translate.js', 'scripts/build-vercel.mjs',
-  'scripts/install-functions.mjs', 'package-lock.json', ...fs.readdirSync('api').map(name => `api/${name}`)]) {
+  'scripts/install-functions.mjs', 'package-lock.json', '.well-known/assetlinks.json',
+  ...fs.readdirSync('api').map(name => `api/${name}`)]) {
   const result = spawnSync('git', ['-c', 'core.excludesFile=.vercelignore', 'check-ignore', '--no-index', file]);
   assert.equal(result.status, 1, `${file} must survive the Vercel upload filter: ${result.stderr}`);
 }

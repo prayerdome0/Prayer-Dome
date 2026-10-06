@@ -20,7 +20,7 @@
       "seo/**",
       "api/**",
       "functions/**",
-      "**/.*",
+      "**/.DS_Store",
       "**/node_modules/**"
     ],
     "cleanUrls": true,
@@ -298,6 +298,19 @@
           {
             "key": "Content-Type",
             "value": "application/xml"
+          }
+        ]
+      },
+      {
+        "source": "/.well-known/assetlinks.json",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600"
           }
         ]
       },

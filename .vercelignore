@@ -7,6 +7,7 @@
 !documents/
 !functions/
 !scripts/
+!.well-known/
 !*.html
 !ai-prayer-data.js
 !devotional-data.js
