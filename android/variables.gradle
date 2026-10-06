@@ -1,4 +1,5 @@
 ext {
+    // Google Play automatic protection requires Android 7.0 (API 24) or newer.
     minSdkVersion = 24
     compileSdkVersion = 36
     targetSdkVersion = 36

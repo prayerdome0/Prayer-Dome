@@ -160,6 +160,10 @@ const pkg = JSON.parse(read('package.json'));
 t('the native push plugin ships with the app', pkg.dependencies['@capacitor/push-notifications'] !== undefined);
 const gradle = read('android/app/build.gradle');
 t('the release train is versioned for Play', gradle.includes('versionCode 2') && gradle.includes('versionName "1.1.0"'));
+const androidVersions = read('android/variables.gradle');
+const minSdk = Number(androidVersions.match(/minSdkVersion\s*=\s*(\d+)/)?.[1]);
+t('the minimum SDK meets the Play automatic-protection requirement',
+  minSdk >= 24 && gradle.includes('minSdkVersion rootProject.ext.minSdkVersion'), minSdk);
 
 /* -------------------------------------------------------- summary */
 console.log(`\n${passed} passed, ${failed} failed`);
