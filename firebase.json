@@ -47,6 +47,14 @@
         "destination": "/bible.html"
       },
       {
+        "source": "/widgets",
+        "destination": "/widgets.html"
+      },
+      {
+        "source": "/lock-screen-verse",
+        "destination": "/widgets.html"
+      },
+      {
         "source": "/prayer",
         "destination": "/prayer.html"
       },

@@ -359,9 +359,10 @@
               '<div class="pd-verse-preview" id="pdVersePreview">Loading today\u2019s verse…</div>' +
               '<div class="pd-verse-actions">' +
                 '<button class="pd-verse-btn primary" id="pdVerseTest"><i class="pd-i pd-i-bell"></i> Send a test verse now</button>' +
+                '<a class="pd-verse-btn" href="/widgets.html"><i class="pd-i pd-i-smartphone"></i> Widget &amp; lock screen</a>' +
                 '<a class="pd-verse-btn" href="/bible.html"><i class="pd-i pd-i-book-open"></i> Open the Bible</a>' +
               '</div>' +
-              '<p class="pd-verse-note"><i class="pd-i pd-i-info"></i> On Android you can also add the <strong>Prayer Dome Verse widget</strong> to your home or lock screen. On iPhone, install Prayer Dome to the Home Screen and allow notifications to receive verses on the lock screen.</p>' +
+              '<p class="pd-verse-note"><i class="pd-i pd-i-info"></i> On Android the <strong>Daily Verse widget</strong> shows Scripture on your home screen and — on Android 16 QPR1+ phones and Android 15 QPR1+ tablets — on your lock screen, without opening the app. On iPhone, build a lock-screen verse wallpaper in the <a href="/widgets.html">verse widget studio</a>, and keep these notifications on to see the verse on the lock screen four times a day.</p>' +
             '</div>';
 
         var preview = host.querySelector('#pdVersePreview');

@@ -1,7 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Prayer Dome brand palette shared by the app shell and the verse widget.
+     The same values live in assets/pd-brand.css, so the widget card a member
+     previews at /widgets.html is the card the phone renders. -->
 <resources>
     <color name="colorPrimary">#0A4D9B</color>
     <color name="colorPrimaryDark">#07366D</color>
     <color name="colorAccent">#D4AF37</color>
     <color name="ic_launcher_background">#0A4D9B</color>
+
+    <color name="pd_navy">#0A4D9B</color>
+    <color name="pd_navy_deep">#0A3D7A</color>
+    <color name="pd_navy_dark">#07244D</color>
+    <color name="pd_blue_light">#93C5FD</color>
+
+    <color name="pd_gold">#D4AF37</color>
+    <color name="pd_gold_soft">#F6DF8A</color>
+    <color name="pd_gold_deep">#A67C00</color>
+
+    <color name="pd_dawn_start">#FFE9B0</color>
+    <color name="pd_dawn_end">#F6C453</color>
+    <color name="pd_rust">#7C2D12</color>
+    <color name="pd_amber_deep">#92400E</color>
+
+    <color name="pd_white">#FFFFFF</color>
+    <color name="pd_white_70">#B3FFFFFF</color>
+    <color name="pd_ink">#0F172A</color>
+    <color name="pd_slate">#64748B</color>
+    <color name="pd_paper_end">#F1F5F9</color>
 </resources>

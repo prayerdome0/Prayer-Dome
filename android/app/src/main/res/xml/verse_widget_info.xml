@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android widget metadata for the Prayer Dome Daily Verse widget.
+
+     widgetCategory="home_screen|keyguard" places the widget in both the home
+     screen picker and (where the platform supports it) the lock screen picker:
+     Android 15 QPR1 and later on tablets, Android 16 QPR1 and later on phones.
+     Every Android widget is eligible for the lock screen, so no separate lock
+     screen build exists — the same card serves both surfaces.
+
+     updatePeriodMillis is 0: the widget schedules its own wake-ups at the four
+     slot boundaries (see VerseWidgetScheduler.java) instead of asking the system
+     to poll every 30 minutes. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/verse_widget_description"
+    android:initialLayout="@layout/verse_widget"
+    android:maxResizeHeight="280dp"
+    android:maxResizeWidth="460dp"
+    android:minHeight="110dp"
+    android:minResizeHeight="70dp"
+    android:minResizeWidth="180dp"
+    android:minWidth="250dp"
+    android:previewImage="@drawable/widget_preview"
+    android:previewLayout="@layout/verse_widget_preview"
+    android:resizeMode="horizontal|vertical"
+    android:targetCellHeight="2"
+    android:targetCellWidth="4"
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen|keyguard" />

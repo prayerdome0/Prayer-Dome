@@ -28,7 +28,16 @@
       "priority": "0.9",
       "changefreq": "weekly"
     },
-    "prayer.html": {
+      "widgets.html": {
+      "path": "/widgets",
+      "title": "Lock Screen Bible Verse Widget & Wallpaper | Prayer Dome",
+      "description": "Put God's Word on your phone's lock screen: add the Prayer Dome Daily Verse widget on Android or create a lock-screen Bible verse wallpaper for iPhone and Android.",
+      "keywords": "bible verse lock screen, lock screen widget, daily verse widget, christian lock screen wallpaper, verse of the day widget, prayer dome",
+      "schema": "webapp",
+      "priority": "0.8",
+      "changefreq": "monthly"
+    },
+  "prayer.html": {
       "path": "/prayer",
       "title": "Global Prayer Wall | Share & Answer Prayer Requests | Prayer Dome",
       "description": "Post a prayer request and let believers around the world pray with you. Public, private or anonymous requests, live prayer counters and answered-prayer testimonies.",

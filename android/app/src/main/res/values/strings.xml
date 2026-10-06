@@ -4,4 +4,11 @@
     <string name="title_activity_main">Prayer Dome</string>
     <string name="package_name">net.prayerdome.app</string>
     <string name="custom_url_scheme">net.prayerdome.app</string>
+
+    <!-- Verse widget: the label under the icon on the home screen, the line the
+         widget picker shows, and the brand credit inside the card. -->
+    <string name="verse_widget_name">Daily Verse</string>
+    <string name="verse_widget_description">God\u2019s Word on your home screen and lock screen — a new Prayer Dome verse morning, midday, afternoon and evening.</string>
+    <string name="verse_widget_brand">PRAYER DOME · PRAYERDOME.NET</string>
+    <string name="verse_widget_refresh">Show the verse for this hour</string>
 </resources>
