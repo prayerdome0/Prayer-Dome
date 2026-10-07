@@ -402,6 +402,19 @@
         grid-template-columns: 1fr 1fr;
       }
     }
+
+    /* Domey is the star of this page: a bigger stage than the shared default,
+       so his face, mouth and hand actions are easy to see. */
+    #panel-talk .pd-mascot {
+      grid-template-columns: minmax(220px, min(46vw, 420px)) minmax(0, 1fr);
+      align-items: start;
+    }
+    #panel-talk .pdm-stage { aspect-ratio: 11 / 12.4; }
+    #panel-talk .pdm-char-wrap { width: 90%; }
+    @media (max-width: 760px) {
+      #panel-talk .pd-mascot { grid-template-columns: minmax(0, 1fr); }
+      #panel-talk .pdm-stage { max-width: 340px; margin: 0 auto; }
+    }
   </style>
   
   <script src="/translation-data.js"></script>
@@ -448,14 +461,14 @@
 <main class="game-wrap">
   <section class="game-hero">
     <span class="pd-acad-eyebrow"><i class="pd-i pd-i-gamepad-2"></i> PRAYERDOME FAITH JOURNEY</span>
-    <h1>Your Spiritual Growth Journey</h1>
-    <p>Travel through different spiritual stages, solve daily situational challenges, earn Faith Points (XP), collect beautiful badges, and maintain your streak!</p>
+    <h1>Play Bible Games with Domey</h1>
+    <p>Domey is your cartoon host: he speaks out loud with a real moving mouth, waves, claps and dances, and he hears your voice when you answer. Play the Bible challenge with him, earn Faith Points (XP), collect badges and keep your streak alive!</p>
     <div>
       <button class="pd-acad-btn pd-acad-btn-primary" onclick="talkWithDomey()"><i class="pd-i pd-i-mic-vocal"></i> Talk with Domey</button>
       <button class="pd-acad-btn pd-acad-btn-secondary" onclick="scrollPlay()"><i class="pd-i pd-i-play"></i> Play Today's Challenge</button>
       <button class="pd-acad-btn pd-acad-btn-ghost" onclick="scrollMystery()" style="border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-gift"></i> Mystery Challenge</button>
     </div>
-    <p class="pd-acad-chip gold" style="margin-top:16px;"><i class="pd-i pd-i-sparkles"></i> Domey talks, listens and answers — just like a real quiz host</p>
+    <p class="pd-acad-chip gold" style="margin-top:16px;"><i class="pd-i pd-i-sparkles"></i> Talk to him — he really does hear you, and he answers back</p>
   </section>
 
   <!-- STATS -->
@@ -522,13 +535,13 @@
     <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;"><span class="pd-acad-chip"><i class="pd-i pd-i-info"></i> Progress auto-saves and syncs with Academy</span><span class="pd-acad-chip"><i class="pd-i pd-i-trophy"></i> Earn XP & unlock levels</span></div>
   </section>
 
-  <!-- TALK WITH DOMEY — cartoon voice host -->
-  <section class="pd-acad-card" id="panel-talk" style="display:none; padding:24px; margin-bottom:20px;">
+  <!-- TALK WITH DOMEY — the cartoon host who speaks, hears you and acts -->
+  <section class="pd-acad-card" id="panel-talk" style="padding:24px; margin-bottom:20px;">
     <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
       <h3 style="margin:0; font-family:Poppins,sans-serif; color:var(--pd-acad-blue); font-size:1.3rem;"><i class="pd-i pd-i-mic-vocal" style="color:var(--pd-gold);"></i> Talk with Domey</h3>
-      <span class="pd-acad-chip gold" style="margin-left:auto;"><i class="pd-i pd-i-sparkles"></i> Cartoon voice host</span>
+      <span class="pd-acad-chip gold" style="margin-left:auto;"><i class="pd-i pd-i-sparkles"></i> Speaks • Hears you • Acts</span>
     </div>
-    <p style="color:var(--pd-acad-muted); margin:0 0 18px; line-height:1.6;">Domey is the Prayer Dome cartoon host. He welcomes you out loud, asks Bible questions, listens to your answer, and explains the scripture behind every question. Answer by talking, tapping, or typing.</p>
+    <p style="color:var(--pd-acad-muted); margin:0 0 18px; line-height:1.6;">Domey is the Prayer Dome cartoon host — with a real moving mouth, hands that wave and clap, and ears that hear your voice. Tap <strong>Start the show</strong>, then simply talk to him: say your answer, ask him to <em>repeat</em>, ask for a <em>hint</em>, or say <em>skip</em>. He replies out loud and explains the scripture behind every question.</p>
 
     <div id="domeyStageWrap" style="padding:clamp(14px,2vw,22px); border-radius:26px; background:linear-gradient(150deg, #07244d 0%, #0A4D9B 60%, #0a3d7a 100%); box-shadow:var(--pd-shadow-lg);">
       <div id="domeyStage" aria-label="Domey, your cartoon Bible quiz host"></div>
@@ -540,6 +553,11 @@
       <span class="pd-acad-chip" id="domeyBestChip"><i class="pd-i pd-i-trophy"></i> Best score: —</span>
       <span class="pd-acad-chip" id="domeyMicChip"><i class="pd-i pd-i-mic"></i> Voice answers ready</span>
     </div>
+
+    <p id="domeyMicNote" style="margin:12px 0 0; font-size:.86rem; color:var(--pd-acad-muted); line-height:1.55;">
+      <i class="pd-i pd-i-info" style="color:var(--pd-gold);"></i>
+      Domey listens on your device through your browser's own speech engine — nothing is recorded, and you can always tap a choice or type instead.
+    </p>
 
     <div id="domeySummary" style="display:none; margin-top:18px; padding:18px; border-radius:20px; background:linear-gradient(135deg, rgba(212,175,55,.12), rgba(10,77,155,.06)); border:1px solid rgba(212,175,55,.35);"></div>
   </section>
@@ -1086,6 +1104,21 @@
     }
   }
 
+  function updateDomeyMicNote(on) {
+    var note = document.getElementById('domeyMicNote');
+    if (!note) return;
+    var ready = window.PDMascot && PDMascot.supportsListening();
+    if (!ready) {
+      note.innerHTML = '<i class="pd-i pd-i-info" style="color:var(--pd-gold);"></i> ' +
+        'This browser cannot listen to your voice — but Domey still speaks, and you can tap a choice or type every answer.';
+      return;
+    }
+    note.innerHTML = '<i class="pd-i ' + (on ? 'pd-i-mic' : 'pd-i-info') + '" style="color:var(--pd-gold);"></i> ' +
+      (on
+        ? 'Your microphone is on — talk to Domey like a friend. Say <strong>repeat</strong>, <strong>hint</strong>, <strong>skip</strong> or <strong>slow down</strong> any time. Nothing is recorded; everything is answered on your device.'
+        : 'Tap <strong>Start the show</strong> and Domey will ask for your microphone so he can hear your answers. Nothing is recorded, and you can always tap a choice or type instead.');
+  }
+
   function ensureDomey() {
     if (domey || !window.PDMascot) return domey;
     var ui = domeyElements();
@@ -1099,9 +1132,21 @@
     domey.on('mic', function (on) {
       var chip = domeyElements().mic;
       if (chip) chip.innerHTML = '<i class="pd-i ' + (on ? 'pd-i-mic' : 'pd-i-mic-off') + '"></i> ' + (on ? 'Listening for your voice' : 'Voice answers ready');
+      updateDomeyMicNote(on);
     });
     renderDomeyStats();
+    updateDomeyMicNote(false);
     return domey;
+  }
+
+  /* Greet the member the moment the page is ready: Domey waves hello, so the
+     character is alive before the show even starts. */
+  function wakeDomey() {
+    var host = ensureDomey();
+    if (!host) return null;
+    host.act('wave', 1600);
+    host.setStatus('Tap Start the show and talk to me');
+    return host;
   }
 
   function domeySummary(data) {
@@ -1135,6 +1180,9 @@
     if (!host) return;
     var ui = domeyElements();
     if (ui.summary) ui.summary.style.display = 'none';
+    // Ask for the microphone right now, while this tap is still a user gesture:
+    // it is the only moment a browser will let us open Domey's ears.
+    if (host.canHear()) host.enableMic();
     if (ui.startBtn) { ui.startBtn.disabled = true; ui.startBtn.innerHTML = '<i class="pd-i pd-i-loader-circle pd-i-spin"></i> Domey is talking…'; }
     domeyBusy = true;
     var awarded = 0;
@@ -1399,11 +1447,14 @@
     startLeaderboardListener();
     renderDomeyStats();
 
+    // Domey is the host of this page: wake him up and let him wave hello.
+    wakeDomey();
+
     var domeyStart = document.getElementById('domeyStartBtn');
     if (domeyStart) domeyStart.addEventListener('click', function () { startDomeyShow(); });
     var domeyStop = document.getElementById('domeyStopBtn');
     if (domeyStop) domeyStop.addEventListener('click', function () {
-      if (domey) { domey.stop(); domey.setStatus('Stopped — tap Start the show when you are ready'); }
+      if (domey) { domey.hurry(); domey.stop(); domey.setStatus('Stopped — tap Start the show when you are ready'); }
       var ui = domeyElements();
       if (ui.startBtn) ui.startBtn.innerHTML = '<i class="pd-i pd-i-play"></i> Start the show';
       domeyBusy = false;

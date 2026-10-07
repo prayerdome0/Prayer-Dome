@@ -248,29 +248,67 @@ body.light-mode .pd-mascot {
 
 .pdm-shadow { fill: rgba(3, 11, 24, .34); animation: pdm-shadow 4.4s ease-in-out infinite; }
 
-.pdm-robe { fill: url(#pdmRobe); }
+/* The robe, face, hair, iris and book cover are painted with the gradients
+   declared inside the character SVG itself, so the stylesheet must NOT set a
+   flat `fill` on them: a CSS declaration beats a presentation attribute, and
+   the character would lose all of its shading. */
+.pdm-robe-light { opacity: .8; }
+.pdm-robe-fold { fill: none; stroke: #06356f; stroke-width: 2.4; stroke-linecap: round; opacity: .55; }
+.pdm-robe-hem { fill: none; stroke: #06356f; stroke-width: 2.6; stroke-linecap: round; opacity: .5; }
 .pdm-robe-trim { fill: none; stroke: var(--pdm-gold); stroke-width: 3.5; stroke-linejoin: round; }
 .pdm-sash { fill: var(--pdm-gold); opacity: .92; }
+.pdm-sash-knot { fill: var(--pdm-gold); }
+.pdm-sash-knot + .pdm-sash-tail,
+.pdm-sash-tail { fill: none; stroke: var(--pdm-gold); stroke-width: 5; stroke-linecap: round; opacity: .9; }
 .pdm-leg { fill: #1b3a63; }
 .pdm-shoe { fill: #101d33; }
 .pdm-skin { fill: var(--pdm-skin); }
 .pdm-skin-shade { fill: var(--pdm-skin-shade); }
-.pdm-hair { fill: var(--pdm-hair); }
-.pdm-face { fill: var(--pdm-skin); }
+
+.pdm-neck-shade { fill: var(--pdm-skin-shade); opacity: .75; }
+
+
+.pdm-hair-lock { fill: #6f4c38; }
+.pdm-face-light { fill: #ffffff; opacity: .13; }
+.pdm-face-side { fill: var(--pdm-skin-shade); opacity: .2; }
+.pdm-face-shade { fill: #b8804f; opacity: .22; }
 .pdm-ear { fill: var(--pdm-skin-shade); }
 .pdm-eye-white { fill: #ffffff; }
+
 .pdm-pupil { fill: #1b2436; }
 .pdm-glint { fill: #ffffff; opacity: .92; }
+.pdm-glint-sm { opacity: .55; }
+.pdm-lash { fill: none; stroke: var(--pdm-hair); stroke-width: 2.6; stroke-linecap: round; opacity: .8; }
 .pdm-lid { fill: var(--pdm-skin); opacity: 0; }
-.pdm-brow { fill: none; stroke: var(--pdm-hair); stroke-width: 5; stroke-linecap: round; }
+.pdm-brow { fill: none; stroke: var(--pdm-hair); stroke-width: 5.4; stroke-linecap: round; }
+.pdm-nose { fill: none; stroke: var(--pdm-skin-shade); stroke-width: 3.2; stroke-linecap: round; opacity: .85; }
+.pdm-nose-shade { fill: none; stroke: var(--pdm-skin-shade); stroke-width: 2.4; stroke-linecap: round; opacity: .5; }
 .pdm-cheek { fill: var(--pdm-cheek); opacity: .32; }
 .pdm-mouth { fill: none; stroke: #7b2f2a; stroke-width: 5; stroke-linecap: round; }
 .pdm-mouth-fill { fill: #7b2f2a; stroke: none; }
-.pdm-book-cover { fill: #7b2f2a; }
+/* speaking mouths: cavity, teeth and tongue, revealed one viseme at a time */
+.pdm-mouth-cavity { fill: #5c1f22; }
+.pdm-lip-fill { fill: #8d4038; }
+.pdm-lip { fill: none; stroke: #8d4038; stroke-width: 3.2; stroke-linecap: round; }
+.pdm-teeth { fill: #fdf6e3; }
+.pdm-tongue { fill: #c4626a; }
+
 .pdm-book-page { fill: #fdf6e3; }
+.pdm-book-lines { fill: none; stroke: #d8cbaa; stroke-width: 1.4; }
 .pdm-book-cross { fill: none; stroke: var(--pdm-gold-soft); stroke-width: 4; stroke-linecap: round; }
 .pdm-emblem { fill: none; stroke: var(--pdm-gold); stroke-width: 3.4; stroke-linecap: round; }
 .pdm-hand { fill: var(--pdm-skin); }
+.pdm-fingers { fill: none; stroke: var(--pdm-skin-shade); stroke-width: 2; stroke-linecap: round; opacity: .7; }
+.pdm-finger { stroke: var(--pdm-skin-shade); stroke-width: 2; stroke-linecap: round; opacity: .7; }
+.pdm-sleeve-light { pointer-events: none; }
+.pdm-glow-pool { opacity: .5; pointer-events: none; }
+/* the hand microphone, only visible when Domey is listening to you */
+.pdm-prop { opacity: 0; transition: opacity .2s ease; }
+.pdm-prop-mic { transform-box: fill-box; transform-origin: 50% 100%; }
+.pdm-mic-body { fill: #223046; }
+.pdm-mic-grille { fill: #0f1726; stroke: #8fb6e8; stroke-width: 1.6; }
+.pdm-mic-band { fill: none; stroke: var(--pdm-gold); stroke-width: 2; }
+.pdm-mic-stem { fill: #223046; }
 .pdm-sparkle { fill: var(--pdm-gold-soft); opacity: 0; transform-origin: center; }
 
 .pdm-arm-r,
@@ -300,14 +338,46 @@ body.light-mode .pd-mascot {
 .pd-mascot[data-pdm-state="happy"] .pdm-cheek,
 .pd-mascot[data-pdm-state="celebrating"] .pdm-cheek { opacity: .55; }
 
-/* --- speaking: lip-sync flap + a lively little bounce --- */
-.pd-mascot[data-pdm-state="speaking"] .pdm-mouth-open {
+/* --- speaking: the viseme mouth ------------------------------------------
+   While Domey speaks, the fixed expression mouths step aside and the lip-sync
+   engine picks a mouth posture per syllable through `data-pdm-vis`. A browser
+   without the engine (rare) falls back to the single flapping open mouth. */
+.pdm-visemes .pdm-vis { opacity: 0; transition: opacity .055s linear; }
+.pd-mascot[data-pdm-vis="rest"] .pdm-vis-rest,
+.pd-mascot[data-pdm-vis="M"] .pdm-vis-M,
+.pd-mascot[data-pdm-vis="F"] .pdm-vis-F,
+.pd-mascot[data-pdm-vis="E"] .pdm-vis-E,
+.pd-mascot[data-pdm-vis="I"] .pdm-vis-I,
+.pd-mascot[data-pdm-vis="A"] .pdm-vis-A,
+.pd-mascot[data-pdm-vis="O"] .pdm-vis-O,
+.pd-mascot[data-pdm-vis="U"] .pdm-vis-U,
+.pd-mascot[data-pdm-vis="L"] .pdm-vis-L { opacity: 1; }
+
+.pdm-mouths,
+.pdm-visemes { transform-box: fill-box; transform-origin: 50% 12%; transition: opacity .12s ease; }
+.pdm-visemes { transform: translateY(calc(var(--pdm-jaw, 0) * 1.1px)); }
+
+/* While the lip-sync engine owns the mouth (`data-pdm-vis` present — see the
+   viseme rules above), the fixed expression mouths step aside. When it lets go,
+   the mood takes the mouth back: the smile, the pout, the praying lips. */
+.pd-mascot[data-pdm-vis] .pdm-mouths { opacity: 0; }
+/* A browser with no speech engine still gets a talking mouth, not a frozen one. */
+.pd-mascot[data-pdm-state="speaking"]:not([data-pdm-vis]) .pdm-mouth-open { opacity: 1; }
+.pd-mascot[data-pdm-state="speaking"]:not([data-pdm-vis]) .pdm-mouth-open {
   transform-box: fill-box;
   transform-origin: 50% 20%;
   animation: pdm-talk var(--pdm-talk-speed, .17s) steps(2, end) infinite;
 }
 .pd-mascot[data-pdm-state="speaking"] .pdm-head { animation: pdm-head-talk .5s ease-in-out infinite; }
 .pd-mascot[data-pdm-state="speaking"] .pdm-char-wrap { animation: pdm-float-talk 1.1s ease-in-out infinite; }
+
+/* --- eyes that follow the member's pointer -------------------------------- */
+.pdm-gaze {
+  transform: translate(var(--pdm-gaze-x, 0px), var(--pdm-gaze-y, 0px));
+  transition: transform .28s cubic-bezier(.22, .61, .36, 1);
+  transform-box: fill-box;
+}
+.pd-mascot[data-pdm-state="idle"] .pdm-head { transform: rotate(var(--pdm-head-yaw, 0deg)); transition: transform .5s ease; }
 
 /* --- thinking: eyes up, one brow raised --- */
 .pd-mascot[data-pdm-state="thinking"] .pdm-eyes { transform: translateY(-3px); }
@@ -344,6 +414,92 @@ body.light-mode .pd-mascot {
 .pdm-eyes .pdm-lid { animation: pdm-blink 5.4s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 0; }
 .pd-mascot[data-pdm-state="praying"] .pdm-eyes .pdm-lid { opacity: 1; animation: none; }
 .pd-mascot[data-pdm-state="celebrating"] .pdm-eyes .pdm-lid { animation-duration: 3.2s; }
+.pdm-eye .pdm-lid { animation-delay: var(--pdm-blink-delay, 0s); }
+
+/* ============================== ACTIONS ==================================
+   Short, readable performances: a wave hello, a pointed finger, counting on
+   the fingers, a shrug, a clap, hands on the heart, a dance. Each one is a
+   class on the root, played for as long as the host leaves it there. */
+
+.pdm-act-wave .pdm-arm-r { animation: pdm-g-wave 1.15s ease-in-out 1; }
+.pdm-act-wave .pdm-head { animation: pdm-g-hail 1.15s ease-in-out 1; }
+.pdm-act-wave .pdm-cheek { opacity: .5; }
+
+.pdm-act-point .pdm-arm-r { animation: pdm-g-point 1.05s ease-in-out 1; }
+.pdm-act-point .pdm-head { animation: pdm-g-lean-r 1.05s ease-in-out 1; }
+.pdm-act-point .pdm-brow-r { transform: translateY(-3px); }
+
+.pdm-act-open .pdm-arm-l { animation: pdm-g-open-l 1.3s ease-in-out 1; }
+.pdm-act-open .pdm-arm-r { animation: pdm-g-open-r 1.3s ease-in-out 1; }
+.pdm-act-open .pdm-brows { transform: translateY(-2px); }
+
+.pdm-act-offer .pdm-arm-l { animation: pdm-g-offer-l 1.2s ease-in-out 1; }
+.pdm-act-offer .pdm-arm-r { animation: pdm-g-offer-r 1.2s ease-in-out 1; }
+.pdm-act-offer .pdm-head { animation: pdm-g-nod-soft 1.2s ease-in-out 1; }
+
+.pdm-act-count .pdm-arm-l { animation: pdm-g-count 1.1s ease-in-out 1; }
+.pdm-act-count .pdm-head { animation: pdm-g-nod-soft 1.1s ease-in-out 1; }
+
+.pdm-act-thumb .pdm-arm-r { animation: pdm-g-thumb 1.15s ease-in-out 1; }
+.pdm-act-thumb .pdm-cheek { opacity: .55; }
+
+.pdm-act-raise .pdm-arm-l { animation: pdm-g-up-l 1.25s ease-in-out 1; }
+.pdm-act-raise .pdm-arm-r { animation: pdm-g-up-r 1.25s ease-in-out 1; }
+.pdm-act-raise .pdm-char-wrap { animation: pdm-jump 1.25s ease-in-out 1; }
+
+.pdm-act-shrug .pdm-arm-l { animation: pdm-g-shrug-l 1.2s ease-in-out 1; }
+.pdm-act-shrug .pdm-arm-r { animation: pdm-g-shrug-r 1.2s ease-in-out 1; }
+.pdm-act-shrug .pdm-head { animation: pdm-g-tilt 1.2s ease-in-out 1; }
+
+.pdm-act-clap .pdm-arm-l { animation: pdm-g-clap-l .34s ease-in-out 4; }
+.pdm-act-clap .pdm-arm-r { animation: pdm-g-clap-r .34s ease-in-out 4; }
+.pdm-act-clap .pdm-cheek { opacity: .6; }
+.pdm-act-clap .pdm-mouths { opacity: 0; }
+
+.pdm-act-heart .pdm-arm-l { animation: pdm-g-heart-l 1.5s ease-in-out 1; }
+.pdm-act-heart .pdm-arm-r { animation: pdm-g-heart-r 1.5s ease-in-out 1; }
+.pdm-act-heart .pdm-head { animation: pdm-g-tilt 1.5s ease-in-out 1; }
+.pdm-act-heart .pdm-cheek { opacity: .6; }
+
+.pdm-act-think .pdm-arm-l { animation: pdm-g-chin 1.6s ease-in-out 1; }
+.pdm-act-think .pdm-head { animation: pdm-g-tilt 1.6s ease-in-out 1; }
+
+.pdm-act-mic .pdm-arm-l { transform: rotate(-24deg) translate(4px, -4px); }
+.pdm-act-mic .pdm-head { animation: pdm-g-tilt 2.4s ease-in-out infinite; }
+
+.pdm-act-dance .pdm-char-wrap { animation: pdm-g-dance .46s ease-in-out 5; }
+.pdm-act-dance .pdm-arm-l { animation: pdm-g-dance-l .46s ease-in-out 5; }
+.pdm-act-dance .pdm-arm-r { animation: pdm-g-dance-r .46s ease-in-out 5; }
+.pdm-act-dance .pdm-head { animation: pdm-head-talk .46s ease-in-out 5; }
+
+.pdm-act-jump .pdm-char-wrap { animation: pdm-jump .5s ease-in-out 2; }
+
+/* the little hand microphone appears exactly when he is listening */
+.pd-mascot[data-pdm-state="listening"] .pdm-prop-mic,
+.pd-mascot[data-pdm-act="mic"] .pdm-prop-mic { opacity: 1; }
+
+/* ============================== REACTIONS ================================
+   Icons that float up the stage when something good happens. Decoration only
+   — never the only way a result is communicated. */
+.pdm-reactions {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.pdm-reaction {
+  position: absolute;
+  bottom: 20%;
+  color: var(--pdm-gold-soft);
+  opacity: 0;
+  font-size: clamp(15px, 4.4vw, 24px);
+  filter: drop-shadow(0 4px 10px rgba(3, 11, 24, .5));
+  animation: pdm-reaction 1.9s ease-out forwards;
+}
+
+.pdm-reaction .pd-i { font-size: inherit; }
 
 /* ============================== BUBBLE =================================== */
 
@@ -639,6 +795,138 @@ body.light-mode .pd-mascot {
 @keyframes pdm-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: .42; }
+}
+@keyframes pdm-reaction {
+  0% { opacity: 0; transform: translateY(6px) scale(.55) rotate(-6deg); }
+  22% { opacity: 1; transform: translateY(-16px) scale(1.05) rotate(4deg); }
+  100% { opacity: 0; transform: translateY(-118px) scale(1.16) rotate(-8deg); }
+}
+
+/* ---- gestures: hands, head and body ---- */
+@keyframes pdm-g-wave {
+  0% { transform: rotate(2deg); }
+  22% { transform: rotate(-58deg); }
+  42% { transform: rotate(-34deg); }
+  60% { transform: rotate(-56deg); }
+  78% { transform: rotate(-38deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes pdm-g-hail {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(5deg) translateY(-2px); }
+  65% { transform: rotate(-3deg); }
+}
+@keyframes pdm-g-point {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-30deg) translate(-6px, -6px); }
+  60% { transform: rotate(-24deg) translate(-4px, -4px); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes pdm-g-lean-r {
+  0%, 100% { transform: rotate(0deg); }
+  35% { transform: rotate(3deg); }
+}
+@keyframes pdm-g-open-l {
+  0% { transform: rotate(0deg); }
+  30% { transform: rotate(-34deg) translate(4px, -4px); }
+  70% { transform: rotate(-27deg) translate(3px, -2px); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes pdm-g-open-r {
+  0% { transform: rotate(0deg); }
+  30% { transform: rotate(34deg) translate(-4px, -4px); }
+  70% { transform: rotate(27deg) translate(-3px, -2px); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes pdm-g-offer-l {
+  0% { transform: rotate(0deg); }
+  35% { transform: rotate(-46deg) translate(7px, -12px); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes pdm-g-offer-r {
+  0% { transform: rotate(0deg); }
+  35% { transform: rotate(46deg) translate(-7px, -12px); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes pdm-g-count {
+  0% { transform: rotate(0deg); }
+  30% { transform: rotate(-60deg) translate(8px, -6px); }
+  50% { transform: rotate(-56deg) translate(7px, -5px); }
+  75% { transform: rotate(-62deg) translate(8px, -7px); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes pdm-g-nod-soft {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  40% { transform: rotate(0deg) translateY(3px); }
+}
+@keyframes pdm-g-thumb {
+  0% { transform: rotate(0deg); }
+  30% { transform: rotate(-44deg) translate(4px, -2px); }
+  75% { transform: rotate(-40deg) translate(3px, -1px); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes pdm-g-up-l {
+  0% { transform: rotate(0deg); }
+  35% { transform: rotate(-64deg) translate(2px, -4px); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes pdm-g-up-r {
+  0% { transform: rotate(0deg); }
+  35% { transform: rotate(64deg) translate(-2px, -4px); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes pdm-g-shrug-l {
+  0% { transform: rotate(0deg); }
+  40% { transform: rotate(-18deg) translate(3px, -6px); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes pdm-g-shrug-r {
+  0% { transform: rotate(0deg); }
+  40% { transform: rotate(18deg) translate(-3px, -6px); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes pdm-g-tilt {
+  0%, 100% { transform: rotate(0deg); }
+  40% { transform: rotate(-6deg); }
+}
+@keyframes pdm-g-clap-l {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-52deg) translate(16px, -14px); }
+}
+@keyframes pdm-g-clap-r {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(52deg) translate(-16px, -14px); }
+}
+@keyframes pdm-g-heart-l {
+  0% { transform: rotate(0deg); }
+  30% { transform: rotate(-38deg) translate(12px, -10px); }
+  80% { transform: rotate(-34deg) translate(11px, -9px); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes pdm-g-heart-r {
+  0% { transform: rotate(0deg); }
+  30% { transform: rotate(38deg) translate(-12px, -10px); }
+  80% { transform: rotate(34deg) translate(-11px, -9px); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes pdm-g-chin {
+  0% { transform: rotate(0deg); }
+  30% { transform: rotate(-72deg) translate(6px, 8px); }
+  85% { transform: rotate(-70deg) translate(6px, 7px); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes pdm-g-dance {
+  0%, 100% { transform: translate(-50%, 0) rotate(0deg); }
+  25% { transform: translate(-50%, -10px) rotate(-3deg); }
+  75% { transform: translate(-50%, -10px) rotate(3deg); }
+}
+@keyframes pdm-g-dance-l {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-46deg) translate(3px, -6px); }
+}
+@keyframes pdm-g-dance-r {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(46deg) translate(-3px, -6px); }
 }
 
 /* ============================ OTHER PIECES =============================== */

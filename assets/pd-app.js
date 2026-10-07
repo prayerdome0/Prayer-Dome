@@ -515,11 +515,22 @@
       else themeMeta.setAttribute('content', '#0A4D9B');
     },
     toggleNotifPanel: function (forceOpen) {
-      var panel = notifications.panelEl;
+      var panel = notifications.panelEl || notifications.ensurePanel();
       if (!panel) return;
       var open = typeof forceOpen === 'boolean' ? forceOpen : !panel.classList.contains('open');
       panel.classList.toggle('open', open);
-      if (open) notifications.syncBadge();
+      var bell = $('#pdNotifBell') || $('#notificationBell') || $('.pd-bell-btn');
+      if (bell) bell.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (!open) return;
+      // Opening the centre always shows the current list, the right empty
+      // state, and the permission strip when alerts are still off.
+      notifications.render();
+      notifications.syncAlerts();
+      notifications.syncBadge();
+      var first = panel.querySelector('.pd-notif-alerts:not([hidden]) button, .pd-notif-item, .pd-notif-head-actions button');
+      if (first && typeof first.focus === 'function') {
+        try { first.focus({ preventScroll: true }); } catch (e) {}
+      }
     },
     /* Branded member photo — falls back to the Prayer Dome avatar, never to a
        third-party placeholder image. */
@@ -960,10 +971,77 @@
     badgeEl: null,
     listEl: null,
     panelEl: null,
+    listId: 'pdNotifList',
+    /**
+     * The notification centre must exist on every page that shows a bell.
+     *
+     * Several pages carried the bell button but not the panel markup, so a tap
+     * on the bell ran `toggleNotifPanel()`, found nothing to open, and the
+     * member was left looking at a button that does nothing. Any page with a
+     * bell now gets the centre built for it, with the same markup, classes and
+     * empty state as the home page — the bell always shows something.
+     */
+    ensurePanel: function () {
+      var existing = $('#pdNotifPanel');
+      if (existing) {
+        notifications.panelEl = existing;
+        notifications.listEl = $('#pdNotifList') || existing.querySelector('[data-pd-notif-list]');
+        if (notifications.listEl) notifications.listId = notifications.listEl.id || notifications.listId;
+        return existing;
+      }
+      var bell = $('#pdNotifBell') || $('#notificationBell') || $('.pd-bell-btn');
+      if (!bell || !document.body) return null;
+
+      var panel = document.createElement('div');
+      panel.className = 'pd-notif-panel';
+      panel.id = 'pdNotifPanel';
+      panel.setAttribute('role', 'dialog');
+      panel.setAttribute('aria-modal', 'false');
+      panel.setAttribute('aria-label', i18n.t('notifications.title'));
+      panel.innerHTML =
+        '<div class="pd-notif-head">' +
+          '<h3><i class="pd-i pd-i-bell"></i> <span>' + esc(i18n.t('notifications.title')) + '</span></h3>' +
+          '<div class="pd-notif-head-actions">' +
+            '<button type="button" title="Mark all read" data-pd-notif="read-all"><i class="pd-i pd-i-check-check"></i></button>' +
+            '<button type="button" title="Clear" data-pd-notif="clear"><i class="pd-i pd-i-trash"></i></button>' +
+            '<button type="button" title="Close" data-pd-notif="close"><i class="pd-i pd-i-x"></i></button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="pd-notif-alerts" data-pd-notif="alerts" hidden>' +
+          '<span class="pd-notif-alerts-icon"><i class="pd-i pd-i-bell"></i></span>' +
+          '<span class="pd-notif-alerts-text">Turn on device alerts so Prayer Dome can reach you when the page is closed.</span>' +
+          '<button type="button" class="pd-notif-alerts-btn" data-pd-notif="enable">Turn on</button>' +
+        '</div>' +
+        '<div id="' + notifications.listId + '"></div>';
+      document.body.appendChild(panel);
+
+      // Role scoped by this page's own panel, so several panels never fight.
+      var list = panel.querySelector('#' + notifications.listId);
+      panel.addEventListener('click', function (event) {
+        var action = event.target && event.target.closest ? event.target.closest('[data-pd-notif]') : null;
+        if (!action) return;
+        var what = action.getAttribute('data-pd-notif');
+        if (what === 'close') ui.toggleNotifPanel(false);
+        else if (what === 'clear') notifications.clear();
+        else if (what === 'read-all') notifications.markAllRead();
+        else if (what === 'enable') notifications.showEnablePop();
+      });
+
+      notifications.panelEl = panel;
+      notifications.listEl = list;
+      return panel;
+    },
+    /** Show or hide the "turn on device alerts" strip inside the centre. */
+    syncAlerts: function () {
+      var panel = notifications.panelEl;
+      if (!panel) return;
+      var strip = panel.querySelector('[data-pd-notif="alerts"]');
+      if (!strip) return;
+      strip.hidden = !notifications.canPrompt();
+    },
     init: function () {
       notifications.badgeEl = $('#pdNotifBadge') || $('.pd-bell-badge') || $('#notifBadge');
-      notifications.listEl = $('#pdNotifList');
-      notifications.panelEl = $('#pdNotifPanel');
+      notifications.ensurePanel();
       // Apply stored read state on boot so nothing reappears as "new".
       notifications.items = notifications.items.map(function (n) {
         if (isRead(n)) n.read = true;
@@ -972,20 +1050,23 @@
       if (notifications.listEl) notifications.render();
       notifications.syncBadge();
 
-      // Bell opens the in-app notification center — and if the browser
-      // permission is still "default", it pops the friendly enable dialog
-      // (instead of leaving the user wondering why nothing pings).
-      var bell = $('#pdNotifBell') || $('#notificationBell');
+      // The bell ALWAYS opens the notification centre. It used to open the
+      // "allow notifications" sheet instead on the first tap, which — on a
+      // page with no panel markup at all — meant the member tapped a bell and
+      // saw nothing happen. Permission is now offered inside the open centre
+      // by a small strip, and can be dismissed without losing the panel.
+      var bell = $('#pdNotifBell') || $('#notificationBell') || $('.pd-bell-btn');
       if (bell) {
+        bell.setAttribute('aria-expanded', 'false');
+        if (!bell.hasAttribute('aria-haspopup')) bell.setAttribute('aria-haspopup', 'dialog');
         bell.addEventListener('click', function (e) {
           e.stopPropagation();
-          if (notifications.canPrompt() && !localStorage.getItem('pd_notif_pop_dismissed')) {
-            notifications.showEnablePop();
-          } else {
-            ui.toggleNotifPanel();
-          }
+          ui.toggleNotifPanel();
         });
       }
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') ui.toggleNotifPanel(false);
+      });
       document.addEventListener('click', function (e) {
         var panel = notifications.panelEl;
         if (panel && panel.classList.contains('open') &&
@@ -1315,7 +1396,8 @@
       var list = notifications.listEl;
       if (!list) return;
       if (!notifications.items.length) {
-        list.innerHTML = '<div class="pd-notif-empty"><i class="pd-i pd-i-bell-off"></i><p>' + esc(i18n.t('notifications.empty')) + '</p></div>';
+        list.innerHTML = '<div class="pd-notif-empty"><i class="pd-i pd-i-bell-off"></i><p>' + esc(i18n.t('notifications.empty')) + '</p>' +
+          '<small>Live services, new sermons, events and prayer updates land here.</small></div>';
         return;
       }
       var icons = {
