@@ -238,6 +238,36 @@ body.light-mode .pd-mascot {
   transform-origin: 50% 100%;
 }
 
+/* ======================= 3D CHARACTER (pd-domey3d.js) =====================
+   The three-dimensional Domey is a WebGL canvas living on the same stage as
+   the drawing: the stylesheet's spot, halo and floor stay behind him, so the
+   only thing that changes is that the character itself has depth, real
+   lighting and a mouth that moves in three dimensions. The SVG character is
+   hidden (not removed) so a lost WebGL context can bring it straight back. */
+
+.pd-mascot.pdm-render-3d .pdm-char-wrap {
+  display: none;
+}
+
+.pdm-canvas3d {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  touch-action: pan-y;
+}
+
+.pd-mascot.pdm-render-3d .pdm-spot,
+.pd-mascot.pdm-render-3d .pdm-halo {
+  opacity: .8;
+}
+
+/* Reduced motion still shows the 3D character — talking is the point — but the
+   engine is told to damp the decorative sway, and the CSS float is dropped. */
+@media (prefers-reduced-motion: reduce) {
+  .pd-mascot.pdm-render-3d .pdm-char-wrap { animation: none; }
+}
+
 .pdm-char {
   display: block;
   width: 100%;
