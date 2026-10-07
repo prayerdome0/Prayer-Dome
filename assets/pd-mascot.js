@@ -85,78 +85,173 @@
 
   /* --------------------------------------------------------- the character */
 
-  var CHARACTER = [
-    '<svg class="pdm-char" viewBox="0 0 220 268" role="img" aria-label="Domey, the Prayer Dome cartoon host">',
-    '<defs>',
-    '<linearGradient id="pdmRobe" x1="0" y1="0" x2="0" y2="1">',
-    '<stop offset="0" stop-color="#1367c4"/><stop offset="1" stop-color="#07244d"/>',
-    '</linearGradient>',
-    '<radialGradient id="pdmGlow" cx="0.5" cy="0.5" r="0.5">',
-    '<stop offset="0" stop-color="#f6df8a" stop-opacity="0.55"/><stop offset="1" stop-color="#f6df8a" stop-opacity="0"/>',
-    '</radialGradient>',
-    '</defs>',
-    '<ellipse class="pdm-shadow" cx="110" cy="252" rx="52" ry="10"/>',
-    '<g class="pdm-legs">',
-    '<rect class="pdm-leg" x="90" y="192" width="17" height="46" rx="8"/>',
-    '<rect class="pdm-leg" x="113" y="192" width="17" height="46" rx="8"/>',
-    '<ellipse class="pdm-shoe" cx="98" cy="243" rx="17" ry="10"/>',
-    '<ellipse class="pdm-shoe" cx="122" cy="243" rx="17" ry="10"/>',
-    '</g>',
-    '<g class="pdm-torso">',
-    '<path class="pdm-robe" d="M110 96 C86 96 73 112 71 140 L63 198 C62 206 68 211 76 211 L144 211 C152 211 158 206 157 198 L149 140 C147 112 134 96 110 96 Z"/>',
-    '<path class="pdm-robe-trim" d="M110 96 C86 96 73 112 71 140 L63 198 C62 206 68 211 76 211 L144 211 C152 211 158 206 157 198 L149 140 C147 112 134 96 110 96 Z"/>',
-    '<path class="pdm-sash" d="M73 146 C92 159 128 159 147 146 L147 157 C128 170 92 170 73 157 Z"/>',
-    '<g class="pdm-emblem">',
-    '<path d="M95 124 C95 112 102 106 110 106 C118 106 125 112 125 124"/>',
-    '<path d="M92 124 H128"/>',
-    '</g>',
-    '</g>',
-    '<g class="pdm-arm pdm-arm-l">',
-    '<path d="M82 112 C66 126 59 148 63 168" fill="none" stroke="#0f5cae" stroke-width="17" stroke-linecap="round"/>',
-    '<circle class="pdm-hand" cx="64" cy="172" r="12"/>',
-    '</g>',
-    '<g class="pdm-arm pdm-arm-r">',
-    '<path d="M138 112 C154 124 160 142 157 162" fill="none" stroke="#0f5cae" stroke-width="17" stroke-linecap="round"/>',
-    '<circle class="pdm-hand" cx="156" cy="166" r="12"/>',
-    '<g class="pdm-book" transform="rotate(8 158 190)">',
-    '<rect class="pdm-book-cover" x="136" y="176" width="44" height="30" rx="5"/>',
-    '<rect class="pdm-book-page" x="140" y="180" width="36" height="22" rx="3"/>',
-    '<path class="pdm-book-cross" d="M158 182 V200 M150 189 H166"/>',
-    '</g>',
-    '</g>',
-    '<g class="pdm-head">',
-    '<ellipse class="pdm-ear" cx="64" cy="64" rx="9" ry="11"/>',
-    '<ellipse class="pdm-ear" cx="156" cy="64" rx="9" ry="11"/>',
-    '<ellipse class="pdm-face" cx="110" cy="62" rx="47" ry="49"/>',
+  /* One character, drawn once, shared by every page.
+   *
+   * Everything is inline SVG and every gradient carries a per-mount id, so two
+   * Domeys on one page (the game stage and a helper in the corner) never steal
+   * each other's paint. Shape names are stable because the stylesheet drives
+   * the expressions, the lip-sync visemes and the hand gestures from them.
+   */
+  function characterMarkup(id) {
+    var robe = 'pdmRobe-' + id;
+    var robeLight = 'pdmRobeLight-' + id;
+    var skin = 'pdmSkin-' + id;
+    var hair = 'pdmHair-' + id;
+    var iris = 'pdmIris-' + id;
+    var glow = 'pdmGlow-' + id;
+    var book = 'pdmBook-' + id;
+    return [
+      '<svg class="pdm-char" viewBox="0 0 220 268" role="img" aria-label="Domey, the Prayer Dome cartoon host">',
+      '<defs>',
+      '<linearGradient id="' + robe + '" x1="0.15" y1="0" x2="0.85" y2="1">',
+      '<stop offset="0" stop-color="#2180e2"/><stop offset="0.5" stop-color="#0d4f9e"/><stop offset="1" stop-color="#062a58"/>',
+      '</linearGradient>',
+      '<linearGradient id="' + robeLight + '" x1="0" y1="0" x2="1" y2="1">',
+      '<stop offset="0" stop-color="#8fc6ff" stop-opacity="0.55"/><stop offset="1" stop-color="#8fc6ff" stop-opacity="0"/>',
+      '</linearGradient>',
+      '<linearGradient id="' + skin + '" x1="0.2" y1="0" x2="0.8" y2="1">',
+      '<stop offset="0" stop-color="#fbd9b4"/><stop offset="0.62" stop-color="#f0c193"/><stop offset="1" stop-color="#dda878"/>',
+      '</linearGradient>',
+      '<linearGradient id="' + hair + '" x1="0" y1="0" x2="0.4" y2="1">',
+      '<stop offset="0" stop-color="#4a3327"/><stop offset="1" stop-color="#211510"/>',
+      '</linearGradient>',
+      '<radialGradient id="' + iris + '" cx="0.4" cy="0.35" r="0.75">',
+      '<stop offset="0" stop-color="#8a5f36"/><stop offset="0.7" stop-color="#4a2d18"/><stop offset="1" stop-color="#22140c"/>',
+      '</radialGradient>',
+      '<linearGradient id="' + book + '" x1="0" y1="0" x2="1" y2="1">',
+      '<stop offset="0" stop-color="#8d3a33"/><stop offset="1" stop-color="#5d231f"/>',
+      '</linearGradient>',
+      '<radialGradient id="' + glow + '" cx="0.5" cy="0.5" r="0.5">',
+      '<stop offset="0" stop-color="#f6df8a" stop-opacity="0.55"/><stop offset="1" stop-color="#f6df8a" stop-opacity="0"/>',
+      '</radialGradient>',
+      '</defs>',
+      '<ellipse class="pdm-glow-pool" cx="110" cy="150" rx="86" ry="96" fill="url(#' + glow + ')"/>',
+      '<ellipse class="pdm-shadow" cx="110" cy="252" rx="54" ry="10"/>',
+      // ---- legs, shoes ----
+      '<g class="pdm-legs">',
+      '<rect class="pdm-leg" x="90" y="188" width="17" height="50" rx="8"/>',
+      '<rect class="pdm-leg" x="113" y="188" width="17" height="50" rx="8"/>',
+      '<ellipse class="pdm-shoe" cx="97" cy="243" rx="18" ry="10"/>',
+      '<ellipse class="pdm-shoe" cx="123" cy="243" rx="18" ry="10"/>',
+      '</g>',
+      // ---- neck (behind the robe) ----
+      '<path class="pdm-neck" d="M100 78 H120 V104 C120 110 100 110 100 104 Z" fill="url(#' + skin + ')"/>',
+      '<path class="pdm-neck-shade" d="M100 92 C105 100 115 100 120 92 V100 C115 106 105 106 100 100 Z"/>',
+      // ---- torso ----
+      '<g class="pdm-torso">',
+      '<path class="pdm-robe" d="M110 96 C86 96 73 112 71 140 L63 198 C62 206 68 211 76 211 L144 211 C152 211 158 206 157 198 L149 140 C147 112 134 96 110 96 Z" fill="url(#' + robe + ')"/>',
+      '<path class="pdm-robe-light" d="M96 102 C86 118 82 142 82 166 C82 182 84 196 88 206 L82 206 C78 190 77 168 79 146 C80 128 86 112 96 102 Z" fill="url(#' + robeLight + ')"/>',
+      '<path class="pdm-robe-fold" fill="none" d="M104 104 C100 138 99 174 101 208"/>',
+      '<path class="pdm-robe-fold" fill="none" d="M128 106 C132 140 133 176 131 208"/>',
+      '<path class="pdm-robe-hem" fill="none" d="M64 202 C88 208 132 208 156 202"/>',
+      '<path class="pdm-robe-trim" fill="none" d="M110 96 C86 96 73 112 71 140 L63 198 C62 206 68 211 76 211 L144 211 C152 211 158 206 157 198 L149 140 C147 112 134 96 110 96 Z"/>',
+      '<path class="pdm-sash" d="M73 146 C92 159 128 159 147 146 L147 157 C128 170 92 170 73 157 Z"/>',
+      '<path class="pdm-sash-knot" d="M101 151 C105 147 115 147 119 151 L115 163 H105 Z"/>',
+      '<path class="pdm-sash-tail" fill="none" d="M108 162 C104 170 102 178 102 186"/>',
+      '<g class="pdm-emblem">',
+      '<path d="M95 124 C95 112 102 106 110 106 C118 106 125 112 125 124"/>',
+      '<path d="M92 124 H128"/>',
+      '</g>',
+        '</g>',
+      // ---- arms, hands, and the props that make a gesture readable ----
+      '<g class="pdm-arm pdm-arm-l">',
+      '<path class="pdm-sleeve" d="M82 112 C66 126 59 148 63 168" fill="none" stroke="#0f5cae" stroke-width="17" stroke-linecap="round"/>',
+      '<path class="pdm-sleeve-light" d="M80 110 C70 122 64 136 63 150" fill="none" stroke="#8fc6ff" stroke-width="3.5" stroke-linecap="round" opacity="0.45"/>',
+      '<circle class="pdm-hand" cx="64" cy="172" r="12"/>',
+      '<g class="pdm-fingers"><path class="pdm-finger" fill="none" d="M57 176 C59 181 64 182 69 179"/><path class="pdm-finger" fill="none" d="M56 171 C58 176 63 177 68 174"/></g>',
+      // The hand microphone: hidden until Domey listens, then raised to his mouth.
+      '<g class="pdm-prop pdm-prop-mic" transform="translate(10 -10) rotate(18 66 150)">',
+      '<rect class="pdm-mic-stem" x="62" y="156" width="7" height="20" rx="3.5"/>',
+      '<rect class="pdm-mic-body" x="56" y="126" width="20" height="34" rx="10" fill="#1b2740"/>',
+      '<circle class="pdm-mic-grille" cx="66" cy="135" r="6"/>',
+      '<path class="pdm-mic-band" fill="none" d="M56 148 H76"/>',
+      '</g>',
+      '</g>',
+      '<g class="pdm-arm pdm-arm-r">',
+      '<path class="pdm-sleeve" d="M138 112 C154 124 160 142 157 162" fill="none" stroke="#0f5cae" stroke-width="17" stroke-linecap="round"/>',
+      '<path class="pdm-sleeve-light" d="M140 112 C150 122 156 134 157 148" fill="none" stroke="#8fc6ff" stroke-width="3" stroke-linecap="round" opacity="0.35"/>',
+      '<circle class="pdm-hand" cx="156" cy="166" r="12"/>',
+      '<g class="pdm-book" transform="rotate(10 156 168)">',
+      '<rect class="pdm-book-cover" x="138" y="158" width="40" height="27" rx="5" fill="url(#' + book + ')"/>',
+      '<rect class="pdm-book-page" x="141" y="161" width="34" height="21" rx="3"/>',
+      '<path class="pdm-book-lines" fill="none" d="M147 168 H171 M147 173 H171"/>',
+      '<path class="pdm-book-cross" fill="none" d="M156 163 V180 M148 170 H164"/>',
+      '</g>',
+      '</g>',
+      '<g class="pdm-head">',
+    '<ellipse class="pdm-ear" cx="66" cy="65" rx="8.5" ry="10.5"/>',
+    '<ellipse class="pdm-ear" cx="154" cy="65" rx="8.5" ry="10.5"/>',
+    '<ellipse class="pdm-face" cx="110" cy="62" rx="47" ry="49" fill="url(#' + skin + ')"/>',
+    '<path class="pdm-face-side" fill="#dda878" opacity="0.12" d="M63 62 C63 88 84 111 110 111 C136 111 157 88 157 62 C157 84 138 104 110 104 C82 104 63 84 63 62 Z"/>',
+    '<ellipse class="pdm-face-light" fill="#ffffff" cx="97" cy="42" rx="24" ry="16"/>',
+    '<ellipse class="pdm-face-shade" fill="#b8804f" cx="110" cy="102" rx="26" ry="10"/>',
     '<g class="pdm-hair-group">',
-    '<path class="pdm-hair" d="M63 62 C63 24 84 8 110 8 C136 8 157 24 157 62 C151 42 140 32 110 32 C80 32 69 42 63 62 Z"/>',
-    '<path class="pdm-hair" d="M100 14 C112 8 128 9 138 17 C128 15 118 15 100 14 Z" opacity="0.55"/>',
+    '<path class="pdm-hair" d="M63 62 C63 24 84 8 110 8 C136 8 157 24 157 62 C151 42 140 32 110 32 C80 32 69 42 63 62 Z" fill="url(#' + hair + ')"/>',
+    '<path class="pdm-hair-lock" d="M100 14 C112 8 128 9 138 17 C128 15 118 15 100 14 Z" opacity="0.55"/>',
+    '<path class="pdm-hair-lock" d="M74 40 C78 26 88 16 102 12 C90 20 82 30 78 44 Z" opacity="0.45"/>',
+    '<path class="pdm-hair-lock" d="M63 62 C64 50 66 44 70 40 C68 48 67 54 67 62 Z" opacity="0.5"/>',
     '</g>',
     '<g class="pdm-brows">',
-    '<path class="pdm-brow pdm-brow-l" d="M84 46 C90 41 97 41 101 45"/>',
-    '<path class="pdm-brow pdm-brow-r" d="M119 45 C123 41 130 41 136 46"/>',
+    '<path class="pdm-brow pdm-brow-l" fill="none" d="M83 47 C89 41 97 41 102 45"/>',
+    '<path class="pdm-brow pdm-brow-r" fill="none" d="M118 45 C123 41 131 41 137 47"/>',
     '</g>',
+    // nose (a tiny line and its shadow — enough to read as a face)
+    '<path class="pdm-nose" fill="none" d="M110 68 C108 72 108 75 111 76"/>',
+    '<path class="pdm-nose-shade" fill="none" d="M106 76 C108.5 78 112 78 114 76"/>',
     '<g class="pdm-eyes">',
     '<g class="pdm-eye pdm-eye-l">',
-    '<ellipse class="pdm-eye-white" cx="90" cy="64" rx="12" ry="13"/>',
-    '<circle class="pdm-pupil" cx="91" cy="65" r="5.8"/>',
-    '<circle class="pdm-glint" cx="88" cy="60" r="2.2"/>',
-    '<rect class="pdm-lid" x="78" y="50" width="24" height="26" rx="12"/>',
+    '<ellipse class="pdm-eye-white" cx="90" cy="64" rx="12.5" ry="13.5"/>',
+    '<g class="pdm-gaze">',
+    '<ellipse class="pdm-iris" cx="91" cy="65" rx="7" ry="7" fill="url(#' + iris + ')"/>',
+    '<circle class="pdm-pupil" cx="91" cy="65" r="3.4"/>',
+    '<circle class="pdm-glint" cx="88.4" cy="61" r="2.3"/>',
+    '<circle class="pdm-glint pdm-glint-sm" cx="93.4" cy="68.4" r="1.1"/>',
+    '</g>',
+    '<path class="pdm-lash" fill="none" d="M78.5 56 C82 51.5 88 49.5 94 51.5"/>',
+    '<rect class="pdm-lid" x="77" y="49.5" width="26" height="27" rx="13"/>',
     '</g>',
     '<g class="pdm-eye pdm-eye-r">',
-    '<ellipse class="pdm-eye-white" cx="130" cy="64" rx="12" ry="13"/>',
-    '<circle class="pdm-pupil" cx="131" cy="65" r="5.8"/>',
-    '<circle class="pdm-glint" cx="128" cy="60" r="2.2"/>',
-    '<rect class="pdm-lid" x="118" y="50" width="24" height="26" rx="12"/>',
+    '<ellipse class="pdm-eye-white" cx="130" cy="64" rx="12.5" ry="13.5"/>',
+    '<g class="pdm-gaze">',
+    '<ellipse class="pdm-iris" cx="131" cy="65" rx="7" ry="7" fill="url(#' + iris + ')"/>',
+    '<circle class="pdm-pupil" cx="131" cy="65" r="3.4"/>',
+    '<circle class="pdm-glint" cx="128.4" cy="61" r="2.3"/>',
+    '<circle class="pdm-glint pdm-glint-sm" cx="133.4" cy="68.4" r="1.1"/>',
+    '</g>',
+    '<path class="pdm-lash" fill="none" d="M126 51.5 C132 49.5 138 51.5 141.5 56"/>',
+    '<rect class="pdm-lid" x="117" y="49.5" width="26" height="27" rx="13"/>',
     '</g>',
     '</g>',
-    '<ellipse class="pdm-cheek pdm-cheek-l" cx="72" cy="80" rx="11" ry="7"/>',
-    '<ellipse class="pdm-cheek pdm-cheek-r" cx="148" cy="80" rx="11" ry="7"/>',
+    '<ellipse class="pdm-cheek pdm-cheek-l" cx="73" cy="79" rx="11" ry="7"/>',
+    '<ellipse class="pdm-cheek pdm-cheek-r" cx="147" cy="79" rx="11" ry="7"/>',
+    // ---- expression mouths (one shape at a time, chosen by the mood) ----
     '<g class="pdm-mouths">',
-    '<path class="pdm-mouth pdm-mouth-smile" d="M96 82 C104 92 116 92 124 82"/>',
+    '<path class="pdm-mouth pdm-mouth-smile" fill="none" d="M96 82 C104 92 116 92 124 82"/>',
     '<ellipse class="pdm-mouth pdm-mouth-open pdm-mouth-fill" cx="110" cy="87" rx="11" ry="9"/>',
-    '<path class="pdm-mouth pdm-mouth-think" d="M100 88 C106 87 114 87 120 88"/>',
-    '<path class="pdm-mouth pdm-mouth-pray" d="M101 86 C105 82 115 82 119 86"/>',
+    '<path class="pdm-mouth pdm-mouth-think" fill="none" d="M100 88 C106 87 114 87 120 88"/>',
+    '<path class="pdm-mouth pdm-mouth-pray" fill="none" d="M101 86 C105 82 115 82 119 86"/>',
+    '</g>',
+    // ---- speaking mouths: the viseme set the lip-sync engine plays ----
+    '<g class="pdm-visemes">',
+    '<g class="pdm-vis pdm-vis-rest"><path class="pdm-lip" fill="none" d="M97 84 C104 88 116 88 123 84"/></g>',
+    '<g class="pdm-vis pdm-vis-M"><path class="pdm-lip-fill" d="M96.5 84 C102 81 118 81 123.5 84 C118 87.5 102 87.5 96.5 84 Z"/>',
+    '<path class="pdm-lip" fill="none" d="M96.5 84 C102 86.5 118 86.5 123.5 84"/></g>',
+    '<g class="pdm-vis pdm-vis-E"><path class="pdm-mouth-cavity" d="M96.5 83 C103 77.5 117 77.5 123.5 83 C117 92.5 103 92.5 96.5 83 Z"/>',
+    '<path class="pdm-teeth" d="M99.5 80.5 H120.5 V85 H99.5 Z"/>',
+    '<path class="pdm-tongue" d="M104 89 C107 92 113 92 116 89 C113 88 107 88 104 89 Z"/></g>',
+    '<g class="pdm-vis pdm-vis-I"><ellipse class="pdm-mouth-cavity" cx="110" cy="84.5" rx="13" ry="5.6"/>',
+    '<path class="pdm-teeth" d="M99 81.5 H121 V84.5 H99 Z"/></g>',
+    '<g class="pdm-vis pdm-vis-A"><ellipse class="pdm-mouth-cavity" cx="110" cy="85.5" rx="11" ry="11"/>',
+    '<path class="pdm-teeth" d="M101 76 H119 V81.5 H101 Z"/>',
+    '<ellipse class="pdm-tongue" cx="110" cy="93" rx="7" ry="4.2"/></g>',
+    '<g class="pdm-vis pdm-vis-O"><ellipse class="pdm-mouth-cavity" cx="110" cy="84.5" rx="8" ry="9.6"/>',
+    '<ellipse class="pdm-tongue" cx="110" cy="90.5" rx="5.4" ry="3.4"/></g>',
+    '<g class="pdm-vis pdm-vis-U"><ellipse class="pdm-mouth-cavity" cx="110" cy="84.5" rx="6" ry="7.2"/>',
+    '<ellipse class="pdm-tongue" cx="110" cy="88.5" rx="4" ry="2.6"/></g>',
+    '<g class="pdm-vis pdm-vis-F"><path class="pdm-mouth-cavity" d="M99 82 C104 80 116 80 121 82 C118 88 102 88 99 82 Z"/>',
+    '<path class="pdm-teeth" d="M100 81 H120 V84.5 H100 Z"/></g>',
+    '<g class="pdm-vis pdm-vis-L"><ellipse class="pdm-mouth-cavity" cx="110" cy="85" rx="10" ry="6.4"/>',
+    '<path class="pdm-teeth" d="M101 81 H119 V84 H101 Z"/></g>',
     '</g>',
     '</g>',
     '<g class="pdm-sparkle-group">',
@@ -165,8 +260,9 @@
     '<path class="pdm-sparkle" d="M30 168 l2.5 7 7 2.5 -7 2.5 -2.5 7 -2.5 -7 -7 -2.5 7 -2.5 z"/>',
     '<path class="pdm-sparkle" d="M188 170 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 z"/>',
     '</g>',
-    '</svg>'
-  ].join('');
+      '</svg>'
+    ].join('');
+  }
 
   /* ------------------------------------------------------------ the voice */
 
@@ -229,10 +325,28 @@
     return best;
   };
 
+  /** One canonical form of a line, shared by captions, lip-sync and the voice. */
+  function cleanSpeech(text) {
+    return String(text == null ? '' : text).replace(/\[[^\]]*\]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  /** Which printed word contains this character offset (speech boundary → lips). */
+  function wordIndexAt(text, charIndex) {
+    var words = String(text).split(' ').filter(Boolean);
+    var cursor = 0;
+    for (var i = 0; i < words.length; i++) {
+      var start = String(text).indexOf(words[i], cursor);
+      var end = start + words[i].length;
+      if (charIndex < end) return i;
+      cursor = end;
+    }
+    return Math.max(0, words.length - 1);
+  }
+
   Voice.prototype.speak = function (text, opts) {
     var self = this;
     opts = opts || {};
-    var clean = String(text == null ? '' : text).replace(/\[[^\]]*\]/g, ' ').replace(/\s+/g, ' ').trim();
+    var clean = cleanSpeech(text);
     if (!clean) return Promise.resolve({ spoken: false, blocked: false, reason: 'empty' });
     if (!this.supported) return Promise.resolve({ spoken: false, blocked: false, reason: 'unsupported' });
     return new Promise(function (resolve) {
@@ -252,17 +366,37 @@
       utterance.pitch = opts.pitch || 1.06;
       utterance.volume = opts.volume == null ? 1 : opts.volume;
 
-      var guard, safety;
+      var guard, safety, keepAlive;
       function finish(spoken, blocked, reason) {
         if (finished) return;
         finished = true;
         clearTimeout(guard);
         clearTimeout(safety);
+        clearInterval(keepAlive);
         resolve({ spoken: spoken, blocked: !!blocked, reason: reason || '' });
       }
       utterance.onstart = function () {
         started = true;
         if (opts.onStart) { try { opts.onStart(); } catch (e) {} }
+        // Chrome silently stops long utterances after ~15 seconds of speech.
+        // Nudging the engine keeps a spoken prayer going to its amen.
+        keepAlive = setInterval(function () {
+          if (finished) { clearInterval(keepAlive); return; }
+          try {
+            if (global.speechSynthesis.speaking && !global.speechSynthesis.paused) {
+              global.speechSynthesis.pause();
+              global.speechSynthesis.resume();
+            }
+          } catch (e) { /* engine does not support pausing */ }
+        }, 9000);
+      };
+      // Word boundaries are what make the mouth really match the voice: the
+      // engine says "this word starts here" and the lip-sync jumps to it.
+      utterance.onboundary = function (event) {
+        if (!opts.onWord) return;
+        var name = event && event.name;
+        if (name && name !== 'word') return;
+        try { opts.onWord(wordIndexAt(clean, event.charIndex || 0), event.charIndex || 0); } catch (e) {}
       };
       utterance.onend = function () { finish(true, false, 'ended'); };
       utterance.onerror = function () { finish(false, false, 'error'); };
@@ -293,7 +427,18 @@
     this.permission = 'unknown';
   }
 
-  // One utterance from the member, resolved as { text, reason }.
+  /**
+   * One utterance from the member, resolved as { text, reason }.
+   *
+   * Two modes, because the two moments are different:
+   *   • short answers (a name, a quiz choice) end as soon as the browser
+   *     delivers a final result — quick and snappy;
+   *   • a prayer request is a full sentence, so `continuous` keeps the ears
+   *     open and closes them a moment after the member stops talking.
+   *
+   * Interim words are never thrown away: a member whose browser ends the
+   * session before finalising the last word still gets understood.
+   */
   Ears.prototype.listenOnce = function (opts) {
     var self = this;
     opts = opts || {};
@@ -301,6 +446,8 @@
     return new Promise(function (resolve) {
       var settled = false;
       var heard = '';
+      var interim = '';
+      var silence = null;
       var recognition;
       try {
         recognition = new self.Ctor();
@@ -309,7 +456,7 @@
         return;
       }
       recognition.lang = opts.lang || self.lang || 'en';
-      recognition.continuous = false;
+      recognition.continuous = !!opts.continuous;
       recognition.interimResults = true;
       recognition.maxAlternatives = 3;
       self.current = recognition;
@@ -320,20 +467,36 @@
         if (settled) return;
         settled = true;
         clearTimeout(timeout);
+        if (silence) clearTimeout(silence);
         try { recognition.abort(); } catch (e) {}
         if (self.current === recognition) self.current = null;
-        resolve({ text: String(finalText != null ? finalText : heard).trim(), reason: reason });
+        var text = String(finalText != null ? finalText : (heard || interim)).trim();
+        resolve({ text: text, reason: text ? (reason === 'silent' ? 'heard' : reason) : reason });
+      }
+
+      // A member who pauses mid-sentence must not be cut off, but the host
+      // also cannot wait for ever: close the ears shortly after real speech
+      // stops arriving.
+      function armSilence() {
+        if (!opts.continuous) return;
+        if (silence) clearTimeout(silence);
+        silence = setTimeout(function () { done(heard ? 'heard' : 'silent', heard); }, opts.silence || 1400);
       }
 
       recognition.onresult = function (event) {
-        var interim = '';
+        interim = '';
         for (var i = event.resultIndex; i < event.results.length; i++) {
           var result = event.results[i];
           var text = result[0] ? result[0].transcript : '';
           if (result.isFinal) { heard = heard ? heard + ' ' + text : text; }
-          else interim += text;
+          else if (opts.continuous) { interim = interim ? interim + ' ' + text : text; }
         }
-        if (opts.onInterim) { try { opts.onInterim(interim || heard); } catch (e) {} }
+        if (opts.onInterim) { try { opts.onInterim((interim || heard).trim()); } catch (e) {} }
+        if (opts.continuous) {
+          if (heard && !interim) armSilence();
+          else if (interim && silence) clearTimeout(silence);
+          return;
+        }
         if (heard) done('heard', heard);
       };
       recognition.onerror = function (event) {
@@ -341,7 +504,7 @@
         if (code === 'not-allowed' || code === 'service-not-allowed') self.permission = 'denied';
         done(code === 'no-speech' ? 'silent' : code);
       };
-      recognition.onend = function () { done(heard ? 'heard' : 'silent', heard); };
+      recognition.onend = function () { done(heard ? 'heard' : 'silent', heard || interim); };
 
       try {
         recognition.start();
@@ -357,8 +520,35 @@
     if (this.current) { try { this.current.abort(); } catch (e) {} this.current = null; }
   };
 
+  /**
+   * Ask the browser for the microphone while a real tap is still "fresh".
+   *
+   * Chrome and Safari only raise the permission prompt from a user gesture, so
+   * the moment the member taps "Start the show" is the one good chance to get
+   * the ears open. Anything the engine may catch during this 1.2s warm-up is
+   * thrown away — the host is still greeting, nothing is being answered yet.
+   */
+  Ears.prototype.warmUp = function () {
+    var self = this;
+    if (!this.supported) return Promise.resolve('unsupported');
+    if (this.permission === 'denied') return Promise.resolve('denied');
+    if (this._warming) return this._warming;
+    this._warming = this.listenOnce({ timeout: 1200 }).then(function (result) {
+      self._warming = null;
+      if (self.permission !== 'denied') self.permission = 'granted';
+      return self.permission;
+    }, function () {
+      self._warming = null;
+      return self.permission;
+    });
+    return this._warming;
+  };
+
   /* ------------------------------------------------------------- the band */
 
+  /* Every cue is synthesised on the spot — there is not one audio file in the
+     whole character, so Domey is just as lively on a cold start, offline, in
+     the Android WebView, and on a slow phone. */
   var Band = {
     ctx: null,
     muted: false,
@@ -369,13 +559,13 @@
       try { this.ctx = new Ctor(); } catch (e) { this.ctx = null; }
       return this.ctx;
     },
-    tone: function (freq, start, duration, gain) {
+    tone: function (freq, start, duration, gain, type) {
       var ctx = this.context();
       if (!ctx || this.muted) return;
       if (ctx.state === 'suspended') { try { ctx.resume(); } catch (e) {} }
       var osc = ctx.createOscillator();
       var amp = ctx.createGain();
-      osc.type = 'sine';
+      osc.type = type || 'sine';
       osc.frequency.value = freq;
       var t0 = ctx.currentTime + (start || 0);
       amp.gain.setValueAtTime(0.0001, t0);
@@ -385,6 +575,33 @@
       osc.start(t0);
       osc.stop(t0 + (duration || 0.18) + 0.03);
     },
+    /* Claps and applause are shaped noise, not tones — a short burst of it
+       reads instantly as an audience celebrating with the member. */
+    noise: function (start, duration, gain, tail) {
+      var ctx = this.context();
+      if (!ctx || this.muted) return;
+      if (ctx.state === 'suspended') { try { ctx.resume(); } catch (e) {} }
+      var frames = Math.max(1, Math.floor(ctx.sampleRate * (duration + (tail || 0))));
+      var buffer = ctx.createBuffer(1, frames, ctx.sampleRate);
+      var data = buffer.getChannelData(0);
+      for (var i = 0; i < frames; i++) {
+        var decay = Math.max(0, 1 - (i / (ctx.sampleRate * (duration || 0.2))));
+        data[i] = (Math.random() * 2 - 1) * decay * decay;
+      }
+      var src = ctx.createBufferSource();
+      src.buffer = buffer;
+      var filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 1500;
+      var amp = ctx.createGain();
+      amp.gain.value = gain || 0.09;
+      src.connect(filter).connect(amp).connect(ctx.destination);
+      src.start(ctx.currentTime + (start || 0));
+    },
+    clap: function (start) {
+      this.noise(start, 0.05, 0.05);
+      this.noise((start || 0) + 0.12, 0.05, 0.04);
+    },
     play: function (name) {
       if (this.muted) return;
       switch (name) {
@@ -393,10 +610,177 @@
         case 'listen': this.tone(520, 0, 0.1, 0.04); this.tone(720, 0.1, 0.12, 0.04); break;
         case 'start': this.tone(523, 0, 0.14); this.tone(659, 0.12, 0.14); this.tone(784, 0.24, 0.24); break;
         case 'celebrate': this.tone(523, 0, 0.14); this.tone(659, 0.11, 0.14); this.tone(784, 0.22, 0.14); this.tone(1047, 0.33, 0.32); break;
+        case 'pop': this.tone(880, 0, 0.08, 0.05); break;
+        case 'ding': this.tone(1320, 0, 0.18, 0.05); this.tone(1760, 0.06, 0.2, 0.035); break;
+        case 'whoosh': this.noise(0, 0.22, 0.04, 0.06); break;
+        case 'boing': this.tone(180, 0, 0.18, 0.05, 'triangle'); this.tone(260, 0.1, 0.22, 0.045, 'triangle'); break;
+        case 'applause': this.noise(0, 0.9, 0.05, 0.5); this.clap(0.05); this.clap(0.4); this.clap(0.7); break;
+        case 'fanfare':
+          this.tone(523, 0, 0.18); this.tone(659, 0.14, 0.18); this.tone(784, 0.28, 0.2);
+          this.tone(1047, 0.44, 0.5); this.tone(784, 0.44, 0.3, 0.04); break;
+        case 'dance':
+          this.tone(523, 0, 0.12, 0.05); this.tone(659, 0.12, 0.12, 0.05); this.tone(784, 0.24, 0.12, 0.05);
+          this.tone(880, 0.36, 0.16, 0.05); this.tone(784, 0.54, 0.12, 0.05); this.tone(659, 0.66, 0.2, 0.05); break;
+        case 'tick': this.tone(1200, 0, 0.05, 0.03, 'square'); break;
+        case 'sad': this.tone(392, 0, 0.24, 0.05); this.tone(330, 0.2, 0.34, 0.045); break;
         default: this.tone(600, 0, 0.1, 0.04);
       }
     },
     unlock: function () { var ctx = this.context(); if (ctx && ctx.state === 'suspended') { try { ctx.resume(); } catch (e) {} } }
+  };
+
+  /* ------------------------------------------------------- the lip-sync ear */
+
+  /* Domey's mouth is not one shape that flaps: it is a small set of mouth
+     postures — the same idea as the visemes a real animator uses — and the
+     engine below walks through them as the sentence is spoken.
+       M  lips together (m, b, p)          F  teeth on lip (f, v)
+       E  relaxed open (e, s, c)           I  wide smile-open (i, y, k)
+       A  big open (a, h)                  O  round (o, w)
+       U  small round (u, r, q)            L  tongue-tip (l, n, d, t)         */
+  var VISEME_MS = { M: 88, F: 84, E: 82, I: 88, A: 112, O: 108, U: 100, L: 74, rest: 130 };
+
+  function visemeFor(ch) {
+    if ('mbp'.indexOf(ch) > -1) return 'M';
+    if (ch === 'f' || ch === 'v') return 'F';
+    if (ch === 'o' || ch === 'w') return 'O';
+    if (ch === 'u' || ch === 'q' || ch === 'r') return 'U';
+    if (ch === 'i' || ch === 'j' || ch === 'y') return 'I';
+    if (ch === 'a') return 'A';
+    if (ch === 'h') return 'A';
+    if (ch === 'e') return 'E';
+    if ('lntd'.indexOf(ch) > -1) return 'L';
+    if ('szckgx'.indexOf(ch) > -1) return 'I';
+    if (ch === ' ') return 'rest';
+    return 'E';
+  }
+
+  /**
+   * Turn one line of speech into a mouth plan: one entry per printed word, each
+   * with the postures that word needs and how long each is held. The words are
+   * kept exactly as the captions print them, so lips, captions and voice all
+   * march in step.
+   */
+  function speechPlan(text, rate) {
+    var pace = Math.max(0.62, Math.min(1.7, 1 / (rate || 1)));
+    return String(text == null ? '' : text).replace(/\s+/g, ' ').trim()
+      .split(' ').filter(Boolean).map(function (word) {
+        var letters = word.toLowerCase().replace(/[^a-z0-9']/g, '');
+        var frames = [];
+        for (var i = 0; i < letters.length; i++) {
+          var v = visemeFor(letters[i]);
+          var last = frames[frames.length - 1];
+          if (last && last.v === v) { last.ms += 24; continue; }
+          frames.push({ v: v, ms: Math.round((VISEME_MS[v] || 86) * pace) });
+        }
+        if (!frames.length) frames.push({ v: 'rest', ms: 110 });
+        var total = frames.reduce(function (n, f) { return n + f.ms; }, 0);
+        return { word: word, frames: frames, ms: total };
+      });
+  }
+
+  function MouthMotor(host) {
+    this.host = host;
+    this.plan = null;
+    this.timer = null;
+    this.wi = 0;
+    this.fi = 0;
+    this.done = true;
+    this.onWord = null;
+  }
+  /** Move the lips: `data-pdm-vis` is what tells the stylesheet which mouth
+   *  posture to show, and the jaw amount is how far open it sits. */
+  MouthMotor.prototype.set = function (viseme, jaw) {
+    var root = this.host.root;
+    if (!root) return;
+    root.setAttribute('data-pdm-vis', viseme || 'rest');
+    root.style.setProperty('--pdm-jaw', String(jaw == null ? 0.4 : jaw));
+  };
+  /** Hand the mouth back to the expression layer (the smile, the pout…). */
+  MouthMotor.prototype.release = function () {
+    var root = this.host.root;
+    if (!root) return;
+    root.removeAttribute('data-pdm-vis');
+    root.style.setProperty('--pdm-jaw', '0');
+  };
+  MouthMotor.prototype.start = function (plan) {
+    this.stop(false);
+    this.plan = plan && plan.length ? plan : null;
+    this.wi = 0;
+    this.fi = 0;
+    this.done = !this.plan;
+    if (this.done) { this.set('rest', 0.1); return this; }
+    if (this.onWord) this.onWord(0);
+    this.tick();
+    return this;
+  };
+  MouthMotor.prototype.tick = function () {
+    var self = this;
+    if (this.done || !this.plan || this.host.destroyed) return;
+    var word = this.plan[this.wi];
+    if (!word) { this.finish(); return; }
+    var frame = word.frames[this.fi] || { v: 'rest', ms: 90 };
+    this.set(frame.v, frame.v === 'A' ? 0.95 : frame.v === 'rest' ? 0.1 : frame.v === 'O' || frame.v === 'U' ? 0.7 : 0.5);
+    // The motor clears this timer itself (start/stop/hurry all go through it),
+    // so it is deliberately not pushed onto the host's timer list.
+    this.timer = setTimeout(function () { self.advance(); }, frame.ms);
+  };
+  MouthMotor.prototype.advance = function () {
+    if (this.done || !this.plan) return;
+    var word = this.plan[this.wi];
+    this.fi++;
+    if (word && this.fi >= word.frames.length) {
+      this.wi++;
+      this.fi = 0;
+      if (this.wi >= this.plan.length) { this.finish(); return; }
+      if (this.onWord) this.onWord(this.wi);
+    }
+    this.tick();
+  };
+  /**
+   * The speech engine reports which word it is pronouncing. Jumping the mouth
+   * there is what turns a guessed flap into real lip-sync: on a device that
+   * reports boundaries, the lips follow the voice instead of a timer.
+   */
+  MouthMotor.prototype.jumpToWord = function (index) {
+    if (this.done || !this.plan || index == null) return;
+    if (index <= this.wi || index >= this.plan.length) return;
+    this.wi = index;
+    this.fi = 0;
+    if (this.onWord) this.onWord(index);
+    this.tick();
+  };
+  MouthMotor.prototype.finish = function () {
+    this.done = true;
+    if (this.timer) clearTimeout(this.timer);
+    this.timer = null;
+    this.release();
+  };
+  MouthMotor.prototype.stop = function (reset) {
+    if (this.timer) clearTimeout(this.timer);
+    this.timer = null;
+    this.plan = null;
+    this.done = true;
+    if (reset !== false) this.release();
+  };
+
+  /* ---------------------------------------------------------- the gestures */
+
+  /* Short, readable actions Domey plays with his hands, head and body. Every
+     one of them is a class on the root, so the stylesheet owns the performance
+     and `prefers-reduced-motion` can simply stop it. */
+  var TALK_GESTURES = ['open', 'point', 'count', 'raise', 'wave', 'thumb', 'shrug', 'offer'];
+  var ALL_GESTURES = TALK_GESTURES.concat(['clap', 'heart', 'think', 'mic', 'dance', 'jump']);
+
+  /* ---------------------------------------------------- the notification-y bits */
+
+  var REACTIONS = {
+    sparkle: 'pd-i-sparkles',
+    star: 'pd-i-star',
+    heart: 'pd-i-heart',
+    cheer: 'pd-i-party-popper',
+    zap: 'pd-i-zap',
+    hand: 'pd-i-hand'
   };
 
   /* ----------------------------------------------------------- the matcher */
@@ -405,8 +789,36 @@
   //   "the first one"            -> { index: 0 }
   //   "noah"                     -> { index: 1 } when a choice matches
   //   "I think it is Moses"      -> { index: 0 }
+  /* Spoken answers arrive as words, printed answers arrive as digits: "forty"
+     has to be understood as 40, and "seven" as 7, or a member who speaks the
+     right answer is marked wrong. */
+  var NUMBER_WORDS = {
+    zero: '0', one: '1', two: '2', three: '3', four: '4', five: '5', six: '6',
+    seven: '7', eight: '8', nine: '9', ten: '10', eleven: '11', twelve: '12',
+    twenty: '20', thirty: '30', forty: '40', fourty: '40', fifty: '50',
+    sixty: '60', seventy: '70', eighty: '80', ninety: '90', hundred: '100',
+    thousand: '1000'
+  };
+  function withNumbers(text) {
+    var words = String(text || '').split(' ').filter(Boolean);
+    var out = [];
+    for (var i = 0; i < words.length; i++) {
+      var digits = NUMBER_WORDS[words[i]];
+      if (digits == null) { out.push(words[i]); continue; }
+      var next = words[i + 1] ? NUMBER_WORDS[words[i + 1]] : null;
+      // "twenty two" is 22, not 20 then 2.
+      if (next != null && Number(next) >= 1 && Number(next) <= 9 && digits.length === 2 && digits[1] === '0') {
+        out.push(String(Number(digits) + Number(next)));
+        i++;
+        continue;
+      }
+      out.push(digits);
+    }
+    return out.join(' ');
+  }
+
   function matchChoices(transcript, choices) {
-    var text = norm(transcript);
+    var text = withNumbers(norm(transcript));
     if (!text || !choices || !choices.length) return { index: null, score: 0 };
     var words = text.split(' ').filter(Boolean);
     var best = { index: null, score: 0 };
@@ -423,7 +835,7 @@
     }
 
     for (var i = 0; i < choices.length; i++) {
-      var choice = norm(choices[i]);
+      var choice = withNumbers(norm(choices[i]));
       if (!choice) continue;
       if (choice === text) return { index: i, score: 1 };
       if (text.indexOf(choice) !== -1 || choice.indexOf(text) !== -1) {
@@ -473,7 +885,11 @@
     rate: 0.98,
     pitch: 1.06,
     placeholder: 'Type your answer…',
-    captionsOnly: false
+    captionsOnly: false,
+    // Lip-sync and the little hand actions; both are pure decoration, so a page
+    // that wants a calm Domey can simply switch them off.
+    lipSync: true,
+    actions: true
   };
 
   function Host(target, options) {
@@ -505,7 +921,14 @@
     this.name = '';
     this.history = [];
     this._stateTimer = null;
+    this._actTimer = null;
+    this._gazeFrame = null;
+    this._gaze = null;
+    this.mouth = new MouthMotor(this);
+    this.mouthOn = !this.options.captionsOnly && this.options.lipSync !== false;
+    this.actionsOn = this.options.actions !== false;
     this._build();
+    this._bindGaze();
   }
 
   Host.prototype.on = function (evt, fn) {
@@ -551,12 +974,15 @@
       '<div class="pdm-spot"></div>' +
       '<div class="pdm-halo"></div>' +
       '<div class="pdm-floor"></div>' +
-      '<div class="pdm-char-wrap">' + CHARACTER + '</div>' +
-      '<div class="pdm-listen-ring"></div>';
+      '<div class="pdm-char-wrap">' + characterMarkup(this.id) + '</div>' +
+      '<div class="pdm-listen-ring"></div>' +
+      '<div class="pdm-reactions" aria-hidden="true"></div>';
     this.hud = el('div', 'pdm-hud');
     this.hud.setAttribute('hidden', '');
     stage.appendChild(this.hud);
     this.stage = stage;
+    this.reactions = stage.querySelector('.pdm-reactions');
+    this.character = stage.querySelector('.pdm-char-wrap');
 
     var dialog = el('div', 'pdm-dialog');
     this.bubble = el('div', 'pdm-bubble');
@@ -647,6 +1073,24 @@
     this._unlock = function () { Band.unlock(); };
     document.addEventListener('touchstart', this._unlock, { passive: true });
     document.addEventListener('click', this._unlock);
+
+    // Tapping the character himself opens his ears: it is a real gesture (the
+    // only kind a browser accepts before showing the microphone prompt) and it
+    // is the most natural thing a member will try first.
+    if (this.options.listenOnTap !== false) {
+      stage.addEventListener('click', function () {
+        if (self.micEnabled || !self.ears.supported || self.destroyed) return;
+        self.enableMic().then(function (granted) {
+          if (!granted || self.destroyed) return;
+          // Never talk over a question that is already waiting for an answer:
+          // the question simply starts listening instead.
+          if (self.answerResolve || self.state !== 'idle') return;
+          self.setStatus('Listening — say what is on your heart');
+          self.say('I can hear you now. Ask me anything, or tap Start the show.', { emote: 'listening' });
+        });
+      });
+      stage.setAttribute('title', this.ears.supported ? 'Tap Domey to let him hear you' : 'Domey, your Prayer Dome host');
+    }
   };
 
   Host.prototype._barButton = function (icon, label, onClick) {
@@ -663,6 +1107,12 @@
     this.state = state;
     this.root.setAttribute('data-pdm-state', state);
     this.root.setAttribute('data-pdm-name', this.name || '');
+    // A state is also a piece of acting: celebration claps, listening raises
+    // the microphone, thinking rubs the chin.
+    if (state === 'celebrating') this.act('clap', 1800);
+    else if (state === 'listening') this.act('mic', 0);
+    else if (state === 'thinking') this.act('think', 2600);
+    else if (state !== 'speaking' && this._actTimer) this.act(null);
     this.emit('state', state);
   };
 
@@ -680,6 +1130,114 @@
       }, ms);
     }
     return this;
+  };
+
+  /* ------------------------------------------------------------- acting */
+
+  /**
+   * Play one short action: wave, point, open hands, clap, heart, think, dance…
+   * Passing no name clears whatever is playing. Actions are pure CSS classes on
+   * the root, so they cost nothing and stop dead under reduced-motion.
+   */
+  Host.prototype.act = function (name, ms) {
+    var self = this;
+    var root = this.root;
+    if (this._actTimer) { clearTimeout(this._actTimer); this._actTimer = null; }
+    for (var i = 0; i < ALL_GESTURES.length; i++) root.classList.remove('pdm-act-' + ALL_GESTURES[i]);
+    if (!name || !this.actionsOn) {
+      root.removeAttribute('data-pdm-act');
+      return this;
+    }
+    // Restart the animation even when the same action is replayed back-to-back.
+    void root.offsetWidth;
+    root.classList.add('pdm-act-' + name);
+    root.setAttribute('data-pdm-act', name);
+    this.emit('action', name);
+    if (ms) {
+      this._actTimer = setTimeout(function () {
+        self._actTimer = null;
+        if (self.destroyed) return;
+        for (var j = 0; j < ALL_GESTURES.length; j++) root.classList.remove('pdm-act-' + ALL_GESTURES[j]);
+        root.removeAttribute('data-pdm-act');
+      }, ms);
+    }
+    return this;
+  };
+
+  /** Float a little icon up the stage — the visual "well done!". */
+  Host.prototype.react = function (kind, count) {
+    if (!this.reactions || this.destroyed) return this;
+    var icon = REACTIONS[kind] || REACTIONS.sparkle;
+    var n = Math.max(1, Math.min(6, count || 3));
+    for (var i = 0; i < n; i++) {
+      var node = el('span', 'pdm-reaction');
+      node.style.left = (18 + Math.random() * 64).toFixed(1) + '%';
+      node.style.animationDelay = (i * 110) + 'ms';
+      node.innerHTML = '<i class="pd-i ' + icon + '" aria-hidden="true"></i>';
+      this.reactions.appendChild(node);
+      (function (child) {
+        setTimeout(function () { if (child.parentNode) child.parentNode.removeChild(child); }, 2200 + n * 120);
+      })(node);
+    }
+    return this;
+  };
+
+  /**
+   * Keep the show moving with small, human movements: a hand that opens while
+   * explaining, a wave hello, a shrug on a tricky question. Only runs while
+   * Domey is actually speaking, so a listening Domey stays still and attentive.
+   */
+  Host.prototype._gestureLoop = function (token) {
+    var self = this;
+    function next(delay) {
+      self._later(function () {
+        if (token.cancelled || self.destroyed) return;
+        if (self.state !== 'speaking' || !self.actionsOn) { next(700); return; }
+        var pick = TALK_GESTURES[Math.floor(Math.random() * TALK_GESTURES.length)];
+        self.act(pick, 950 + Math.round(Math.random() * 700));
+        next(1500 + Math.round(Math.random() * 1300));
+      }, delay);
+    }
+    next(500 + Math.round(Math.random() * 800));
+  };
+
+  /**
+   * Eyes that follow the member's pointer. This is the cheapest possible trick
+   * that makes a drawing feel alive: the pupils track, and in the idle pose the
+   * head leans a little toward wherever the member is.
+   */
+  Host.prototype._bindGaze = function () {
+    var self = this;
+    if (typeof document === 'undefined' || !document.addEventListener) return;
+    if (typeof global.matchMedia === 'function' && !global.matchMedia('(hover: hover)').matches) return;
+    var raf = global.requestAnimationFrame || function (fn) { return setTimeout(fn, 40); };
+    this._gaze = function (event) {
+      if (self.destroyed || self._gazeFrame) return;
+      var x = event.clientX, y = event.clientY;
+      self._gazeFrame = raf(function () {
+        self._gazeFrame = null;
+        if (self.destroyed || !self.stage) return;
+        var box = self.stage.getBoundingClientRect();
+        if (!box || !box.width) return;
+        var dx = Math.max(-1, Math.min(1, (x - (box.left + box.width / 2)) / (box.width * 0.75)));
+        var dy = Math.max(-1, Math.min(1, (y - (box.top + box.height * 0.3)) / (box.height * 0.7)));
+        self.root.style.setProperty('--pdm-gaze-x', (dx * 2.6).toFixed(2) + 'px');
+        self.root.style.setProperty('--pdm-gaze-y', (dy * 1.9).toFixed(2) + 'px');
+        self.root.style.setProperty('--pdm-head-yaw', (dx * 2.4).toFixed(2) + 'deg');
+      });
+    };
+    document.addEventListener('pointermove', this._gaze, { passive: true });
+  };
+
+  Host.prototype._unbindGaze = function () {
+    if (this._gaze) {
+      document.removeEventListener('pointermove', this._gaze);
+      this._gaze = null;
+    }
+    if (this._gazeFrame && global.cancelAnimationFrame) {
+      try { global.cancelAnimationFrame(this._gazeFrame); } catch (e) {}
+    }
+    this._gazeFrame = null;
   };
 
   Host.prototype.setHud = function (data) {
@@ -713,25 +1271,33 @@
   Host.prototype._renderCaptions = function (text, durationMs, token) {
     var self = this;
     var words = String(text || '').split(/\s+/).filter(Boolean);
-    if (!words.length) { this.textEl.innerHTML = ''; return; }
+    if (!words.length) { this.textEl.innerHTML = ''; return { reveal: function () {}, showWord: function () {} }; }
     var perWord = Math.max(90, Math.round(durationMs / words.length));
     var shown = 0;
     this.textEl.innerHTML = words.map(function (w) { return '<span class="pdm-word">' + esc(w) + '</span>'; }).join(' ');
     var spans = this.textEl.querySelectorAll('.pdm-word');
-    var tick = setInterval(function () {
-      if (self.destroyed || (token && token.cancelled)) { clearInterval(tick); return; }
-      if (shown < spans.length) {
+    function showWord(index) {
+      // The mouth and the captions are driven by the same plan: revealing the
+      // word the lips are on is what makes the whole thing feel spoken.
+      while (shown <= index && shown < spans.length) {
         spans[shown].classList.add('shown');
         shown++;
-      } else {
-        clearInterval(tick);
       }
+    }
+    // A fallback ticker: on a browser with no speech engine (or a muted voice)
+    // there are no word boundaries, so the captions keep their own pace.
+    var tick = setInterval(function () {
+      if (self.destroyed || (token && token.cancelled)) { clearInterval(tick); return; }
+      if (shown < spans.length) { showWord(shown); } else { clearInterval(tick); }
     }, perWord);
     this.timers.push(tick);
-    return { reveal: function () {
-      clearInterval(tick);
-      spans.forEach(function (s) { s.classList.add('shown'); });
-    } };
+    return {
+      showWord: showWord,
+      reveal: function () {
+        clearInterval(tick);
+        spans.forEach(function (s) { s.classList.add('shown'); });
+      }
+    };
   };
 
   Host.prototype.say = function (text, opts) {
@@ -747,36 +1313,64 @@
       if (this._token) this._token.cancelled = true;
       this._token = { cancelled: false };
     }
-    this.lastSpoken = text;
-    this.history.push({ who: 'host', text: text, at: Date.now() });
-    this.emit('say', text);
+    var line = cleanSpeech(text);
+    this.lastSpoken = line;
+    this.history.push({ who: 'host', text: line, at: Date.now() });
+    this.emit('say', line);
 
-    var words = String(text).split(/\s+/).length;
-    var estimate = Math.max(1200, words * (60000 / (170 * (this.options.rate || 1))));
+    var words = line ? line.split(' ').filter(Boolean).length : 0;
+    var rate = opts.rate || this.options.rate || 1;
+    var estimate = Math.max(1200, words * (60000 / (170 * rate)));
     this._setState(opts.emote || 'speaking');
     this.setStatus(opts.status || 'Speaking');
-    var captions = this._renderCaptions(text, estimate, token);
+
+    // Captions, lips and voice all read from the same plan, so the member hears
+    // a word, sees it light up and sees the mouth shape that word needs.
+    var captions = this._renderCaptions(line, estimate, token);
+    var plan = speechPlan(line, rate);
+    if (this.mouthOn) {
+      this.mouth.onWord = function (index) { captions.showWord(index); };
+      this.mouth.start(plan);
+    }
+    if (opts.emote !== 'praying' && this.actionsOn) this._gestureLoop(token);
 
     var speakOpts = {
-      rate: opts.rate || this.options.rate,
+      rate: rate,
       pitch: opts.pitch || this.options.pitch,
-      lang: opts.lang || this.options.lang
+      lang: opts.lang || this.options.lang,
+      onStart: opts.onStart,
+      // The engine's word boundaries keep the lips honest; without them the
+      // plan simply plays at its own pace.
+      onWord: function (index) {
+        if (!self.mouthOn) return;
+        captions.showWord(index);
+        self.mouth.jumpToWord(index);
+      }
     };
     var spoken = Promise.resolve({ spoken: false, blocked: false, reason: 'captions-only' });
     if (!this.options.captionsOnly && !this.muted) {
-      spoken = this.voice.speak(text, speakOpts);
+      spoken = this.voice.speak(line, speakOpts);
+    }
+
+    function landed(result) {
+      if (!self.mouthOn) return result;
+      // Only the line that owns the mouth may rest it, otherwise a slow line
+      // would silence the mouth of the line that replaced it.
+      if (self.mouth.plan === plan) self.mouth.stop();
+      return result;
     }
 
     return spoken.then(function (result) {
       if (token.cancelled || self.destroyed) return result;
       if (result.blocked) {
         self.speechBlocked = true;
-        self._pendingSpeech = { text: text, opts: opts };
+        self._pendingSpeech = { text: line, opts: opts };
         // Speech was blocked (no user gesture yet): the captions still play, so
         // the member always sees the greeting even when the browser is strict.
         return self._wait(Math.min(estimate, 5000), token).then(function () {
           if (self.speechBlocked) self.enableBtn.hidden = false;
           captions.reveal();
+          landed(result);
           self._settleAfterSpeak(opts, token);
           return result;
         });
@@ -787,11 +1381,15 @@
         // captions carry every word (capped so a long line never drags).
         return self._wait(Math.min(estimate * 0.85, 12000), token).then(function () {
           captions.reveal();
+          landed(result);
           self._settleAfterSpeak(opts, token);
           return result;
         });
       }
       captions.reveal();
+      // The voice has stopped, so the lips stop with it — a mouth that keeps
+      // flapping after the last word is the one thing that breaks the illusion.
+      landed(result);
       return self._wait(opts.hold || 350, token).then(function () {
         self._settleAfterSpeak(opts, token);
         return result;
@@ -829,6 +1427,9 @@
   };
 
   Host.prototype.hurry = function () {
+    // Skipping ahead must skip the whole performance: the lips, the captions
+    // and the wait all jump to the end of the line together.
+    if (this.mouthOn) this.mouth.finish();
     if (typeof this._hurry === 'function') this._hurry();
     return this;
   };
@@ -843,8 +1444,10 @@
     if (this._token) this._token.cancelled = true;
     if (this._speechToken) this._speechToken.cancelled = true;
     this._clearTimers();
+    this.mouth.stop();
     this.voice.stop();
     this.ears.stop();
+    this.act(null);
     if (this.answerResolve) { var r = this.answerResolve; this.answerResolve = null; r({ text: '', source: 'stopped', index: null }); }
     this._setState('idle');
     this.setStatus('Stopped');
@@ -854,6 +1457,7 @@
     this.stop();
     if (this._stateTimer) { clearTimeout(this._stateTimer); this._stateTimer = null; }
     this.destroyed = true;
+    this._unbindGaze();
     document.removeEventListener('touchstart', this._unlock);
     document.removeEventListener('click', this._unlock);
     this.root.innerHTML = '';
@@ -892,22 +1496,79 @@
 
   Host.prototype.micEnabled = false;
 
-  Host.prototype.toggleMic = function () {
-    this.micEnabled = !this.micEnabled;
-    this.micBtn.setAttribute('aria-pressed', this.micEnabled ? 'true' : 'false');
-    this.micBtn.querySelector('i').className = iconClass(this.micEnabled ? 'mic' : 'mic-off');
-    this.micBtn.querySelector('span').textContent = this.micEnabled ? 'Voice answers on' : 'Answer by voice';
-    this.micBtn.classList.toggle('is-live', this.micEnabled);
-    if (this.micEnabled) {
-      Band.unlock();
-      this.setStatus('Listening');
+  Host.prototype._micUi = function (on) {
+    if (this.micBtn) {
+      this.micBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      var icon = this.micBtn.querySelector('i');
+      if (icon) icon.className = iconClass(on ? 'mic' : 'mic-off');
+      var label = this.micBtn.querySelector('span');
+      if (label) label.textContent = on ? 'Voice answers on' : 'Answer by voice';
+      this.micBtn.classList.toggle('is-live', !!on);
+    }
+    this.root.classList.toggle('pdm-mic-on', !!on);
+  };
+
+  /**
+   * Open the ears.
+   *
+   * A host who cannot hear the member is only half a host, so this is what the
+   * show calls the instant the member taps "Start the show" — that tap is the
+   * one gesture browsers accept before they will allow a microphone prompt.
+   * Nothing is recorded: the browser's own speech engine turns the answer into
+   * text on the device, and the host keeps only the answer.
+   */
+  Host.prototype.enableMic = function (opts) {
+    var self = this;
+    opts = opts || {};
+    if (!this.ears.supported) {
+      this.setStatus('This browser cannot listen — tap a choice or type');
+      return Promise.resolve(false);
+    }
+    // A member who already blocked the microphone is not asked again: the host
+    // keeps working, it just stops offering to listen.
+    if (this.ears.permission === 'denied' && this._micWarmed) {
+      this.setStatus('Microphone blocked — tap a choice or type instead');
+      return Promise.resolve(false);
+    }
+    Band.unlock();
+    if (!this.micEnabled) {
+      this.micEnabled = true;
+      this._micUi(true);
       this.emote('listening');
       this.emit('mic', true);
-    } else {
-      this.ears.stop();
-      this.emit('mic', false);
     }
-    return this.micEnabled;
+    // A question that is already on screen starts listening again right away.
+    if (this.answerResolve && this._listenLoop) this._later(this._listenLoop, 220);
+    if (opts.warmUp === false || this._micWarmed) return Promise.resolve(true);
+    this._micWarmed = true;
+    return this.ears.warmUp().then(function () {
+      if (self.destroyed) return false;
+      if (self.ears.permission === 'denied') {
+        self.disableMic();
+        self.setStatus('Microphone blocked — tap a choice or type instead');
+        return false;
+      }
+      if (self.answerResolve && self._listenLoop) self._later(self._listenLoop, 220);
+      return true;
+    });
+  };
+
+  /** Can this browser let Domey hear spoken answers at all? */
+  Host.prototype.canHear = function () { return !!this.ears.supported; };
+
+  Host.prototype.disableMic = function () {
+    this.micEnabled = false;
+    this._micUi(false);
+    this.ears.stop();
+    if (this.state === 'listening') this._setState('idle');
+    this.emit('mic', false);
+    return this;
+  };
+
+  Host.prototype.toggleMic = function () {
+    if (this.micEnabled) { this.disableMic(); return false; }
+    this.enableMic();
+    return true;
   };
 
   /* ------------------------------------------------------------- the ask */
@@ -923,6 +1584,7 @@
     if (!this.answerResolve) return false;
     var resolve = this.answerResolve;
     this.answerResolve = null;
+    this._listenLoop = null;
     this.question = null;
     this.ears.stop();
     this.micBadge.hidden = true;
@@ -944,6 +1606,10 @@
     spec = spec || {};
     if (!spec.text) return Promise.reject(new Error('PDMascot.ask needs spec.text'));
     var choices = (spec.choices || []).slice();
+    // A question that lists choices is a choice question, whether or not the
+    // page remembered to say so — otherwise a spoken answer would be accepted
+    // as free text and marked against nothing.
+    if (!spec.kind) spec.kind = choices.length ? 'choice' : 'text';
 
     // Clear the previous question straight away — a leftover choice chip must
     // never sit on screen looking clickable while Domey asks something new.
@@ -990,6 +1656,44 @@
       }
 
       var heardNothing = 0;
+
+      /**
+       * Things a member can simply say to the host, in the middle of a
+       * question: "say that again", "give me a hint", "skip", "slow down".
+       * Answering a question is not the only way to talk to Domey.
+       */
+      function voiceCommand(spoken) {
+        var text = norm(spoken);
+        if (/^(repeat|again|say (that|it) again|pardon|come again|what)\b/.test(text)) {
+          self.say('Of course. ' + (spec.text || '') + (spec.hints && spec.hints.length ? ' A hint for you: ' + spec.hints.join(' ') + '.' : ''), { emote: 'happy', status: 'Your turn' })
+            .then(function () { if (self.answerResolve) listenLoop(); });
+          return true;
+        }
+        if (/^(hint|help|clue|i need help)\b/.test(text)) {
+          self.say(spec.hints && spec.hints.length
+            ? 'Here is your hint: ' + spec.hints.join(' ') + '.'
+            : 'Think about who God chose for that moment in the story.', { emote: 'thinking', status: 'Your turn' })
+            .then(function () { if (self.answerResolve) listenLoop(); });
+          return true;
+        }
+        if (/^(skip|pass|next|move on|no idea|i do not know|i dont know|dont know|i don't know)\b/.test(text)) {
+          self.emit('heard', spoken);
+          self._accept('', 'skip', null);
+          return true;
+        }
+        if (/^(slow down|speak slower|too fast)\b/.test(text)) {
+          self.options.rate = Math.max(0.7, (self.options.rate || 1) - 0.14);
+          self.say('No problem, I will speak a little slower.', { emote: 'happy', status: 'Your turn' })
+            .then(function () { if (self.answerResolve) listenLoop(); });
+          return true;
+        }
+        if (/^(stop|quiet|silence|be quiet)\b/.test(text)) {
+          self._accept('', 'skip', null);
+          return true;
+        }
+        return false;
+      }
+
       function listenLoop() {
         if (self.destroyed || !self.answerResolve || token.cancelled) return;
         if (!self.micEnabled || !self.ears.supported) return;
@@ -999,15 +1703,20 @@
         self.ears.listenOnce({
           lang: self.options.lang,
           timeout: spec.listenTimeout || 14000,
+          // A prayer request or a spoken sentence is longer than one quiz word,
+          // so those keep the ears open a moment after the member stops.
+          continuous: spec.kind === 'text' || !!spec.continuous,
           onInterim: function (partial) { if (partial) self.setStatus('Heard: ' + partial); }
         }).then(function (result) {
           if (self.destroyed || !self.answerResolve || token.cancelled) return;
           self.micBadge.hidden = true;
           if (result.text) {
             self._setState('thinking');
+            if (voiceCommand(result.text)) return;
             var match = spec.kind === 'choice' ? matchChoices(result.text, choices) : { index: null, score: 1 };
             if (spec.kind === 'choice' && match.index == null && (spec.accept || []).length === 0) {
               heardNothing++;
+              self.react('hand', 1);
               self.say(match.score > 0.3 ? 'I am not sure I caught that. Let us try once more.' : 'I did not catch an answer. Say it again, or tap a choice.', { status: 'Your turn' })
                 .then(function () { if (self.answerResolve) listenLoop(); });
               return;
@@ -1017,28 +1726,40 @@
             return;
           }
           if (result.reason === 'not-allowed' || result.reason === 'service-not-allowed') {
-            self.micEnabled = false;
-            self.micBtn.setAttribute('aria-pressed', 'false');
-            self.micBtn.querySelector('span').textContent = 'Answer by voice';
-            self.say('I cannot reach the microphone, so just type your answer or tap a choice.', { status: 'Your turn' });
+            self.disableMic();
+            self.say('I cannot reach the microphone, so just type your answer or tap a choice.', { emote: 'encouraging', status: 'Your turn' });
             return;
           }
-          if (result.reason === 'silent' || result.reason === 'no-speech') {
+          if (result.reason === 'silent' || result.reason === 'no-speech' || result.reason === 'aborted') {
             heardNothing++;
             if (heardNothing === 3) {
               // Keep the conversation warm, then quietly start listening again
               // so a member who needs a moment can still simply speak.
-              self.say('I am still here. Take your time — tap a choice if you would rather not talk.', { status: 'Your turn' })
+              self.say('I am still here. Take your time — tap a choice if you would rather not talk.', { emote: 'encouraging', status: 'Your turn' })
                 .then(function () { if (self.answerResolve) self._later(listenLoop, 2500); });
               return;
             }
             if (heardNothing > 6) return;
-            listenLoop();
+            self._later(listenLoop, 260);
           }
         });
       }
 
-      self._later(listenLoop, 420);
+      // The show opens the ears itself; a page that only wants tapping can pass
+      // `listen: false` and never touch the microphone.
+      //
+      // The open question owns its ears: however the microphone is opened — the
+      // Start button, the microphone button, or a tap on Domey himself — the
+      // question starts listening again instead of waiting in silence.
+      if (spec.listen !== false && self.ears.supported) self._listenLoop = listenLoop;
+      if (spec.listen !== false && self.ears.supported && !self.micEnabled) {
+        self.enableMic({ warmUp: !!spec.warmUp }).then(function () {
+          if (self.destroyed || !self.answerResolve) return;
+          self._later(listenLoop, 260);
+        });
+      } else {
+        self._later(listenLoop, 420);
+      }
 
       // A gentle nudge keeps a silent conversation moving without ever
       // cancelling the question: the member can answer at any time.
@@ -1100,6 +1821,24 @@
     'Good try! Keep this one in your heart.',
     'Almost! Let me share it with you.'
   ];
+  var QUIPS = [
+    'You are doing great, {name}.',
+    'Ooh, this next one is a good one.',
+    'Stay with me, {name} — here comes another.',
+    'I love playing this with you.',
+    'Let us see what you remember from the Word.',
+    'Ready? This one is a favourite of mine.'
+  ];
+  var TWO_IN_A_ROW = [
+    'Two in a row, {name}!',
+    'Look at that, {name} — two in a row!',
+    'You are warming up, {name}!'
+  ];
+  var STREAK_CHEERS = [
+    'Three in a row, {name}! You are on fire!',
+    'Three in a row! {name}, that is wonderful!',
+    'And that makes three! Well done, {name}!'
+  ];
 
   function buildQuestion(item) {
     // Shuffle so the right answer is never always first.
@@ -1144,12 +1883,22 @@
 
     host.emit('show:start', { total: questions.length });
     Band.play('start');
+    host.act('wave', 1800);
+    host.react('sparkle', 3);
     hud(0);
 
     var greeting = options.intro || ('Hi! Welcome to Prayer Dome! I am ' + host.options.name +
       ', and I am so glad you are here. Let us play a Bible challenge together — say your answer out loud, tap it, or type it.');
 
     return host.say(greeting, { emote: 'happy' }).then(function () {
+      if (token.cancelled) return null;
+      // If the microphone is open, say so out loud — half the fun of talking to
+      // Domey is finding out he really does hear you.
+      if (host.ears.supported && host.micEnabled) {
+        return host.say('My ears are open — you can answer by talking.', { emote: 'listening' });
+      }
+      return null;
+    }).then(function () {
       if (token.cancelled) return null;
       return host.ask({
         text: 'Before we start, what should I call you?',
@@ -1175,7 +1924,12 @@
       hud(index + 1);
       host.emit('round', { index: index, total: questions.length, question: item });
       host._setState('thinking');
-      return host.say('Question ' + (index + 1) + '. ' + item.q, { emote: 'thinking', status: 'Your turn' })
+      host.act('point', 1200);
+      Band.play('tick');
+      // A little variety keeps five rounds from sounding like one: every third
+      // question gets a quip before the question itself.
+      var quip = index > 0 && index % 2 === 1 ? pick(QUIPS).replace('{name}', host.name || 'friend') + ' ' : '';
+      return host.say(quip + 'Question ' + (index + 1) + '. ' + item.q, { emote: 'thinking', status: 'Your turn' })
         .then(function () {
           if (token.cancelled) return null;
           return host.ask({
@@ -1205,14 +1959,29 @@
             xp += 20 + Math.min(30, streak * 5);
             dots.push('correct');
             Band.play('correct');
-            host.emote('celebrating', 1600);
+            host.emote('celebrating', 2000);
+            host.react('star', streak >= 2 ? 4 : 2);
+            host.act(streak >= 2 ? 'raise' : 'thumb', 1400);
             if (options.onScore) options.onScore({ correct: correct, total: questions.length, xp: xp, streak: streak, right: true });
-            return host.say(pick(PRAISE) + ' (' + item.verse + ')' , { emote: 'celebrating', hold: 250 });
+            var cheer = pick(PRAISE);
+            var who = host.name && host.name !== 'friend' ? host.name + ', ' : '';
+            if (streak >= 3) {
+              // Three in a row deserves the dance.
+              Band.play('dance');
+              host.act('dance', 2200);
+              host.react('cheer', 4);
+              cheer = pick(STREAK_CHEERS).replace('{name}', who ? who.trim().replace(/,$/, '') : 'friend');
+            } else if (streak === 2) {
+              cheer = pick(TWO_IN_A_ROW).replace('{name}', who ? who.trim().replace(/,$/, '') : 'friend');
+            }
+            return host.say(cheer + ' (' + item.verse + ')', { emote: 'celebrating', hold: 250 });
           }
           streak = 0;
           dots.push('wrong');
           Band.play('wrong');
-          host.emote('encouraging', 1600);
+          host.emote('encouraging', 2000);
+          host.react('heart', 2);
+          host.act('open', 1500);
           if (options.onScore) options.onScore({ correct: correct, total: questions.length, xp: xp, streak: streak, right: false });
           var right = item.options[item.correctIndex];
           return host.say(pick(ENCOURAGE) + ' The answer is ' + right + '. ' + item.verse + ' says it clearly.',
@@ -1239,7 +2008,20 @@
       var closing = 'That is ' + correct + ' out of ' + total + '. ' + badge +
         ' You earned ' + xp + ' Faith Points. Come back any time — I am always here, and I love talking with you.';
       host.emote('celebrating');
-      if (percent >= 80) Band.play('celebrate');
+      if (percent >= 80) {
+        Band.play('fanfare');
+        Band.play('applause');
+        host.react('cheer', 6);
+        host.act('dance', 2600);
+      } else if (percent >= 50) {
+        Band.play('celebrate');
+        host.react('sparkle', 4);
+        host.act('raise', 1800);
+      } else {
+        Band.play('applause');
+        host.react('heart', 3);
+        host.act('open', 1600);
+      }
       host.emit('show:end', { correct: correct, total: total, xp: xp, percent: percent, bestStreak: bestStreak });
       if (options.onFinish) options.onFinish({ correct: correct, total: total, xp: xp, percent: percent, bestStreak: bestStreak });
       return host.say(closing, { emote: 'celebrating', hold: 600 }).then(function () {
@@ -1453,7 +2235,12 @@
     supportsListening: function () { return !!(global.SpeechRecognition || global.webkitSpeechRecognition); },
     stopped: function () { try { global.speechSynthesis.cancel(); } catch (e) {} },
     band: Band,
-    version: '1.0.0'
+    // The mouth shapes and hand actions the character can perform, plus the
+    // planner that turns a sentence into them, published for pages and tests.
+    visemes: ['rest', 'M', 'F', 'E', 'I', 'A', 'O', 'U', 'L'],
+    actions: ALL_GESTURES,
+    lipSync: speechPlan,
+    version: '1.1.0'
   };
 
   // A one-shot line of speech for pages that only want a voice (no character).

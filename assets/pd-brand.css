@@ -1246,6 +1246,32 @@ body.dark-mode .pd-notif-icon {
 .pd-notif-go { align-self: center; color: var(--pd-gold-deep); }
 .pd-notif-empty { text-align: center; padding: 50px 20px; color: var(--text-sub, #64748b); font-size: .85rem; }
 .pd-notif-empty i { font-size: 2.6rem; opacity: .3; display: block; margin-bottom: 12px; }
+.pd-notif-empty small { display: block; margin-top: 6px; font-size: .78rem; opacity: .8; line-height: 1.5; }
+
+/* --- "Turn on device alerts" strip inside the notification centre ---------- */
+.pd-notif-alerts {
+  display: flex; align-items: center; gap: 10px;
+  margin: 12px 14px 4px; padding: 12px 14px;
+  border-radius: 16px;
+  background: linear-gradient(120deg, rgba(212, 175, 55, .16), rgba(10, 77, 155, .12));
+  border: 1px solid rgba(212, 175, 55, .45);
+  color: var(--pd-blue, #0A4D9B);
+  font-size: .8rem; font-weight: 600; line-height: 1.45;
+}
+.pd-notif-alerts[hidden] { display: none; }
+.pd-notif-alerts-icon {
+  width: 34px; height: 34px; border-radius: 12px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(212, 175, 55, .22); color: var(--pd-gold-deep, #a67c00);
+}
+.pd-notif-alerts-text { flex: 1 1 auto; min-width: 0; }
+.pd-notif-alerts-btn {
+  border: none; cursor: pointer; flex-shrink: 0;
+  padding: 8px 14px; border-radius: 999px;
+  background: linear-gradient(135deg, var(--pd-gold, #d4af37), #b8941f);
+  color: #07244d; font-weight: 800; font-size: .78rem;
+}
+body.dark-mode .pd-notif-alerts { color: #eaf2ff; }
 
 /* --- Toasts ---------------------------------------------------------------- */
 .pd-toast-container {
