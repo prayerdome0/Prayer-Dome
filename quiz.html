@@ -553,12 +553,31 @@
            light brand tint (#93c5fd) and controls without a colour get readable text. */
         .quiz-accent { color: var(--accent-green); }
         body.dark-mode .quiz-accent { color: #93c5fd; }
+
+        /* ----- Domey, the real host ----- */
+        .domey-host { display: flex; align-items: center; gap: 16px; padding: 16px 18px; margin-bottom: 22px; }
+        .domey-photo-wrap { position: relative; flex: 0 0 auto; }
+        .domey-photo { width: 76px; height: 76px; object-fit: cover; object-position: 50% 22%; border-radius: 50%; border: 3px solid var(--accent-gold); box-shadow: 0 6px 18px rgba(0,0,0,.25); background: #0f2c5c; }
+        .domey-photo.talking { animation: domeyTalk .5s ease-in-out infinite alternate; }
+        @keyframes domeyTalk { from { transform: scale(1); } to { transform: scale(1.06); } }
+        .domey-live-dot { position: absolute; right: 2px; bottom: 2px; width: 15px; height: 15px; border-radius: 50%; background: #22c55e; border: 2.5px solid #fff; opacity: 0; transition: opacity .2s; }
+        .domey-live-dot.on { opacity: 1; animation: domeyPulse 1s infinite; }
+        @keyframes domeyPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,.5);} 50% { box-shadow: 0 0 0 6px rgba(34,197,94,0);} }
+        .domey-host-copy { flex: 1 1 auto; min-width: 0; }
+        .domey-host-copy h2 { font-family: 'Poppins', serif; color: var(--accent-gold); font-size: 1.1rem; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+        .domey-host-copy p { margin: 0; color: var(--text-sub); font-size: .9rem; line-height: 1.5; }
+        .domey-voice-btn { flex: 0 0 auto; padding: 10px 16px; }
+        .verse-line { margin-top: 16px; padding: 12px 16px; border-radius: 12px; background: rgba(212,175,55,.12); border: 1px solid rgba(212,175,55,.35); color: var(--text-main); font-size: .9rem; line-height: 1.5; animation: slideIn .4s ease; }
+        .verse-line strong { color: var(--accent-gold); }
+        @media (max-width: 620px) { .domey-host { flex-wrap: wrap; } .domey-voice-btn { width: 100%; } }
     </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
     <script src="/assets/pd-content-data.js" defer></script>
     <script src="/assets/pd-academy-data.js" defer></script>
     <script src="/assets/pd-certificate.js" defer></script>
+    <script src="/assets/pd-domey-questions.js" defer></script>
+    <script src="/assets/pd-mascot.js" defer></script>
     <script src="/translation-data.js"></script>
 <script src="/assets/pd-verse-data.js" defer></script>
 <script src="/assets/pd-verse-alerts.js" defer></script>
@@ -589,7 +608,22 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <div class="main-container">
-        
+
+        <!-- Domey, the real host of the quiz -->
+        <section class="domey-host glass-card" id="domeyHostCard">
+            <div class="domey-photo-wrap">
+                <img src="/assets/domey/domey-real.jpg" alt="Domey, your Bible quiz host, speaking" class="domey-photo" id="domeyQuizPhoto">
+                <span class="domey-live-dot" id="domeyQuizDot" title="Domey is speaking"></span>
+            </div>
+            <div class="domey-host-copy">
+                <h2><i class="pd-i pd-i-mic-vocal"></i> Domey is your host</h2>
+                <p id="domeyQuizLine">I read every question out loud and show you the scripture behind each answer. Turn your sound on and let's go!</p>
+            </div>
+            <button class="btn-modern domey-voice-btn" id="domeyVoiceBtn" onclick="toggleDomeyVoice()" title="Toggle Domey's voice">
+                <i class="pd-i pd-i-volume-2" id="domeyVoiceIcon"></i> <span id="domeyVoiceLabel">Voice on</span>
+            </button>
+        </section>
+
         <!-- Stats Bar -->
         <div class="stats-bar glass-card">
             <div class="score-display">
@@ -644,6 +678,7 @@
 
             <div class="question-text" id="questionText">Loading Question...</div>
             <div class="options-grid" id="optionsGrid"></div>
+            <div class="verse-line" id="verseLine" style="display:none"></div>
 
             <div style="text-align: right; margin-top: 30px;">
                 <button class="btn-modern" id="nextBtn" onclick="nextQuestion()" disabled style="width: 100%; max-width: 300px;">
@@ -732,8 +767,52 @@
                 window.speechSynthesis.speak(utterance);
             }
         }
+
+        /* Domey, the real host. The portrait is a genuine photograph; while the
+           browser's voice reads a question we pulse the photo and light the live
+           dot so Domey reads as talking out loud with a real mouth. */
+        let domeyVoiceOn = true;
+        function domeyPhoto(on) {
+            const photo = document.getElementById('domeyQuizPhoto');
+            const dot = document.getElementById('domeyQuizDot');
+            if (photo) photo.classList.toggle('talking', !!on);
+            if (dot) dot.classList.toggle('on', !!on);
+        }
+        function domeySay(text, onDone) {
+            if (!domeyVoiceOn || !('speechSynthesis' in window)) { if (onDone) onDone(); return; }
+            try {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(text);
+                u.rate = 1.05; u.pitch = 1.05;
+                u.onend = u.onerror = () => { domeyPhoto(false); if (onDone) onDone(); };
+                domeyPhoto(true);
+                window.speechSynthesis.speak(u);
+                setTimeout(() => { try { if (!window.speechSynthesis.speaking) domeyPhoto(false); } catch(e) {} },
+                    Math.min(12000, 1200 + String(text).length * 70));
+            } catch(e) { domeyPhoto(false); if (onDone) onDone(); }
+        }
+        window.toggleDomeyVoice = function() {
+            domeyVoiceOn = !domeyVoiceOn;
+            const icon = document.getElementById('domeyVoiceIcon');
+            const label = document.getElementById('domeyVoiceLabel');
+            if (icon) icon.className = domeyVoiceOn ? 'pd-i pd-i-volume-2' : 'pd-i pd-i-volume-x';
+            if (label) label.textContent = domeyVoiceOn ? 'Voice on' : 'Voice off';
+            if (!domeyVoiceOn) { try { window.speechSynthesis.cancel(); } catch(e) {} domeyPhoto(false); }
+            showToast(domeyVoiceOn ? 'Domey will read questions aloud.' : 'Domey is muted.');
+        };
+        function showVerse(qData) {
+            const el = document.getElementById('verseLine');
+            if (!el) return;
+            if (qData && qData.verse) {
+                el.innerHTML = '<strong><i class="pd-i pd-i-book-open"></i> ' + escapeHtml(qData.verse) + '</strong> — the scripture behind this answer.';
+                el.style.display = 'block';
+            } else {
+                el.style.display = 'none';
+            }
+        }
         
-        // --- 300+ UNIQUE BIBLE QUESTIONS (No repeats across 30 levels of 10 questions = 300 total) ---
+        // Fallback set used only if Domey's full bank (pd-domey-questions.js) fails
+        // to load. The live journey is built from that 1,248-question bank.
         const rawQuestions = [
             ["Who created the heavens and the earth?", "Moses", "God", "Abraham", "David", 1],
             ["Who built the ark?", "Noah", "Abraham", "Moses", "David", 0],
@@ -830,18 +909,36 @@
             };
         }
 
-        // Build enough levels from the current question library. Teaching-linked
+        // Build the journey from Domey's full 1,248-question bank when it loaded
+        // (the same bank that powers "Talk with Domey"), so levels are deep and
+        // every answer carries its scripture. The bundled 70-question set stays as
+        // an offline safety net if the bank ever fails to load. Teaching-linked
         // certificate quizzes are surfaced separately in the Academy section.
         const QUESTIONS_PER_LEVEL = 10;
-        const allQuestions = shuffleArray([...rawQuestions]);
         const levelQuestions = {};
-        const TOTAL_LEVELS = Math.max(1, Math.floor(allQuestions.length / QUESTIONS_PER_LEVEL));
+        let TOTAL_LEVELS;
 
-        for (let lvl = 1; lvl <= TOTAL_LEVELS; lvl++) {
-            const startIdx = (lvl - 1) * QUESTIONS_PER_LEVEL;
-            const levelQ = allQuestions.slice(startIdx, startIdx + QUESTIONS_PER_LEVEL);
-            levelQuestions[lvl] = levelQ.map(q => randomizeOptions(q));
-        }
+        (function buildLevels() {
+            let pool = [];
+            if (window.PDDomeyQuestions && PDDomeyQuestions.count >= QUESTIONS_PER_LEVEL) {
+                // The bank already guarantees four choices and a valid answer; a
+                // fresh shuffle per load keeps each journey unique.
+                pool = shuffleArray(PDDomeyQuestions.all()).map(item => ({
+                    text: item.q,
+                    options: item.options.slice(),
+                    correct: item.answer,
+                    verse: item.verse,
+                    topic: item.topic
+                }));
+            } else {
+                pool = shuffleArray([...rawQuestions]).map(q => randomizeOptions(q));
+            }
+            TOTAL_LEVELS = Math.max(1, Math.floor(pool.length / QUESTIONS_PER_LEVEL));
+            for (let lvl = 1; lvl <= TOTAL_LEVELS; lvl++) {
+                const startIdx = (lvl - 1) * QUESTIONS_PER_LEVEL;
+                levelQuestions[lvl] = pool.slice(startIdx, startIdx + QUESTIONS_PER_LEVEL);
+            }
+        })();
 
         // Game State
         let userProgress = { completedLevels: [], currentLevel: 1, totalScore: 0 };
@@ -957,6 +1054,8 @@
                 btn.onclick = () => checkAnswer(idx);
                 optsGrid.appendChild(btn);
             });
+            showVerse(null);
+            domeySay(qData.text);
             startTimer();
         }
 
@@ -1015,6 +1114,8 @@
                 try { sfxWrong.currentTime = 0; sfxWrong.play().catch(()=>{}); } catch(e){}
                 streak = 0;
             }
+            showVerse(qData);
+            domeyPhoto(false);
             updateStreakUI();
             document.getElementById('nextBtn').disabled = false;
         };
@@ -1027,6 +1128,8 @@
             const qData = levelQuestions[activeLevel][qIndex];
             const correctBtn = document.getElementById(`opt-${qData.correct}`);
             if (correctBtn) correctBtn.classList.add('correct');
+            showVerse(qData);
+            domeyPhoto(false);
             document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
             document.getElementById('nextBtn').disabled = false;
         }
@@ -1055,7 +1158,7 @@
                 mSub.innerText = "Awesome job! You unlocked the next level.";
                 actionBtn.style.display = "inline-flex";
                 try { sfxWin.currentTime = 0; sfxWin.play().catch(()=>{}); } catch(e){}
-                confetti({ particleCount: 200, spread: 120 });
+                if (typeof confetti !== 'undefined') confetti({ particleCount: 200, spread: 120 });
                 userProgress.totalScore += scoreInLevel;
                 if (!userProgress.completedLevels.includes(activeLevel)) {
                     userProgress.completedLevels.push(activeLevel);
@@ -1247,9 +1350,11 @@
             try {
                 const p = window.PD_PROFILE || JSON.parse(localStorage.getItem('pd_profile') || 'null');
                 if (p && (p.fullName || p.displayName)) return p.fullName || p.displayName;
-            } catch(e) {}
-            const u = firebase.auth().currentUser;
-            if (u && (u.displayName || u.email)) return u.displayName || u.email.split('@')[0];
+    } catch(e) {}
+    // Modular Firebase: there is no legacy global `firebase` on this page — the
+    // app's auth instance (and the live `currentUser`) are already in scope.
+    const u = (auth && auth.currentUser) || currentUser;
+    if (u && (u.displayName || u.email)) return u.displayName || u.email.split('@')[0];
             return localStorage.getItem('pd_certificate_name') || 'Prayer Dome Member';
         }
         function renderAcademyQuizzes(){
@@ -1334,7 +1439,7 @@
         };
         document.addEventListener('DOMContentLoaded', renderAcademyQuizzes);
 
-        console.log('Prayer Dome Quiz v2 - 30 Levels, Unique Questions, Randomized Answers!');
+        console.log('Prayer Dome Quiz — hosted by Domey (' + (window.PDDomeyQuestions ? PDDomeyQuestions.count : rawQuestions.length) + ' questions), ' + TOTAL_LEVELS + ' levels, randomized answers.');
     </script>
 </body>
 </html>
