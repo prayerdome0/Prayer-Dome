@@ -1301,6 +1301,20 @@
            light brand tint (#93c5fd) and controls without a colour get readable text. */
         body.dark-mode .christian-btn:not(.gold):not(:hover) { color: #93c5fd; }
         body.dark-mode .media-btn { color: var(--accent-gold); }
+
+        /* ----- Domey, the real host ----- */
+        .domey-host { display:flex; align-items:center; gap:12px; margin:12px; padding:12px 14px; border-radius:16px; background:linear-gradient(135deg, rgba(212,175,55,.14), rgba(10,77,155,.08)); border:1px solid rgba(212,175,55,.35); }
+        .domey-photo-wrap { position:relative; flex:0 0 auto; }
+        .domey-photo { width:56px; height:56px; object-fit:cover; object-position:50% 22%; border-radius:50%; border:2.5px solid var(--accent-gold); box-shadow:0 4px 14px rgba(0,0,0,.25); background:#0f2c5c; }
+        .domey-photo.talking { animation:domeyTalk .5s ease-in-out infinite alternate; }
+        @keyframes domeyTalk { from { transform:scale(1); } to { transform:scale(1.07); } }
+        .domey-live-dot { position:absolute; right:1px; bottom:1px; width:12px; height:12px; border-radius:50%; background:#22c55e; border:2px solid #fff; opacity:0; transition:opacity .2s; }
+        .domey-live-dot.on { opacity:1; animation:domeyPulse 1s infinite; }
+        @keyframes domeyPulse { 0%,100% { box-shadow:0 0 0 0 rgba(34,197,94,.5);} 50% { box-shadow:0 0 0 5px rgba(34,197,94,0);} }
+        .domey-host-copy { flex:1 1 auto; min-width:0; }
+        .domey-host-copy h2 { font-family:'Poppins',serif; color:var(--accent-gold); font-size:.95rem; margin:0 0 2px; display:flex; align-items:center; gap:6px; }
+        .domey-host-copy p { margin:0; color:var(--text-sub); font-size:.78rem; line-height:1.45; }
+        .domey-greet-btn { flex:0 0 auto; background:var(--grad-lux); color:#fff; border:none; }
 </style>
     <link rel="stylesheet" href="/assets/pd-brand.css">
     <script src="/assets/pd-motion.js" defer></script>
@@ -1345,6 +1359,17 @@
     <div id="tab-chats" class="tab-content active">
         <div class="chats-container">
             <div class="rooms-sidebar" id="roomsSidebar">
+                <div class="domey-host" id="domeyChatHost">
+                    <div class="domey-photo-wrap">
+                        <img src="/assets/domey/domey-real.jpg" alt="Domey, your Prayer Dome host, speaking" class="domey-photo" id="domeyChatPhoto">
+                        <span class="domey-live-dot" id="domeyChatDot" title="Domey is speaking"></span>
+                    </div>
+                    <div class="domey-host-copy">
+                        <h2><i class="pd-i pd-i-mic-vocal"></i> Domey</h2>
+                        <p id="domeyChatLine">Welcome to the fellowship! Tap to hear me greet you out loud.</p>
+                    </div>
+                    <button class="header-btn domey-greet-btn" onclick="domeyGreet()" title="Hear Domey greet you" aria-label="Hear Domey greet you"><i class="pd-i pd-i-volume-2"></i></button>
+                </div>
                 <div class="rooms-header">
                     <h3><i class="pd-i pd-i-message-circle-more"></i> Conversations</h3>
                     <div style="display:flex;gap:8px;margin-top:10px;">
@@ -3539,6 +3564,30 @@
             window.location.href = 'index.html';
         };
         
+        /* Domey, the real host: a genuine photograph that pulses and lights a live
+           dot while the browser's voice greets the member out loud. */
+        function domeyChatPhoto(on) {
+            const photo = document.getElementById('domeyChatPhoto');
+            const dot = document.getElementById('domeyChatDot');
+            if (photo) photo.classList.toggle('talking', !!on);
+            if (dot) dot.classList.toggle('on', !!on);
+        }
+        window.domeyGreet = function() {
+            const line = 'Welcome to the Prayer Dome fellowship! Join a room, share a prayer, and encourage someone today. God bless you!';
+            const el = document.getElementById('domeyChatLine');
+            if (el) el.textContent = line;
+            if (!('speechSynthesis' in window)) { showToast('Voice is not available on this device.', 'info'); return; }
+            try {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(line);
+                u.rate = 1.02; u.pitch = 1.05;
+                u.onend = u.onerror = () => domeyChatPhoto(false);
+                domeyChatPhoto(true);
+                window.speechSynthesis.speak(u);
+                setTimeout(() => { try { if (!window.speechSynthesis.speaking) domeyChatPhoto(false); } catch(e) {} }, 12000);
+            } catch(e) { domeyChatPhoto(false); }
+        };
+
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
             toast.className = 'toast-message toast-' + type;
