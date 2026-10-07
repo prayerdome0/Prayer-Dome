@@ -232,12 +232,17 @@ const SW = read('sw.js');
   /* --------------------------------------------------- 3. the game page */
   t('the game page loads the cartoon host', GAME.includes('/assets/pd-mascot.js') &&
     GAME.includes('/assets/pd-mascot.css'));
-  t('the game page offers "Talk with Domey" as a game', /gameTab-talk/.test(GAME) &&
-    /switchGame\('talk'\)/.test(GAME) && /id="panel-talk"/.test(GAME));
+  t('the game page is Domey only — every other game is gone',
+    /id="panel-talk"/.test(GAME) && !/gameTab-/.test(GAME) && !/switchGame\(/.test(GAME) &&
+    !/panel-(memory|quiz|scramble|extra-games)/.test(GAME) && !/BIBLE_QUIZ_POOL/.test(GAME));
   t('the game page has a start control and a live score chip',
     /id="domeyStartBtn"/.test(GAME) && /id="domeyBestChip"/.test(GAME));
   t('the game show feeds real Bible questions into the host',
-    /BIBLE_QUIZ_POOL\.map/.test(GAME) && /PDMascot\.show\(/.test(GAME));
+    /PDDomeyQuestions\.forMascot/.test(GAME) && /PDMascot\.show\(/.test(GAME) &&
+    /\/assets\/pd-domey-questions\.js/.test(GAME));
+  t('the game page builds the character in three dimensions',
+    /\/assets\/pd-domey3d\.js/.test(GAME) && /render: 'auto'/.test(GAME) &&
+    /renderer3d\.fit\(\)/.test(GAME));
   t('correct answers earn Faith Points and badges in the member journey',
     /addXP\(gain\)/.test(GAME) && /unlockBadge\('word-seeker'\)/.test(GAME));
   t('the host is silenced when the member switches game or leaves the tab',

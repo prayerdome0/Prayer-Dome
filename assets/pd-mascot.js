@@ -889,7 +889,11 @@
     // Lip-sync and the little hand actions; both are pure decoration, so a page
     // that wants a calm Domey can simply switch them off.
     lipSync: true,
-    actions: true
+    actions: true,
+    // Which character: 'auto' uses the three-dimensional Domey
+    // (/assets/pd-domey3d.js) as soon as that module and WebGL are ready and
+    // falls back to the inline SVG otherwise; 'svg' always keeps the drawing.
+    render: 'auto'
   };
 
   function Host(target, options) {
@@ -927,9 +931,83 @@
     this.mouth = new MouthMotor(this);
     this.mouthOn = !this.options.captionsOnly && this.options.lipSync !== false;
     this.actionsOn = this.options.actions !== false;
+    this.renderer3d = null;
     this._build();
     this._bindGaze();
+    this._bindRender3D();
   }
+
+  /**
+   * Upgrade the character to the 3D renderer when the page loaded it.
+   *
+   * The 2D drawing is always built first, so the stage is never empty: the
+   * three-dimensional Domey simply takes over when /assets/pd-domey3d.js (and
+   * the vendored three.js module it imports) are ready and WebGL is available.
+   * Nothing else about the host changes — the same root element carries the
+   * same `data-pdm-vis`, `data-pdm-act`, `data-pdm-state` and gaze signals, so
+   * captions, lip-sync, gestures, listening and the scoreboard all keep working.
+   */
+  Host.prototype._bindRender3D = function () {
+    var self = this;
+    if (this.options.render === 'svg') return;
+    var engine = global.PDDomey3D;
+    if (!engine || typeof engine.create !== 'function') return;
+    // Already loaded (a page that puts pd-domey3d.js before pd-mascot.js):
+    // upgrade on the next tick so the caller can finish mount() first.
+    if (engine.three && engine.three()) {
+      this._later(function () { self.use3D(); }, 0);
+      return;
+    }
+    if (typeof engine.ready !== 'function') return;
+    engine.ready().then(function () {
+      if (self.destroyed) return;
+      self.use3D();
+    }).catch(function (error) {
+      // No 3D on this device: the drawing stays, and the show goes on.
+      console.warn('[PDMascot] 3D character unavailable, keeping the drawing', error);
+    });
+  };
+
+  /**
+   * Swap the drawing for the 3D character. Returns the renderer, or null when
+   * there is nothing to swap (no module, no WebGL, already upgraded).
+   */
+  Host.prototype.use3D = function () {
+    var self = this;
+    if (this.renderer3d || this.destroyed || this.options.render === 'svg') return this.renderer3d;
+    var engine = global.PDDomey3D;
+    if (!engine || typeof engine.create !== 'function' || !engine.available()) return null;
+    var instance = engine.create(this.stage, {
+      host: this,
+      reducedMotion: engine.prefersReducedMotion && engine.prefersReducedMotion(),
+      onContextLost: function () {
+        // The GPU went away mid-show: drop back to the drawing, not to a blank
+        // stage, and keep the conversation running.
+        self.use2D();
+      }
+    });
+    if (!instance) return null;
+    this.renderer3d = instance;
+    this.root.classList.add('pdm-render-3d');
+    this.root.setAttribute('data-pdm-render', '3d');
+    this.emit('renderer', '3d');
+    return instance;
+  };
+
+  /** Go back to the inline SVG character (WebGL lost, or by request). */
+  Host.prototype.use2D = function () {
+    if (this.renderer3d) {
+      try { this.renderer3d.dispose(); } catch (e) {}
+      this.renderer3d = null;
+    }
+    this.root.classList.remove('pdm-render-3d');
+    this.root.setAttribute('data-pdm-render', '2d');
+    this.emit('renderer', 'svg');
+    return this;
+  };
+
+  /** True while the three-dimensional character is on stage. */
+  Host.prototype.is3D = function () { return !!this.renderer3d; };
 
   Host.prototype.on = function (evt, fn) {
     (this.listeners[evt] = this.listeners[evt] || []).push(fn);
@@ -1458,10 +1536,18 @@
     if (this._stateTimer) { clearTimeout(this._stateTimer); this._stateTimer = null; }
     this.destroyed = true;
     this._unbindGaze();
+    // Hand the GPU buffers back before the markup goes away; a page that mounts
+    // and destroys Domey repeatedly must not leak a WebGL context each time.
+    if (this.renderer3d) {
+      try { this.renderer3d.dispose(); } catch (e) {}
+      this.renderer3d = null;
+    }
     document.removeEventListener('touchstart', this._unlock);
     document.removeEventListener('click', this._unlock);
     this.root.innerHTML = '';
     this.root.classList.remove('pd-mascot');
+    this.root.classList.remove('pdm-render-3d');
+    this.root.removeAttribute('data-pdm-render');
   };
 
   /* -------------------------------------------------------- voice controls */
@@ -2240,7 +2326,14 @@
     visemes: ['rest', 'M', 'F', 'E', 'I', 'A', 'O', 'U', 'L'],
     actions: ALL_GESTURES,
     lipSync: speechPlan,
-    version: '1.1.0'
+    // The 3D character (/assets/pd-domey3d.js) is optional: pages that load it
+    // get a three-dimensional Domey automatically, pages that do not keep the
+    // drawing. These two helpers let a page check before it promises him.
+    supports3D: function () {
+      return !!(global.PDDomey3D && global.PDDomey3D.available && global.PDDomey3D.available());
+    },
+    dimensions: ['2d', '3d'],
+    version: '1.2.0'
   };
 
   // A one-shot line of speech for pages that only want a voice (no character).

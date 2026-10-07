@@ -3,7 +3,7 @@
 // shade) even when the app is closed — see /assets/pd-verse-data.js.
 try { importScripts('/assets/pd-verse-data.js'); } catch (e) { /* verses unavailable offline */ }
 // Bump CACHE_NAME whenever the precache list changes.
-const CACHE_NAME = 'prayer-dome-v26';
+const CACHE_NAME = 'prayer-dome-v27';
 
 // Shell assets worth having available offline.
 const PRECACHE = [
@@ -66,6 +66,11 @@ const PRECACHE = [
     // Domey, the talking cartoon host used by the game and the Live lounge.
     '/assets/pd-mascot.css',
     '/assets/pd-mascot.js',
+    // Domey's real 3D body (three.js r165, vendored so it works offline) and
+    // the question bank he plays from — 1,248 questions across 14 topics.
+    '/assets/pd-domey3d.js',
+    '/assets/three.module.min.js',
+    '/assets/pd-domey-questions.js',
     '/assets/pd-upload.js',
     '/assets/pd-verse-data.js',
     '/assets/pd-verse-alerts.js',
