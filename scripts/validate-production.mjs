@@ -68,7 +68,8 @@ for (const file of htmlFiles) {
   while ((match = scriptPattern.exec(html))) {
     const [, attributes, code] = match;
     index += 1;
-    if (!code.trim() || /\btype\s*=\s*["']application\/(?:ld\+)?json["']/i.test(attributes)) continue;
+    // JSON-LD and import maps are data blocks, not executable scripts.
+    if (!code.trim() || /\btype\s*=\s*["']application\/(?:ld\+)?json["']/i.test(attributes) || /\btype\s*=\s*["']importmap["']/i.test(attributes)) continue;
     try {
       check(file, code);
     } catch (error) {

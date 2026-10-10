@@ -1,0 +1,18 @@
+VRM1_Constraint_Twist_Sample.vrm
+
+Source:   https://github.com/pixiv/three-vrm (packages/three-vrm/examples/models)
+Author:   pixiv Inc. (c) 2022 pixiv Inc.
+Licence:  VRM Public License 1.0 (https://vrm.dev/licenses/1.0/), as declared in
+          the model's own VRM metadata (VRMC_vrm.meta):
+            allowRedistribution:          true
+            modification:                 allowModificationRedistribution
+            commercialUsage:              corporation
+            creditNotation:               unnecessary
+            avatarPermission:             everyone
+            allowAntisocialOrHateUsage:   false
+            allowExcessivelyViolentUsage: true
+            allowExcessivelySexualUsage:  true
+            allowPoliticalOrReligiousUsage: true
+
+Cost: free. No account, subscription, or API key is needed.
+Use in this site: a stylised cartoon character in the Talk with Domey game.

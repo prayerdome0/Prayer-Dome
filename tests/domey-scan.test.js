@@ -50,14 +50,13 @@ t('the parsed model is upright with the face toward +Z (nose tip is the front-mo
 const licence = read('assets/domey/scan/LeePerrySmith_License.txt');
 t('the model licence (CC BY 3.0) ships beside the model', /Attribution 3\.0/.test(licence) && /triplegangers/.test(licence));
 const game = read('game.html');
-t('the game page credits the scan and links the licence', /Lee Perry-Smith/.test(game) && /creativecommons\.org\/licenses\/by\/3\.0/.test(game));
-t('the game page loads the scan script before the mascot', game.indexOf('pd-domey-scan.js') > -1 && game.indexOf('pd-domey-scan.js') < game.indexOf('pd-mascot.js'));
-t('the game no longer describes Domey as a cartoon', !/cartoon host|cartoon Bible quiz host/i.test(game));
+t('the game page credits the stylised character and links its licence', /VRM1_Constraint_Twist_Sample/.test(game) && /vrm\.dev\/licenses\/1\.0/.test(game));
+t('the game page loads the character script before the mascot', game.indexOf('pd-domey-human.js') > -1 && game.indexOf('pd-domey-human.js') < game.indexOf('pd-mascot.js'));
 
 const mascot = read('assets/pd-mascot.js');
-t('the mascot uses the realistic head first and falls back to the cartoon rig',
-  /PDDomeyScan\.buildRig/.test(mascot) && /realistic head unavailable, using the cartoon rig/.test(mascot) && /cartoon: true/.test(mascot));
-t('the realistic head is passed to the engine as its rig', /createOptions\.rig = global\.PDDomeyScan\.buildRig/.test(mascot));
+t('the mascot uses the stylised human first and keeps the 2D drawing if it fails',
+  /global\.PDDomeyHuman/.test(mascot) && /human\.load\(THREE\)/.test(mascot) && /stylised character unavailable, keeping the drawing/.test(mascot) && /2d-low-end/.test(mascot));
+t('the stylised human is passed to the engine as its rig', /createOptions\.rig = global\.PDDomeyHuman\.buildRig/.test(mascot));
 t('the engine honours a lower pixel ratio on low-end devices', /maxPixelRatio/.test(read('assets/pd-domey3d.js')) && /maxPixelRatio: opts\.lowEnd \? 1 : 2/.test(mascot));
 t('low-end detection covers Android devices with little memory or few cores', /lowMemory && fewCores|android && \(lowMemory \|\| fewCores\)/.test(scanSrc));
 
