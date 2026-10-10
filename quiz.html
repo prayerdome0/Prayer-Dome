@@ -1028,7 +1028,7 @@
             document.getElementById('levelMap').style.display = 'none';
             document.getElementById('quizActiveScreen').style.display = 'block';
             loadQuestion();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            pdScrollToScreen('quizActiveScreen');
         };
 
         function loadQuestion() {
@@ -1179,11 +1179,21 @@
             modal.style.display = 'flex';
         }
 
+        // Land on a specific screen below the sticky header instead of the page top.
+        function pdScrollToScreen(id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            var bar = document.querySelector('.pd-topbar');
+            var stuck = bar && ['fixed', 'sticky'].indexOf(getComputedStyle(bar).position) > -1;
+            var top = el.getBoundingClientRect().top + window.pageYOffset - (stuck ? bar.offsetHeight : 0) - 12;
+            window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+        }
+
         window.continueToMap = function() {
             document.getElementById('levelCompleteModal').style.display = 'none';
             document.getElementById('quizActiveScreen').style.display = 'none';
             document.getElementById('levelMap').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            pdScrollToScreen('levelMap');
         };
 
         window.retryLevel = function() {

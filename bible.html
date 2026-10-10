@@ -138,8 +138,7 @@
     <script src="/assets/pd-icons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
@@ -396,10 +395,10 @@
 
     <div class="app-wrapper">
         <div class="app-tabs">
-            <button class="app-tab active" onclick="switchTab('read')"><i class="pd-i pd-i-book-open"></i> Read</button>
-            <button class="app-tab" onclick="switchTab('progress')"><i class="pd-i pd-i-chart-line"></i> Progress</button>
-            <button class="app-tab" onclick="switchTab('notebook')"><i class="pd-i pd-i-bookmark"></i> Notebook</button>
-            <button class="app-tab" onclick="switchTab('search')"><i class="pd-i pd-i-search"></i> Search</button>
+            <button class="app-tab active" data-tab="read" onclick="switchTab('read')"><i class="pd-i pd-i-book-open"></i> Read</button>
+            <button class="app-tab" data-tab="progress" onclick="switchTab('progress')"><i class="pd-i pd-i-chart-line"></i> Progress</button>
+            <button class="app-tab" data-tab="notebook" onclick="switchTab('notebook')"><i class="pd-i pd-i-bookmark"></i> Notebook</button>
+            <button class="app-tab" data-tab="search" onclick="switchTab('search')"><i class="pd-i pd-i-search"></i> Search</button>
         </div>
 
         <!-- READ TAB -->
@@ -425,6 +424,7 @@
                     <button class="version-btn" id="versionNLT" data-version="NLT" aria-pressed="false" onclick="setVersion('NLT')" title="New Living Translation">NLT</button>
                     <button class="version-btn" id="versionESV" data-version="ESV" aria-pressed="false" onclick="setVersion('ESV')" title="English Standard Version">ESV</button>
                     <button class="version-btn" id="versionMSG" data-version="MSG" aria-pressed="false" onclick="setVersion('MSG')" title="The Message">MSG</button>
+                    <button class="version-btn" id="versionBSB" data-version="BSB" aria-pressed="false" onclick="setVersion('BSB')" title="Berean Standard Bible (public domain)">BSB</button>
                     <span class="version-note" id="versionStatus" role="status" aria-live="polite">Choose a version to read</span>
                     <span class="text-size-controls" role="group" aria-label="Text size">
                         <button id="textSmall" onclick="setTextSize('small')" title="Smaller text" aria-label="Smaller text">A-</button>
@@ -518,10 +518,9 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
+        // Firebase is loaded on demand. The reader must not depend on it: if the
+        // CDN is blocked or offline, guests keep reading and saving locally.
+        const FIREBASE_BASE = "https://www.gstatic.com/firebasejs/10.8.0/";
         const firebaseConfig = { 
             apiKey: "AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo", 
             authDomain: "prayer-dome.firebaseapp.com", 
@@ -530,16 +529,40 @@
             messagingSenderId: "198295153196", 
             appId: "1:198295153196:web:1222b31948d7974ba3bf89" 
         };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
+        let fbDb = null;
+        let fbAuth = null;
+        let fbApi = null;
+        async function loadFirebase() {
+            try {
+                const [appMod, fsMod, authMod] = await Promise.all([
+                    import(FIREBASE_BASE + "firebase-app.js"),
+                    import(FIREBASE_BASE + "firebase-firestore.js"),
+                    import(FIREBASE_BASE + "firebase-auth.js")
+                ]);
+                const app = appMod.initializeApp(firebaseConfig);
+                fbDb = fsMod.getFirestore(app);
+                fbAuth = authMod.getAuth(app);
+                fbApi = {
+                    doc: fsMod.doc, getDoc: fsMod.getDoc, setDoc: fsMod.setDoc, updateDoc: fsMod.updateDoc,
+                    collection: fsMod.collection, addDoc: fsMod.addDoc, getDocs: fsMod.getDocs,
+                    query: fsMod.query, orderBy: fsMod.orderBy, serverTimestamp: fsMod.serverTimestamp,
+                    onAuthStateChanged: authMod.onAuthStateChanged
+                };
+                return true;
+            } catch (error) {
+                console.warn("Account sync is unavailable; the Bible still works on this device.", error && error.message);
+                fbDb = null; fbAuth = null; fbApi = null;
+                return false;
+            }
+        }
 
         const BIBLE_VERSIONS = {
             NIV: { name: 'New International Version', copyright: 'The Holy Bible, New International Version®, NIV® Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.® Used by permission. All rights reserved worldwide.' },
             KJV: { name: 'King James Version', copyright: 'King James Version (KJV). Public domain in the United States.' },
             NLT: { name: 'New Living Translation', copyright: 'Holy Bible, New Living Translation®, copyright © 1996, 2004, 2015 by Tyndale House Foundation. Used by permission of Tyndale House Publishers, Inc. All rights reserved.' },
             ESV: { name: 'English Standard Version', copyright: 'The Holy Bible, English Standard Version® (ESV®), copyright © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved.' },
-            MSG: { name: 'The Message', copyright: 'The Message® copyright © 1993, 2002, 2018 by Eugene H. Peterson. Used by permission of NavPress. All rights reserved.' }
+            MSG: { name: 'The Message', copyright: 'The Message® copyright © 1993, 2002, 2018 by Eugene H. Peterson. Used by permission of NavPress. All rights reserved.' },
+            BSB: { name: 'Berean Standard Bible', copyright: 'Berean Standard Bible (BSB). Dedicated to the public domain (CC0) on 30 April 2023 by the Berean Bible team and BSB Publishing. Text served from this site, not from a licensed API.' }
         };
         const TEXT_SIZES = ['small', 'medium', 'large'];
         function readPreference(key, fallback) {
@@ -597,13 +620,13 @@
             }
             
             try {
-                const progressRef = doc(db, "bibleProgress", currentUser.uid);
-                const progressDoc = await getDoc(progressRef);
+                const progressRef = fbApi.doc(fbDb, "bibleProgress", currentUser.uid);
+                const progressDoc = await fbApi.getDoc(progressRef);
                 if (progressDoc.exists()) {
                     const data = progressDoc.data();
                     readChapters = new Set(data.readChapters || []);
                 } else {
-                    await setDoc(progressRef, { readChapters: [], lastUpdated: serverTimestamp() });
+                    await fbApi.setDoc(progressRef, { readChapters: [], lastUpdated: fbApi.serverTimestamp() });
                 }
                 updateProgressUI();
                 renderReadingPlan();
@@ -627,15 +650,15 @@
             }
             
             try {
-                const progressRef = doc(db, "bibleProgress", currentUser.uid);
-                await updateDoc(progressRef, {
+                const progressRef = fbApi.doc(fbDb, "bibleProgress", currentUser.uid);
+                await fbApi.updateDoc(progressRef, {
                     readChapters: [...readChapters],
-                    lastUpdated: serverTimestamp()
+                    lastUpdated: fbApi.serverTimestamp()
                 });
                 updateProgressUI();
                 renderReadingPlan();
                 // Show small celebration
-                confetti({ particleCount: 30, spread: 40, origin: { y: 0.8 } });
+                if (typeof confetti === 'function') confetti({ particleCount: 30, spread: 40, origin: { y: 0.8 } });
                 const toast = document.createElement('div');
                 toast.className = 'toast';
                 toast.style.cssText = 'position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:var(--accent-green); color:white; padding:8px 20px; border-radius:30px; z-index:2000; font-weight:600;';
@@ -678,7 +701,7 @@
             }).join('');
         }
 
-        window.goToBook = (bookName) => {
+        function goToBook(bookName) {
             const bookIndex = bibleBooks.findIndex(b => b.name === bookName);
             if (bookIndex !== -1) {
                 document.getElementById('bookSelect').value = bookIndex;
@@ -696,7 +719,7 @@
             updateChapters();
         }
 
-        window.updateChapters = () => {
+        function updateChapters() {
             const bIdx = parseInt(document.getElementById('bookSelect').value);
             const cSel = document.getElementById('chapterSelect');
             cSel.innerHTML = "";
@@ -715,6 +738,10 @@
 
         async function checkVersionStatus(version) {
             const status = document.getElementById('versionStatus');
+            if (version === 'BSB') {
+                if (status && version === currentVersion) status.textContent = `${BIBLE_VERSIONS.BSB.name} · public domain text on this site`;
+                return;
+            }
             if (status && version === currentVersion) {
                 status.textContent = `${BIBLE_VERSIONS[version].name} · checking sources`;
             }
@@ -728,7 +755,9 @@
                     if (status) {
                         status.textContent = json.configured
                             ? `${currentTranslationName} · ready`
-                            : `${currentTranslationName} · setup required`;
+                            : (version === 'NIV'
+                                ? `${currentTranslationName} · licensing limit`
+                                : `${currentTranslationName} · setup required`);
                         status.title = json.message || (json.getBibleFallbackAvailable
                             ? 'Exact-version sources include Bolls.life and the free GetBible.net KJV fallback.'
                             : `Exact-version sources: ${(json.providers || []).join(', ') || 'version-matched providers'}. GetBible.net does not currently publish this edition; no other translation will be substituted.`);
@@ -744,7 +773,7 @@
             }
         }
 
-        window.setVersion = (value) => {
+        function setVersion(value) {
             const version = String(value || '').trim().toUpperCase();
             if (!BIBLE_VERSIONS[version]) return;
             currentVersion = version;
@@ -760,7 +789,7 @@
         };
         updateVersionButtons();
 
-        window.setTextSize = (size) => {
+        function setTextSize(size) {
             if (!TEXT_SIZES.includes(size)) return;
             textSize = size;
             try { localStorage.setItem('pd_bible_textsize', size); } catch (e) { /* preference is optional */ }
@@ -779,7 +808,10 @@
            Every chapter you read is saved on this device. When the internet
            drops (or data is finished), saved chapters still open instantly —
            the Bible remains usable offline. */
-        const BIBLE_CACHE_KEY = 'pd_bible_cache_v1';
+        const BIBLE_CACHE_KEY = 'pd_bible_cache_v2';
+        // v1 chapters were saved before the NIV identifier and Strong's cleaning
+        // were fixed, so they may hold the wrong text under a label. Drop them.
+        try { localStorage.removeItem('pd_bible_cache_v1'); } catch (e) { /* storage optional */ }
         const BIBLE_CACHE_MAX = 120; // chapters kept on the device
 
         function cacheAll() {
@@ -811,7 +843,52 @@
             badge.innerHTML = `<i class="pd-i pd-i-download" aria-hidden="true"></i> ${saved} chapter${saved === 1 ? '' : 's'} saved offline`;
         }
 
-        window.fetchChapter = async () => {
+        // BSB (Berean Standard Bible, public domain) is read from the bundled
+        // per-book files in /assets/bible/bsb/, so it needs no API key.
+        const BSB_NOT_IN_TEXT = 'Not included in the main text of the Berean Standard Bible.';
+        const bsbBookCache = new Map();
+        function loadBsbBook(bookId) {
+            if (!bsbBookCache.has(bookId)) {
+                const request = fetch(`/assets/bible/bsb/${encodeURIComponent(bookId)}.json`)
+                    .then(res => {
+                        if (!res.ok) throw new Error(`The Berean Standard Bible text for this book could not be loaded (HTTP ${res.status}). Please try again.`);
+                        return res.json();
+                    })
+                    .catch(error => { bsbBookCache.delete(bookId); throw error; });
+                bsbBookCache.set(bookId, request);
+            }
+            return bsbBookCache.get(bookId);
+        }
+        async function fetchBsbChapter(book, chapter) {
+            const data = await loadBsbBook(book.id);
+            const verseMap = data.chapters && data.chapters[String(chapter)];
+            if (!verseMap) throw new Error(`${book.name} ${chapter} is not in the Berean Standard Bible text.`);
+            const verses = Object.keys(verseMap).map(Number).sort((a, b) => a - b).map(number => ({
+                verse: number,
+                text: verseMap[number] || BSB_NOT_IN_TEXT
+            }));
+            return { ok: true, translation: 'BSB', translationName: data.translationName, copyright: data.copyright, verses };
+        }
+        async function searchBsb(query, limit) {
+            const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+            const results = [];
+            for (const book of bibleBooks) {
+                const data = await loadBsbBook(book.id);
+                for (const [chapter, verseMap] of Object.entries(data.chapters || {})) {
+                    for (const [verse, text] of Object.entries(verseMap)) {
+                        if (!text) continue;
+                        const lower = text.toLowerCase();
+                        if (words.every(word => lower.includes(word))) {
+                            results.push({ reference: `${book.name} ${chapter}:${verse}`, text });
+                            if (results.length >= limit) return results;
+                        }
+                    }
+                }
+            }
+            return results;
+        }
+
+        async function fetchChapter() {
             const requestId = ++chapterRequestId;
             const version = currentVersion;
             const bookIndex = parseInt(document.getElementById('bookSelect').value, 10);
@@ -835,9 +912,15 @@
             reader.innerHTML = '<div class="loading-spinner" role="status" aria-label="Loading chapter"></div>';
 
             try {
-                const url = `/api/bible?action=chapter&id=${encodeURIComponent(book.id)}&chapter=${encodeURIComponent(chapter)}&version=${encodeURIComponent(version)}`;
-                const response = await fetch(url);
-                const json = await response.json();
+                let response = { ok: true, status: 200 };
+                let json;
+                if (version === 'BSB') {
+                    json = await fetchBsbChapter(book, chapter);
+                } else {
+                    const url = `/api/bible?action=chapter&id=${encodeURIComponent(book.id)}&chapter=${encodeURIComponent(chapter)}&version=${encodeURIComponent(version)}`;
+                    response = await fetch(url);
+                    json = await response.json();
+                }
                 if (requestId !== chapterRequestId) return;
                 if (!response.ok || !json.ok) {
                     throw Object.assign(new Error(json.message || `${BIBLE_VERSIONS[version].name} unavailable`), {
@@ -944,10 +1027,10 @@
             html += "</div>";
             html += `<p class="bible-copyright">${escapeHtml(copy)}</p>`;
             document.getElementById('bibleReader').innerHTML = html;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            scrollIntoReadingView(document.querySelector('#bibleReader .chapter-title-wrap') || document.getElementById('bibleReader'));
         }
 
-        window.selVerse = (i) => {
+        function selVerse(i) {
             selectedVerseIdx = i;
             document.querySelectorAll('.verse-item').forEach(el => el.classList.remove('selected'));
             const el = document.getElementById(`v-${i}`);
@@ -961,7 +1044,7 @@
             }
         };
 
-        window.copyVerse = () => {
+        function copyVerse() {
             if (selectedVerseIdx !== null && currentVerses[selectedVerseIdx]) {
                 const v = currentVerses[selectedVerseIdx];
                 navigator.clipboard.writeText(`${v.text} — ${currentBookName} ${currentChapter}:${v.verse} (${currentVersion})`);
@@ -970,7 +1053,7 @@
             }
         };
 
-        window.saveNoteFromVerse = () => {
+        function saveNoteFromVerse() {
             if (selectedVerseIdx === null) return;
             const v = currentVerses[selectedVerseIdx];
             document.getElementById('noteRef').textContent = `${currentBookName} ${currentChapter}:${v.verse} (${currentVersion})`;
@@ -978,18 +1061,18 @@
             document.getElementById('noteModal').style.display = 'flex';
         };
 
-        window.saveNote = async () => {
+        async function saveNote() {
             const noteText = document.getElementById('noteText').value;
             const ref = document.getElementById('noteRef').textContent;
             if (!noteText) return;
             
             if (currentUser) {
                 try {
-                    await addDoc(collection(db, "bibleNotes", currentUser.uid, "notes"), {
+                    await fbApi.addDoc(fbApi.collection(fbDb, "bibleNotes", currentUser.uid, "notes"), {
                         reference: ref,
                         note: noteText,
                         type: 'note',
-                        timestamp: serverTimestamp()
+                        timestamp: fbApi.serverTimestamp()
                     });
                     showToast("Note saved!", "success");
                 } catch(e) { console.error(e); }
@@ -1004,7 +1087,7 @@
             loadNotes();
         };
 
-        window.openNoteModal = (isGeneral) => {
+        function openNoteModal(isGeneral) {
             if (isGeneral) {
                 document.getElementById('noteRef').textContent = "General Study Note";
                 document.getElementById('noteText').value = '';
@@ -1020,9 +1103,9 @@
             
             if (currentUser) {
                 try {
-                    const notesRef = collection(db, "bibleNotes", currentUser.uid, "notes");
-                    const q = query(notesRef, orderBy("timestamp", "desc"));
-                    const snapshot = await getDocs(q);
+                    const notesRef = fbApi.collection(fbDb, "bibleNotes", currentUser.uid, "notes");
+                    const q = fbApi.query(notesRef, fbApi.orderBy("timestamp", "desc"));
+                    const snapshot = await fbApi.getDocs(q);
                     snapshot.forEach(doc => {
                         const data = doc.data();
                         notesList.push({
@@ -1046,13 +1129,13 @@
                 <div class="notebook-item">
                     <div class="notebook-ref"><i class="pd-i pd-i-pen"></i> ${n.reference}</div>
                     <div class="notebook-text">${escapeHtml(n.note)}</div>
-                    <div class="notebook-date"><i class="pd-i pd-i-clock"></i> ${moment(n.date).format('MMM D, YYYY')}</div>
+                    <div class="notebook-date"><i class="pd-i pd-i-clock"></i> ${new Date(n.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
                 </div>
             `).join('');
         }
 
         // Search the selected edition only; the API never substitutes another version.
-        window.searchBible = async () => {
+        async function searchBible() {
             const query = document.getElementById('searchInput').value.trim();
             const resultsDiv = document.getElementById('searchResults');
             const version = currentVersion;
@@ -1060,6 +1143,22 @@
             resultsDiv.innerHTML = '<div class="loading-spinner" role="status" aria-label="Searching"></div>';
 
             try {
+                if (version === 'BSB') {
+                    const hits = await searchBsb(query, 30);
+                    if (!hits.length) {
+                        resultsDiv.innerHTML = `<div style="text-align:center; padding:40px;">No results found in BSB.</div>`;
+                        return;
+                    }
+                    resultsDiv.innerHTML = hits.map(item => {
+                        const encodedReference = encodeURIComponent(item.reference).replace(/'/g, '%27');
+                        return `
+                    <div class="search-result-item" onclick="goToReference('${encodedReference}')">
+                        <div class="search-result-ref"><i class="pd-i pd-i-book"></i> ${escapeHtml(item.reference)} <small style="opacity:.7; font-weight:500;">(BSB)</small></div>
+                        <div class="search-result-text">${escapeHtml(item.text)}</div>
+                    </div>`;
+                    }).join('');
+                    return;
+                }
                 const url = `/api/bible?action=search&q=${encodeURIComponent(query)}&limit=30&version=${encodeURIComponent(version)}`;
                 const response = await fetch(url);
                 const data = await response.json();
@@ -1087,42 +1186,46 @@
                 resultsDiv.innerHTML = `<div class="bible-error"><h4>Search error</h4><p>${escapeHtml(error.message || `${BIBLE_VERSIONS[version].name} search is temporarily unavailable.`)}</p></div>`;
             }
         };
-        window.goToReference = (encodedRef) => {
+        function goToReference(encodedRef) {
             const ref = decodeURIComponent(encodedRef || '');
-            const m = ref.match(/^\s*((?:[123]\s)?[A-Za-z]+(?:\s+[A-Za-z]+)?)\s*(\d+)(?::(\d+))?/);
-            if (!m) return;
-            const name = m[1], ch = parseInt(m[2],10), v = m[3] ? parseInt(m[3],10) : null;
+            // Everything before the chapter number is the book name, so
+            // multi-word names such as "Song of Solomon" resolve correctly.
+            const m = ref.match(/^(.*?)\s*(\d+)(?::(\d+))?\s*$/);
+            if (!m || !m[1].trim()) return;
+            const name = m[1].trim(), ch = parseInt(m[2],10), v = m[3] ? parseInt(m[3],10) : null;
             const idx = bibleBooks.findIndex(b => b.name.toLowerCase() === name.toLowerCase());
             if (idx === -1) return;
             document.getElementById('bookSelect').value = idx;
             updateChapters();
             document.getElementById('chapterSelect').value = ch;
             fetchChapter().then(() => {
-                if (v != null) setTimeout(() => {
+                if (v != null) {
                     const vi = currentVerses.findIndex(x => x.verse == v);
-                    if (vi !== -1) { selVerse(vi); const el = document.getElementById('v-'+vi); if (el) el.scrollIntoView({behavior:'smooth', block:'center'}); }
-                }, 700);
+                    if (vi !== -1) {
+                        selVerse(vi);
+                        const el = document.getElementById('v-' + vi);
+                        if (el) scrollIntoReadingView(el);
+                    }
+                }
             });
             switchTab('read');
         };
 
-        window.goToChapterAndVerse = (bookName, chapter, verse) => {
+        function goToChapterAndVerse(bookName, chapter, verse) {
             const bookIndex = bibleBooks.findIndex(b => b.name === bookName);
             if (bookIndex !== -1) {
                 document.getElementById('bookSelect').value = bookIndex;
                 updateChapters();
                 document.getElementById('chapterSelect').value = chapter;
-                fetchChapter().then(() => {
-                    setTimeout(() => {
-                        const verseIdx = currentVerses.findIndex(v => v.verse == verse);
-                        if(verseIdx !== -1) {
-                            selVerse(verseIdx);
-                            const el = document.getElementById(`v-${verseIdx}`);
-                            if(el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }
-                    }, 800);
-                });
                 switchTab('read');
+                fetchChapter().then(() => {
+                    const verseIdx = currentVerses.findIndex(v => v.verse == verse);
+                    if (verseIdx !== -1) {
+                        selVerse(verseIdx);
+                        const el = document.getElementById(`v-${verseIdx}`);
+                        if (el) scrollIntoReadingView(el);
+                    }
+                });
             }
         };
 
@@ -1131,7 +1234,7 @@
         let isReading = false;
         let readIdx = 0;
 
-        window.startAudioFromSelected = () => {
+        function startAudioFromSelected() {
             if (selectedVerseIdx !== null) {
                 stopAudio();
                 readIdx = selectedVerseIdx;
@@ -1161,13 +1264,13 @@
                 el.classList.add('reading');
                 el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-            
+
             speech.speak(utter);
             isReading = true;
             document.getElementById('playBtn').innerHTML = '<i class="pd-i pd-i-pause"></i>';
         }
 
-        window.toggleAudio = () => {
+        function toggleAudio() {
             if (isReading && speech.speaking) {
                 speech.cancel();
                 isReading = false;
@@ -1180,7 +1283,7 @@
             }
         };
 
-        window.audioSkip = (dir) => {
+        function audioSkip(dir) {
             readIdx += dir;
             if (readIdx < 0) readIdx = 0;
             if (readIdx >= currentVerses.length) readIdx = currentVerses.length - 1;
@@ -1197,14 +1300,31 @@
             document.querySelectorAll('.verse-item').forEach(el => el.classList.remove('reading'));
         }
 
-        window.switchTab = (tab) => {
-            document.querySelectorAll('.app-tab').forEach(el => el.classList.remove('active'));
+        function switchTab(tab) {
+            const panel = document.getElementById(`tab-${tab}`);
+            if (!panel) return;
+            document.querySelectorAll('.app-tab').forEach(el => {
+                const active = el.dataset.tab === tab;
+                el.classList.toggle('active', active);
+                el.setAttribute('aria-selected', String(active));
+            });
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(`tab-${tab}`).classList.add('active');
+            panel.classList.add('active');
             if (tab === 'notebook') loadNotes();
             if (tab === 'progress') renderReadingPlan();
         };
+
+        /* Scroll so the element sits just below the fixed header, on phones and
+           desktops alike. Used whenever a chapter, verse or result is opened. */
+        function scrollIntoReadingView(el, behavior) {
+            if (!el) return;
+            // .pd-topbar is sticky on every page; its height is what the reader must clear.
+            const bar = document.querySelector('.pd-topbar');
+            const stuck = bar && ['fixed', 'sticky'].includes(getComputedStyle(bar).position);
+            const headerHeight = stuck ? bar.offsetHeight : 0;
+            const top = el.getBoundingClientRect().top + window.pageYOffset - headerHeight - 12;
+            window.scrollTo({ top: Math.max(0, top), behavior: behavior || 'smooth' });
+        }
 
 window.toggleDarkMode = function() {
     var dark = (window.PDApp && PDApp.theme ? PDApp.theme.isDark() : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
@@ -1212,7 +1332,11 @@ window.toggleDarkMode = function() {
     document.documentElement.classList.toggle('dark-mode', dark);
     try { var b = document.querySelector('[data-pd-theme-toggle] .pd-i') || document.querySelector('.theme-toggle-btn .pd-i'); if (b) b.className = dark ? 'pd-i pd-i-sun' : 'pd-i pd-i-moon'; } catch (e) {}
 };
-        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.style.display = 'none';
+        }
+        window.closeModal = closeModal;
 
         function escapeHtml(str) {
             if (!str) return '';
@@ -1230,29 +1354,36 @@ window.toggleDarkMode = function() {
             setTimeout(() => toast.remove(), 3000);
         }
 
-        onAuthStateChanged(auth, (user) => {
+        function onUserChanged(user) {
             currentUser = user;
             loadReadingProgress();
             loadNotes();
-        });
+        }
+
+        window.audioSkip = audioSkip;
+        window.copyVerse = copyVerse;
+        window.fetchChapter = fetchChapter;
+        window.goToBook = goToBook;
+        window.goToChapterAndVerse = goToChapterAndVerse;
+        window.goToReference = goToReference;
+        window.openNoteModal = openNoteModal;
+        window.saveNote = saveNote;
+        window.saveNoteFromVerse = saveNoteFromVerse;
+        window.searchBible = searchBible;
+        window.selVerse = selVerse;
+        window.setTextSize = setTextSize;
+        window.setVersion = setVersion;
+        window.startAudioFromSelected = startAudioFromSelected;
+        window.switchTab = switchTab;
+        window.toggleAudio = toggleAudio;
+        window.updateChapters = updateChapters;
 
         init();
+        loadFirebase().then(ready => {
+            if (ready) fbApi.onAuthStateChanged(fbAuth, onUserChanged);
+            else onUserChanged(null);
+        });
         
-        // Make functions global
-        window.fetchChapter = fetchChapter;
-        window.setVersion = setVersion;
-        window.selVerse = selVerse;
-        window.copyVerse = copyVerse;
-        window.saveNoteFromVerse = saveNoteFromVerse;
-        window.startAudioFromSelected = startAudioFromSelected;
-        window.toggleAudio = toggleAudio;
-        window.audioSkip = audioSkip;
-        window.searchBible = searchBible;
-        window.goToChapterAndVerse = goToChapterAndVerse;
-        window.saveNote = saveNote;
-        window.openNoteModal = openNoteModal;
-        window.switchTab = switchTab;
-        window.toggleDarkMode = toggleDarkMode;
     </script>
 </body>
 </html>

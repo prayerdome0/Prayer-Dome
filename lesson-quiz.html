@@ -269,13 +269,22 @@
     }).join('');
   }
 
+  // Land on the quiz panel (below the sticky header), not the top of the page.
+  function scrollToQuizPanel(){
+    var el=document.getElementById('quizActive'); if(!el) return;
+    var bar=document.querySelector('.pd-topbar');
+    var stuck=bar && ['fixed','sticky'].indexOf(getComputedStyle(bar).position)>-1;
+    var top=el.getBoundingClientRect().top+window.pageYOffset-(stuck?bar.offsetHeight:0)-16;
+    window.scrollTo({top:Math.max(0,top), behavior:'smooth'});
+  }
   document.getElementById('startQuizBtn')&&document.getElementById('startQuizBtn').addEventListener('click', function(){
     document.getElementById('quizIntro').style.display='none';
     document.getElementById('quizActive').style.display='block';
     current=0; renderQ();
+    scrollToQuizPanel();
   });
   document.getElementById('nextQBtn')&&document.getElementById('nextQBtn').addEventListener('click', function(){
-    if(current < questions.length-1){ current++; renderQ(); window.scrollTo({top:0, behavior:'smooth'}); }
+    if(current < questions.length-1){ current++; renderQ(); scrollToQuizPanel(); }
     else { showReview(); }
   });
   document.getElementById('prevQBtn')&&document.getElementById('prevQBtn').addEventListener('click', function(){ if(current>0){ current--; renderQ(); }});
@@ -288,7 +297,7 @@
     document.getElementById('quizResult').style.display='none';
     document.getElementById('quizActive').style.display='block';
     current=0; renderQ();
-    window.scrollTo({top:0, behavior:'smooth'});
+    scrollToQuizPanel();
   });
   document.getElementById('viewAnswersBtn')&&document.getElementById('viewAnswersBtn').addEventListener('click', function(){ var d=document.getElementById('answersDetail'); d.style.display=d.style.display==='none'?'block':'none'; this.textContent = d.style.display==='none' ? 'View correct answers' : 'Hide answers'; });
 
