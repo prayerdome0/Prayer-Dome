@@ -165,7 +165,7 @@ public class VerseWidgetPlugin extends Plugin {
         current.put("slot", store.isPinned() ? "pinned" : data.currentSlot(now).id);
         current.put("slotLabel", store.isPinned() ? "Pinned verse" : data.currentSlot(now).label);
         current.put("greeting", store.isPinned() ? "Pinned verse" : data.currentSlot(now).greeting);
-        current.put("translation", "KJV");
+        current.put("translation", "NIV");
         state.put("verse", current);
 
         JSArray slots = new JSArray();

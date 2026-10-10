@@ -1,11 +1,23 @@
 /*!
- * Prayer Dome — Daily Verse Library
+ * Prayer Dome — Daily Verse Library (NIV)
  * ---------------------------------------------------------------------------
  * Four Scripture sets, one for each moment of the day. The same file is used by
  * the app, by the service worker (importScripts) and by the Android home-screen
  * widget generator, so a member sees the same verse everywhere.
  *
- * Translation: King James Version (public domain).
+ * Translation: New International Version (NIV).
+ *
+ * COPYRIGHT NOTICE
+ * ----------------
+ * The Holy Bible, New International Version®, NIV® Copyright © 1973, 1978, 1984,
+ * 2011 by Biblica, Inc.® Used by permission. All rights reserved worldwide.
+ *
+ * The NIV text is used under the terms of the api.bible license (Biblica /
+ * HarperCollins Christian Publishing). Passages are short, curated memory
+ * verses (single verses or brief adjacent verses) for devotional use in
+ * notifications and on the home-screen/lock-screen widget. Full-chapter
+ * reading always goes through the authorized /api/bible proxy so that the
+ * complete text, copyright line and license are served correctly.
  */
 (function (root) {
     'use strict';
@@ -17,94 +29,95 @@
         { id: 'evening',   label: 'Evening Verse',   icon: 'pd-i-moon', defaultTime: '20:00', greeting: 'Rest well tonight' }
     ];
 
+    // Short NIV memory verses for notifications and widgets.
     var VERSES = {
         morning: [
-            { ref: 'Lamentations 3:22-23', text: 'It is of the LORD\u2019S mercies that we are not consumed, because his compassions fail not. They are new every morning: great is thy faithfulness.' },
-            { ref: 'Psalm 5:3', text: 'My voice shalt thou hear in the morning, O LORD; in the morning will I direct my prayer unto thee, and will look up.' },
-            { ref: 'Psalm 143:8', text: 'Cause me to hear thy lovingkindness in the morning; for in thee do I trust: cause me to know the way wherein I should walk; for I lift up my soul unto thee.' },
-            { ref: 'Psalm 118:24', text: 'This is the day which the LORD hath made; we will rejoice and be glad in it.' },
-            { ref: 'Isaiah 40:31', text: 'But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles; they shall run, and not be weary; and they shall walk, and not faint.' },
-            { ref: 'Psalm 90:14', text: 'O satisfy us early with thy mercy; that we may rejoice and be glad all our days.' },
-            { ref: 'Proverbs 3:5-6', text: 'Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths.' },
-            { ref: 'Mark 1:35', text: 'And in the morning, rising up a great while before day, he went out, and departed into a solitary place, and there prayed.' },
-            { ref: 'Psalm 59:16', text: 'But I will sing of thy power; yea, I will sing aloud of thy mercy in the morning: for thou hast been my defence and refuge in the day of my trouble.' },
-            { ref: 'Joshua 1:9', text: 'Have not I commanded thee? Be strong and of a good courage; be not afraid, neither be thou dismayed: for the LORD thy God is with thee whithersoever thou goest.' },
-            { ref: 'Philippians 4:13', text: 'I can do all things through Christ which strengtheneth me.' },
-            { ref: 'Psalm 37:5', text: 'Commit thy way unto the LORD; trust also in him; and he shall bring it to pass.' },
-            { ref: 'Isaiah 41:10', text: 'Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee; yea, I will help thee; yea, I will uphold thee with the right hand of my righteousness.' },
-            { ref: 'Jeremiah 29:11', text: 'For I know the thoughts that I think toward you, saith the LORD, thoughts of peace, and not of evil, to give you an expected end.' },
-            { ref: 'Matthew 6:33', text: 'But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.' },
-            { ref: 'Psalm 63:1', text: 'O God, thou art my God; early will I seek thee: my soul thirsteth for thee, my flesh longeth for thee in a dry and thirsty land, where no water is.' },
-            { ref: 'Deuteronomy 31:6', text: 'Be strong and of a good courage, fear not, nor be afraid of them: for the LORD thy God, he it is that doth go with thee; he will not fail thee, nor forsake thee.' },
-            { ref: 'Psalm 19:14', text: 'Let the words of my mouth, and the meditation of my heart, be acceptable in thy sight, O LORD, my strength, and my redeemer.' },
-            { ref: '2 Corinthians 5:17', text: 'Therefore if any man be in Christ, he is a new creature: old things are passed away; behold, all things are become new.' },
-            { ref: 'Psalm 121:1-2', text: 'I will lift up mine eyes unto the hills, from whence cometh my help. My help cometh from the LORD, which made heaven and earth.' }
+            { ref: 'Lamentations 3:22-23', text: 'Because of the LORD\u2019s great love we are not consumed, for his compassions never fail. They are new every morning; great is your faithfulness.' },
+            { ref: 'Psalm 5:3', text: 'In the morning, LORD, you hear my voice; in the morning I lay my requests before you and wait expectantly.' },
+            { ref: 'Psalm 143:8', text: 'Let the morning bring me word of your unfailing love, for I have put my trust in you. Show me the way I should go, for to you I entrust my life.' },
+            { ref: 'Psalm 118:24', text: 'The LORD has done it this very day; let us rejoice today and be glad.' },
+            { ref: 'Isaiah 40:31', text: 'But those who hope in the LORD will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint.' },
+            { ref: 'Psalm 90:14', text: 'Satisfy us in the morning with your unfailing love, that we may sing for joy and be glad all our days.' },
+            { ref: 'Proverbs 3:5-6', text: 'Trust in the LORD with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight.' },
+            { ref: 'Mark 1:35', text: 'Very early in the morning, while it was still dark, Jesus got up, left the house and went off to a solitary place, where he prayed.' },
+            { ref: 'Psalm 59:16', text: 'But I will sing of your strength, in the morning I will sing of your love; for you are my fortress, my refuge in times of trouble.' },
+            { ref: 'Joshua 1:9', text: 'Have I not commanded you? Be strong and courageous. Do not be afraid; do not be discouraged, for the LORD your God will be with you wherever you go.' },
+            { ref: 'Philippians 4:13', text: 'I can do all this through him who gives me strength.' },
+            { ref: 'Psalm 37:5', text: 'Commit your way to the LORD; trust in him and he will do this.' },
+            { ref: 'Isaiah 41:10', text: 'So do not fear, for I am with you; do not be dismayed, for I am your God. I will strengthen you and help you; I will uphold you with my righteous right hand.' },
+            { ref: 'Jeremiah 29:11', text: '\u201CFor I know the plans I have for you,\u201D declares the LORD, \u201Cplans to prosper you and not to harm you, plans to give you hope and a future.\u201D' },
+            { ref: 'Matthew 6:33', text: 'But seek first his kingdom and his righteousness, and all these things will be given to you as well.' },
+            { ref: 'Psalm 63:1', text: 'You, God, are my God, earnestly I seek you; I thirst for you, my whole being longs for you, in a dry and parched land where there is no water.' },
+            { ref: 'Deuteronomy 31:6', text: 'Be strong and courageous. Do not be afraid or terrified because of them, for the LORD your God goes with you; he will never leave you nor forsake you.' },
+            { ref: 'Psalm 19:14', text: 'May these words of my mouth and this meditation of my heart be pleasing in your sight, LORD, my Rock and my Redeemer.' },
+            { ref: '2 Corinthians 5:17', text: 'Therefore, if anyone is in Christ, the new creation has come: The old has gone, the new is here!' },
+            { ref: 'Psalm 121:1-2', text: 'I lift up my eyes to the mountains \u2014 where does my help come from? My help comes from the LORD, the Maker of heaven and earth.' }
         ],
         midday: [
-            { ref: 'Matthew 11:28', text: 'Come unto me, all ye that labour and are heavy laden, and I will give you rest.' },
-            { ref: 'Psalm 46:1', text: 'God is our refuge and strength, a very present help in trouble.' },
-            { ref: 'Isaiah 26:3', text: 'Thou wilt keep him in perfect peace, whose mind is stayed on thee: because he trusteth in thee.' },
-            { ref: 'Colossians 3:23', text: 'And whatsoever ye do, do it heartily, as to the Lord, and not unto men.' },
-            { ref: 'Psalm 55:22', text: 'Cast thy burden upon the LORD, and he shall sustain thee: he shall never suffer the righteous to be moved.' },
-            { ref: '1 Peter 5:7', text: 'Casting all your care upon him; for he careth for you.' },
-            { ref: 'Nehemiah 8:10', text: 'Neither be ye sorry; for the joy of the LORD is your strength.' },
-            { ref: 'Psalm 27:1', text: 'The LORD is my light and my salvation; whom shall I fear? the LORD is the strength of my life; of whom shall I be afraid?' },
-            { ref: 'Galatians 6:9', text: 'And let us not be weary in well doing: for in due season we shall reap, if we faint not.' },
-            { ref: '2 Corinthians 12:9', text: 'My grace is sufficient for thee: for my strength is made perfect in weakness.' },
-            { ref: 'Psalm 34:8', text: 'O taste and see that the LORD is good: blessed is the man that trusteth in him.' },
-            { ref: 'Romans 8:28', text: 'And we know that all things work together for good to them that love God, to them who are the called according to his purpose.' },
-            { ref: 'Proverbs 16:3', text: 'Commit thy works unto the LORD, and thy thoughts shall be established.' },
-            { ref: 'Psalm 119:105', text: 'Thy word is a lamp unto my feet, and a light unto my path.' },
-            { ref: 'Hebrews 4:16', text: 'Let us therefore come boldly unto the throne of grace, that we may obtain mercy, and find grace to help in time of need.' },
-            { ref: 'James 1:5', text: 'If any of you lack wisdom, let him ask of God, that giveth to all men liberally, and upbraideth not; and it shall be given him.' },
-            { ref: 'Philippians 4:19', text: 'But my God shall supply all your need according to his riches in glory by Christ Jesus.' },
-            { ref: 'Psalm 145:18', text: 'The LORD is nigh unto all them that call upon him, to all that call upon him in truth.' },
-            { ref: 'Isaiah 43:2', text: 'When thou passest through the waters, I will be with thee; and through the rivers, they shall not overflow thee.' },
-            { ref: 'Matthew 5:16', text: 'Let your light so shine before men, that they may see your good works, and glorify your Father which is in heaven.' }
+            { ref: 'Matthew 11:28', text: '\u201CCome to me, all you who are weary and burdened, and I will give you rest.\u201D' },
+            { ref: 'Psalm 46:1', text: 'God is our refuge and strength, an ever-present help in trouble.' },
+            { ref: 'Isaiah 26:3', text: 'You will keep in perfect peace those whose minds are steadfast, because they trust in you.' },
+            { ref: 'Colossians 3:23', text: 'Whatever you do, work at it with all your heart, as working for the Lord, not for human masters.' },
+            { ref: 'Psalm 55:22', text: 'Cast your cares on the LORD and he will sustain you; he will never let the righteous be shaken.' },
+            { ref: '1 Peter 5:7', text: 'Cast all your anxiety on him because he cares for you.' },
+            { ref: 'Nehemiah 8:10', text: 'Do not grieve, for the joy of the LORD is your strength.' },
+            { ref: 'Psalm 27:1', text: 'The LORD is my light and my salvation \u2014 whom shall I fear? The LORD is the stronghold of my life \u2014 of whom shall I be afraid?' },
+            { ref: 'Galatians 6:9', text: 'Let us not become weary in doing good, for at the proper time we will reap a harvest if we do not give up.' },
+            { ref: '2 Corinthians 12:9', text: 'But he said to me, \u201CMy grace is sufficient for you, for my power is made perfect in weakness.\u201D' },
+            { ref: 'Psalm 34:8', text: 'Taste and see that the LORD is good; blessed is the one who takes refuge in him.' },
+            { ref: 'Romans 8:28', text: 'And we know that in all things God works for the good of those who love him, who have been called according to his purpose.' },
+            { ref: 'Proverbs 16:3', text: 'Commit to the LORD whatever you do, and he will establish your plans.' },
+            { ref: 'Psalm 119:105', text: 'Your word is a lamp for my feet, a light on my path.' },
+            { ref: 'Hebrews 4:16', text: 'Let us then approach God\u2019s throne of grace with confidence, so that we may receive mercy and find grace to help us in our time of need.' },
+            { ref: 'James 1:5', text: 'If any of you lacks wisdom, you should ask God, who gives generously to all without finding fault, and it will be given to you.' },
+            { ref: 'Philippians 4:19', text: 'And my God will meet all your needs according to the riches of his glory in Christ Jesus.' },
+            { ref: 'Psalm 145:18', text: 'The LORD is near to all who call on him, to all who call on him in truth.' },
+            { ref: 'Isaiah 43:2', text: 'When you pass through the waters, I will be with you; and when you pass through the rivers, they will not sweep over you.' },
+            { ref: 'Matthew 5:16', text: 'In the same way, let your light shine before others, that they may see your good deeds and glorify your Father in heaven.' }
         ],
         afternoon: [
-            { ref: 'Psalm 23:1-3', text: 'The LORD is my shepherd; I shall not want. He maketh me to lie down in green pastures: he leadeth me beside the still waters. He restoreth my soul.' },
-            { ref: 'John 14:27', text: 'Peace I leave with you, my peace I give unto you: not as the world giveth, give I unto you. Let not your heart be troubled, neither let it be afraid.' },
-            { ref: 'Philippians 4:6-7', text: 'Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God. And the peace of God, which passeth all understanding, shall keep your hearts and minds through Christ Jesus.' },
-            { ref: 'Psalm 138:8', text: 'The LORD will perfect that which concerneth me: thy mercy, O LORD, endureth for ever.' },
-            { ref: 'Romans 15:13', text: 'Now the God of hope fill you with all joy and peace in believing, that ye may abound in hope, through the power of the Holy Ghost.' },
-            { ref: 'Psalm 62:5-6', text: 'My soul, wait thou only upon God; for my expectation is from him. He only is my rock and my salvation: he is my defence; I shall not be moved.' },
-            { ref: 'Isaiah 30:15', text: 'In returning and rest shall ye be saved; in quietness and in confidence shall be your strength.' },
-            { ref: '2 Timothy 1:7', text: 'For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind.' },
-            { ref: 'Psalm 31:24', text: 'Be of good courage, and he shall strengthen your heart, all ye that hope in the LORD.' },
-            { ref: 'Hebrews 13:5', text: 'I will never leave thee, nor forsake thee.' },
-            { ref: 'Psalm 73:26', text: 'My flesh and my heart faileth: but God is the strength of my heart, and my portion for ever.' },
-            { ref: 'Isaiah 55:11', text: 'So shall my word be that goeth forth out of my mouth: it shall not return unto me void.' },
-            { ref: 'Ephesians 3:20', text: 'Now unto him that is able to do exceeding abundantly above all that we ask or think, according to the power that worketh in us.' },
-            { ref: 'Psalm 91:1-2', text: 'He that dwelleth in the secret place of the most High shall abide under the shadow of the Almighty. I will say of the LORD, He is my refuge and my fortress: my God; in him will I trust.' },
-            { ref: 'John 15:5', text: 'I am the vine, ye are the branches: He that abideth in me, and I in him, the same bringeth forth much fruit: for without me ye can do nothing.' },
-            { ref: 'Psalm 32:8', text: 'I will instruct thee and teach thee in the way which thou shalt go: I will guide thee with mine eye.' },
-            { ref: 'Micah 6:8', text: 'He hath shewed thee, O man, what is good; and what doth the LORD require of thee, but to do justly, and to love mercy, and to walk humbly with thy God?' },
-            { ref: 'Psalm 103:2-3', text: 'Bless the LORD, O my soul, and forget not all his benefits: Who forgiveth all thine iniquities; who healeth all thy diseases.' },
-            { ref: 'Romans 12:12', text: 'Rejoicing in hope; patient in tribulation; continuing instant in prayer.' },
-            { ref: 'Psalm 46:10', text: 'Be still, and know that I am God: I will be exalted among the heathen, I will be exalted in the earth.' }
+            { ref: 'Psalm 23:1-3', text: 'The LORD is my shepherd, I lack nothing. He makes me lie down in green pastures, he leads me beside quiet waters, he refreshes my soul.' },
+            { ref: 'John 14:27', text: 'Peace I leave with you; my peace I give you. I do not give to you as the world gives. Do not let your hearts be troubled and do not be afraid.' },
+            { ref: 'Philippians 4:6-7', text: 'Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God. And the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus.' },
+            { ref: 'Psalm 138:8', text: 'The LORD will vindicate me; your love, LORD, endures forever \u2014 do not abandon the works of your hands.' },
+            { ref: 'Romans 15:13', text: 'May the God of hope fill you with all joy and peace as you trust in him, so that you may overflow with hope by the power of the Holy Spirit.' },
+            { ref: 'Psalm 62:5-6', text: 'Yes, my soul, find rest in God; my hope comes from him. Truly he is my rock and my salvation; he is my fortress, I shall not be shaken.' },
+            { ref: 'Isaiah 30:15', text: 'In repentance and rest is your salvation, in quietness and trust is your strength.' },
+            { ref: '2 Timothy 1:7', text: 'For the Spirit God gave us does not make us timid, but gives us power, love and self-discipline.' },
+            { ref: 'Psalm 31:24', text: 'Be strong and take heart, all you who hope in the LORD.' },
+            { ref: 'Hebrews 13:5', text: 'Never will I leave you; never will I forsake you.' },
+            { ref: 'Psalm 73:26', text: 'My flesh and my heart may fail, but God is the strength of my heart and my portion forever.' },
+            { ref: 'Isaiah 55:11', text: 'So is my word that goes out from my mouth: It will not return to me empty, but will accomplish what I desire and achieve the purpose for which I sent it.' },
+            { ref: 'Ephesians 3:20', text: 'Now to him who is able to do immeasurably more than all we ask or imagine, according to his power that is at work within us.' },
+            { ref: 'Psalm 91:1-2', text: 'Whoever dwells in the shelter of the Most High will rest in the shadow of the Almighty. I will say of the LORD, \u201CHe is my refuge and my fortress, my God, in whom I trust.\u201D' },
+            { ref: 'John 15:5', text: '\u201CI am the vine; you are the branches. If you remain in me and I in you, you will bear much fruit; apart from me you can do nothing.\u201D' },
+            { ref: 'Psalm 32:8', text: 'I will instruct you and teach you in the way you should go; I will counsel you with my loving eye on you.' },
+            { ref: 'Micah 6:8', text: 'He has shown you, O mortal, what is good. And what does the LORD require of you? To act justly and to love mercy and to walk humbly with your God.' },
+            { ref: 'Psalm 103:2-3', text: 'Praise the LORD, my soul, and forget not all his benefits \u2014 who forgives all your sins and heals all your diseases.' },
+            { ref: 'Romans 12:12', text: 'Be joyful in hope, patient in affliction, faithful in prayer.' },
+            { ref: 'Psalm 46:10', text: 'He says, \u201CBe still, and know that I am God; I will be exalted among the nations, I will be exalted in the earth.\u201D' }
         ],
         evening: [
-            { ref: 'Psalm 4:8', text: 'I will both lay me down in peace, and sleep: for thou, LORD, only makest me dwell in safety.' },
-            { ref: 'Psalm 127:2', text: 'For so he giveth his beloved sleep.' },
-            { ref: 'Proverbs 3:24', text: 'When thou liest down, thou shalt not be afraid: yea, thou shalt lie down, and thy sleep shall be sweet.' },
-            { ref: 'Psalm 63:6', text: 'When I remember thee upon my bed, and meditate on thee in the night watches.' },
-            { ref: 'Matthew 11:29', text: 'Take my yoke upon you, and learn of me; for I am meek and lowly in heart: and ye shall find rest unto your souls.' },
-            { ref: 'Psalm 3:5', text: 'I laid me down and slept; I awaked; for the LORD sustained me.' },
-            { ref: 'Psalm 141:2', text: 'Let my prayer be set forth before thee as incense; and the lifting up of my hands as the evening sacrifice.' },
-            { ref: 'Psalm 42:8', text: 'Yet the LORD will command his lovingkindness in the daytime, and in the night his song shall be with me, and my prayer unto the God of my life.' },
-            { ref: '1 Thessalonians 5:17-18', text: 'Pray without ceasing. In every thing give thanks: for this is the will of God in Christ Jesus concerning you.' },
-            { ref: 'Psalm 34:1', text: 'I will bless the LORD at all times: his praise shall continually be in my mouth.' },
-            { ref: 'Psalm 136:1', text: 'O give thanks unto the LORD; for he is good: for his mercy endureth for ever.' },
-            { ref: 'Ephesians 4:26', text: 'Let not the sun go down upon your wrath.' },
-            { ref: 'Psalm 16:7-8', text: 'I will bless the LORD, who hath given me counsel: my reins also instruct me in the night seasons. I have set the LORD always before me.' },
-            { ref: 'Isaiah 26:9', text: 'With my soul have I desired thee in the night; yea, with my spirit within me will I seek thee early.' },
-            { ref: 'Psalm 77:6', text: 'I call to remembrance my song in the night: I commune with mine own heart: and my spirit made diligent search.' },
-            { ref: 'Numbers 6:24-26', text: 'The LORD bless thee, and keep thee: The LORD make his face shine upon thee, and be gracious unto thee: The LORD lift up his countenance upon thee, and give thee peace.' },
-            { ref: 'Psalm 30:5', text: 'Weeping may endure for a night, but joy cometh in the morning.' },
-            { ref: 'John 3:16', text: 'For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.' },
-            { ref: 'Psalm 139:9-10', text: 'If I take the wings of the morning, and dwell in the uttermost parts of the sea; Even there shall thy hand lead me, and thy right hand shall hold me.' },
-            { ref: 'Zephaniah 3:17', text: 'The LORD thy God in the midst of thee is mighty; he will save, he will rejoice over thee with joy; he will rest in his love, he will joy over thee with singing.' }
+            { ref: 'Psalm 4:8', text: 'In peace I will lie down and sleep, for you alone, LORD, make me dwell in safety.' },
+            { ref: 'Psalm 127:2', text: 'In vain you rise early and stay up late, toiling for food to eat \u2014 for he grants sleep to those he loves.' },
+            { ref: 'Proverbs 3:24', text: 'When you lie down, you will not be afraid; when you lie down, your sleep will be sweet.' },
+            { ref: 'Psalm 63:6', text: 'On my bed I remember you; I think of you through the watches of the night.' },
+            { ref: 'Matthew 11:29', text: 'Take my yoke upon you and learn from me, for I am gentle and humble in heart, and you will find rest for your souls.' },
+            { ref: 'Psalm 3:5', text: 'I lie down and sleep; I wake again, because the LORD sustains me.' },
+            { ref: 'Psalm 141:2', text: 'May my prayer be set before you like incense; may the lifting up of my hands be like the evening sacrifice.' },
+            { ref: 'Psalm 42:8', text: 'By day the LORD directs his love, at night his song is with me \u2014 a prayer to the God of my life.' },
+            { ref: '1 Thessalonians 5:17-18', text: 'Pray continually, give thanks in all circumstances; for this is God\u2019s will for you in Christ Jesus.' },
+            { ref: 'Psalm 34:1', text: 'I will extol the LORD at all times; his praise will always be on my lips.' },
+            { ref: 'Psalm 136:1', text: 'Give thanks to the LORD, for he is good. His love endures forever.' },
+            { ref: 'Ephesians 4:26', text: '\u201CIn your anger do not sin\u201D: Do not let the sun go down while you are still angry.' },
+            { ref: 'Psalm 16:7-8', text: 'I will praise the LORD, who counsels me; even at night my heart instructs me. I keep my eyes always on the LORD. With him at my right hand, I will not be shaken.' },
+            { ref: 'Isaiah 26:9', text: 'My soul yearns for you in the night; in the morning my spirit longs for you.' },
+            { ref: 'Psalm 77:6', text: 'I remembered my songs in the night. My heart meditated and my spirit asked.' },
+            { ref: 'Numbers 6:24-26', text: 'The LORD bless you and keep you; the LORD make his face shine on you and be gracious to you; the LORD turn his face toward you and give you peace.' },
+            { ref: 'Psalm 30:5', text: 'For his anger lasts only a moment, but his favor lasts a lifetime; weeping may stay for the night, but rejoicing comes in the morning.' },
+            { ref: 'John 3:16', text: 'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.' },
+            { ref: 'Psalm 139:9-10', text: 'If I rise on the wings of the dawn, if I settle on the far side of the sea, even there your hand will guide me, your right hand will hold me fast.' },
+            { ref: 'Zephaniah 3:17', text: 'The LORD your God is with you, the Mighty Warrior who saves. He will take great delight in you; in his love he will no longer rebuke you, but will rejoice over you with singing.' }
         ]
     };
 
@@ -113,6 +126,8 @@
         var start = new Date(d.getFullYear(), 0, 0);
         return Math.floor((d - start) / 86400000);
     }
+
+    var NIV_COPYRIGHT = 'NIV® — Holy Bible, New International Version®. Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.® Used by permission. All rights reserved worldwide.';
 
     /** Deterministic verse for a slot on a given day — same for every device. */
     function verseFor(slotId, date) {
@@ -128,7 +143,9 @@
             greeting: slot.greeting,
             reference: verse.ref,
             text: verse.text,
-            translation: 'KJV'
+            translation: 'NIV',
+            translationName: 'New International Version',
+            copyright: NIV_COPYRIGHT
         };
     }
 

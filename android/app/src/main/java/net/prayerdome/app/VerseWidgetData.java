@@ -74,11 +74,11 @@ public final class VerseWidgetData {
     private final List<String> checkpointRefs = new ArrayList<>();
     private final int[] boundaries = DEFAULT_BOUNDARIES.clone();
 
-    /** Safety net so the widget is never blank, even if the packaged data is unreadable. */
+    /** Safety net so the widget is never blank, even if the packaged data is unreadable. NIV. */
     private static final Verse FALLBACK =
             new Verse("John 3:16",
-                    "For God so loved the world, that he gave his only begotten Son, "
-                            + "that whosoever believeth in him should not perish, but have everlasting life.");
+                    "For God so loved the world that he gave his one and only Son, "
+                            + "that whoever believes in him shall not perish but have eternal life.");
 
     public static synchronized VerseWidgetData get(Context context) {
         if (instance == null) instance = new VerseWidgetData(context.getApplicationContext());

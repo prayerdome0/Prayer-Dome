@@ -202,30 +202,51 @@
     function G(g) { geo.push(g); return g; }
     function M(m) { mats.push(m); return m; }
 
-    /* -------- palette, read from the brand: blue robe, gold trim, warm skin */
-    var SKIN = M(new THREE.MeshStandardMaterial({ color: 0xf3c69c, roughness: 0.62, metalness: 0 }));
-    var SKIN_DEEP = M(new THREE.MeshStandardMaterial({ color: 0xe0a878, roughness: 0.66, metalness: 0 }));
-    var ROBE = M(new THREE.MeshStandardMaterial({ color: 0x1157ab, roughness: 0.58, metalness: 0.04 }));
-    var ROBE_DARK = M(new THREE.MeshStandardMaterial({ color: 0x0b3f80, roughness: 0.6, metalness: 0.04 }));
-    var GOLD = M(new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.34, metalness: 0.55, emissive: 0x3a2c05, emissiveIntensity: 0.5 }));
-    var HAIR = M(new THREE.MeshStandardMaterial({ color: 0x2a1912, roughness: 0.72, metalness: 0 }));
-    var EYE_WHITE = M(new THREE.MeshStandardMaterial({ color: 0xfbfbfb, roughness: 0.28, metalness: 0 }));
-    var IRIS = M(new THREE.MeshStandardMaterial({ color: 0x7a4a22, roughness: 0.32, metalness: 0.05 }));
-    var PUPIL = M(new THREE.MeshStandardMaterial({ color: 0x14100c, roughness: 0.3, metalness: 0 }));
+    /* -------- palette: richer, more human materials (soft subsurface-like skin) */
+    var skinMat = function (color, opts) {
+      return M(new THREE.MeshStandardMaterial(Object.assign({
+        color: color, roughness: 0.58, metalness: 0,
+        // A faint warm emissive simulates subsurface scattering on the nose/cheeks.
+        emissive: 0x8a4a28, emissiveIntensity: 0.06
+      }, opts || {})));
+    };
+    var SKIN = skinMat(0xf0c193);
+    var SKIN_DEEP = skinMat(0xd69a6c, { roughness: 0.66 });
+    var SKIN_LIP = skinMat(0xd88a7a, { roughness: 0.48, emissive: 0x6a2a2a, emissiveIntensity: 0.08 });
+    var ROBE = M(new THREE.MeshStandardMaterial({ color: 0x0f4e99, roughness: 0.62, metalness: 0.04,
+      emissive: 0x08223f, emissiveIntensity: 0.15 }));
+    var ROBE_DARK = M(new THREE.MeshStandardMaterial({ color: 0x083269, roughness: 0.68, metalness: 0.04 }));
+    var TROUSER = M(new THREE.MeshStandardMaterial({ color: 0x0a1f3d, roughness: 0.78, metalness: 0.02 }));
+    var SHOE = M(new THREE.MeshStandardMaterial({ color: 0x1a1208, roughness: 0.45, metalness: 0.18 }));
+    var GOLD = M(new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.6,
+      emissive: 0x3a2c05, emissiveIntensity: 0.5 }));
+    var HAIR = M(new THREE.MeshStandardMaterial({ color: 0x1e140d, roughness: 0.78, metalness: 0.02 }));
+    var EYE_WHITE = M(new THREE.MeshStandardMaterial({ color: 0xfcfcfc, roughness: 0.24, metalness: 0 }));
+    var IRIS = M(new THREE.MeshStandardMaterial({ color: 0x5c3618, roughness: 0.28, metalness: 0.06 }));
+    var PUPIL = M(new THREE.MeshStandardMaterial({ color: 0x0c0907, roughness: 0.18, metalness: 0 }));
+    var SCLERA_SHADE = M(new THREE.MeshStandardMaterial({ color: 0xe7c9b0, roughness: 0.3, metalness: 0,
+      transparent: true, opacity: 0.35 }));
     var GLINT = M(new THREE.MeshBasicMaterial({ color: 0xffffff }));
-    var MOUTH = M(new THREE.MeshStandardMaterial({ color: 0x621c22, roughness: 0.7, metalness: 0 }));
-    var LIP = M(new THREE.MeshStandardMaterial({ color: 0xb4615c, roughness: 0.6, metalness: 0 }));
-    var TEETH = M(new THREE.MeshStandardMaterial({ color: 0xfdfdfa, roughness: 0.3, metalness: 0 }));
-    var TONGUE = M(new THREE.MeshStandardMaterial({ color: 0xc35a63, roughness: 0.55, metalness: 0 }));
-    var CHEEK = M(new THREE.MeshStandardMaterial({ color: 0xe07f68, roughness: 0.8, transparent: true, opacity: 0.32 }));
+    var MOUTH = M(new THREE.MeshStandardMaterial({ color: 0x4a151a, roughness: 0.7, metalness: 0 }));
+    var LIP = M(new THREE.MeshStandardMaterial({ color: 0xa8554f, roughness: 0.45, metalness: 0 }));
+    var TEETH = M(new THREE.MeshStandardMaterial({ color: 0xf8f6ef, roughness: 0.28, metalness: 0 }));
+    var TONGUE = M(new THREE.MeshStandardMaterial({ color: 0xb85058, roughness: 0.5, metalness: 0,
+      emissive: 0x3a1418, emissiveIntensity: 0.1 }));
+    var CHEEK = M(new THREE.MeshStandardMaterial({ color: 0xdb7965, roughness: 0.85,
+      transparent: true, opacity: 0.28, emissive: 0x703028, emissiveIntensity: 0.05 }));
+    var NOSE = M(new THREE.MeshStandardMaterial({ color: 0xdca57d, roughness: 0.6, metalness: 0,
+      emissive: 0x4a2818, emissiveIntensity: 0.04 }));
     var BOOK = M(new THREE.MeshStandardMaterial({ color: 0x8d3a33, roughness: 0.6, metalness: 0.06 }));
     var PAGES = M(new THREE.MeshStandardMaterial({ color: 0xf7f0e2, roughness: 0.85, metalness: 0 }));
-    var MIC = M(new THREE.MeshStandardMaterial({ color: 0x1b2740, roughness: 0.45, metalness: 0.3 }));
+    var MIC = M(new THREE.MeshStandardMaterial({ color: 0x1b2740, roughness: 0.4, metalness: 0.35 }));
     var SPARK = M(new THREE.MeshBasicMaterial({ color: 0xffe08a, transparent: true, opacity: 0.95 }));
+    var NAIL = M(new THREE.MeshStandardMaterial({ color: 0xecc9a6, roughness: 0.35, metalness: 0 }));
 
     var rig = { THREE: THREE, version: VERSION };
     var root = group(THREE, null);
     rig.root = root;
+    // Lift the figure so the feet land on the floor ring.
+    root.position.y = 0.22;
 
     /* ------------------------------------------------------------- the body */
     var body = group(THREE, root);          // breathes and hops
@@ -245,88 +266,228 @@
     // The emblem on the chest: an open book, the Prayer Dome mark.
     part(THREE, figure, G(new THREE.BoxGeometry(0.20, 0.15, 0.03)), GOLD, [0, 0.98, 0.30], [0.1, 0, 0]);
 
+    /* neck */
     part(THREE, figure, G(new THREE.CapsuleGeometry(0.10, 0.10, 6, 16)), SKIN, [0, 1.24, 0]);
-    part(THREE, figure, G(new THREE.SphereGeometry(0.20, 22, 16)), ROBE, [0.46, 1.12, 0]);
-    part(THREE, figure, G(new THREE.SphereGeometry(0.20, 22, 16)), ROBE, [-0.46, 1.12, 0]);
-    part(THREE, figure, G(new THREE.SphereGeometry(0.15, 18, 12)), ROBE_DARK, [0.17, 0.09, 0.05], null, [1.15, 0.55, 1.5]);
-    part(THREE, figure, G(new THREE.SphereGeometry(0.15, 18, 12)), ROBE_DARK, [-0.17, 0.09, 0.05], null, [1.15, 0.55, 1.5]);
+    /* shoulder pads */
+    part(THREE, figure, G(new THREE.SphereGeometry(0.21, 22, 16)), ROBE, [0.46, 1.12, 0], null, [1, 0.78, 0.9]);
+    part(THREE, figure, G(new THREE.SphereGeometry(0.21, 22, 16)), ROBE, [-0.46, 1.12, 0], null, [1, 0.78, 0.9]);
+    /* robe pocket folds */
+    part(THREE, figure, G(new THREE.SphereGeometry(0.15, 18, 12)), ROBE_DARK, [0.18, 0.54, 0.30], null, [1.2, 0.5, 0.6]);
+    part(THREE, figure, G(new THREE.SphereGeometry(0.15, 18, 12)), ROBE_DARK, [-0.18, 0.54, 0.30], null, [1.2, 0.5, 0.6]);
 
-    /* --------------------------------------------------------------- arms */
+    /* --------------------------------------------------------------- legs + feet */
+    function buildLeg(side) {
+      var s = side === 'R' ? 1 : -1;
+      var hip = group(THREE, figure, [s * 0.18, 0.05, 0.02]);
+      var thigh = group(THREE, hip);
+      part(THREE, thigh, G(new THREE.CapsuleGeometry(0.16, 0.30, 8, 16)), TROUSER, [0, -0.20, 0]);
+      part(THREE, thigh, G(new THREE.SphereGeometry(0.17, 16, 12)), TROUSER, [0, 0.05, 0]);
+      var knee = group(THREE, thigh, [0, -0.42, 0]);
+      part(THREE, knee, G(new THREE.CapsuleGeometry(0.13, 0.32, 8, 16)), TROUSER, [0, -0.18, 0]);
+      // cuff of the trousers
+      part(THREE, knee, G(new THREE.CylinderGeometry(0.14, 0.15, 0.06, 18)), ROBE_DARK, [0, -0.38, 0]);
+      // ankle / skin above the shoe
+      part(THREE, knee, G(new THREE.SphereGeometry(0.10, 16, 12)), SKIN_DEEP, [0, -0.44, 0.02]);
+      // shoe
+      var shoe = group(THREE, knee, [0, -0.50, 0.05]);
+      part(THREE, shoe, G(new THREE.CapsuleGeometry(0.10, 0.18, 6, 12)), SHOE, [0, -0.02, 0.04], null, [1, 0.55, 1.5]);
+      part(THREE, shoe, G(new THREE.SphereGeometry(0.09, 14, 10)), SHOE, [-0.12, -0.03, 0.02], null, [0.7, 0.5, 1.2]);
+      // sole
+      part(THREE, shoe, G(new THREE.BoxGeometry(0.22, 0.03, 0.32)), SHOE, [0.02, -0.08, 0.04]);
+      return { root: hip, thigh: thigh, knee: knee, shoe: shoe, side: side, sign: s };
+    }
+    var legR = buildLeg('R');
+    var legL = buildLeg('L');
+    rig.legs = { R: legR, L: legL };
+
+    /* --------------------------------------------------------------- arms + articulated hands */
     var REST_ARM = 0.17;
+    function buildFinger(parent, mat, pos, dir, segLens, radius) {
+      // dir: 0..1 — 0 points down, 1 curls forward.
+      var finger = group(THREE, parent, pos);
+      var nodes = [finger];
+      var cursor = finger;
+      var segs = [null];
+      var total = [0];
+      for (var i = 0; i < segLens.length; i++) {
+        var knuckle = group(THREE, cursor, [0, -total[i], 0.01 * i]);
+        knuckle.rotation.x = (dir || 0) * 0.15;
+        part(THREE, knuckle, G(new THREE.CapsuleGeometry(radius, segLens[i], 4, 8)), mat,
+          [0, -segLens[i] * 0.5, 0], null, [1, 1, 1]);
+        part(THREE, knuckle, G(new THREE.SphereGeometry(radius * 0.9, 10, 8)), mat);
+        var nail = part(THREE, knuckle, G(new THREE.SphereGeometry(radius * 0.7, 10, 8)), NAIL,
+          [0, -segLens[i] * 0.95, radius * 0.7], [Math.PI * 0.5, 0, 0], [1, 0.55, 0.8]);
+        nodes.push(knuckle); segs.push(segLens[i]);
+        total.push(total[i] + segLens[i]);
+        cursor = knuckle;
+      }
+      return { root: finger, nodes: nodes, lengths: segs, curl: 0 };
+    }
+    function buildHand(side, parent, pos) {
+      var s = side === 'R' ? 1 : -1;
+      var hand = group(THREE, parent, pos);
+      // palm
+      part(THREE, hand, G(new THREE.SphereGeometry(0.10, 18, 14)), SKIN, [0, -0.02, 0.02], null, [1.0, 1.05, 0.72]);
+      part(THREE, hand, G(new THREE.SphereGeometry(0.09, 16, 12)), SKIN_DEEP, [0, -0.06, 0.06], null, [1.0, 0.7, 0.55]);
+      // wrist cuff
+      part(THREE, hand, G(new THREE.TorusGeometry(0.08, 0.022, 6, 16)), SKIN_DEEP, [0, 0.08, 0], [Math.PI / 2, 0, 0]);
+      // thumb
+      var thumb = group(THREE, hand, [s * 0.09, -0.02, 0.0]);
+      thumb.rotation.z = s * 0.6;
+      thumb.rotation.x = -0.35;
+      part(THREE, thumb, G(new THREE.CapsuleGeometry(0.025, 0.07, 4, 8)), SKIN, [0, -0.04, 0]);
+      var thumbTip = group(THREE, thumb, [0, -0.10, 0]);
+      part(THREE, thumbTip, G(new THREE.SphereGeometry(0.030, 12, 10)), SKIN);
+      part(THREE, thumbTip, G(new THREE.SphereGeometry(0.020, 10, 8)), NAIL, [0, -0.02, 0.025], [Math.PI * 0.5, 0, 0], [1, 0.5, 0.8]);
+      // four fingers (root, mid, tip)
+      var fingerData = [
+        { x: -0.050, y: -0.085, z: 0.02, len: [0.055, 0.045, 0.035], r: 0.022 },
+        { x: -0.017, y: -0.100, z: 0.02, len: [0.065, 0.050, 0.038], r: 0.023 },
+        { x:  0.017, y: -0.100, z: 0.02, len: [0.063, 0.048, 0.036], r: 0.022 },
+        { x:  0.050, y: -0.088, z: 0.02, len: [0.050, 0.040, 0.032], r: 0.020 }
+      ];
+      var fingers = [];
+      fingerData.forEach(function (f) {
+        var base = group(THREE, hand, [f.x, f.y, f.z]);
+        var joints = [base];
+        for (var j = 0; j < f.len.length; j++) {
+          var seg = group(THREE, joints[j]);
+          part(THREE, seg, G(new THREE.CapsuleGeometry(f.r, f.len[j], 4, 8)), SKIN,
+            [0, -f.len[j] * 0.5, 0], null, [1, 1, 1]);
+          part(THREE, seg, G(new THREE.SphereGeometry(f.r * 0.95, 10, 8)), SKIN);
+          if (j === f.len.length - 1) {
+            part(THREE, seg, G(new THREE.SphereGeometry(f.r * 0.8, 10, 8)), NAIL,
+              [0, -f.len[j] * 0.95, f.r * 1.2], [Math.PI * 0.5, 0, 0], [1, 0.55, 0.8]);
+          }
+          joints.push(seg);
+        }
+        fingers.push({ base: base, joints: joints, lengths: f.len });
+      });
+      return { root: hand, thumb: thumb, thumbTip: thumbTip, fingers: fingers };
+    }
     function buildArm(side) {
       var s = side === 'R' ? 1 : -1;
       var shoulder = group(THREE, figure, [s * 0.46, 1.12, 0]);
       shoulder.rotation.z = s * REST_ARM;
-      part(THREE, shoulder, G(new THREE.CapsuleGeometry(0.115, 0.30, 8, 18)), ROBE, [0, -0.24, 0]);
-      part(THREE, shoulder, G(new THREE.TorusGeometry(0.125, 0.028, 8, 20)), GOLD,
-        [0, -0.52, 0], [Math.PI / 2, 0, 0]);
-      var hand = part(THREE, shoulder, G(new THREE.SphereGeometry(0.135, 20, 14)), SKIN,
-        [0, -0.66, 0.02], null, [1, 0.95, 1]);
-      return { root: shoulder, hand: hand, side: side, sign: s };
+      // upper arm
+      part(THREE, shoulder, G(new THREE.CapsuleGeometry(0.12, 0.30, 8, 18)), ROBE, [0, -0.24, 0]);
+      // elbow
+      var elbow = group(THREE, shoulder, [0, -0.54, 0]);
+      // forearm
+      part(THREE, elbow, G(new THREE.CapsuleGeometry(0.10, 0.28, 8, 18)), ROBE, [0, -0.20, 0]);
+      // cuff
+      part(THREE, elbow, G(new THREE.TorusGeometry(0.11, 0.026, 8, 20)), GOLD,
+        [0, -0.40, 0], [Math.PI / 2, 0, 0]);
+      // a peek of wrist skin
+      part(THREE, elbow, G(new THREE.SphereGeometry(0.10, 16, 12)), SKIN, [0, -0.47, 0.02]);
+      var handInfo = buildHand(side, elbow, [0, -0.54, 0.02]);
+      return { root: shoulder, elbow: elbow, hand: handInfo.root, handInfo: handInfo, side: side, sign: s };
     }
     var armR = buildArm('R');
     var armL = buildArm('L');
     rig.arms = { R: armR, L: armL };
 
-    // The Bible in his right hand — the same prop the 2D character holds.
-    var bible = group(THREE, armR.root, [0.02, -0.72, 0.13]);
-    bible.rotation.set(-0.25, 0, 0.12);
-    part(THREE, bible, G(new THREE.BoxGeometry(0.30, 0.055, 0.22)), BOOK);
-    part(THREE, bible, G(new THREE.BoxGeometry(0.275, 0.035, 0.205)), PAGES, [0, 0.015, 0]);
-    part(THREE, bible, G(new THREE.BoxGeometry(0.028, 0.02, 0.16)), GOLD, [0, 0.035, 0]);
-    part(THREE, bible, G(new THREE.BoxGeometry(0.10, 0.02, 0.028)), GOLD, [0, 0.035, 0.02]);
+    // The Bible in his right hand — the same prop the 2D character holds, reparented to the hand.
+    var bible = group(THREE, armR.handInfo.root, [-0.02, -0.10, 0.13]);
+    bible.rotation.set(-0.35, 0, 0.12);
+    part(THREE, bible, G(new THREE.BoxGeometry(0.28, 0.05, 0.20)), BOOK);
+    part(THREE, bible, G(new THREE.BoxGeometry(0.26, 0.032, 0.19)), PAGES, [0, 0.015, 0]);
+    part(THREE, bible, G(new THREE.BoxGeometry(0.026, 0.018, 0.15)), GOLD, [0, 0.033, 0]);
+    part(THREE, bible, G(new THREE.BoxGeometry(0.09, 0.018, 0.026)), GOLD, [0, 0.033, 0.02]);
     rig.bible = bible;
 
-    // The hand microphone: hidden until Domey listens.
-    var mic = group(THREE, armL.root, [0, -0.72, 0.18]);
-    mic.rotation.set(-0.5, 0, 0.25);
-    part(THREE, mic, G(new THREE.CylinderGeometry(0.038, 0.045, 0.16, 16)), MIC);
-    part(THREE, mic, G(new THREE.SphereGeometry(0.062, 18, 14)), MIC, [0, 0.11, 0]);
-    part(THREE, mic, G(new THREE.CylinderGeometry(0.02, 0.02, 0.05, 12)), GOLD, [0, -0.10, 0]);
+    // The hand microphone: hidden until Domey listens; attached to left hand.
+    var mic = group(THREE, armL.handInfo.root, [0.0, -0.05, 0.12]);
+    mic.rotation.set(-0.7, 0, 0.15);
+    part(THREE, mic, G(new THREE.CylinderGeometry(0.032, 0.038, 0.14, 14)), MIC);
+    part(THREE, mic, G(new THREE.SphereGeometry(0.052, 16, 12)), MIC, [0, 0.10, 0]);
+    part(THREE, mic, G(new THREE.CylinderGeometry(0.018, 0.018, 0.05, 12)), GOLD, [0, -0.10, 0]);
     mic.visible = false;
     rig.mic = mic;
 
-    /* --------------------------------------------------------------- head */
-    var head = group(THREE, figure, [0, 1.42, 0]);
+    /* --------------------------------------------------------------- head (more human proportion) */
+    var head = group(THREE, figure, [0, 1.40, 0]);
     rig.head = head;
-    var skull = part(THREE, head, G(new THREE.SphereGeometry(0.42, 34, 26)), SKIN, null, null, [1, 1.05, 0.96]);
+    var skull = part(THREE, head, G(new THREE.SphereGeometry(0.40, 40, 30)), SKIN, null, null, [1, 1.08, 0.98]);
     rig.skull = skull;
-    part(THREE, head, G(new THREE.SphereGeometry(0.105, 18, 14)), SKIN, [0.415, -0.02, 0], null, [0.45, 1, 0.78]);
-    part(THREE, head, G(new THREE.SphereGeometry(0.105, 18, 14)), SKIN, [-0.415, -0.02, 0], null, [0.45, 1, 0.78]);
-    part(THREE, head, G(new THREE.SphereGeometry(0.055, 16, 12)), SKIN_DEEP, [0, -0.02, 0.405], null, [0.85, 0.78, 0.9]);
-    // Hair: a cap plus three fringe puffs, exactly the silhouette of the drawing.
-    part(THREE, head, G(new THREE.SphereGeometry(0.435, 32, 20, 0, Math.PI * 2, 0, Math.PI * 0.54)), HAIR,
-      [0, 0.02, -0.01], [-0.12, 0, 0], [1.02, 1, 1.02]);
-    part(THREE, head, G(new THREE.SphereGeometry(0.15, 18, 14)), HAIR, [-0.17, 0.29, 0.31], null, [1, 0.85, 0.8]);
-    part(THREE, head, G(new THREE.SphereGeometry(0.13, 18, 14)), HAIR, [0.02, 0.33, 0.30], null, [1, 0.8, 0.75]);
-    part(THREE, head, G(new THREE.SphereGeometry(0.12, 18, 14)), HAIR, [0.20, 0.29, 0.29], null, [1, 0.85, 0.8]);
+    // jaw — gives the head a real chin line instead of a round ball
+    part(THREE, head, G(new THREE.SphereGeometry(0.22, 24, 18)), SKIN, [0, -0.32, 0.10], null, [1.05, 0.72, 0.95]);
+    part(THREE, head, G(new THREE.SphereGeometry(0.12, 18, 14)), SKIN_DEEP, [0, -0.38, 0.18], null, [1.0, 0.5, 0.8]);
+    // chin dimple
+    part(THREE, head, G(new THREE.SphereGeometry(0.030, 12, 10)), SKIN_DEEP, [0, -0.40, 0.36], null, [1, 0.5, 0.6]);
+    // ears (more detailed)
+    [-1, 1].forEach(function (s) {
+      var ear = group(THREE, head, [s * 0.39, 0.00, -0.02]);
+      ear.rotation.y = s * 0.2;
+      part(THREE, ear, G(new THREE.SphereGeometry(0.072, 16, 12)), SKIN, null, null, [0.55, 1.0, 0.9]);
+      part(THREE, ear, G(new THREE.SphereGeometry(0.050, 14, 10)), SKIN_DEEP, [s * -0.01, -0.01, 0.02], null, [0.7, 0.75, 0.5]);
+      part(THREE, ear, G(new THREE.TorusGeometry(0.032, 0.009, 6, 12, Math.PI * 1.4)), SKIN_DEEP,
+        [0, 0, 0.01], [0, s * 0.3, 0]);
+    });
+    // nose — built from three small blobs so it has bridge, tip and nostrils
+    var nose = group(THREE, head, [0, -0.08, 0.38]);
+    part(THREE, nose, G(new THREE.CapsuleGeometry(0.032, 0.14, 6, 10)), NOSE, [0, 0.05, 0], null, [0.7, 1.0, 0.6]);
+    part(THREE, nose, G(new THREE.SphereGeometry(0.048, 16, 12)), NOSE, [0, -0.03, 0.02]);
+    part(THREE, nose, G(new THREE.SphereGeometry(0.022, 12, 10)), SKIN_DEEP, [-0.018, -0.06, 0.04]);
+    part(THREE, nose, G(new THREE.SphereGeometry(0.022, 12, 10)), SKIN_DEEP, [0.018, -0.06, 0.04]);
+    // Hair: softer, slightly wavier cap with fringe
+    part(THREE, head, G(new THREE.SphereGeometry(0.42, 34, 22, 0, Math.PI * 2, 0, Math.PI * 0.58)), HAIR,
+      [0, 0.03, -0.015], [-0.14, 0, 0], [1.04, 1.02, 1.04]);
+    // sideburns
+    part(THREE, head, G(new THREE.SphereGeometry(0.10, 16, 12)), HAIR, [-0.36, -0.05, 0.08], [0, 0.4, 0], [0.6, 1.0, 0.7]);
+    part(THREE, head, G(new THREE.SphereGeometry(0.10, 16, 12)), HAIR, [0.36, -0.05, 0.08], [0, -0.4, 0], [0.6, 1.0, 0.7]);
+    // fringe tufts
+    part(THREE, head, G(new THREE.SphereGeometry(0.12, 18, 14)), HAIR, [-0.18, 0.24, 0.30], [0.3, 0.1, 0], [1.1, 0.75, 0.85]);
+    part(THREE, head, G(new THREE.SphereGeometry(0.11, 18, 14)), HAIR, [0.00, 0.28, 0.30], [0.35, 0, 0], [1.1, 0.7, 0.8]);
+    part(THREE, head, G(new THREE.SphereGeometry(0.11, 18, 14)), HAIR, [0.18, 0.24, 0.30], [0.3, -0.1, 0], [1.1, 0.75, 0.85]);
 
-    var cheeks = [0.25, -0.25].map(function (x, index) {
-      return part(THREE, head, G(new THREE.SphereGeometry(0.075, 16, 12)), CHEEK,
-        [x, -0.06, 0.30], [-0.2, (index ? -1 : 1) * 0.25, 0], [1, 0.62, 0.3]);
+    var cheeks = [0.22, -0.22].map(function (x, index) {
+      return part(THREE, head, G(new THREE.SphereGeometry(0.078, 16, 12)), CHEEK,
+        [x, -0.11, 0.30], [-0.1, (index ? -1 : 1) * 0.20, 0], [1.1, 0.72, 0.5]);
     });
     rig.cheeks = cheeks;
 
-    /* --------------------------------------------------------------- eyes */
+    /* --------------------------------------------------------------- eyes — more human, mobile pupil */
     function buildEye(side) {
       var s = side === 'R' ? 1 : -1;
-      var socket = group(THREE, head, [s * 0.165, 0.10, 0.368]);
-      socket.rotation.x = -0.26;
+      var socket = group(THREE, head, [s * 0.155, 0.07, 0.36]);
+      socket.rotation.x = -0.15;
+      // eyelid (slight hood over top)
+      var lid = part(THREE, socket, G(new THREE.SphereGeometry(0.100, 20, 14)), SKIN,
+        [0, 0.030, -0.005], null, [1.05, 0.32, 0.72]);
+      var lidLow = part(THREE, socket, G(new THREE.SphereGeometry(0.100, 20, 14)), SKIN,
+        [0, -0.040, -0.010], null, [1.05, 0.22, 0.72]);
       var eye = group(THREE, socket);
-      part(THREE, eye, G(new THREE.SphereGeometry(0.105, 22, 16)), EYE_WHITE, null, null, [1, 1.02, 0.62]);
-      part(THREE, eye, G(new THREE.SphereGeometry(0.052, 18, 14)), IRIS, [0, 0, 0.062]);
-      part(THREE, eye, G(new THREE.SphereGeometry(0.027, 14, 12)), PUPIL, [0, 0, 0.088]);
-      part(THREE, eye, G(new THREE.SphereGeometry(0.016, 10, 8)), GLINT, [0.024, 0.030, 0.094]);
-      return { socket: socket, eye: eye };
+      part(THREE, eye, G(new THREE.SphereGeometry(0.082, 24, 18)), EYE_WHITE, null, null, [1, 1.0, 0.65]);
+      // sclera shading at the corner makes it rounder
+      part(THREE, eye, G(new THREE.SphereGeometry(0.060, 16, 12)), SCLERA_SHADE, [-s * 0.04, -0.02, -0.01]);
+      var iris = part(THREE, eye, G(new THREE.SphereGeometry(0.044, 20, 14)), IRIS, [0, 0, 0.052]);
+      var pupil = part(THREE, eye, G(new THREE.SphereGeometry(0.023, 14, 12)), PUPIL, [0, 0, 0.078]);
+      // iris ring (dark limbal ring)
+      part(THREE, eye, G(new THREE.TorusGeometry(0.044, 0.004, 6, 18)), PUPIL,
+        [0, 0, 0.05], [Math.PI / 2, 0, 0]);
+      // glints — primary and secondary
+      var glint1 = part(THREE, eye, G(new THREE.SphereGeometry(0.012, 10, 8)), GLINT, [0.018, 0.024, 0.080]);
+      var glint2 = part(THREE, eye, G(new THREE.SphereGeometry(0.007, 8, 6)), GLINT, [-0.016, -0.010, 0.072]);
+      // lashes
+      var lash = part(THREE, socket, G(new THREE.CapsuleGeometry(0.005, 0.085, 4, 10)), HAIR,
+        [0, 0.055, 0.055], [0.1, 0, 0], [1, 0.5, 0.4]);
+      return { socket: socket, eye: eye, iris: iris, pupil: pupil, lid: lid, lidLow: lidLow, glint1: glint1, glint2: glint2 };
     }
     var eyes = { R: buildEye('R'), L: buildEye('L') };
     rig.eyes = eyes;
 
     function buildBrow(side) {
       var s = side === 'R' ? 1 : -1;
-      var brow = group(THREE, head, [s * 0.17, 0.255, 0.352]);
-      brow.rotation.set(-0.34, 0, s * 0.12);
-      part(THREE, brow, G(new THREE.CapsuleGeometry(0.018, 0.125, 6, 12)), HAIR, null, [0, 0, Math.PI / 2]);
+      var brow = group(THREE, head, [s * 0.16, 0.22, 0.34]);
+      brow.rotation.set(-0.30, 0, s * 0.10);
+      // main ridge
+      part(THREE, brow, G(new THREE.CapsuleGeometry(0.015, 0.105, 6, 12)), HAIR, null, [0, 0, Math.PI / 2]);
+      // a few hair tufts for thickness
+      for (var k = -1; k <= 1; k++) {
+        part(THREE, brow, G(new THREE.CapsuleGeometry(0.005, 0.022, 4, 6)), HAIR,
+          [k * 0.035, 0.014, 0.01], [0.3, 0, k * s * 0.2]);
+      }
       return brow;
     }
     var brows = { R: buildBrow('R'), L: buildBrow('L') };
@@ -591,6 +752,79 @@
       figure.rotation.x = approachAngle(figure.rotation.x, pose.lean, step, 0.3);
       torso.scale.set(1.08 + breathe * 0.35, 1 - breathe * 0.4, 0.8);
 
+      /* ---- legs: natural stance with slight weight shift, knees soft */
+      var weightShift = Math.sin(state.time * 0.8) * 0.02 * speed;
+      legR.root.rotation.x = approachAngle(legR.root.rotation.x, 0.04 + weightShift, step, 0.3);
+      legL.root.rotation.x = approachAngle(legL.root.rotation.x, 0.04 - weightShift, step, 0.3);
+      legR.knee.rotation.x = approachAngle(legR.knee.rotation.x, 0.08 - weightShift, step, 0.3);
+      legL.knee.rotation.x = approachAngle(legL.knee.rotation.x, 0.08 + weightShift, step, 0.3);
+      if (state.action === 'jump' || state.action === 'dance') {
+        var kick = Math.sin(state.time * 6) * 0.25;
+        legR.knee.rotation.x = approachAngle(legR.knee.rotation.x, 0.4 - kick * 0.4, step, 0.18);
+        legL.knee.rotation.x = approachAngle(legL.knee.rotation.x, 0.4 + kick * 0.4, step, 0.18);
+      }
+      if (state.action === 'clap' || state.state === 'celebrating') {
+        var bounce = Math.abs(Math.sin(state.time * 5.5)) * 0.15;
+        legR.knee.rotation.x = approachAngle(legR.knee.rotation.x, 0.15 + bounce, step, 0.15);
+        legL.knee.rotation.x = approachAngle(legL.knee.rotation.x, 0.15 + bounce, step, 0.15);
+      }
+
+      /* ---- fingers: relaxed curl at rest, grip Bible/mic, point, count, clap */
+      function curlFingers(handInfo, amount, spread) {
+        if (!handInfo || !handInfo.fingers) return;
+        var joints = handInfo.fingers.forEach(function (f, idx) {
+          var curl = amount;
+          // middle finger curls most, pinky least
+          var per = [0.95, 1.05, 1.0, 0.85][idx] || 1;
+          var sp = (spread || 0) * (idx - 1.5) * 0.05;
+          for (var j = 1; j < f.joints.length; j++) {
+            var target = curl * per * (0.5 + j * 0.35);
+            f.joints[j].rotation.x = approachAngle(f.joints[j].rotation.x, target, step, 0.12);
+            f.joints[j].rotation.z = approachAngle(f.joints[j].rotation.z, sp, step, 0.15);
+          }
+          f.base.rotation.z = approachAngle(f.base.rotation.z, sp, step, 0.15);
+        });
+        handInfo.thumb.rotation.x = approachAngle(handInfo.thumb.rotation.x, -0.35 - amount * 0.3, step, 0.15);
+      }
+      var grip = (state.action === 'mic' || pose.mic > 0.5) ? 0.8 : (state.action === 'offer' ? 0.3 : 0.22);
+      var gripR = (state.action === 'point' || state.action === 'thumb' || state.action === 'wave') ? 0.10 : 0.35;
+      if (state.action === 'count') gripR = 0.35;
+      if (state.action === 'open' || state.action === 'raise') gripR = 0.0;
+      if (state.action === 'clap') { grip = 0.45; gripR = 0.45; }
+      curlFingers(armL.handInfo, grip, state.action === 'open' ? 0.5 : 0);
+      curlFingers(armR.handInfo, gripR, state.action === 'open' ? 0.5 : 0);
+      // point: extend the index finger
+      if (armR.handInfo && state.action === 'point') {
+        var index = armR.handInfo.fingers[1];
+        if (index) for (var j = 1; j < index.joints.length; j++) index.joints[j].rotation.x = 0;
+      }
+      // count: cycle through extended fingers
+      if (armR.handInfo && state.action === 'count') {
+        var upFingers = Math.floor((state.actionAge * 2.2) % 4);
+        armR.handInfo.fingers.forEach(function (f, idx) {
+          var extend = idx <= upFingers ? 0 : 0.55;
+          for (var j = 1; j < f.joints.length; j++) f.joints[j].rotation.x = extend;
+        });
+      }
+      // thumbs up
+      if (armR.handInfo && state.action === 'thumb') {
+        armR.handInfo.thumb.rotation.z = approachAngle(armR.handInfo.thumb.rotation.z, -1.2, step, 0.18);
+      } else if (armR.handInfo) {
+        armR.handInfo.thumb.rotation.z = approachAngle(armR.handInfo.thumb.rotation.z, armR.sign * 0.6, step, 0.2);
+      }
+
+      /* ---- elbow bend for natural arm shapes */
+      var elbowBendL = 0.45 + pose.armL.x * 0.8;
+      var elbowBendR = 0.45 + pose.armR.x * 0.8;
+      if (state.action === 'clap') { elbowBendL = 1.1; elbowBendR = 1.1; }
+      if (state.action === 'think') elbowBendR = 1.3;
+      if (state.action === 'mic' || pose.mic > 0.5) elbowBendL = 1.3;
+      if (state.action === 'wave') elbowBendR = 0.9;
+      armL.elbow.rotation.x = approachAngle(armL.elbow.rotation.x, elbowBendL, step, 0.18);
+      armR.elbow.rotation.x = approachAngle(armR.elbow.rotation.x, elbowBendR, step, 0.18);
+      armL.elbow.rotation.z = approachAngle(armL.elbow.rotation.z, -0.1, step, 0.2);
+      armR.elbow.rotation.z = approachAngle(armR.elbow.rotation.z, 0.1, step, 0.2);
+
       /* ---- the mouth ------------------------------------------------------
          While a viseme is playing the mouth is a real opening whose height,
          width, roundness, teeth and tongue come from the posture table, scaled
@@ -639,23 +873,49 @@
         state.mouth.open = approach(state.mouth.open, 0, step, 0.08);
       }
 
-      /* ---- eyes: blink, follow the member, widen when celebrating */
+      /* ---- eyes: natural blink (fast close, slow open), look around, widen on surprise */
       state.blink.next -= step;
-      if (state.blink.next <= 0) { state.blink.next = 1.8 + Math.random() * 3.4; state.blink.t = 0.16; }
+      if (state.blink.next <= 0) {
+        state.blink.next = 2.2 + Math.random() * 3.8;
+        state.blink.t = 0.18;
+        state.blink.phase = 0; // 0->1 closing, 1->2 opening
+      }
       if (state.blink.t > 0) {
         state.blink.t -= step;
-        state.blink.closed = clamp(state.blink.t / 0.08, 0, 1);
+        if (state.blink.t > 0.09) state.blink.phase = 0;
+        else state.blink.phase = 1;
+        var blinkProgress = state.blink.phase === 0
+          ? clamp((0.18 - state.blink.t) / 0.09, 0, 1)
+          : clamp(state.blink.t / 0.09, 0, 1);
+        // Ease the curve for a snappy close
+        state.blink.closed = (state.blink.phase === 0)
+          ? blinkProgress * blinkProgress
+          : blinkProgress;
       } else {
-        state.blink.closed = approach(state.blink.closed, 0, step, 0.05);
+        state.blink.closed = approach(state.blink.closed, 0, step, 0.08);
       }
-      var surprise = state.state === 'celebrating' ? 1.12 : 1;
-      state.look.x = approach(state.look.x, state.gaze.x * 0.045, step, 0.12);
-      state.look.y = approach(state.look.y, -state.gaze.y * 0.03, step, 0.12);
+      // Occasional micro-saccades make the gaze feel alive
+      if (Math.random() < 0.004 * speed) {
+        state.gaze.x = clamp((Math.random() - 0.5) * 0.6, -1, 1);
+        state.gaze.y = clamp((Math.random() - 0.5) * 0.4, -1, 1);
+      }
+      var surprise = state.state === 'celebrating' ? 1.10 : (state.state === 'thinking' ? 0.95 : 1);
+      var bored = state.state === 'listening' ? 0.97 : 1;
+      state.look.x = approach(state.look.x, state.gaze.x * 0.040, step, 0.10);
+      state.look.y = approach(state.look.y, -state.gaze.y * 0.028, step, 0.10);
       ['R', 'L'].forEach(function (key) {
         var eye = eyes[key];
         eye.eye.position.x = state.look.x;
         eye.eye.position.y = state.look.y;
-        eye.eye.scale.set(1, surprise * (1 - state.blink.closed * 0.94), 1);
+        var closed = state.blink.closed;
+        // eyelids scale vertically to cover the eye
+        eye.lid.scale.y = 0.32 + closed * 1.8;
+        eye.lid.position.y = 0.03 + closed * 0.04;
+        eye.lidLow.scale.y = 0.22 + closed * 1.5;
+        eye.lidLow.position.y = -0.04 - closed * 0.04;
+        eye.eye.scale.set(1, surprise * bored * (1 - closed * 0.92), 1);
+        // iris reacts slightly to light (celebrating = a little wider pupil)
+        eye.pupil.scale.setScalar(1 + (state.state === 'celebrating' ? 0.15 : 0));
       });
 
       /* ---- brows: raised on a question or a win, level on a wrong answer */
@@ -765,43 +1025,47 @@
     var scene = new T.Scene();
     var camera = new T.PerspectiveCamera(30, 1, 0.1, 60);
 
-    // Three lights and a very soft floor: enough to read as a real person
-    // standing on the stage, cheap enough for a phone.
-    var key = new T.DirectionalLight(0xfff2d8, 2.2);
-    key.position.set(1.9, 3.3, 2.7);
+    // Four lights — key, fill, rim, and a warm bounce — so skin reads as human
+    // and the robes stay dimensional. Cheap enough for mid-range Android.
+    var key = new T.DirectionalLight(0xfff1d9, 2.4);
+    key.position.set(2.0, 3.6, 3.0);
     key.castShadow = true;
     key.shadow.mapSize.set(1024, 1024);
     key.shadow.camera.near = 0.5;
-    key.shadow.camera.far = 12;
-    key.shadow.camera.left = -2;
-    key.shadow.camera.right = 2;
-    key.shadow.camera.top = 3;
-    key.shadow.camera.bottom = -1;
+    key.shadow.camera.far = 14;
+    key.shadow.camera.left = -2.4;
+    key.shadow.camera.right = 2.4;
+    key.shadow.camera.top = 3.4;
+    key.shadow.camera.bottom = -1.4;
     key.shadow.bias = -0.0012;
     key.shadow.normalBias = 0.02;
     scene.add(key);
     scene.add(key.target);
 
-    var fill = new T.DirectionalLight(0xa9ccff, 0.7);
-    fill.position.set(-2.6, 1.7, 1.8);
+    var fill = new T.DirectionalLight(0xbcd6ff, 0.85);
+    fill.position.set(-2.8, 1.6, 2.0);
     scene.add(fill);
-    var rim = new T.DirectionalLight(0xffd98a, 1.2);
-    rim.position.set(-1.4, 2.4, -2.8);
+    var rim = new T.DirectionalLight(0xffd98a, 1.3);
+    rim.position.set(-1.6, 2.6, -3.0);
     scene.add(rim);
-    scene.add(new T.HemisphereLight(0xbcd8ff, 0x0a2c55, 0.55));
+    var bounce = new T.DirectionalLight(0xd9b98a, 0.35);
+    bounce.position.set(0, -1.2, 1.8);
+    scene.add(bounce);
+    scene.add(new T.HemisphereLight(0xc5dcff, 0x0a2c55, 0.50));
+    scene.add(new T.AmbientLight(0xffffff, 0.18));
 
-    var floor = new T.Mesh(new T.CircleGeometry(1.5, 48), new T.ShadowMaterial({ opacity: 0.32 }));
+    var floor = new T.Mesh(new T.CircleGeometry(1.8, 56), new T.ShadowMaterial({ opacity: 0.34 }));
     floor.rotation.x = -Math.PI / 2;
-    floor.position.y = 0.001;
+    floor.position.y = -0.70;
     floor.receiveShadow = true;
     scene.add(floor);
 
     var ring = new T.Mesh(
-      new T.TorusGeometry(1.0, 0.016, 8, 72),
-      new T.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.6, emissive: 0x3a2c05, emissiveIntensity: 0.6 })
+      new T.TorusGeometry(1.15, 0.014, 8, 80),
+      new T.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.3, metalness: 0.6, emissive: 0x3a2c05, emissiveIntensity: 0.55 })
     );
     ring.rotation.x = -Math.PI / 2;
-    ring.position.y = 0.012;
+    ring.position.y = -0.685;
     scene.add(ring);
 
     var rig = options.rig || buildRig(T, options);
@@ -809,10 +1073,11 @@
 
     container.appendChild(canvas);
 
-    /* Keep the whole character in frame whatever the stage shape: the panel is
-       taller than it is wide, the live lounge is wider than it is tall. */
-    var FIT_HEIGHT = 2.12;
-    var FIT_WIDTH = 1.72;
+    /* Keep the whole character in frame whatever the stage shape.
+       Full-body framing: camera shows head to feet (Domey now has legs!). */
+    var FIT_HEIGHT = 2.85;
+    var FIT_WIDTH = 1.95;
+    var TARGET_Y = 0.78;
     function fit() {
       var width = Math.max(1, container.clientWidth || canvas.clientWidth || 320);
       var height = Math.max(1, container.clientHeight || canvas.clientHeight || 380);
@@ -821,8 +1086,8 @@
       var distanceV = (FIT_HEIGHT / 2) / Math.tan(fov / 2);
       var distanceH = (FIT_WIDTH / 2) / (Math.tan(fov / 2) * camera.aspect);
       var distance = Math.max(distanceV, distanceH) * 1.04;
-      camera.position.set(0, 1.02, distance);
-      camera.lookAt(0, 0.99, 0);
+      camera.position.set(0, TARGET_Y + 0.25, distance);
+      camera.lookAt(0, TARGET_Y, 0);
       camera.updateProjectionMatrix();
       renderer.setSize(width, height, false);
     }

@@ -1,12 +1,19 @@
 /*
- * Prayer Dome — Multilingual Scripture Pack
+ * Prayer Dome — Multilingual Phrase Pack
  * ===========================================================================
- * English (KJV) · Chitumbuka · siSwati · Bemba · Nyanja
+ * English (KJV phrasing) · Chitumbuka · siSwati · Bemba · Nyanja
  *
  * ---------------------------------------------------------------------------
- * PLEASE READ BEFORE PUBLISHING — TRANSLATION PROVENANCE
+ * PLEASE READ — SCOPE & PROVENANCE
  * ---------------------------------------------------------------------------
- * The English text is King James Version and is public domain: it is exact.
+ * This file powers the multilingual phrase/translation feature: short UI
+ * phrases, proverbs and community-draft renderings for Chitumbuka, siSwati,
+ * Bemba and Nyanja speakers. The English column uses familiar King James
+ * phrasing because it is public domain and short enough to quote here.
+ *
+ * The full Bible reader at /bible and the daily-verse / widget / notification
+ * system are New International Version (NIV) only, and are served through the
+ * authorized /api/bible proxy. This file does not replace that reader.
  *
  * The Chitumbuka, siSwati, Bemba and Nyanja renderings in this file are **community drafts**.
  * They were prepared to give the ministry a working starting point, and every
@@ -36,7 +43,7 @@ const PD_LANGUAGES = [
     code: 'en',
     name: 'English',
     endonym: 'English',
-    source: 'King James Version (public domain)',
+    source: 'Phrases in familiar public-domain wording. Full Bible reading is NIV.',
     official: true,
     speech: ['en-GB', 'en-US', 'en'],
     accent: '#0d9488'

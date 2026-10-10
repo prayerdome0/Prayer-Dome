@@ -31,7 +31,7 @@ w.askAssistant();
 const res=d.getElementById('results');
 t('results rendered after ask', res.innerHTML.length>500);
 t('shows Fear & Anxiety topic', res.textContent.includes('Fear & Anxiety'));
-t('renders scripture refs', (res.textContent.match(/KJV/g)||[]).length===4);
+t('renders scripture refs', res.querySelectorAll('.verse-ref').length===4);
 t('renders prayer points', res.querySelectorAll('ol.points li').length===5);
 t('renders written prayer', res.querySelector('.prayer-body').textContent.length>100);
 t('renders encouragement', !!res.querySelector('.encourage'));
