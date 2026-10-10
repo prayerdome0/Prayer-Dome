@@ -9,10 +9,10 @@
  * relabelled as another translation.
  *
  * Providers (in order of preference, per edition):
- *   - NIV: api.bible (https://rest.api.bible/v1, Bible ID 78a9f6124f344018-01),
- *     which needs NIV_API_KEY. NIV is a copyrighted text: api.bible serves it
- *     under its own licence terms. Bolls.life flags its NIV texts as ablated
- *     (removed) and is never used for NIV.
+ *   - NIV: no API. NIV is a copyrighted Biblica text and Prayer Dome holds no
+ *     licence that covers this site, so the reader lists NIV but shows no NIV
+ *     text, and makes no request to any provider for it. Bolls.life flags its
+ *     NIV texts as ablated (removed) and is never used for NIV either.
  *   - KJV: GetBible v2 (kjv, public domain), then Bolls.life KJV with Strong's
  *     numbers removed.
  *   - NLT, MSG: api.bible when NLT_BIBLE_ID / MSG_BIBLE_ID and the API key are
@@ -36,7 +36,7 @@ const https = require('https');
 const { URL } = require('url');
 
 const API_BIBLE_BASE = 'https://rest.api.bible/v1';
-const NIV_BIBLE_ID_DEFAULT = '78a9f6124f344018-01';
+const NIV_UNAVAILABLE_MESSAGE = 'NIV text is not shown. It is licensed by Biblica, and Prayer Dome does not hold a licence that covers this site. No other translation is shown in its place.';
 const CACHE_MAX_AGE = 300;
 const REQUEST_TIMEOUT_MS = 3500;
 
@@ -194,7 +194,8 @@ function apiBibleKey() {
 }
 
 function apiBibleIdFor(version) {
-  if (version === 'NIV') return process.env.NIV_BIBLE_ID || NIV_BIBLE_ID_DEFAULT;
+  // NIV has no API route (see the header), so it never has an ID.
+  if (version === 'NIV') return '';
   const envName = TRANSLATIONS[version] && TRANSLATIONS[version].apiBibleEnv;
   return envName ? (process.env[envName] || '') : '';
 }
@@ -440,10 +441,10 @@ async function fetchGetBibleChapter(version, book, chapter) {
   return normalizeGetBibleChapter(json, version, book, chapter);
 }
 
-function notConfiguredError(version) {
-  const error = new Error(`${TRANSLATIONS[version].name} requires an authorized api.bible key.`);
-  error.code = 'NIV_NOT_CONFIGURED';
-  error.providerAttempts = [{ provider: 'api.bible', error: 'API key or Bible ID is not configured' }];
+function nivUnavailableError() {
+  const error = new Error(NIV_UNAVAILABLE_MESSAGE);
+  error.code = 'NIV_UNAVAILABLE';
+  error.providerAttempts = [];
   return error;
 }
 
@@ -459,14 +460,7 @@ async function fetchChapter(version, book, chapter) {
     }
   };
 
-  if (version === 'NIV') {
-    if (!apiBibleConfigured('NIV')) throw notConfiguredError('NIV');
-    const official = await tryProvider('api.bible', () => fetchApiBibleChapter(version, book, chapter), false);
-    if (official) return official;
-    const error = new Error('The authorized NIV provider could not return this chapter.');
-    error.providerAttempts = attempts;
-    throw error;
-  }
+  if (version === 'NIV') throw nivUnavailableError();
 
   if (apiBibleConfigured(version)) {
     const licensed = await tryProvider('api.bible', () => fetchApiBibleChapter(version, book, chapter), false);
@@ -543,15 +537,10 @@ async function fetchBollsSearch(version, query, limit) {
 
 async function fetchSearch(version, query, limit) {
   const attempts = [];
-  if (version === 'NIV' || apiBibleConfigured(version)) {
-    if (!apiBibleConfigured(version)) throw notConfiguredError(version);
+  if (version === 'NIV') throw nivUnavailableError();
+  if (apiBibleConfigured(version)) {
     try { return await fetchApiBibleSearch(version, query, limit); }
     catch (error) { attempts.push(`api.bible: ${String(error.message || error)}`); }
-    if (version === 'NIV') {
-      const error = new Error('The authorized NIV search provider is unavailable');
-      error.providerAttempts = attempts;
-      throw error;
-    }
   }
   if (TRANSLATIONS[version].bolls) {
     try { return await fetchBollsSearch(version, query, limit); }
@@ -567,7 +556,7 @@ function statusPayload(version) {
   if (apiBibleConfigured(version)) providers.push('api.bible');
   if (GETBIBLE_EXACT_EDITIONS.has(version)) providers.push('GetBible.net');
   if (TRANSLATIONS[version].bolls) providers.push('Bolls.life');
-  const configured = version === 'NIV' ? apiBibleConfigured('NIV') : true;
+  const configured = version !== 'NIV';
   return {
     ok: true,
     translation: version,
@@ -577,9 +566,7 @@ function statusPayload(version) {
     getBibleFallbackAvailable: GETBIBLE_EXACT_EDITIONS.has(version),
     getBibleCode: TRANSLATIONS[version].getBibleCode,
     copyright: TRANSLATIONS[version].copyright,
-    message: version === 'NIV' && !configured
-      ? 'NIV reading requires an authorized api.bible key. Configure the NIV_API_KEY environment variable; Prayer Dome will not substitute another translation.'
-      : ''
+    message: version === 'NIV' ? NIV_UNAVAILABLE_MESSAGE : ''
   };
 }
 
@@ -626,15 +613,15 @@ module.exports = async function handler(req, res) {
       const data = await fetchChapter(version, valid.book, valid.chapter);
       return send(res, 200, Object.assign({ ok: true }, data));
     } catch (error) {
-      const notConfigured = error.code === 'NIV_NOT_CONFIGURED';
-      return send(res, notConfigured ? 503 : 502, {
+      const notConfigured = error.code === 'NIV_UNAVAILABLE';
+      return send(res, notConfigured ? 451 : 502, {
         ok: false,
         translation: version,
         translationName: TRANSLATIONS[version].name,
         copyright: TRANSLATIONS[version].copyright,
-        error: notConfigured ? 'NIV_NOT_CONFIGURED' : 'TRANSLATION_UNAVAILABLE',
+        error: notConfigured ? 'NIV_UNAVAILABLE' : 'TRANSLATION_UNAVAILABLE',
         message: notConfigured
-          ? 'NIV reading requires an authorized api.bible key. Configure NIV_API_KEY; Prayer Dome will not substitute another translation.'
+          ? NIV_UNAVAILABLE_MESSAGE
           : `The ${TRANSLATIONS[version].name} text is temporarily unavailable. Prayer Dome has not substituted a different translation. Please try again shortly.`,
         providersTried: (error.providerAttempts || []).map(providerLabel)
       });
@@ -649,14 +636,14 @@ module.exports = async function handler(req, res) {
       const data = await fetchSearch(version, query, limit);
       return send(res, 200, Object.assign({ ok: true }, data));
     } catch (error) {
-      const notConfigured = error.code === 'NIV_NOT_CONFIGURED';
-      return send(res, notConfigured ? 503 : 502, {
+      const notConfigured = error.code === 'NIV_UNAVAILABLE';
+      return send(res, notConfigured ? 451 : 502, {
         ok: false,
         translation: version,
         translationName: TRANSLATIONS[version].name,
-        error: notConfigured ? 'NIV_NOT_CONFIGURED' : 'SEARCH_UNAVAILABLE',
+        error: notConfigured ? 'NIV_UNAVAILABLE' : 'SEARCH_UNAVAILABLE',
         message: notConfigured
-          ? 'NIV search requires an authorized api.bible key. Configure NIV_API_KEY; Prayer Dome will not substitute another translation.'
+          ? NIV_UNAVAILABLE_MESSAGE
           : `${TRANSLATIONS[version].name} search is temporarily unavailable. No other translation has been substituted. Please try again shortly.`,
         providersTried: (error.providerAttempts || []).map(providerLabel)
       });
@@ -684,14 +671,14 @@ module.exports = async function handler(req, res) {
         fallbackUsed: data.fallbackUsed
       });
     } catch (error) {
-      const notConfigured = error.code === 'NIV_NOT_CONFIGURED';
-      return send(res, notConfigured ? 503 : 502, {
+      const notConfigured = error.code === 'NIV_UNAVAILABLE';
+      return send(res, notConfigured ? 451 : 502, {
         ok: false,
         translation: version,
         translationName: TRANSLATIONS[version].name,
-        error: notConfigured ? 'NIV_NOT_CONFIGURED' : 'TRANSLATION_UNAVAILABLE',
+        error: notConfigured ? 'NIV_UNAVAILABLE' : 'TRANSLATION_UNAVAILABLE',
         message: notConfigured
-          ? 'NIV reading requires an authorized api.bible key. Configure NIV_API_KEY; Prayer Dome will not substitute another translation.'
+          ? NIV_UNAVAILABLE_MESSAGE
           : `The ${TRANSLATIONS[version].name} text is temporarily unavailable. No other translation has been substituted.`
       });
     }
@@ -703,7 +690,6 @@ module.exports = async function handler(req, res) {
 module.exports.TRANSLATIONS = TRANSLATIONS;
 module.exports.GETBIBLE_EXACT_EDITIONS = GETBIBLE_EXACT_EDITIONS;
 module.exports.USFM = USFM;
-module.exports.NIV_BIBLE_ID_DEFAULT = NIV_BIBLE_ID_DEFAULT;
 module.exports._normalizeGetBibleChapter = normalizeGetBibleChapter;
 module.exports._normalizeVerses = normalizeVerses;
 module.exports._normalizeApiBibleChapter = normalizeApiBibleChapter;

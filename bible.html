@@ -749,7 +749,9 @@
                     if (status) {
                         status.textContent = json.configured
                             ? `${currentTranslationName} · ready`
-                            : `${currentTranslationName} · setup required`;
+                            : (version === 'NIV'
+                                ? `${currentTranslationName} · licensing limit`
+                                : `${currentTranslationName} · setup required`);
                         status.title = json.message || (json.getBibleFallbackAvailable
                             ? 'Exact-version sources include Bolls.life and the free GetBible.net KJV fallback.'
                             : `Exact-version sources: ${(json.providers || []).join(', ') || 'version-matched providers'}. GetBible.net does not currently publish this edition; no other translation will be substituted.`);

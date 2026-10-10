@@ -119,13 +119,15 @@ async function withHttpsResponses(fixtures, run) {
   t('status clearly reports the current GetBible coverage',
     status.json.getBibleFallbackAvailable === false && status.json.providers.includes('Bolls.life'));
   const nivStatus = await invoke('/api/bible?action=status&version=NIV');
-  t('NIV is not marked ready without its authorized api.bible key',
+  t('NIV is listed but not served: no provider and a licensing message',
     nivStatus.status === 200 && nivStatus.json.configured === false &&
-    !nivStatus.json.providers.includes('Bolls.life') && /NIV_API_KEY/.test(nivStatus.json.message));
+    nivStatus.json.providers.length === 0 && /not shown/.test(nivStatus.json.message) &&
+    !/NIV_API_KEY|api\.bible/.test(nivStatus.json.message));
   const nivWithoutKey = await invoke('/api/bible?action=chapter&id=43&chapter=3&version=NIV');
-  t('NIV never uses the blocked Bolls route or a different translation when unconfigured',
-    nivWithoutKey.status === 503 && nivWithoutKey.json.error === 'NIV_NOT_CONFIGURED' &&
-    /not substitute/.test(nivWithoutKey.json.message));
+  t('NIV chapters return a licensing message with no text and no substitute',
+    nivWithoutKey.status === 451 && nivWithoutKey.json.error === 'NIV_UNAVAILABLE' &&
+    nivWithoutKey.json.translation === 'NIV' && /not shown/.test(nivWithoutKey.json.message) &&
+    !nivWithoutKey.json.verses);
   const unsupported = await invoke('/api/bible?action=chapter&id=43&chapter=3&version=AMP');
   t('unsupported version codes are rejected before any provider call',
     unsupported.status === 400 && unsupported.json.error === 'UNSUPPORTED_TRANSLATION');
@@ -141,13 +143,11 @@ async function withHttpsResponses(fixtures, run) {
       requests.length === 1 && requests[0].includes('/get-text/NLT/43/3/'));
   });
 
-  t('the NIV Bible ID is the api.bible NIV edition, not the KJV edition',
-    handler.NIV_BIBLE_ID_DEFAULT === '78a9f6124f344018-01' && handler._apiBibleIdFor('NIV') === '78a9f6124f344018-01');
-  t('the NIV Bible ID can be overridden only by configuration', (function () {
+  t('NIV has no API route: no Bible ID is ever produced for it, even if configured', (function () {
     process.env.NIV_BIBLE_ID = 'test-override';
     const value = handler._apiBibleIdFor('NIV');
     delete process.env.NIV_BIBLE_ID;
-    return value === 'test-override';
+    return value === '' && handler.NIV_BIBLE_ID_DEFAULT === undefined;
   })());
 
   // KJV: GetBible is the exact-edition primary; Bolls is the cleaned fallback.
@@ -189,46 +189,22 @@ async function withHttpsResponses(fixtures, run) {
       result.status === 502 && result.json.translation === 'KJV' && result.json.error === 'TRANSLATION_UNAVAILABLE');
   });
 
-  // NIV through api.bible: the chapter request, the response guard and the parser.
-  const nivChapter = {
-    data: {
-      id: 'JHN.3',
-      bibleId: '78a9f6124f344018-01',
-      reference: 'John 3',
-      copyright: 'Scripture quotations taken from The Holy Bible, New International Version® NIV® Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.®',
-      content: '<p class="p"><span data-number="1" data-sid="JHN 3:1" class="v">1</span>Now there was a Pharisee named Nicodemus.</p>' +
-        '<p class="p"><span data-number="2" data-sid="JHN 3:2" class="v">2</span>He came to Jesus by night. <span class="note">x</span></p>' +
-        '<p class="p"><span data-number="3" data-sid="JHN 3:3" class="v">3</span>Jesus replied, <span class="wj">Very truly</span> I tell you.</p>'
-    }
-  };
+  // NIV has no API route. Even with a key present, no request is made and no text is returned.
   process.env.NIV_API_KEY = 'test-key-not-real';
-  await withHttpsResponses([{ body: nivChapter }], async requests => {
+  await withHttpsResponses([{ body: { data: { content: '<span class="v" data-number="1">1</span>should never be used' } } }], async requests => {
     const result = await invoke('/api/bible?action=chapter&id=43&chapter=3&version=NIV');
-    t('NIV chapters come from api.bible with the NIV edition ID and USFM chapter ID',
-      requests.length === 1 && requests[0] === 'https://rest.api.bible/v1/bibles/78a9f6124f344018-01/chapters/JHN.3?content-type=html&include-notes=false&include-titles=false&include-chapter-numbers=false&include-verse-numbers=true',
-      requests[0]);
-    t('NIV chapters are labelled NIV with their verses in order',
-      result.status === 200 && result.json.translation === 'NIV' && result.json.provider === 'api.bible' &&
-      result.json.verses.length === 3 && result.json.verses[2].text === 'Jesus replied, Very truly I tell you.');
-    t('the API key is never echoed in a response',
+    t('NIV makes no provider request, even when a key is configured', requests.length === 0, requests.join(' | '));
+    t('NIV text is never returned or echoed, even when a key is configured',
+      result.status === 451 && !JSON.stringify(result.json).includes('should never be used') &&
       !JSON.stringify(result.json).includes('test-key-not-real'));
   });
-  await withHttpsResponses([{ body: { data: { ...nivChapter.data, bibleId: 'de4e12af7f28f599-01', copyright: 'King James Version' } } }], async () => {
-    const result = await invoke('/api/bible?action=chapter&id=43&chapter=3&version=NIV');
-    t('api.bible text for a different Bible ID is rejected and never shown as NIV',
-      result.status === 502 && result.json.error === 'TRANSLATION_UNAVAILABLE');
-  });
-  await withHttpsResponses([{ body: { data: { ...nivChapter.data, copyright: 'Some other copyright' } } }], async () => {
-    const result = await invoke('/api/bible?action=chapter&id=43&chapter=3&version=NIV');
-    t('api.bible text without the NIV copyright line is rejected',
-      result.status === 502);
-  });
+  delete process.env.NIV_API_KEY;
+
+  // The api.bible parser still serves the optional NLT and MSG routes, so it stays guarded.
   t('out-of-sequence verses are rejected rather than shown out of order', (function () {
     try { handler._parseApiBibleHtml('<span class="v" data-number="1">1</span>a <span class="v" data-number="3">3</span>b'); return false; }
     catch (error) { return /out of sequence/.test(error.message); }
   })());
-  delete process.env.NIV_API_KEY;
-
   // Bolls search uses the current v2 find endpoint and returns verse references.
   await withHttpsResponses([{ body: { exact_matches: 1, total: 1, results: [{ pk: 1, translation: 'NLT', book: 43, chapter: 3, verse: 16, text: 'For God so loved the world…' }] } }], async requests => {
     const result = await invoke('/api/bible?action=search&q=loved&version=NLT');
@@ -239,8 +215,8 @@ async function withHttpsResponses(fixtures, run) {
   });
   await withHttpsResponses([{ body: { results: [{ book: 43, chapter: 3, verse: 16, text: 'For God so loved the world.' }] } }], async () => {
     const result = await invoke('/api/bible?action=search&q=loved&version=NIV');
-    t('NIV search without a configured api.bible key reports NIV_NOT_CONFIGURED instead of using another source',
-      result.status === 503 && result.json.error === 'NIV_NOT_CONFIGURED');
+    t('NIV search returns a licensing message and never another source',
+      result.status === 451 && result.json.error === 'NIV_UNAVAILABLE' && !result.json.verses);
   });
 
   const html = fs.readFileSync(path.join(ROOT, 'bible.html'), 'utf8');

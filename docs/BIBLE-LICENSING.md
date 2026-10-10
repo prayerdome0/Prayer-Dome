@@ -8,7 +8,7 @@ the providers. It is kept in step with `api/bible.js`.
 
 | Edition | Primary source | Fallback | Licence status |
 |---|---|---|---|
-| NIV | api.bible (`https://rest.api.bible/v1`, Bible ID `78a9f6124f344018-01`) with `NIV_API_KEY` | none | Copyrighted (Biblica). api.bible's NIV licence is not for commercial use. See "Open decisions". |
+| NIV | **None. No API.** The reader lists NIV, shows a licensing message and no text, and makes no provider request. | none | Copyrighted (Biblica). Prayer Dome holds no licence that covers this site. |
 | KJV | GetBible v2 (`api.getbible.net/v2/kjv`) | Bolls.life KJV, Strong's numbers removed | Public domain (US). |
 | NLT | api.bible when `NLT_BIBLE_ID` and the key are set | Bolls.life NLT | Copyrighted (Tyndale). Bolls.life rights unverified. |
 | ESV | Bolls.life ESV | none | Copyrighted (Crossway). Bolls.life rights unverified. |
@@ -24,6 +24,7 @@ Rules the code enforces:
   unavailable, the reader says so and shows no text.
 - The Bolls.life `get-chapter` (commentary) route is not used. The reader uses
   `get-text`, and search uses `/v2/find/<slug>`.
+- NIV is never requested from any provider. Its status is reported as a licensing limit.
 - API keys are read from the environment only. They are sent in a request
   header and are never returned in a response or logged.
 
@@ -31,15 +32,14 @@ Rules the code enforces:
 
 | Variable | Purpose |
 |---|---|
-| `NIV_API_KEY` (or `BIBLE_API_KEY`) | api.bible key. Required for NIV. |
-| `NIV_BIBLE_ID` | Overrides the NIV Bible ID. Default `78a9f6124f344018-01`. |
+| `NIV_API_KEY` (or `BIBLE_API_KEY`) | Optional api.bible key, used only for NLT and MSG. NIV ignores it. |
 | `NLT_BIBLE_ID`, `MSG_BIBLE_ID` | Optional api.bible IDs for NLT and MSG, used with the same key. |
 
 Set these in the Vercel project for production. Do not commit them.
 
 ## Open decisions for the owner
 
-1. **NIV licence.** api.bible's Starter plan is free but non-commercial. Its
+1. **NIV licence (removed for now).** NIV is not served from any API. To show NIV text in future, the owner must obtain a written licence covering this site. api.bible's Starter plan is free but non-commercial. Its
    Express licence for NIV requires non-commercial use with no ads, no
    in-app purchases and no freemium features, and its help pages say
    commercial use needs a paid plan and per-translation fees. Biblica's
