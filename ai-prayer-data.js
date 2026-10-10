@@ -1,8 +1,10 @@
 /*
  * Prayer Dome — Prayer Assistant knowledge base
  * ------------------------------------------------------------------
- * Curated topical library of scriptures, prayer points and encouragement.
- * All scripture text is King James Version (public domain).
+ * Curated topical library of scriptures, prayer points and encouragement
+ * for conversational use in the Prayer Assistant. Passages are short,
+ * quotable verses drawn from familiar wording and paraphrased for devotional
+ * response. Authoritative chapter reading in the Bible is always NIV.
  *
  * Runs entirely in the browser: no API key, no backend, no per-request cost,
  * and it keeps working offline once the service worker has cached it.

@@ -361,6 +361,9 @@
         <div class="vw-status" id="vwStatus" role="status" aria-live="polite">
             <i class="pd-i pd-i-loader-circle"></i> <span id="vwStatusText">Checking this device…</span>
         </div>
+        <div class="vw-status is-good" style="margin-top:12px;">
+            <i class="pd-i pd-i-book-open"></i> All verses are from the New International Version (NIV) — © Biblica, Inc. Used by permission.
+        </div>
     </section>
 
     <div class="vw-layout">
@@ -540,7 +543,10 @@
         </details>
         <details>
             <summary>Which translation is used?</summary>
-            <p>The King James Version, which is in the public domain, so verses can be shared and displayed freely.</p>
+            <p>All verses are from the <strong>New International Version (NIV)</strong> — the same translation used throughout the app.
+                NIV® Copyright © Biblica, Inc. The widget and notifications display short, curated memory verses from
+                the authorized NIV feed; full-chapter reading in the Bible uses the licensed NIV endpoint. Other
+                translations are not substituted.</p>
         </details>
         <details>
             <summary>Can I keep one verse instead of the rotation?</summary>
@@ -551,7 +557,7 @@
 </main>
 
 <footer class="pd-page-footer">
-    <div class="pd-page-verse"><i class="pd-i pd-i-book"></i> “Thy word have I hid in mine heart, that I might not sin against thee.” — Psalm 119:11</div>
+    <div class="pd-page-verse"><i class="pd-i pd-i-book"></i> “I have hidden your word in my heart that I might not sin against you.” — Psalm 119:11 (NIV)</div>
     <div>© Prayer Dome Ministry · Zambia · Eswatini · Ireland</div>
 </footer>
 
@@ -640,7 +646,7 @@
         host.innerHTML = shown.map(function (verse, index) {
             var active = state.selected && state.selected.reference === verse.reference;
             return '<button type="button" class="vw-verse-item' + (active ? ' is-active' : '') + '" role="listitem" data-verse-index="' + index + '">' +
-                '<span class="vw-vi-ref">' + esc(verse.reference) + ' (' + esc(verse.translation || 'KJV') + ') · ' + esc(verse.slotLabel) + '</span>' +
+                '<span class="vw-vi-ref">' + esc(verse.reference) + ' (' + esc(verse.translation || 'NIV') + ') · ' + esc(verse.slotLabel) + '</span>' +
                 '<span class="vw-vi-text">' + esc(verse.text) + '</span>' +
             '</button>';
         }).join('');
@@ -827,7 +833,7 @@
         if ($('vwWallRef') && $('vwWallRef').checked) {
             ctx.font = '700 ' + Math.round(width * 0.042 * scale) + 'px Poppins, Georgia, serif';
             ctx.fillStyle = palette.reference;
-            ctx.fillText('— ' + verse.reference + ' (KJV)', width / 2, referenceY);
+            ctx.fillText('— ' + verse.reference + ' (NIV)', width / 2, referenceY);
         }
 
         if ($('vwWallBrand') && $('vwWallBrand').checked) {

@@ -122,7 +122,7 @@ const widgetVerses = widgetData.slots.flatMap((slot) => widgetData.verses[slot.i
 t('every verse, reference and slot reaches the widget unchanged',
   siteVerses.length === widgetVerses.length && siteVerses.every((verse, index) => verse === widgetVerses[index]),
   `${siteVerses.length} site verses, ${widgetVerses.length} packaged`);
-t('the widget data is King James Version only', widgetData.translation.includes('King James'));
+t('the widget data is NIV', /NIV|New International Version/i.test(widgetData.translation));
 
 /* The JSON keys Java reads must exist in the generated data — a renamed key
    would only surface as a blank widget on a phone. */
@@ -427,7 +427,7 @@ function installCanvasStub(window, sink) {
       const printed = drawCalls.filter((call) => call[0] === 'text').map((call) => call[2]);
       const body = printed.filter((line) => !/^— /.test(line) && line !== 'PRAYER DOME' && line !== 'prayerdome.net');
       return body.length >= 3 && body.join(' ').length > 60 &&
-        printed.some((line) => /— .+ \(KJV\)$/.test(line)) &&
+        printed.some((line) => /— .+ \(NIV\)$/.test(line)) &&
         printed.includes('PRAYER DOME') && printed.includes('prayerdome.net');
     })());
   t('changing the phone model redraws at the new resolution',
@@ -441,7 +441,7 @@ function installCanvasStub(window, sink) {
       drawCalls.length = 0;
       d.getElementById('vwWallRef').checked = false;
       d.getElementById('vwWallRef').dispatchEvent(new w.Event('change'));
-      return !drawCalls.some((call) => call[0] === 'text' && /\(KJV\)$/.test(call[2]));
+      return !drawCalls.some((call) => call[0] === 'text' && /\(NIV\)$/.test(call[2]));
     })());
   t('the verse size slider scales the printed Scripture',
     (function () {
@@ -486,7 +486,7 @@ function installCanvasStub(window, sink) {
           available: true, placed: 1, canPin: true, verified: true,
           preferences: nativePreferences,
           verse: { reference: 'Psalm 23:1', text: 'The LORD is my shepherd; I shall not want.',
-            slot: 'morning', slotLabel: 'Morning Verse', greeting: 'Good morning', translation: 'KJV' },
+            slot: 'morning', slotLabel: 'Morning Verse', greeting: 'Good morning', translation: "NIV" },
           slots: []
         }),
         setPreferences: (payload) => { nativeCalls.push(['setPreferences', payload]); return Promise.resolve({}); },

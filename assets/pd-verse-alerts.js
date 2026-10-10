@@ -133,7 +133,7 @@
 
                 ctx.fillStyle = '#f6df8a';
                 ctx.font = 'bold 30px Inter, Arial, sans-serif';
-                ctx.fillText(verse.reference + '  (' + (verse.translation || 'KJV') + ')', 70, Math.min(y + 22, 430));
+                ctx.fillText(verse.reference + '  (NIV)', 70, Math.min(y + 22, 430));
 
                 ctx.fillStyle = 'rgba(255,255,255,0.75)';
                 ctx.font = '600 22px Inter, Arial, sans-serif';
@@ -163,7 +163,7 @@
         if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return false;
 
         var title = (verse.slotLabel || 'Daily Verse') + ' · Prayer Dome';
-        var body = '\u201C' + verse.text + '\u201D\n— ' + verse.reference + ' (' + (verse.translation || 'KJV') + ')';
+        var body = '\u201C' + verse.text + '\u201D\n— ' + verse.reference + ' (NIV)';
         var image = null;
         try { image = await buildVerseCard(verse); } catch (e) { image = null; }
 
@@ -222,7 +222,7 @@
                         reference: ref,
                         title: (f.title && f.title.stringValue) || null,
                         slots: (f.slots && f.slots.stringValue) || 'all',
-                        translation: (f.translation && f.translation.stringValue) || 'KJV'
+                        translation: (f.translation && f.translation.stringValue) || 'NIV'
                     };
                 }
             }

@@ -191,7 +191,7 @@
                     slot: slot.id,
                     slotLabel: slot.label,
                     greeting: slot.greeting,
-                    translation: 'KJV'
+                    translation: 'NIV'
                 });
             });
         });
@@ -235,7 +235,7 @@
                 esc(data.text) + '</div>' +
             (settings.showReference
                 ? '<div class="pd-vw-ref" style="color:' + palette.reference + ';font-size:' + (12 * scale).toFixed(1) + 'px;">— ' +
-                    esc(data.reference) + ' (KJV)</div>'
+                    esc(data.reference) + ' (NIV)</div>'
                 : '') +
             (settings.showBrand
                 ? '<div class="pd-vw-brand" style="color:' + palette.brand + ';font-size:' + (9 * scale).toFixed(1) + 'px;">' +

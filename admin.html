@@ -1789,7 +1789,7 @@
                 <div class="form-group"><label>Occasion / Title</label><input type="text" id="verseTitle" class="form-control" placeholder="e.g. Good Friday, National Fasting Week, Youth Camp" maxlength="80"></div>
                 <div class="form-group"><label>Scripture Reference *</label><input type="text" id="verseRef" class="form-control" placeholder="e.g. Isaiah 53:5" maxlength="60"></div>
                 <div class="form-group"><label>Verse Text *</label><textarea id="verseText" class="form-control" rows="4" placeholder="But he was wounded for our transgressions…" maxlength="600"></textarea></div>
-                <div class="form-group"><label>Translation</label><input type="text" id="verseTranslation" class="form-control" value="KJV" maxlength="20"></div>
+                <div class="form-group"><label>Translation</label><input type="text" id="verseTranslation" class="form-control" value="NIV" maxlength="20"></div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeModal('modalVerse')">Cancel</button>
@@ -3353,7 +3353,7 @@ window.toggleDarkMode = function() {
                     title: document.getElementById('verseTitle').value.trim(),
                     reference: reference,
                     text: text,
-                    translation: document.getElementById('verseTranslation').value.trim() || 'KJV',
+                    translation: document.getElementById('verseTranslation').value.trim() || 'NIV',
                     slots: slots,
                     special: true,
                     createdAt: serverTimestamp(),
@@ -3366,7 +3366,7 @@ window.toggleDarkMode = function() {
                 document.getElementById('verseTitle').value = '';
                 document.getElementById('verseRef').value = '';
                 document.getElementById('verseText').value = '';
-                document.getElementById('verseTranslation').value = 'KJV';
+                document.getElementById('verseTranslation').value = 'NIV';
                 document.getElementById('verseSlots').value = 'all';
                 loadVerseSchedule();
             } catch(e) { toast('Error: ' + e.message, 'error'); }
@@ -3382,7 +3382,7 @@ window.toggleDarkMode = function() {
                 document.getElementById('verseTitle').value = v.title || '';
                 document.getElementById('verseRef').value = v.reference || '';
                 document.getElementById('verseText').value = v.text || '';
-                document.getElementById('verseTranslation').value = v.translation || 'KJV';
+                document.getElementById('verseTranslation').value = v.translation || 'NIV';
                 const slots = Array.isArray(v.slots) ? v.slots : [];
                 document.getElementById('verseSlots').value = (!slots.length || slots.length === 4) ? 'all' : slots.join(',');
                 openModal('modalVerse');

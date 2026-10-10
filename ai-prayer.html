@@ -468,9 +468,11 @@ function topicArt(id) { return PD_TOPIC_ART[id] || null; }
 /* =====================================================================
  * Multilingual verses
  * ---------------------------------------------------------------------
- * The assistant's own library is KJV-only. translation-data.js carries a
- * curated pack in Chitumbuka and siSwati. Where a verse the assistant just
- * showed also exists in that pack, we offer to show it in those languages.
+ * The assistant's scripture library is curated for the Prayer Assistant
+ * (short, quotable passages). The Bible reader is NIV-only; translation-data.js
+ * carries a curated pack in Chitumbuka and siSwati. Where a verse the
+ * assistant just showed also exists in that pack, we offer to show it in
+ * those languages.
  *
  * We match on the reference string. If a verse is not in the pack we simply
  * do not offer the buttons — better silence than a wrong translation.
@@ -640,7 +642,7 @@ function render(topic, opts) {
         html +=
             '<div class="verse">' +
               '<p class="verse-text">&ldquo;' + esc(v.text) + '&rdquo;</p>' +
-              '<span class="verse-ref"><i class="pd-i pd-i-bookmark"></i> ' + esc(v.ref) + ' (KJV)</span>' +
+              '<span class="verse-ref"><i class="pd-i pd-i-bookmark"></i> ' + esc(v.ref) + '</span>' +
               '<div class="verse-tools">' +
                 '<button class="mini-btn" onclick="copyVerse(' + i + ')"><i class="pd-i pd-i-copy"></i> Copy</button>' +
                 '<button class="mini-btn" onclick="shareVerse(' + i + ')"><i class="pd-i pd-i-share-2"></i> Share</button>' +
@@ -708,7 +710,7 @@ function render(topic, opts) {
 /* ---------- Verse & prayer actions ---------- */
 function verseString(i) {
     const v = window.__pdVerses[i];
-    return '"' + v.text + '" — ' + v.ref + ' (KJV)';
+    return '"' + v.text + '" — ' + v.ref;
 }
 
 function copyVerse(i) {

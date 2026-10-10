@@ -253,7 +253,7 @@ async function specialVerseForToday() {
             text, reference,
             title: (f.title && f.title.stringValue) || null,
             slots: (f.slots && f.slots.stringValue) || 'all',
-            translation: (f.translation && f.translation.stringValue) || 'KJV'
+            translation: (f.translation && f.translation.stringValue) || 'NIV'
         };
     } catch (e) { return null; }
 }
@@ -262,7 +262,7 @@ async function showVerseNotification(verse) {
     const title = (verse.slotLabel || 'Daily Verse') + ' \u00b7 Prayer Dome';
     return self.registration.showNotification(title, {
         body: '\u201C' + verse.text + '\u201D\n\u2014 ' + verse.reference +
-              ' (' + (verse.translation || 'KJV') + ')',
+              ' (' + (verse.translation || 'NIV') + ')',
         icon: '/assets/logo-192.png',
         badge: '/assets/logo-192.png',
         tag: 'pd-verse-' + verse.slot + '-' + todayStamp(),
