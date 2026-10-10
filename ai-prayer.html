@@ -469,10 +469,10 @@ function topicArt(id) { return PD_TOPIC_ART[id] || null; }
  * Multilingual verses
  * ---------------------------------------------------------------------
  * The assistant's scripture library is curated for the Prayer Assistant
- * (short, quotable passages). The Bible reader is NIV-only; translation-data.js
- * carries a curated pack in Chitumbuka and siSwati. Where a verse the
- * assistant just showed also exists in that pack, we offer to show it in
- * those languages.
+ * (short, quotable passages). The Bible reader offers NIV, KJV, NLT, ESV and
+ * MSG; translation-data.js carries a separate curated pack in Chitumbuka and
+ * siSwati. Where a verse the assistant just showed also exists in that pack,
+ * we offer to show it in those languages.
  *
  * We match on the reference string. If a verse is not in the pack we simply
  * do not offer the buttons — better silence than a wrong translation.

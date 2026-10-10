@@ -1,31 +1,28 @@
 'use strict';
 
 /**
- * Prayer Dome — Authorized NIV Bible endpoint
+ * Prayer Dome — version-aware Bible endpoint
  * ---------------------------------------------------------------------------
- * All Bible reading in the app goes through this endpoint so that:
- *   1. The only translation offered is the New International Version (NIV).
- *   2. API keys never live in browser code.
- *   3. Failure states are honest: we do not silently swap to KJV when NIV is
- *      unavailable, and we never fabricate a verse.
+ * The reader offers NIV, KJV, NLT, ESV and MSG. Every provider request is
+ * pinned to the requested edition; a provider response is never relabelled as
+ * another translation.
  *
- * Two backends are supported, in order:
- *   1. api.bible (the Digital Bible Platform / Biblica / HarperCollins Christian
- *      Publishing official feed). This is the licensed source. Requires the
- *      NIV_API_KEY (or BIBLE_API_KEY) environment variable, and the NIV
- *      bible id defaults to the Biblica NIV (de4e12af7f28f599-02).
- *   2. If no key is configured the endpoint returns 503 with a clear
- *      "configuration required" message — the UI shows that message instead of
- *      inventing verses or silently falling back to another translation.
+ * Providers, in order:
+ *   - NIV: authorized api.bible only (requires NIV_API_KEY). Bolls.life's old
+ *     NIV route no longer serves NIV text, so it is deliberately not used.
+ *   - KJV: the version-specific Bolls.life feed, then exact-edition GetBible v2.
+ *   - NLT, ESV, MSG: their version-specific Bolls.life feeds.
+ *
+ * GetBible v2 currently publishes KJV, but not NIV, NLT, ESV or MSG. The code
+ * only enables its fallback for KJV; it never uses KJV text as a substitute
+ * for another requested edition.
  *
  * Endpoints:
+ *   GET /api/bible?action=status&version=NIV
  *   GET /api/bible?action=books
- *   GET /api/bible?action=chapter&book=John&chapter=3
- *   GET /api/bible?action=chapter&id=43&chapter=3     (osis book id 1..66)
- *   GET /api/bible?action=search&q=love
- *   GET /api/bible?action=verse&ref=John+3:16
- *
- * Cached for 5 minutes at the edge to respect the provider's rate limits.
+ *   GET /api/bible?action=chapter&id=43&chapter=3&version=KJV
+ *   GET /api/bible?action=search&q=love&version=NIV
+ *   GET /api/bible?action=verse&ref=John+3:16&version=NIV
  */
 
 const https = require('https');
@@ -33,7 +30,40 @@ const { URL } = require('url');
 
 const NIV_BIBLE_ID = process.env.NIV_BIBLE_ID || 'de4e12af7f28f599-02';
 const API_KEY = process.env.NIV_API_KEY || process.env.BIBLE_API_KEY || '';
-const CACHE_MAX_AGE = 300; // seconds — verse text does not change
+const CACHE_MAX_AGE = 300;
+const REQUEST_TIMEOUT_MS = 3500;
+
+const TRANSLATIONS = {
+  NIV: {
+    name: 'New International Version',
+    getBibleCode: 'niv',
+    copyright: 'The Holy Bible, New International Version®, NIV® Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.® Used by permission. All rights reserved worldwide.'
+  },
+  KJV: {
+    name: 'King James Version',
+    getBibleCode: 'kjv',
+    copyright: 'King James Version (KJV). Public domain in the United States.'
+  },
+  NLT: {
+    name: 'New Living Translation',
+    getBibleCode: 'nlt',
+    copyright: 'Holy Bible, New Living Translation®, copyright © 1996, 2004, 2015 by Tyndale House Foundation. Used by permission of Tyndale House Publishers, Inc. All rights reserved.'
+  },
+  ESV: {
+    name: 'English Standard Version',
+    getBibleCode: 'esv',
+    copyright: 'The Holy Bible, English Standard Version® (ESV®), copyright © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved.'
+  },
+  MSG: {
+    name: 'The Message',
+    getBibleCode: 'msg',
+    copyright: 'The Message® copyright © 1993, 2002, 2018 by Eugene H. Peterson. Used by permission of NavPress. All rights reserved.'
+  }
+};
+
+// GetBible v2 is a free, public, version-specific API. It currently publishes
+// KJV for this English set. Do not infer availability from a similar edition.
+const GETBIBLE_EXACT_EDITIONS = new Set(['KJV']);
 
 const BOOKS = [
   { id: 1, osis: 'Gen', name: 'Genesis', ch: 50 },
@@ -104,13 +134,26 @@ const BOOKS = [
   { id: 66, osis: 'Rev', name: 'Revelation', ch: 22 }
 ];
 
-const NAME_TO_BOOK = {};
-BOOKS.forEach(b => { NAME_TO_BOOK[b.name.toLowerCase()] = b; NAME_TO_BOOK[b.osis.toLowerCase()] = b; });
-const BOOK_BY_ID = {};
-BOOKS.forEach(b => { BOOK_BY_ID[b.id] = b; });
+const BOOK_BY_ID = Object.create(null);
+const NAME_TO_BOOK = Object.create(null);
+BOOKS.forEach(book => {
+  BOOK_BY_ID[book.id] = book;
+  NAME_TO_BOOK[book.name.toLowerCase()] = book;
+  NAME_TO_BOOK[book.osis.toLowerCase()] = book;
+});
+Object.assign(NAME_TO_BOOK, {
+  psalm: BOOK_BY_ID[19],
+  song: BOOK_BY_ID[22],
+  'song of songs': BOOK_BY_ID[22],
+  'revelations': BOOK_BY_ID[66],
+  mt: BOOK_BY_ID[40],
+  mk: BOOK_BY_ID[41],
+  lk: BOOK_BY_ID[42],
+  jn: BOOK_BY_ID[43],
+  rev: BOOK_BY_ID[66]
+});
 
-function send(res, status, payload, extraHeaders) {
-  const body = JSON.stringify(payload);
+function send(res, status, payload) {
   res.statusCode = status;
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.setHeader('Cache-Control', status === 200
@@ -119,254 +162,450 @@ function send(res, status, payload, extraHeaders) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (extraHeaders) Object.keys(extraHeaders).forEach(k => res.setHeader(k, extraHeaders[k]));
-  res.end(body);
-}
-
-function configurationError(res) {
-  return send(res, 503, {
-    ok: false,
-    translation: 'NIV',
-    translationName: 'New International Version',
-    copyright: '© Biblica, Inc. NIV® used by permission of Biblica, Inc. All rights reserved worldwide.',
-    error: 'NIV_NOT_CONFIGURED',
-    message: 'The NIV Bible feed has not been configured yet. This application displays the New International Version only; it never silently falls back to another translation. Add an authorized api.bible key as the NIV_API_KEY environment variable (the NIV Bible id defaults to "' + NIV_BIBLE_ID + '" and can be overridden with NIV_BIBLE_ID). The api.bible free tier is available to registered Christian ministries at no cost, and covers passage retrieval, search, and audio for licensed use.',
-    setup: {
-      provider: 'api.bible (Biblica / HarperCollins Christian Publishing)',
-      env: 'NIV_API_KEY',
-      bibleIdEnv: 'NIV_BIBLE_ID',
-      defaultBibleId: NIV_BIBLE_ID,
-      freeTier: true
-    }
-  });
+  res.end(JSON.stringify(payload));
 }
 
 function httpsGet(url, headers) {
   return new Promise((resolve, reject) => {
     let parsed;
-    try { parsed = new URL(url); } catch (e) { return reject(e); }
+    try { parsed = new URL(url); } catch (error) { reject(error); return; }
+    if (parsed.protocol !== 'https:') {
+      reject(new Error('Only HTTPS Bible providers are permitted'));
+      return;
+    }
+
     const req = https.request({
       hostname: parsed.hostname,
       path: parsed.pathname + parsed.search,
       method: 'GET',
-      headers: Object.assign({ 'api-key': API_KEY, 'accept': 'application/json' }, headers || {})
-    }, (res2) => {
+      headers: Object.assign({ accept: 'application/json' }, headers || {})
+    }, response => {
       const chunks = [];
-      res2.on('data', c => chunks.push(c));
-      res2.on('end', () => {
+      response.on('data', chunk => chunks.push(chunk));
+      response.on('end', () => {
         const text = Buffer.concat(chunks).toString('utf8');
-        if (res2.statusCode >= 400) {
-          return reject(new Error('HTTP ' + res2.statusCode + ': ' + text.slice(0, 300)));
+        if (response.statusCode < 200 || response.statusCode >= 300) {
+          reject(new Error(`HTTP ${response.statusCode} from ${parsed.hostname}`));
+          return;
         }
-        try { resolve(JSON.parse(text)); } catch (e) { reject(new Error('Bad JSON: ' + text.slice(0, 200))); }
+        try {
+          resolve(JSON.parse(text));
+        } catch (error) {
+          reject(new Error(`Invalid JSON from ${parsed.hostname}`));
+        }
       });
     });
     req.on('error', reject);
-    req.setTimeout(12000, () => { req.destroy(new Error('NIV API request timed out')); });
+    req.setTimeout(REQUEST_TIMEOUT_MS, () => req.destroy(new Error('Bible provider request timed out')));
     req.end();
   });
 }
 
-/** Strip api.bible verse content of markup; extract verse number. */
-function cleanVerse(item) {
-  const raw = item.content || item.text || '';
-  const text = raw
-    .replace(/<\/?p[^>]*>/g, '')
-    .replace(/<\/?span[^>]*>/g, '')
-    .replace(/<br\s*\/?>/g, ' ')
-    .replace(/<note>[\s\S]*?<\/note>/g, '')
+function decodeText(value) {
+  return String(value || '')
+    .replace(/<note\b[^>]*>[\s\S]*?<\/note>/gi, '')
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/<\/?(?:p|span|div|w|char|verse|q|title|chapter)[^>]*>/gi, ' ')
     .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;|&#160;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
     .replace(/\s+/g, ' ')
-    .replace(/^\s*\d+\s*/, '')       // leading verse numbers
     .trim();
-  let num = 0;
-  var m = (item.id || '').match(/\.(\d+)$/);
-  if (m) num = parseInt(m[1], 10);
-  else {
-    var m2 = raw.match(/<verse[^>]*num="(\d+)"/i);
-    if (m2) num = parseInt(m2[1], 10);
-    else num = parseInt(item.number || item.verse || '0', 10) || 0;
-  }
-  return { verse: num, text: text };
 }
 
-function parseReference(ref) {
-  // "John 3:16" -> bookName "John", chapter 3, verse 16
-  var m = String(ref).match(/^\s*((?:[123]\s)?[A-Za-z]+(?:\s+[A-Za-z]+)?)\s*(\d+)(?::(\d+))?\s*$/i);
-  if (!m) return null;
-  var name = m[1].replace(/\s+/g, ' ').trim();
-  var book = NAME_TO_BOOK[name.toLowerCase()];
-  // try match by prefix
-  if (!book) {
-    var keys = Object.keys(NAME_TO_BOOK);
-    for (var i = 0; i < keys.length; i++) {
-      if (keys[i].indexOf(name.toLowerCase()) === 0) { book = NAME_TO_BOOK[keys[i]]; break; }
-    }
-  }
-  if (!book) return null;
-  return { book: book, chapter: parseInt(m[2], 10), verse: m[3] ? parseInt(m[3], 10) : null };
+function normalizeVerses(verses) {
+  if (!Array.isArray(verses)) return [];
+  return verses.map(item => ({
+    verse: parseInt(item.verse || item.number || item.num, 10) || 0,
+    text: decodeText(item.text || item.content || '')
+  })).filter(item => item.verse > 0 && item.text);
 }
 
-async function fetchChapter(bookId, chapter) {
-  const path = `/v1/bibles/${NIV_BIBLE_ID}/chapters/${bookId < 40 ? 'GEN.' : 'JHN.'}${chapter}`;
-  // api.bible uses osis book ids (e.g. "JHN.3")
-  const book = BOOK_BY_ID[parseInt(bookId, 10)];
-  if (!book) throw new Error('Unknown book id ' + bookId);
-  const passageId = book.osis + '.' + chapter;
-  const url = `https://api.scripture.api.bible/v1/bibles/${NIV_BIBLE_ID}/chapters/${encodeURIComponent(passageId)}?content-type=json&include-notes=false&include-titles=false&include-chapter-numbers=false&include-verse-numbers=true`;
-  const json = await httpsGet(url);
-  const contents = (json.data && json.data.content) || [];
+function getVersion(value) {
+  const code = String(value || 'NIV').trim().toUpperCase();
+  return Object.prototype.hasOwnProperty.call(TRANSLATIONS, code) ? code : null;
+}
+
+function validateChapter(bookId, chapterNumber) {
+  const idValue = String(bookId == null ? '' : bookId);
+  const chapterValue = String(chapterNumber == null ? '' : chapterNumber);
+  if (!/^\d+$/.test(idValue) || !/^\d+$/.test(chapterValue)) return null;
+  const book = BOOK_BY_ID[Number(idValue)];
+  const chapter = Number(chapterValue);
+  if (!book || !Number.isInteger(chapter) || chapter < 1 || chapter > book.ch) return null;
+  return { book, chapter };
+}
+
+function parseReference(reference) {
+  const match = String(reference || '').trim().match(/^(.+?)\s+(\d+)(?::(\d+))?$/);
+  if (!match) return null;
+  const name = match[1].replace(/\s+/g, ' ').trim().toLowerCase();
+  const book = NAME_TO_BOOK[name];
+  const chapter = parseInt(match[2], 10);
+  const verse = match[3] ? parseInt(match[3], 10) : null;
+  if (!book || !Number.isInteger(chapter) || chapter < 1 || chapter > book.ch ||
+      (verse !== null && (!Number.isInteger(verse) || verse < 1))) return null;
+  return { book, chapter, verse };
+}
+
+function normalizeApiBibleChapter(json, book, chapter) {
+  const data = json && json.data ? json.data : {};
   const verses = [];
-  // api.bible returns an array of items with type "tag" or "text"; verses are in attrs.verseId
+
   function walk(node) {
     if (!node) return;
-    if (Array.isArray(node)) { node.forEach(walk); return; }
-    if (node.type === 'tag' && node.name === 'verse' && node.attrs) {
-      var vid = node.attrs['data-id'] || node.attrs.verseId || node.attrs.usfm;
-      var numMatch = vid ? vid.match(/\.(\d+)$/) : null;
-      var num = numMatch ? parseInt(numMatch[1], 10) : 0;
-      var text = '';
-      function gather(n) {
-        if (!n) return;
-        if (Array.isArray(n)) { n.forEach(gather); return; }
-        if (n.type === 'text' && typeof n.text === 'string') text += n.text;
-        else if (n.content) gather(n.content);
-        else if (n.items) gather(n.items);
-      }
+    if (Array.isArray(node)) {
+      node.forEach(walk);
+      return;
+    }
+    if (node.type === 'tag' && String(node.name).toLowerCase() === 'verse' && node.attrs) {
+      const id = node.attrs['data-id'] || node.attrs.verseId || node.attrs.usfm || '';
+      const numberMatch = String(id).match(/\.(\d+)$/);
+      const verse = numberMatch ? parseInt(numberMatch[1], 10) :
+        parseInt(node.attrs.number || node.attrs.num || '0', 10);
+      let text = '';
+      const gather = part => {
+        if (!part) return;
+        if (Array.isArray(part)) { part.forEach(gather); return; }
+        if (part.type === 'text' && typeof part.text === 'string') text += part.text;
+        else if (part.content) gather(part.content);
+        else if (part.items) gather(part.items);
+      };
       gather(node.content || node.items);
-      text = text.replace(/^\s*\d+\s*/, '').replace(/\s+/g, ' ').trim();
-      if (text && num) verses.push({ verse: num, text: text });
-    } else if (node.content) walk(node.content);
+      const clean = decodeText(text).replace(/^\d+\s*/, '');
+      if (verse > 0 && clean) verses.push({ verse, text: clean });
+      return;
+    }
+    if (node.content) walk(node.content);
     else if (node.items) walk(node.items);
   }
-  if (Array.isArray(contents)) contents.forEach(walk);
-  else walk(contents);
-  // Also support direct verse array if the API hands back data.verses[]
-  if (!verses.length && Array.isArray(json.data && json.data.verses)) {
-    json.data.verses.forEach(v => {
-      var cv = cleanVerse(v);
-      if (cv.text && cv.verse) verses.push(cv);
-    });
+
+  walk(data.content || []);
+  if (!verses.length) {
+    normalizeVerses(data.verses).forEach(item => verses.push(item));
   }
+  if (!verses.length) throw new Error('api.bible returned no chapter verses');
   return {
     book: book.name,
     bookId: book.id,
-    chapter: parseInt(chapter, 10),
+    chapter,
     reference: `${book.name} ${chapter}`,
     translation: 'NIV',
-    translationName: 'New International Version',
-    copyright: json.data && json.data.copyright || '© Biblica, Inc. Used by permission. All rights reserved.',
-    verses: verses
+    translationName: TRANSLATIONS.NIV.name,
+    copyright: data.copyright || TRANSLATIONS.NIV.copyright,
+    verses
   };
 }
 
-async function fetchSearch(q, limit) {
-  const url = `https://api.scripture.api.bible/v1/bibles/${NIV_BIBLE_ID}/search?query=${encodeURIComponent(q)}&limit=${limit || 20}&sort=canonical&fuzziness=0`;
+async function fetchApiBibleNiv(book, chapter) {
+  const passageId = `${book.osis}.${chapter}`;
+  const query = 'content-type=json&include-notes=false&include-titles=false&include-chapter-numbers=false&include-verse-numbers=true';
+  const url = `https://api.scripture.api.bible/v1/bibles/${encodeURIComponent(NIV_BIBLE_ID)}/chapters/${encodeURIComponent(passageId)}?${query}`;
+  const json = await httpsGet(url, { 'api-key': API_KEY });
+  return normalizeApiBibleChapter(json, book, chapter);
+}
+
+async function fetchBollsChapter(version, book, chapter) {
+  const url = `https://bolls.life/get-chapter/${encodeURIComponent(version)}/${book.id}/${chapter}/`;
   const json = await httpsGet(url);
-  const verses = (json.data && json.data.verses || []).map(v => ({
-    reference: v.reference,
-    bookId: v.bookId,
-    chapter: v.chapterId,
-    verse: v.verseId,
-    text: (v.text || '').replace(/^\s*\d+\s*/, '').trim()
-  }));
+  const verses = normalizeVerses(Array.isArray(json) ? json : (json && (json.verses || json.data)));
+  if (!verses.length) throw new Error('Bolls.life returned no chapter verses');
   return {
-    translation: 'NIV',
-    translationName: 'New International Version',
-    query: q,
-    total: (json.data && json.data.total) || verses.length,
-    verses: verses
+    book: book.name,
+    bookId: book.id,
+    chapter,
+    reference: `${book.name} ${chapter}`,
+    translation: version,
+    translationName: TRANSLATIONS[version].name,
+    copyright: TRANSLATIONS[version].copyright,
+    verses
   };
 }
 
-async function fetchVerse(ref) {
-  const parsed = parseReference(ref);
-  if (!parsed || !parsed.verse) {
-    // fall back: fetch chapter then filter
-    const ch = await fetchChapter(parsed ? parsed.book.id : 43, parsed ? parsed.chapter : 3);
-    var v = ch.verses.find(x => x.verse === parsed.verse) || ch.verses[0];
-    return {
-      reference: `${ch.book} ${ch.chapter}:${v.verse}`,
-      translation: 'NIV',
-      text: v.text,
-      copyright: ch.copyright
-    };
+function normalizeGetBibleChapter(json, version, book, chapter) {
+  if (!TRANSLATIONS[version]) throw new Error('Unsupported GetBible edition');
+  const abbreviation = String(json && json.abbreviation || '').toUpperCase();
+  if (abbreviation !== version) {
+    throw new Error(`GetBible returned ${abbreviation || 'an unidentified edition'}, not ${version}`);
   }
-  const passageId = parsed.book.osis + '.' + parsed.chapter + '.' + parsed.verse;
-  const url = `https://api.scripture.api.bible/v1/bibles/${NIV_BIBLE_ID}/verses/${encodeURIComponent(passageId)}?content-type=json&include-notes=false`;
-  const json = await httpsGet(url);
-  var cv = cleanVerse(json.data || {});
+  if (Number(json && json.book_nr) !== book.id || Number(json && json.chapter) !== chapter) {
+    throw new Error('GetBible returned a different passage');
+  }
+  const verses = normalizeVerses(json.verses);
+  if (!verses.length) throw new Error('GetBible returned no chapter verses');
   return {
-    reference: `${parsed.book.name} ${parsed.chapter}:${parsed.verse}`,
+    book: book.name,
+    bookId: book.id,
+    chapter,
+    reference: `${book.name} ${chapter}`,
+    translation: version,
+    translationName: TRANSLATIONS[version].name,
+    copyright: TRANSLATIONS[version].copyright,
+    verses
+  };
+}
+
+async function fetchGetBibleChapter(version, book, chapter) {
+  const edition = TRANSLATIONS[version];
+  const url = `https://api.getbible.net/v2/${encodeURIComponent(edition.getBibleCode)}/${book.id}/${chapter}.json`;
+  const json = await httpsGet(url);
+  return normalizeGetBibleChapter(json, version, book, chapter);
+}
+
+async function fetchChapter(version, book, chapter) {
+  const attempts = [];
+  const tryProvider = async (name, operation, fallbackUsed) => {
+    try {
+      const result = await operation();
+      return Object.assign(result, { provider: name, fallbackUsed: !!fallbackUsed });
+    } catch (error) {
+      attempts.push({ provider: name, error: String(error && error.message || error) });
+      return null;
+    }
+  };
+
+  if (version === 'NIV') {
+    if (!API_KEY) {
+      const error = new Error('An authorized api.bible key is required to serve the NIV.');
+      error.code = 'NIV_NOT_CONFIGURED';
+      error.providerAttempts = [{ provider: 'api.bible', error: 'NIV_API_KEY is not configured' }];
+      throw error;
+    }
+    const official = await tryProvider('api.bible', () => fetchApiBibleNiv(book, chapter), false);
+    if (official) return official;
+    const error = new Error('The authorized NIV provider could not return this chapter.');
+    error.providerAttempts = attempts;
+    throw error;
+  }
+
+  const primary = await tryProvider('Bolls.life', () => fetchBollsChapter(version, book, chapter), false);
+  if (primary) return primary;
+
+  if (GETBIBLE_EXACT_EDITIONS.has(version)) {
+    const fallback = await tryProvider('GetBible.net', () => fetchGetBibleChapter(version, book, chapter), true);
+    if (fallback) return fallback;
+  }
+
+  const error = new Error(`${TRANSLATIONS[version].name} is unavailable from its exact-version providers`);
+  error.providerAttempts = attempts;
+  throw error;
+}
+async function fetchApiBibleSearch(query, limit) {
+  const url = `https://api.scripture.api.bible/v1/bibles/${encodeURIComponent(NIV_BIBLE_ID)}/search?query=${encodeURIComponent(query)}&limit=${limit}&sort=canonical&fuzziness=0`;
+  const json = await httpsGet(url, { 'api-key': API_KEY });
+  const data = json && json.data || {};
+  const verses = (data.verses || []).map(item => {
+    const reference = String(item.reference || '').trim();
+    return {
+      reference,
+      bookId: item.bookId,
+      chapter: item.chapterId,
+      verse: item.verseId,
+      text: decodeText(item.text || '')
+    };
+  }).filter(item => item.reference && item.text);
+  return {
     translation: 'NIV',
-    text: cv.text,
-    copyright: (json.data && json.data.copyright) || '© Biblica, Inc. Used by permission.'
+    translationName: TRANSLATIONS.NIV.name,
+    query,
+    total: parseInt(data.total, 10) || verses.length,
+    verses
+  };
+}
+
+async function fetchBollsSearch(version, query, limit) {
+  const url = `https://bolls.life/search/${encodeURIComponent(version)}/?search=${encodeURIComponent(query)}`;
+  const json = await httpsGet(url);
+  const rows = Array.isArray(json) ? json : (json && (json.results || json.verses || json.data)) || [];
+  if (!Array.isArray(rows)) throw new Error('Bolls.life returned an invalid search response');
+  const verses = rows.slice(0, limit).map(item => {
+    const book = BOOK_BY_ID[parseInt(item.book_id || item.bookId, 10)] ||
+      NAME_TO_BOOK[String(item.book_name || item.book || '').toLowerCase()];
+    const chapter = parseInt(item.chapter || item.chapter_number, 10);
+    const verse = parseInt(item.verse || item.verse_number, 10);
+    if (!book || !chapter || !verse) return null;
+    return {
+      reference: `${book.name} ${chapter}:${verse}`,
+      bookId: book.id,
+      chapter,
+      verse,
+      text: decodeText(item.text || '')
+    };
+  }).filter(item => item && item.text);
+  return {
+    translation: version,
+    translationName: TRANSLATIONS[version].name,
+    query,
+    total: verses.length,
+    verses
+  };
+}
+
+async function fetchSearch(version, query, limit) {
+  const attempts = [];
+  if (version === 'NIV') {
+    if (!API_KEY) {
+      const error = new Error('An authorized api.bible key is required to search the NIV.');
+      error.code = 'NIV_NOT_CONFIGURED';
+      error.providerAttempts = [{ provider: 'api.bible', error: 'NIV_API_KEY is not configured' }];
+      throw error;
+    }
+    try { return await fetchApiBibleSearch(query, limit); }
+    catch (error) { attempts.push(`api.bible: ${String(error.message || error)}`); }
+    const error = new Error('The authorized NIV search provider is unavailable');
+    error.providerAttempts = attempts;
+    throw error;
+  }
+
+  try { return await fetchBollsSearch(version, query, limit); }
+  catch (error) { attempts.push(`Bolls.life: ${String(error.message || error)}`); }
+  const error = new Error(`${TRANSLATIONS[version].name} search is unavailable`);
+  error.providerAttempts = attempts;
+  throw error;
+}
+function statusPayload(version) {
+  const providers = [];
+  if (version === 'NIV') {
+    if (API_KEY) providers.push('api.bible');
+  } else {
+    providers.push('Bolls.life');
+  }
+  if (GETBIBLE_EXACT_EDITIONS.has(version)) providers.push('GetBible.net');
+  const configured = version !== 'NIV' || !!API_KEY;
+  return {
+    ok: true,
+    translation: version,
+    translationName: TRANSLATIONS[version].name,
+    configured,
+    providers,
+    getBibleFallbackAvailable: GETBIBLE_EXACT_EDITIONS.has(version),
+    getBibleCode: TRANSLATIONS[version].getBibleCode,
+    copyright: TRANSLATIONS[version].copyright,
+    message: version === 'NIV' && !API_KEY
+      ? 'NIV reading requires an authorized api.bible key. Configure the NIV_API_KEY environment variable; Prayer Dome will not substitute another translation.'
+      : ''
   };
 }
 
 module.exports = async function handler(req, res) {
-  // CORS preflight
   if (req.method === 'OPTIONS') return send(res, 204, {});
   if (req.method !== 'GET') return send(res, 405, { ok: false, error: 'Method not allowed' });
 
-  const url = new URL(req.url, 'https://' + (req.headers.host || 'localhost'));
-  const action = url.searchParams.get('action') || 'status';
-
-  if (action === 'status') {
-    return send(res, 200, {
-      ok: true,
-      translation: 'NIV',
-      translationName: 'New International Version',
-      configured: !!API_KEY,
-      bibleId: NIV_BIBLE_ID,
-      copyright: 'The Holy Bible, New International Version®, NIV® Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.® Used by permission. All rights reserved worldwide.'
+  const requestUrl = new URL(req.url, `https://${req.headers.host || 'localhost'}`);
+  const action = requestUrl.searchParams.get('action') || 'status';
+  const version = getVersion(requestUrl.searchParams.get('version'));
+  if (!version) {
+    return send(res, 400, {
+      ok: false,
+      error: 'UNSUPPORTED_TRANSLATION',
+      message: 'Choose one of the supported Bible versions: NIV, KJV, NLT, ESV or MSG.'
     });
   }
 
+  if (action === 'status') return send(res, 200, statusPayload(version));
   if (action === 'books') {
     return send(res, 200, {
       ok: true,
-      translation: 'NIV',
-      books: BOOKS.map(b => ({ id: b.id, name: b.name, chapters: b.ch, osis: b.osis }))
+      translation: version,
+      books: BOOKS.map(book => ({ id: book.id, name: book.name, chapters: book.ch, osis: book.osis }))
     });
   }
 
-  if (!API_KEY) return configurationError(res);
-
-  try {
-    if (action === 'chapter') {
-      var book = url.searchParams.get('book');
-      var ch = url.searchParams.get('chapter');
-      var bookId = url.searchParams.get('id');
-      if (!bookId && book) {
-        var found = NAME_TO_BOOK[(book || '').toLowerCase()];
-        if (!found) return send(res, 400, { ok: false, error: 'Unknown book: ' + book });
-        bookId = found.id;
-      }
-      if (!bookId || !ch) return send(res, 400, { ok: false, error: 'book/id and chapter required' });
-      const data = await fetchChapter(bookId, ch);
+  if (action === 'chapter') {
+    const rawBookId = requestUrl.searchParams.get('id');
+    const rawBookName = requestUrl.searchParams.get('book');
+    const validBookId = rawBookId && /^\d+$/.test(rawBookId);
+    const book = rawBookId
+      ? (validBookId ? BOOK_BY_ID[Number(rawBookId)] : null)
+      : NAME_TO_BOOK[String(rawBookName || '').toLowerCase()];
+    const chapter = requestUrl.searchParams.get('chapter');
+    const valid = book && validateChapter(book.id, chapter);
+    if (!valid) return send(res, 400, { ok: false, error: 'INVALID_PASSAGE', message: 'A valid book and chapter are required.' });
+    try {
+      const data = await fetchChapter(version, valid.book, valid.chapter);
       return send(res, 200, Object.assign({ ok: true }, data));
+    } catch (error) {
+      const notConfigured = error.code === 'NIV_NOT_CONFIGURED';
+      return send(res, notConfigured ? 503 : 502, {
+        ok: false,
+        translation: version,
+        translationName: TRANSLATIONS[version].name,
+        copyright: TRANSLATIONS[version].copyright,
+        error: notConfigured ? 'NIV_NOT_CONFIGURED' : 'TRANSLATION_UNAVAILABLE',
+        message: notConfigured
+          ? 'NIV reading requires an authorized api.bible key. Configure NIV_API_KEY; Prayer Dome will not substitute another translation.'
+          : `The ${TRANSLATIONS[version].name} feed is temporarily unavailable. Prayer Dome has not substituted a different translation. Please try again shortly.`,
+        providersTried: (error.providerAttempts || []).map(attempt => typeof attempt === 'string' ? attempt.split(':')[0] : attempt.provider)
+      });
     }
-    if (action === 'search') {
-      var q = url.searchParams.get('q');
-      if (!q) return send(res, 400, { ok: false, error: 'q required' });
-      const data = await fetchSearch(q, url.searchParams.get('limit') || 20);
-      return send(res, 200, Object.assign({ ok: true }, data));
-    }
-    if (action === 'verse') {
-      var ref = url.searchParams.get('ref');
-      if (!ref) return send(res, 400, { ok: false, error: 'ref required' });
-      const data = await fetchVerse(ref);
-      return send(res, 200, Object.assign({ ok: true }, data));
-    }
-    return send(res, 400, { ok: false, error: 'Unknown action: ' + action });
-  } catch (err) {
-    return send(res, 502, {
-      ok: false,
-      translation: 'NIV',
-      error: 'NIV_FETCH_FAILED',
-      message: 'The NIV Bible feed is temporarily unavailable. The app has not substituted another translation. Please try again shortly.',
-      detail: String(err && err.message || err)
-    });
   }
+
+  if (action === 'search') {
+    const query = String(requestUrl.searchParams.get('q') || '').trim().slice(0, 100);
+    if (!query) return send(res, 400, { ok: false, error: 'QUERY_REQUIRED', message: 'Enter a word or phrase to search.' });
+    const limit = Math.max(1, Math.min(parseInt(requestUrl.searchParams.get('limit'), 10) || 20, 30));
+    try {
+      const data = await fetchSearch(version, query, limit);
+      return send(res, 200, Object.assign({ ok: true }, data));
+    } catch (error) {
+      const notConfigured = error.code === 'NIV_NOT_CONFIGURED';
+      return send(res, notConfigured ? 503 : 502, {
+        ok: false,
+        translation: version,
+        translationName: TRANSLATIONS[version].name,
+        error: notConfigured ? 'NIV_NOT_CONFIGURED' : 'SEARCH_UNAVAILABLE',
+        message: notConfigured
+          ? 'NIV search requires an authorized api.bible key. Configure NIV_API_KEY; Prayer Dome will not substitute another translation.'
+          : `${TRANSLATIONS[version].name} search is temporarily unavailable. No other translation has been substituted. Please try again shortly.`,
+        providersTried: error.providerAttempts || []
+      });
+    }
+  }
+
+  if (action === 'verse') {
+    const reference = requestUrl.searchParams.get('ref') || '';
+    const parsed = parseReference(reference);
+    if (!parsed || !parsed.verse) {
+      return send(res, 400, { ok: false, error: 'INVALID_REFERENCE', message: 'Use a reference such as John 3:16.' });
+    }
+    try {
+      const data = await fetchChapter(version, parsed.book, parsed.chapter);
+      const verse = data.verses.find(item => item.verse === parsed.verse);
+      if (!verse) return send(res, 404, { ok: false, error: 'VERSE_NOT_FOUND', translation: version });
+      return send(res, 200, {
+        ok: true,
+        reference: `${parsed.book.name} ${parsed.chapter}:${verse.verse}`,
+        translation: version,
+        translationName: TRANSLATIONS[version].name,
+        copyright: data.copyright,
+        text: verse.text,
+        provider: data.provider,
+        fallbackUsed: data.fallbackUsed
+      });
+    } catch (error) {
+      const notConfigured = error.code === 'NIV_NOT_CONFIGURED';
+      return send(res, notConfigured ? 503 : 502, {
+        ok: false,
+        translation: version,
+        translationName: TRANSLATIONS[version].name,
+        error: notConfigured ? 'NIV_NOT_CONFIGURED' : 'TRANSLATION_UNAVAILABLE',
+        message: notConfigured
+          ? 'NIV reading requires an authorized api.bible key. Configure NIV_API_KEY; Prayer Dome will not substitute another translation.'
+          : `The ${TRANSLATIONS[version].name} text is temporarily unavailable. No other translation has been substituted.`
+      });
+    }
+  }
+
+  return send(res, 400, { ok: false, error: `Unknown action: ${action}` });
 };
+
+module.exports.TRANSLATIONS = TRANSLATIONS;
+module.exports.GETBIBLE_EXACT_EDITIONS = GETBIBLE_EXACT_EDITIONS;
+module.exports._normalizeGetBibleChapter = normalizeGetBibleChapter;
+module.exports._normalizeVerses = normalizeVerses;
+module.exports._parseReference = parseReference;
+module.exports._getVersion = getVersion;

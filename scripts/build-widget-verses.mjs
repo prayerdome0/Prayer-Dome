@@ -83,7 +83,7 @@ const payload = {
   version: 1,
   generated: new Date().toISOString().slice(0, 10),
   source: 'assets/pd-verse-data.js',
-  translation: 'King James Version (public domain)',
+  translation: 'New International Version (NIV)',
   brand: {
     name: 'Prayer Dome',
     tagline: 'A House of Prayer for All Nations',

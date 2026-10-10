@@ -16,8 +16,9 @@
  * HarperCollins Christian Publishing). Passages are short, curated memory
  * verses (single verses or brief adjacent verses) for devotional use in
  * notifications and on the home-screen/lock-screen widget. Full-chapter
- * reading always goes through the authorized /api/bible proxy so that the
- * complete text, copyright line and license are served correctly.
+ * reading goes through the version-aware /api/bible proxy; its reader offers
+ * NIV, KJV, NLT, ESV and MSG with edition-specific copyright and no silent
+ * substitutions. NIV uses the authorized api.bible feed when configured.
  */
 (function (root) {
     'use strict';

@@ -274,8 +274,8 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .controls-panel { background: var(--bg-card); border-radius: 24px; padding: 20px; margin-bottom: 25px; border: 1px solid var(--border-color); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .version-selector { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); }
-        .version-btn { padding: 8px 18px; border-radius: 30px; border: 2px solid var(--border-color); background: var(--bg-primary); color: var(--text-secondary); font-weight: 700; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+        .version-selector { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; overflow: visible; padding-bottom: 12px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); min-width: 0; }
+        .version-btn { padding: 8px clamp(12px, 2vw, 18px); border-radius: 30px; border: 2px solid var(--border-color); background: var(--bg-primary); color: var(--text-secondary); font-weight: 700; cursor: pointer; white-space: nowrap; transition: 0.2s; }
         .version-btn.active { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-light)); border-color: var(--accent-green); color: white; }
         .version-btn:hover { transform: translateY(-2px); }
 
@@ -284,7 +284,7 @@
         .btn-read { background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-dark)); color: white; border: none; padding: 12px 25px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.2s; }
         .btn-read:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212,175,55,0.4); }
 
-        .bible-reader { background: var(--bg-card); border-radius: 24px; padding: 32px clamp(18px, 4vw, 48px) 40px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); font-family: 'Lora', Georgia, 'Times New Roman', serif; font-size: clamp(1.05rem, 2.6vw, 1.22rem); line-height: 1.85; color: var(--text-primary); max-width: 820px; margin: 14px auto; overflow-wrap: break-word; word-wrap: break-word; overflow-x: hidden; -webkit-hyphens: auto; hyphens: auto; }
+        .bible-reader { background: var(--bg-card); border-radius: 24px; padding: 32px clamp(18px, 4vw, 48px) 40px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); font-family: 'Lora', Georgia, 'Times New Roman', serif; font-size: clamp(1rem, 2.4vw, 1.24rem); line-height: 1.85; color: var(--text-primary); width: min(100%, 820px); min-width: 0; margin: 14px auto; overflow-wrap: anywhere; word-wrap: break-word; overflow-x: hidden; -webkit-hyphens: auto; hyphens: auto; }
         body.bible-text-large .bible-reader { font-size: clamp(1.2rem, 3vw, 1.45rem); line-height: 1.9; }
         body.bible-text-small .bible-reader { font-size: clamp(.95rem, 2.3vw, 1.05rem); line-height: 1.75; }
         .chapter-title-wrap { text-align: center; margin-bottom: 22px; }
@@ -357,10 +357,12 @@
         .modal-content textarea { width: 100%; height: 120px; padding: 12px; border-radius: 16px; border: 2px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); margin: 15px 0; font-family: inherit; }
 
         @media (max-width: 600px) {
-            .bible-reader { padding: 22px 16px 28px; border-radius: 18px; margin: 10px 8px; font-size: 1.02rem; line-height: 1.75; max-width: 100%; }
-            .chapter-title { font-size: 1.45rem; }
-            .version-note { display: none; }
-            .version-selector { flex-wrap: wrap; }
+            .bible-reader { padding: 22px clamp(14px, 4vw, 20px) 28px; border-radius: 18px; margin: 10px auto; font-size: clamp(.98rem, 4vw, 1.08rem); line-height: 1.78; max-width: 100%; }
+            .chapter-title { font-size: clamp(1.3rem, 6vw, 1.6rem); }
+            .version-note { display: inline-flex; max-width: 100%; font-size: .68rem; }
+            .version-selector { flex-wrap: wrap; gap: 6px; }
+            .version-btn { padding: 7px 12px; font-size: .84rem; }
+            .text-size-controls { margin-left: auto; }
             .action-bar { padding: 8px 16px; gap: 12px; bottom: 100px; }
             .reading-plan-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
             .logo-ring { width: 40px; height: 40px; }
@@ -417,13 +419,17 @@
             </div>
 
             <div class="controls-panel">
-                <div class="version-selector">
-                    <button class="version-btn active" aria-current="true" onclick="setVersion('NIV')" title="New International Version — © Biblica, Inc.">NIV</button>
-                    <span class="version-note" id="nivStatus">New International Version · Licensed</span>
+                <div class="version-selector" role="group" aria-label="Bible translation">
+                    <button class="version-btn" id="versionNIV" data-version="NIV" aria-pressed="false" onclick="setVersion('NIV')" title="New International Version">NIV</button>
+                    <button class="version-btn" id="versionKJV" data-version="KJV" aria-pressed="false" onclick="setVersion('KJV')" title="King James Version">KJV</button>
+                    <button class="version-btn" id="versionNLT" data-version="NLT" aria-pressed="false" onclick="setVersion('NLT')" title="New Living Translation">NLT</button>
+                    <button class="version-btn" id="versionESV" data-version="ESV" aria-pressed="false" onclick="setVersion('ESV')" title="English Standard Version">ESV</button>
+                    <button class="version-btn" id="versionMSG" data-version="MSG" aria-pressed="false" onclick="setVersion('MSG')" title="The Message">MSG</button>
+                    <span class="version-note" id="versionStatus" role="status" aria-live="polite">Choose a version to read</span>
                     <span class="text-size-controls" role="group" aria-label="Text size">
-                        <button id="textSmall" onclick="setTextSize('small')" title="Smaller text">A-</button>
-                        <button id="textMedium" class="active" onclick="setTextSize('medium')" title="Medium text">A</button>
-                        <button id="textLarge" onclick="setTextSize('large')" title="Larger text">A+</button>
+                        <button id="textSmall" onclick="setTextSize('small')" title="Smaller text" aria-label="Smaller text">A-</button>
+                        <button id="textMedium" class="active" onclick="setTextSize('medium')" title="Medium text" aria-label="Medium text">A</button>
+                        <button id="textLarge" onclick="setTextSize('large')" title="Larger text" aria-label="Larger text">A+</button>
                     </span>
                 </div>
                 <div class="nav-controls">
@@ -528,17 +534,32 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+        const BIBLE_VERSIONS = {
+            NIV: { name: 'New International Version', copyright: 'The Holy Bible, New International Version®, NIV® Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.® Used by permission. All rights reserved worldwide.' },
+            KJV: { name: 'King James Version', copyright: 'King James Version (KJV). Public domain in the United States.' },
+            NLT: { name: 'New Living Translation', copyright: 'Holy Bible, New Living Translation®, copyright © 1996, 2004, 2015 by Tyndale House Foundation. Used by permission of Tyndale House Publishers, Inc. All rights reserved.' },
+            ESV: { name: 'English Standard Version', copyright: 'The Holy Bible, English Standard Version® (ESV®), copyright © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved.' },
+            MSG: { name: 'The Message', copyright: 'The Message® copyright © 1993, 2002, 2018 by Eugene H. Peterson. Used by permission of NavPress. All rights reserved.' }
+        };
+        const TEXT_SIZES = ['small', 'medium', 'large'];
+        function readPreference(key, fallback) {
+            try { return localStorage.getItem(key) || fallback; }
+            catch (e) { return fallback; }
+        }
+        const storedVersion = readPreference('pd_bible_version', 'NIV').toUpperCase();
+        let currentVersion = BIBLE_VERSIONS[storedVersion] ? storedVersion : 'NIV';
+        let currentTranslationName = BIBLE_VERSIONS[currentVersion].name;
         let currentUser = null;
-        const currentVersion = 'NIV'; // Prayer Dome ships NIV only.
-        let nivConfigured = null;
-        let currentCopyright = 'Holy Bible, New International Version®, NIV® Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc.® Used by permission. All rights reserved worldwide.';
+        let currentCopyright = BIBLE_VERSIONS[currentVersion].copyright;
         let currentVerses = [];
         let selectedVerseIdx = null;
         let currentBookName = "";
         let currentChapter = "";
+        let chapterRequestId = 0;
         let readChapters = new Set(); // Track read chapters as "BookName ChapterNumber"
         let notes = [];
-        let textSize = localStorage.getItem('pd_bible_textsize') || 'medium';
+        let textSize = readPreference('pd_bible_textsize', 'medium');
+        if (!TEXT_SIZES.includes(textSize)) textSize = 'medium';
         document.body.classList.add('bible-text-' + textSize);
 
         // Bible Books with chapter counts
@@ -682,49 +703,77 @@
             for(let i=1; i<=bibleBooks[bIdx].ch; i++) cSel.innerHTML += `<option value="${i}">Chapter ${i}</option>`;
         };
 
-        window.setVersion = (v) => {
-            // Only NIV is supported. Do not silently switch translations.
-            if (String(v || '').toUpperCase() !== 'NIV') {
-                showToast('Prayer Dome provides the New International Version (NIV) only.', 'info');
-                return;
+        function updateVersionButtons() {
+            document.querySelectorAll('.version-btn[data-version]').forEach(button => {
+                const selected = button.dataset.version === currentVersion;
+                button.classList.toggle('active', selected);
+                button.setAttribute('aria-pressed', String(selected));
+                if (selected) button.setAttribute('aria-current', 'true');
+                else button.removeAttribute('aria-current');
+            });
+        }
+
+        async function checkVersionStatus(version) {
+            const status = document.getElementById('versionStatus');
+            if (status && version === currentVersion) {
+                status.textContent = `${BIBLE_VERSIONS[version].name} · checking sources`;
             }
-            document.querySelectorAll('.version-btn').forEach(b => b.classList.toggle('active', b.innerText === 'NIV'));
-            if(currentVerses.length > 0) fetchChapter();
-        };
-
-        window.setTextSize = (size) => {
-            textSize = size;
-            localStorage.setItem('pd_bible_textsize', size);
-            document.body.classList.remove('bible-text-small','bible-text-medium','bible-text-large');
-            document.body.classList.add('bible-text-' + size);
-            document.querySelectorAll('.text-size-controls button').forEach(btn => btn.classList.remove('active'));
-            const map = { small: 'textSmall', medium: 'textMedium', large: 'textLarge' };
-            const active = document.getElementById(map[size]);
-            if (active) active.classList.add('active');
-        };
-        setTextSize(textSize);
-
-        // Check NIV API status once on load
-        async function checkNivStatus() {
             try {
-                const res = await fetch('/api/bible?action=status');
+                const res = await fetch(`/api/bible?action=status&version=${encodeURIComponent(version)}`);
                 const json = await res.json();
-                nivConfigured = !!json.configured;
-                currentCopyright = json.copyright || currentCopyright;
-                const status = document.getElementById('nivStatus');
-                if (status) {
-                    status.textContent = nivConfigured
-                        ? 'New International Version · Authorized'
-                        : 'NIV · setup required';
-                    status.title = json.message || '';
+                if (!res.ok || !json.ok || json.translation !== version) throw new Error('Version status unavailable');
+                if (version === currentVersion) {
+                    currentTranslationName = json.translationName || BIBLE_VERSIONS[version].name;
+                    currentCopyright = json.copyright || BIBLE_VERSIONS[version].copyright;
+                    if (status) {
+                        status.textContent = json.configured
+                            ? `${currentTranslationName} · ready`
+                            : `${currentTranslationName} · setup required`;
+                        status.title = json.message || (json.getBibleFallbackAvailable
+                            ? 'Exact-version sources include Bolls.life and the free GetBible.net KJV fallback.'
+                            : `Exact-version sources: ${(json.providers || []).join(', ') || 'version-matched providers'}. GetBible.net does not currently publish this edition; no other translation will be substituted.`);
+                    }
                 }
                 return json;
-            } catch (e) {
-                nivConfigured = false;
-                return { configured: false };
+            } catch (error) {
+                if (version === currentVersion && status) {
+                    status.textContent = `${BIBLE_VERSIONS[version].name} · source status unavailable`;
+                    status.title = 'The selected translation remains unchanged; try loading a chapter to check availability.';
+                }
+                return { ok: false, translation: version };
             }
         }
-        checkNivStatus();
+
+        window.setVersion = (value) => {
+            const version = String(value || '').trim().toUpperCase();
+            if (!BIBLE_VERSIONS[version]) return;
+            currentVersion = version;
+            currentTranslationName = BIBLE_VERSIONS[version].name;
+            currentCopyright = BIBLE_VERSIONS[version].copyright;
+            selectedVerseIdx = null;
+            const actionBar = document.getElementById('actionBar');
+            if (actionBar) actionBar.style.display = 'none';
+            try { localStorage.setItem('pd_bible_version', version); } catch (e) { /* preference is optional */ }
+            updateVersionButtons();
+            checkVersionStatus(version);
+            if (currentBookName && currentChapter) fetchChapter();
+        };
+        updateVersionButtons();
+
+        window.setTextSize = (size) => {
+            if (!TEXT_SIZES.includes(size)) return;
+            textSize = size;
+            try { localStorage.setItem('pd_bible_textsize', size); } catch (e) { /* preference is optional */ }
+            document.body.classList.remove('bible-text-small','bible-text-medium','bible-text-large');
+            document.body.classList.add('bible-text-' + size);
+            document.querySelectorAll('.text-size-controls button').forEach(btn => {
+                const active = btn.id === ({ small: 'textSmall', medium: 'textMedium', large: 'textLarge' })[size];
+                btn.classList.toggle('active', active);
+                btn.setAttribute('aria-pressed', String(active));
+            });
+        };
+        setTextSize(textSize);
+        checkVersionStatus(currentVersion);
 
         /* ---------- Offline chapter cache ----------
            Every chapter you read is saved on this device. When the internet
@@ -763,81 +812,99 @@
         }
 
         window.fetchChapter = async () => {
-            const bIdx = parseInt(document.getElementById('bookSelect').value);
-            const bookId = bIdx + 1;
-            currentBookName = bibleBooks[bIdx].name;
-            currentChapter = document.getElementById('chapterSelect').value;
+            const requestId = ++chapterRequestId;
+            const version = currentVersion;
+            const bookIndex = parseInt(document.getElementById('bookSelect').value, 10);
+            const book = bibleBooks[bookIndex];
+            const chapter = parseInt(document.getElementById('chapterSelect').value, 10);
             const reader = document.getElementById('bibleReader');
+            if (!book || !Number.isInteger(chapter) || chapter < 1 || chapter > book.ch) return;
 
-            // Saved chapter? Render it immediately — no waiting for the network.
-            const saved = cacheGet(currentVersion, currentBookName, currentChapter);
+            currentBookName = book.name;
+            currentChapter = String(chapter);
+            const saved = cacheGet(version, currentBookName, currentChapter);
             if (saved && !navigator.onLine) {
-                currentVerses = saved.verses;
-                render(currentBookName, currentChapter, saved.copyright);
+                currentVerses = saved.verses || [];
+                currentTranslationName = saved.translationName || BIBLE_VERSIONS[version].name;
+                currentCopyright = saved.copyright || BIBLE_VERSIONS[version].copyright;
+                render(currentBookName, currentChapter, currentCopyright, version, currentTranslationName);
                 showOfflineNotice();
                 return;
             }
 
-            reader.innerHTML = '<div class="loading-spinner"></div>';
+            reader.innerHTML = '<div class="loading-spinner" role="status" aria-label="Loading chapter"></div>';
 
             try {
-                const url = `/api/bible?action=chapter&id=${encodeURIComponent(bookId)}&chapter=${encodeURIComponent(currentChapter)}`;
-                const res = await fetch(url);
-                const json = await res.json();
-                if (!json.ok) {
-                    throw Object.assign(new Error(json.message || 'NIV unavailable'), { payload: json, status: res.status });
+                const url = `/api/bible?action=chapter&id=${encodeURIComponent(book.id)}&chapter=${encodeURIComponent(chapter)}&version=${encodeURIComponent(version)}`;
+                const response = await fetch(url);
+                const json = await response.json();
+                if (requestId !== chapterRequestId) return;
+                if (!response.ok || !json.ok) {
+                    throw Object.assign(new Error(json.message || `${BIBLE_VERSIONS[version].name} unavailable`), {
+                        payload: json,
+                        status: response.status
+                    });
                 }
-                let data = json.verses || [];
-                if (!Array.isArray(data) || !data.length) throw new Error('empty chapter');
-                // Normalize verse shape
-                data = data.map(v => ({
-                    verse: parseInt(v.verse || v.number || v.num, 10) || 0,
-                    text: String(v.text || '').replace(/<(?:.|\n)*?>/gm, '').replace(/\s+/g, ' ').trim()
-                })).filter(v => v.text && v.verse);
-                if (!data.length) throw new Error('no verses parsed');
+                if (String(json.translation || '').toUpperCase() !== version) {
+                    throw new Error(`The server returned a different Bible version than ${version}.`);
+                }
+                let verses = json.verses || [];
+                if (!Array.isArray(verses) || !verses.length) throw new Error('The chapter was empty.');
+                verses = verses.map(verse => ({
+                    verse: parseInt(verse.verse || verse.number || verse.num, 10) || 0,
+                    text: String(verse.text || '').replace(/<(?:.|\n)*?>/gm, '').replace(/\s+/g, ' ').trim()
+                })).filter(verse => verse.text && verse.verse > 0);
+                if (!verses.length) throw new Error('No readable verses were returned.');
 
-                currentVerses = data;
-                currentCopyright = json.copyright || currentCopyright;
-                render(currentBookName, currentChapter, currentCopyright);
-                cachePut(currentVersion, currentBookName, currentChapter, { verses: data, copyright: currentCopyright });
+                currentVerses = verses;
+                currentTranslationName = json.translationName || BIBLE_VERSIONS[version].name;
+                currentCopyright = json.copyright || BIBLE_VERSIONS[version].copyright;
+                render(currentBookName, currentChapter, currentCopyright, version, currentTranslationName);
+                cachePut(version, currentBookName, currentChapter, {
+                    verses,
+                    copyright: currentCopyright,
+                    translationName: currentTranslationName
+                });
 
                 await saveChapterProgress(currentBookName, currentChapter);
+                if (requestId !== chapterRequestId) return;
 
                 const audioRef = document.getElementById('audioRef');
                 const audioVer = document.getElementById('audioVer');
-                if (audioRef) audioRef.innerText = `${currentBookName} ${currentChapter}`;
-                if (audioVer) audioVer.innerHTML = `New International Version (NIV)`;
+                if (audioRef) audioRef.textContent = `${currentBookName} ${currentChapter}`;
+                if (audioVer) audioVer.textContent = `${currentTranslationName} (${version})`;
                 const player = document.getElementById('audioPlayer');
                 if (player) player.style.display = 'flex';
                 hideOfflineNotice();
 
-            } catch (e) {
-                console.warn('NIV chapter fetch failed:', e);
-                // Offline or unreachable — fall back to the saved copy.
-                const cached = cacheGet(currentVersion, currentBookName, currentChapter);
+            } catch (error) {
+                if (requestId !== chapterRequestId) return;
+                console.warn(`${version} chapter fetch failed:`, error);
+                const cached = cacheGet(version, currentBookName, currentChapter);
                 if (cached) {
-                    currentVerses = cached.verses;
-                    render(currentBookName, currentChapter, cached.copyright);
+                    currentVerses = cached.verses || [];
+                    currentTranslationName = cached.translationName || BIBLE_VERSIONS[version].name;
+                    currentCopyright = cached.copyright || BIBLE_VERSIONS[version].copyright;
+                    render(currentBookName, currentChapter, currentCopyright, version, currentTranslationName);
                     showOfflineNotice();
                     return;
                 }
-                const payload = e.payload || {};
-                const isConfig = payload.error === 'NIV_NOT_CONFIGURED';
+
+                const payload = error.payload || {};
+                const message = payload.message || error.message || (navigator.onLine
+                    ? `The ${BIBLE_VERSIONS[version].name} chapter could not be downloaded. No other translation has been substituted. Please try again.`
+                    : "You're offline and this chapter has not been saved on this device yet. Chapters you have read stay available offline.");
                 reader.innerHTML = `
                     <div class="bible-error">
                         <i class="pd-i pd-i-book-open-text" style="font-size:2rem; color:var(--accent-gold); display:block; margin-bottom:14px; opacity:.7;"></i>
-                        <h4>${isConfig ? 'NIV authorization needed' : 'Unable to load this NIV chapter'}</h4>
-                        <p>${escapeHtml(payload.message || e.message || (navigator.onLine
-                            ? 'The chapter could not be downloaded. The app has not switched to another translation. Please try again.'
-                            : "You're offline and this chapter has not been saved on this device yet. Chapters you have read stay available offline."))}</p>
-                        ${isConfig ? '<p style="font-size:.78rem; color:var(--text-secondary);">Administrators: configure the <code>NIV_API_KEY</code> environment variable from api.bible (Biblica). The free tier covers licensed NIV passage retrieval and search.</p>' : ''}
+                        <h4>Unable to load this chapter in ${escapeHtml(BIBLE_VERSIONS[version].name)} (${version})</h4>
+                        <p>${escapeHtml(message)}</p>
                         <button onclick="fetchChapter()" style="background:var(--accent-green,#0A4D9B); border:0; color:#fff; font-weight:800; padding:10px 22px; border-radius:50px; cursor:pointer; font-family:'Inter',sans-serif;">
                             <i class="pd-i pd-i-rotate-cw"></i> Try Again
                         </button>
                     </div>`;
             }
         };
-
         function showOfflineNotice() {
             let n = document.getElementById('bibleOfflineNotice');
             if (!n) {
@@ -859,17 +926,19 @@
         window.addEventListener('offline', () => { if (currentVerses && currentVerses.length) showOfflineNotice(); });
         window.addEventListener('online', hideOfflineNotice);
 
-        function render(book, ch, copyright) {
-            const copy = copyright || currentCopyright;
+        function render(book, ch, copyright, version, translationName) {
+            const code = BIBLE_VERSIONS[version] ? version : currentVersion;
+            const name = translationName || BIBLE_VERSIONS[code].name;
+            const copy = copyright || BIBLE_VERSIONS[code].copyright;
             let html = `<div class="chapter-title-wrap">`
                 + `<h2 class="chapter-title">${escapeHtml(book)} ${escapeHtml(ch)}</h2>`
-                + `<div class="chapter-translation">New International Version (NIV)</div>`
+                + `<div class="chapter-translation">${escapeHtml(name)} (${escapeHtml(code)})</div>`
                 + `<div class="chapter-divider"></div>`
                 + `</div>`
                 + `<div class="verses-container" data-pd-no-auto>`;
             currentVerses.forEach((v, i) => {
                 const verseText = (v.text || '').trim();
-                // Re-add a space between verses so words don't run together
+                // Re-add a space between verses so words don't run together.
                 html += `<span class="verse-item" id="v-${i}" onclick="selVerse(${i})"><span class="verse-num">${v.verse}</span>${escapeHtml(verseText)}</span> `;
             });
             html += "</div>";
@@ -895,7 +964,7 @@
         window.copyVerse = () => {
             if (selectedVerseIdx !== null && currentVerses[selectedVerseIdx]) {
                 const v = currentVerses[selectedVerseIdx];
-                navigator.clipboard.writeText(`${v.text} — ${currentBookName} ${currentChapter}:${v.verse}`);
+                navigator.clipboard.writeText(`${v.text} — ${currentBookName} ${currentChapter}:${v.verse} (${currentVersion})`);
                 alert("Verse copied to clipboard!");
                 document.getElementById('actionBar').style.display = 'none';
             }
@@ -904,14 +973,14 @@
         window.saveNoteFromVerse = () => {
             if (selectedVerseIdx === null) return;
             const v = currentVerses[selectedVerseIdx];
-            document.getElementById('noteRef').innerHTML = `${currentBookName} ${currentChapter}:${v.verse}`;
+            document.getElementById('noteRef').textContent = `${currentBookName} ${currentChapter}:${v.verse} (${currentVersion})`;
             document.getElementById('noteText').value = '';
             document.getElementById('noteModal').style.display = 'flex';
         };
 
         window.saveNote = async () => {
             const noteText = document.getElementById('noteText').value;
-            const ref = document.getElementById('noteRef').innerHTML;
+            const ref = document.getElementById('noteRef').textContent;
             if (!noteText) return;
             
             if (currentUser) {
@@ -937,7 +1006,7 @@
 
         window.openNoteModal = (isGeneral) => {
             if (isGeneral) {
-                document.getElementById('noteRef').innerHTML = "General Study Note";
+                document.getElementById('noteRef').textContent = "General Study Note";
                 document.getElementById('noteText').value = '';
                 document.getElementById('noteModal').style.display = 'flex';
             }
@@ -982,38 +1051,42 @@
             `).join('');
         }
 
-        // Search Bible (NIV only, through our authorized proxy)
+        // Search the selected edition only; the API never substitutes another version.
         window.searchBible = async () => {
             const query = document.getElementById('searchInput').value.trim();
             const resultsDiv = document.getElementById('searchResults');
+            const version = currentVersion;
             if (!query) return;
-            resultsDiv.innerHTML = '<div class="loading-spinner"></div>';
+            resultsDiv.innerHTML = '<div class="loading-spinner" role="status" aria-label="Searching"></div>';
 
             try {
-                const res = await fetch(`/api/bible?action=search&q=${encodeURIComponent(query)}&limit=30`);
-                const data = await res.json();
-                if (!data.ok) {
-                    resultsDiv.innerHTML = `<div class="bible-error"><h4>NIV search unavailable</h4><p>${escapeHtml(data.message || 'The NIV search feed is not available right now.')}</p></div>`;
+                const url = `/api/bible?action=search&q=${encodeURIComponent(query)}&limit=30&version=${encodeURIComponent(version)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (!response.ok || !data.ok) {
+                    resultsDiv.innerHTML = `<div class="bible-error"><h4>${escapeHtml(BIBLE_VERSIONS[version].name)} search unavailable</h4><p>${escapeHtml(data.message || 'The selected version cannot be searched right now.')}</p></div>`;
                     return;
                 }
+                if (String(data.translation || '').toUpperCase() !== version) {
+                    throw new Error(`The server returned a different Bible version than ${version}.`);
+                }
                 if (!data.verses || data.verses.length === 0) {
-                    resultsDiv.innerHTML = '<div style="text-align:center; padding:40px;">No results found in NIV.</div>';
+                    resultsDiv.innerHTML = `<div style="text-align:center; padding:40px;">No results found in ${escapeHtml(version)}.</div>`;
                     return;
                 }
                 resultsDiv.innerHTML = data.verses.slice(0, 30).map(item => {
-                    // item.reference already contains Book C:V; navigate there
-                    const ref = String(item.reference || '');
+                    const reference = String(item.reference || '');
+                    const encodedReference = encodeURIComponent(reference).replace(/'/g, '%27');
                     return `
-                    <div class="search-result-item" onclick="goToReference('${encodeURIComponent(ref)}')">
-                        <div class="search-result-ref"><i class="pd-i pd-i-book"></i> ${escapeHtml(ref)} <small style="opacity:.7; font-weight:500;">(NIV)</small></div>
+                    <div class="search-result-item" onclick="goToReference('${encodedReference}')">
+                        <div class="search-result-ref"><i class="pd-i pd-i-book"></i> ${escapeHtml(reference)} <small style="opacity:.7; font-weight:500;">(${escapeHtml(version)})</small></div>
                         <div class="search-result-text">${escapeHtml(item.text || '')}</div>
                     </div>`;
                 }).join('');
             } catch (error) {
-                resultsDiv.innerHTML = '<div class="bible-error"><h4>Search error</h4><p>The NIV search is temporarily unavailable.</p></div>';
+                resultsDiv.innerHTML = `<div class="bible-error"><h4>Search error</h4><p>${escapeHtml(error.message || `${BIBLE_VERSIONS[version].name} search is temporarily unavailable.`)}</p></div>`;
             }
         };
-
         window.goToReference = (encodedRef) => {
             const ref = decodeURIComponent(encodedRef || '');
             const m = ref.match(/^\s*((?:[123]\s)?[A-Za-z]+(?:\s+[A-Za-z]+)?)\s*(\d+)(?::(\d+))?/);
