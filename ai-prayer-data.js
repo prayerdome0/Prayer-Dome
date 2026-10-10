@@ -4,7 +4,7 @@
  * Curated topical library of scriptures, prayer points and encouragement
  * for conversational use in the Prayer Assistant. Passages are short,
  * quotable verses drawn from familiar wording and paraphrased for devotional
- * response. Authoritative chapter reading in the Bible is always NIV.
+ * response. The separate Bible reader offers NIV, KJV, NLT, ESV and MSG.
  *
  * Runs entirely in the browser: no API key, no backend, no per-request cost,
  * and it keeps working offline once the service worker has cached it.

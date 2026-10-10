@@ -11,9 +11,10 @@
  * Bemba and Nyanja speakers. The English column uses familiar King James
  * phrasing because it is public domain and short enough to quote here.
  *
- * The full Bible reader at /bible and the daily-verse / widget / notification
- * system are New International Version (NIV) only, and are served through the
- * authorized /api/bible proxy. This file does not replace that reader.
+ * The full Bible reader at /bible offers NIV, KJV, NLT, ESV and MSG through
+ * the version-aware /api/bible proxy. The separate daily-verse / widget /
+ * notification system remains a curated NIV pack. This file does not replace
+ * the full Bible reader.
  *
  * The Chitumbuka, siSwati, Bemba and Nyanja renderings in this file are **community drafts**.
  * They were prepared to give the ministry a working starting point, and every
@@ -43,7 +44,7 @@ const PD_LANGUAGES = [
     code: 'en',
     name: 'English',
     endonym: 'English',
-    source: 'Phrases in familiar public-domain wording. Full Bible reading is NIV.',
+    source: 'Phrases in familiar public-domain wording. The Bible reader offers NIV, KJV, NLT, ESV and MSG.',
     official: true,
     speech: ['en-GB', 'en-US', 'en'],
     accent: '#0d9488'
