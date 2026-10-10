@@ -1332,7 +1332,11 @@ window.toggleDarkMode = function() {
     document.documentElement.classList.toggle('dark-mode', dark);
     try { var b = document.querySelector('[data-pd-theme-toggle] .pd-i') || document.querySelector('.theme-toggle-btn .pd-i'); if (b) b.className = dark ? 'pd-i pd-i-sun' : 'pd-i pd-i-moon'; } catch (e) {}
 };
-        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.style.display = 'none';
+        }
+        window.closeModal = closeModal;
 
         function escapeHtml(str) {
             if (!str) return '';
