@@ -971,25 +971,55 @@
   /**
    * Swap the drawing for the 3D character. Returns the renderer, or null when
    * there is nothing to swap (no module, no WebGL, already upgraded).
+   *
+   * When the page ships the realistic head (pd-domey-scan.js), that head is used
+   * first. If the model cannot load, the cartoon rig is used instead, and if
+   * that fails too the drawing stays. Nothing is left on a permanent loader.
    */
-  Host.prototype.use3D = function () {
+  Host.prototype.use3D = function (opts) {
     var self = this;
     if (this.renderer3d || this.destroyed || this.options.render === 'svg') return this.renderer3d;
     var engine = global.PDDomey3D;
     if (!engine || typeof engine.create !== 'function' || !engine.available()) return null;
-    var instance = engine.create(this.stage, {
+    opts = opts || {};
+    var scan = global.PDDomeyScan;
+    if (scan && !opts.cartoon && !opts.asset && typeof scan.load === 'function' && engine.three && engine.three()) {
+      var THREE = engine.three();
+      var lowEnd = scan.isLowEnd();
+      scan.load(THREE).then(function (asset) {
+        if (self.destroyed || self.renderer3d) return;
+        self._mount3D(engine, { asset: asset, three: THREE, lowEnd: lowEnd });
+      }).catch(function (error) {
+        console.warn('[PDMascot] realistic head unavailable, using the cartoon rig', error && error.message);
+        if (!self.destroyed && !self.renderer3d) self._mount3D(engine, { cartoon: true });
+      });
+      return null;
+    }
+    return this._mount3D(engine, opts);
+  };
+
+  Host.prototype._mount3D = function (engine, opts) {
+    var self = this;
+    var createOptions = {
       host: this,
       reducedMotion: engine.prefersReducedMotion && engine.prefersReducedMotion(),
+      maxPixelRatio: opts.lowEnd ? 1 : 2,
       onContextLost: function () {
         // The GPU went away mid-show: drop back to the drawing, not to a blank
         // stage, and keep the conversation running.
         self.use2D();
       }
-    });
+    };
+    if (opts.asset && global.PDDomeyScan) {
+      createOptions.three = opts.three;
+      createOptions.rig = global.PDDomeyScan.buildRig(opts.three, { asset: opts.asset, lowEnd: opts.lowEnd });
+    }
+    var instance = engine.create(this.stage, createOptions);
     if (!instance) return null;
     this.renderer3d = instance;
     this.root.classList.add('pdm-render-3d');
     this.root.setAttribute('data-pdm-render', '3d');
+    this.root.setAttribute('data-pdm-model', createOptions.rig ? 'scan' : 'cartoon');
     this.emit('renderer', '3d');
     return instance;
   };

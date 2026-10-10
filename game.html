@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Talk with Domey — 3D Bible Quiz Host | Prayer Dome</title>
   <link rel="manifest" href="/manifest.json">
-  <meta name="description" content="Talk with Domey, the Prayer Dome 3D cartoon host: he speaks out loud, his mouth and hands move, and he hears your voice through 1,248 Bible questions across 14 topics.">
+  <meta name="description" content="Talk with Domey, the Prayer Dome 3D host: he speaks out loud, his lips and head move, and he hears your voice through 1,248 Bible questions across 14 topics.">
   <link rel="icon" type="image/png" href="/assets/logo.png">
   <link rel="apple-touch-icon" href="/assets/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,13 +14,14 @@
   <link rel="stylesheet" href="/assets/pd-icons.css">
   <script src="/assets/pd-icons.js"></script>
   <link rel="stylesheet" href="/assets/pd-brand.css">
-  <!-- Domey, the talking cartoon host: greets out loud, asks Bible questions and
+  <!-- Domey, the talking 3D host: greets out loud, asks Bible questions and
        listens to the answer. Shared with the Live page waiting room. -->
   <link rel="stylesheet" href="/assets/pd-mascot.css">
   <!-- The real 3D engine (three.js, vendored so it works offline) and the
        1,248-question Bible bank Domey draws his rounds from. -->
   <script src="/assets/three.module.min.js" type="module" defer></script>
   <script src="/assets/pd-domey3d.js" defer></script>
+  <script src="/assets/pd-domey-scan.js" defer></script>
   <script src="/assets/pd-domey-questions.js" defer></script>
   <script src="/assets/pd-mascot.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -477,7 +478,7 @@
   <section class="game-hero">
     <span class="pd-acad-eyebrow"><i class="pd-i pd-i-mic-vocal"></i> TALK WITH DOMEY • 3D BIBLE HOST</span>
     <h1>Talk with Domey in 3D</h1>
-    <p>Domey is your 3D cartoon host: he speaks out loud with a real moving mouth, waves, claps and dances, and he hears your voice when you answer. His question bank holds <strong id="domeyBankTotal">1,000+</strong> Bible questions across 14 topics — and he never asks the same one twice in a single show.</p>
+    <p>Domey is your 3D host: he speaks out loud with a real moving mouth, waves, claps and dances, and he hears your voice when you answer. His question bank holds <strong id="domeyBankTotal">1,000+</strong> Bible questions across 14 topics — and he never asks the same one twice in a single show.</p>
     <div>
       <button class="pd-acad-btn pd-acad-btn-primary" type="button" onclick="talkWithDomey()"><i class="pd-i pd-i-play"></i> Talk with Domey</button>
       <button class="pd-acad-btn pd-acad-btn-ghost" type="button" onclick="chooseDomeyTopic()" style="border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-list"></i> Choose a topic</button>
@@ -509,17 +510,18 @@
     </div>
   </section>
 
-  <!-- TALK WITH DOMEY — the 3D cartoon host who speaks, hears you and acts -->
+  <!-- TALK WITH DOMEY — the 3D host who speaks, hears you and acts -->
   <section class="pd-acad-card" id="panel-talk" style="padding:24px; margin-bottom:20px;">
     <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
       <h2 style="margin:0; font-family:Poppins,sans-serif; color:var(--pd-acad-blue); font-size:1.35rem;"><i class="pd-i pd-i-mic-vocal" style="color:var(--pd-gold);"></i> Talk with Domey</h2>
       <span class="pd-acad-chip gold" id="domeyRenderChip" style="margin-left:auto;"><i class="pd-i pd-i-sparkles"></i> Warming up the 3D stage…</span>
     </div>
-    <p style="color:var(--pd-acad-muted); margin:0 0 18px; line-height:1.6;">Domey is the Prayer Dome cartoon host, built as a real 3D character — with a jaw that moves through each word he says, hands that wave and clap, and ears that hear your voice. Tap <strong>Start the show</strong>, then simply talk to him: say your answer, ask him to <em>repeat</em>, ask for a <em>hint</em>, or say <em>skip</em>. He replies out loud and explains the scripture behind every question.</p>
+    <p style="color:var(--pd-acad-muted); margin:0 0 18px; line-height:1.6;">Domey is the Prayer Dome 3D host, built on a realistic human head — with a jaw and lips that move through each word he says, a head that turns to you, and ears that hear your voice. Tap <strong>Start the show</strong>, then simply talk to him: say your answer, ask him to <em>repeat</em>, ask for a <em>hint</em>, or say <em>skip</em>. He replies out loud and explains the scripture behind every question.</p>
 
     <div id="domeyStageWrap" style="padding:clamp(14px,2vw,22px); border-radius:26px; background:linear-gradient(150deg, #07244d 0%, #0A4D9B 60%, #0a3d7a 100%); box-shadow:var(--pd-shadow-lg);">
-      <div id="domeyStage" aria-label="Domey, your 3D cartoon Bible quiz host"></div>
+      <div id="domeyStage" role="img" aria-label="Domey, your 3D Bible quiz host"></div>
     </div>
+    <p id="domeyCredit" style="color:var(--pd-acad-muted); font-size:.78rem; margin:8px 2px 0; line-height:1.5;">Domey's head is a real human scan: <a href="https://triplegangers.com/" rel="noopener" target="_blank">Infinite-Level 3D Head Scan by Lee Perry-Smith, triplegangers.com</a>, licensed <a href="https://creativecommons.org/licenses/by/3.0/" rel="license noopener" target="_blank">CC BY 3.0</a>.</p>
 
     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:18px;">
       <button class="pd-acad-btn pd-acad-btn-primary" id="domeyStartBtn" type="button"><i class="pd-i pd-i-play"></i> Start the show</button>
@@ -573,10 +575,9 @@
   </section>
 </main>
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
+  // Firebase loads on demand. If the CDN is blocked or offline, the game still
+  // runs on this device and only the cloud sync is skipped.
+  const FB_BASE = "https://www.gstatic.com/firebasejs/10.8.0/";
   // standard firebase init
   var FCM_CONFIG = {
     apiKey: 'AIzaSyCxvql0r_aeerphxTA0UUedRppdBxGf7wo',
@@ -586,9 +587,26 @@
     messagingSenderId: '198295153196',
     appId: '1:198295153196:web:1222b31948d7974ba3bf89'
   };
-  const app = initializeApp(FCM_CONFIG);
-  const db = getFirestore(app);
-  const auth = getAuth(app);
+  let db = null;
+  let auth = null;
+  let fb = null;
+  async function loadFirebase() {
+    try {
+      const [appMod, fsMod, authMod] = await Promise.all([
+        import(FB_BASE + "firebase-app.js"),
+        import(FB_BASE + "firebase-firestore.js"),
+        import(FB_BASE + "firebase-auth.js")
+      ]);
+      const app = appMod.initializeApp(FCM_CONFIG);
+      db = fsMod.getFirestore(app);
+      auth = authMod.getAuth(app);
+      fb = { doc: fsMod.doc, getDoc: fsMod.getDoc, setDoc: fsMod.setDoc, onAuthStateChanged: authMod.onAuthStateChanged };
+      return true;
+    } catch (error) {
+      console.warn("Cloud sync is unavailable; the game still runs on this device.", error && error.message);
+      return false;
+    }
+  }
 
   let user = null;
   let gameData = {
@@ -664,9 +682,9 @@
   async function syncToFirebase() {
     if (user) {
       try {
-        await setDoc(doc(db, "users", user.uid, "game", "progress"), gameData, { merge: true });
+        await fb.setDoc(fb.doc(db, "users", user.uid, "game", "progress"), gameData, { merge: true });
         // Also save to global leaderboard
-        await setDoc(doc(db, "leaderboard", user.uid), {
+        await fb.setDoc(fb.doc(db, "leaderboard", user.uid), {
           uid: user.uid,
           name: user.displayName || (user.email || '').split('@')[0] || 'Member',
           xp: gameData.xp,
@@ -682,7 +700,7 @@
 
   async function loadFirebaseState(uid) {
     try {
-      const snap = await getDoc(doc(db, "users", uid, "game", "progress"));
+      const snap = await fb.getDoc(fb.doc(db, "users", uid, "game", "progress"));
       if (snap.exists()) {
         gameData = Object.assign(gameData, snap.data());
         updateUI();
@@ -778,7 +796,7 @@
     var chip = domeyElements().render;
     if (chip) {
       chip.innerHTML = kind === '3d'
-        ? '<i class="pd-i pd-i-sparkles"></i> 3D character • lips and hands live'
+        ? '<i class="pd-i pd-i-sparkles"></i> ' + (domey && domey.root && domey.root.getAttribute('data-pdm-model') === 'scan' ? '3D human head • lips and head live' : '3D character • lips live')
         : '<i class="pd-i pd-i-sparkles"></i> Drawing mode (no WebGL here)';
     }
     fitDomey();
@@ -1002,11 +1020,14 @@
     });
     window.addEventListener('pagehide', function () { if (domey) domey.destroy(); });
 
-    onAuthStateChanged(auth, u => {
-      if (u) {
-        user = u;
-        loadFirebaseState(u.uid);
-      }
+    loadFirebase().then(ready => {
+      if (!ready) return;
+      fb.onAuthStateChanged(auth, u => {
+        if (u) {
+          user = u;
+          loadFirebaseState(u.uid);
+        }
+      });
     });
   });
 </script>

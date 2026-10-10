@@ -1020,7 +1020,7 @@
     if (T.SRGBColorSpace) renderer.outputColorSpace = T.SRGBColorSpace;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = T.PCFSoftShadowMap;
-    renderer.setPixelRatio(Math.min(2, global.devicePixelRatio || 1));
+    renderer.setPixelRatio(Math.min(options.maxPixelRatio || 2, global.devicePixelRatio || 1));
 
     var scene = new T.Scene();
     var camera = new T.PerspectiveCamera(30, 1, 0.1, 60);
