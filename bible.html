@@ -424,6 +424,7 @@
                     <button class="version-btn" id="versionNLT" data-version="NLT" aria-pressed="false" onclick="setVersion('NLT')" title="New Living Translation">NLT</button>
                     <button class="version-btn" id="versionESV" data-version="ESV" aria-pressed="false" onclick="setVersion('ESV')" title="English Standard Version">ESV</button>
                     <button class="version-btn" id="versionMSG" data-version="MSG" aria-pressed="false" onclick="setVersion('MSG')" title="The Message">MSG</button>
+                    <button class="version-btn" id="versionBSB" data-version="BSB" aria-pressed="false" onclick="setVersion('BSB')" title="Berean Standard Bible (public domain)">BSB</button>
                     <span class="version-note" id="versionStatus" role="status" aria-live="polite">Choose a version to read</span>
                     <span class="text-size-controls" role="group" aria-label="Text size">
                         <button id="textSmall" onclick="setTextSize('small')" title="Smaller text" aria-label="Smaller text">A-</button>
@@ -560,7 +561,8 @@
             KJV: { name: 'King James Version', copyright: 'King James Version (KJV). Public domain in the United States.' },
             NLT: { name: 'New Living Translation', copyright: 'Holy Bible, New Living Translation®, copyright © 1996, 2004, 2015 by Tyndale House Foundation. Used by permission of Tyndale House Publishers, Inc. All rights reserved.' },
             ESV: { name: 'English Standard Version', copyright: 'The Holy Bible, English Standard Version® (ESV®), copyright © 2001 by Crossway, a publishing ministry of Good News Publishers. Used by permission. All rights reserved.' },
-            MSG: { name: 'The Message', copyright: 'The Message® copyright © 1993, 2002, 2018 by Eugene H. Peterson. Used by permission of NavPress. All rights reserved.' }
+            MSG: { name: 'The Message', copyright: 'The Message® copyright © 1993, 2002, 2018 by Eugene H. Peterson. Used by permission of NavPress. All rights reserved.' },
+            BSB: { name: 'Berean Standard Bible', copyright: 'Berean Standard Bible (BSB). Dedicated to the public domain (CC0) on 30 April 2023 by the Berean Bible team and BSB Publishing. Text served from this site, not from a licensed API.' }
         };
         const TEXT_SIZES = ['small', 'medium', 'large'];
         function readPreference(key, fallback) {
@@ -736,6 +738,10 @@
 
         async function checkVersionStatus(version) {
             const status = document.getElementById('versionStatus');
+            if (version === 'BSB') {
+                if (status && version === currentVersion) status.textContent = `${BIBLE_VERSIONS.BSB.name} · public domain text on this site`;
+                return;
+            }
             if (status && version === currentVersion) {
                 status.textContent = `${BIBLE_VERSIONS[version].name} · checking sources`;
             }
@@ -837,6 +843,51 @@
             badge.innerHTML = `<i class="pd-i pd-i-download" aria-hidden="true"></i> ${saved} chapter${saved === 1 ? '' : 's'} saved offline`;
         }
 
+        // BSB (Berean Standard Bible, public domain) is read from the bundled
+        // per-book files in /assets/bible/bsb/, so it needs no API key.
+        const BSB_NOT_IN_TEXT = 'Not included in the main text of the Berean Standard Bible.';
+        const bsbBookCache = new Map();
+        function loadBsbBook(bookId) {
+            if (!bsbBookCache.has(bookId)) {
+                const request = fetch(`/assets/bible/bsb/${encodeURIComponent(bookId)}.json`)
+                    .then(res => {
+                        if (!res.ok) throw new Error(`The Berean Standard Bible text for this book could not be loaded (HTTP ${res.status}). Please try again.`);
+                        return res.json();
+                    })
+                    .catch(error => { bsbBookCache.delete(bookId); throw error; });
+                bsbBookCache.set(bookId, request);
+            }
+            return bsbBookCache.get(bookId);
+        }
+        async function fetchBsbChapter(book, chapter) {
+            const data = await loadBsbBook(book.id);
+            const verseMap = data.chapters && data.chapters[String(chapter)];
+            if (!verseMap) throw new Error(`${book.name} ${chapter} is not in the Berean Standard Bible text.`);
+            const verses = Object.keys(verseMap).map(Number).sort((a, b) => a - b).map(number => ({
+                verse: number,
+                text: verseMap[number] || BSB_NOT_IN_TEXT
+            }));
+            return { ok: true, translation: 'BSB', translationName: data.translationName, copyright: data.copyright, verses };
+        }
+        async function searchBsb(query, limit) {
+            const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+            const results = [];
+            for (const book of bibleBooks) {
+                const data = await loadBsbBook(book.id);
+                for (const [chapter, verseMap] of Object.entries(data.chapters || {})) {
+                    for (const [verse, text] of Object.entries(verseMap)) {
+                        if (!text) continue;
+                        const lower = text.toLowerCase();
+                        if (words.every(word => lower.includes(word))) {
+                            results.push({ reference: `${book.name} ${chapter}:${verse}`, text });
+                            if (results.length >= limit) return results;
+                        }
+                    }
+                }
+            }
+            return results;
+        }
+
         async function fetchChapter() {
             const requestId = ++chapterRequestId;
             const version = currentVersion;
@@ -861,9 +912,15 @@
             reader.innerHTML = '<div class="loading-spinner" role="status" aria-label="Loading chapter"></div>';
 
             try {
-                const url = `/api/bible?action=chapter&id=${encodeURIComponent(book.id)}&chapter=${encodeURIComponent(chapter)}&version=${encodeURIComponent(version)}`;
-                const response = await fetch(url);
-                const json = await response.json();
+                let response = { ok: true, status: 200 };
+                let json;
+                if (version === 'BSB') {
+                    json = await fetchBsbChapter(book, chapter);
+                } else {
+                    const url = `/api/bible?action=chapter&id=${encodeURIComponent(book.id)}&chapter=${encodeURIComponent(chapter)}&version=${encodeURIComponent(version)}`;
+                    response = await fetch(url);
+                    json = await response.json();
+                }
                 if (requestId !== chapterRequestId) return;
                 if (!response.ok || !json.ok) {
                     throw Object.assign(new Error(json.message || `${BIBLE_VERSIONS[version].name} unavailable`), {
@@ -1086,6 +1143,22 @@
             resultsDiv.innerHTML = '<div class="loading-spinner" role="status" aria-label="Searching"></div>';
 
             try {
+                if (version === 'BSB') {
+                    const hits = await searchBsb(query, 30);
+                    if (!hits.length) {
+                        resultsDiv.innerHTML = `<div style="text-align:center; padding:40px;">No results found in BSB.</div>`;
+                        return;
+                    }
+                    resultsDiv.innerHTML = hits.map(item => {
+                        const encodedReference = encodeURIComponent(item.reference).replace(/'/g, '%27');
+                        return `
+                    <div class="search-result-item" onclick="goToReference('${encodedReference}')">
+                        <div class="search-result-ref"><i class="pd-i pd-i-book"></i> ${escapeHtml(item.reference)} <small style="opacity:.7; font-weight:500;">(BSB)</small></div>
+                        <div class="search-result-text">${escapeHtml(item.text)}</div>
+                    </div>`;
+                    }).join('');
+                    return;
+                }
                 const url = `/api/bible?action=search&q=${encodeURIComponent(query)}&limit=30&version=${encodeURIComponent(version)}`;
                 const response = await fetch(url);
                 const data = await response.json();
@@ -1115,9 +1188,11 @@
         };
         function goToReference(encodedRef) {
             const ref = decodeURIComponent(encodedRef || '');
-            const m = ref.match(/^\s*((?:[123]\s)?[A-Za-z]+(?:\s+[A-Za-z]+)?)\s*(\d+)(?::(\d+))?/);
-            if (!m) return;
-            const name = m[1], ch = parseInt(m[2],10), v = m[3] ? parseInt(m[3],10) : null;
+            // Everything before the chapter number is the book name, so
+            // multi-word names such as "Song of Solomon" resolve correctly.
+            const m = ref.match(/^(.*?)\s*(\d+)(?::(\d+))?\s*$/);
+            if (!m || !m[1].trim()) return;
+            const name = m[1].trim(), ch = parseInt(m[2],10), v = m[3] ? parseInt(m[3],10) : null;
             const idx = bibleBooks.findIndex(b => b.name.toLowerCase() === name.toLowerCase());
             if (idx === -1) return;
             document.getElementById('bookSelect').value = idx;

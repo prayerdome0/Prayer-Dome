@@ -220,8 +220,11 @@ async function withHttpsResponses(fixtures, run) {
   });
 
   const html = fs.readFileSync(path.join(ROOT, 'bible.html'), 'utf8');
-  t('the Bible reader exposes NIV, KJV, NLT, ESV and MSG controls',
-    ['NIV', 'KJV', 'NLT', 'ESV', 'MSG'].every(code =>
+  t('BSB is its own labelled translation read from the bundled public-domain files',
+    html.includes("BSB: { name: 'Berean Standard Bible'") && html.includes("version === 'BSB'") &&
+    html.includes('/assets/bible/bsb/'));
+  t('the Bible reader exposes NIV, KJV, NLT, ESV, MSG and BSB controls',
+    ['NIV', 'KJV', 'NLT', 'ESV', 'MSG', 'BSB'].every(code =>
       html.includes(`data-version="${code}"`) && html.includes(`setVersion('${code}')`)));
   t('chapter and search requests send the selected version to the API',
     /action=chapter[^`]*version=/.test(html) && /action=search[^`]*version=/.test(html));

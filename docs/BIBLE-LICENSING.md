@@ -9,6 +9,7 @@ the providers. It is kept in step with `api/bible.js`.
 | Edition | Primary source | Fallback | Licence status |
 |---|---|---|---|
 | NIV | **None. No API.** The reader lists NIV, shows a licensing message and no text, and makes no provider request. | none | Copyrighted (Biblica). Prayer Dome holds no licence that covers this site. |
+| BSB | Bundled files in `assets/bible/bsb/` (no API, no key). Built by `scripts/build-bsb.mjs` from the USFM build in github.com/ethnosdev/bsb (CC0, `database_builder/bsb_usfm`). | none | Public domain. The Berean Standard Bible was dedicated to the public domain (CC0) on 30 April 2023. 31,086 verse entries. 16 verses the BSB omits from its main text (e.g. John 5:4) are not shown. |
 | KJV | GetBible v2 (`api.getbible.net/v2/kjv`) | Bolls.life KJV, Strong's numbers removed | Public domain (US). |
 | NLT | api.bible when `NLT_BIBLE_ID` and the key are set | Bolls.life NLT | Copyrighted (Tyndale). Bolls.life rights unverified. |
 | ESV | Bolls.life ESV | none | Copyrighted (Crossway). Bolls.life rights unverified. |
