@@ -3,7 +3,7 @@
 // shade) even when the app is closed — see /assets/pd-verse-data.js.
 try { importScripts('/assets/pd-verse-data.js'); } catch (e) { /* verses unavailable offline */ }
 // Bump CACHE_NAME whenever the precache list changes.
-const CACHE_NAME = 'prayer-dome-v30';
+const CACHE_NAME = 'prayer-dome-v31';
 
 // Shell assets worth having available offline.
 const PRECACHE = [
@@ -74,8 +74,8 @@ const PRECACHE = [
     '/assets/pd-domey-lady.js',
     '/assets/three.module.min.js',
     '/assets/pd-domey-questions.js',
-    // Domey's real photograph — the talking host on the chat and quiz pages.
-    '/assets/domey/domey-real.jpg',
+    // Domey's cartoon portrait — the talking host on the chat and quiz pages.
+    '/assets/domey/domey-cartoon.jpg',
     '/assets/pd-upload.js',
     '/assets/pd-verse-data.js',
     '/assets/pd-verse-alerts.js',
