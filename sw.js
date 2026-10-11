@@ -3,7 +3,7 @@
 // shade) even when the app is closed — see /assets/pd-verse-data.js.
 try { importScripts('/assets/pd-verse-data.js'); } catch (e) { /* verses unavailable offline */ }
 // Bump CACHE_NAME whenever the precache list changes.
-const CACHE_NAME = 'prayer-dome-v30';
+const CACHE_NAME = 'prayer-dome-v31';
 
 // Shell assets worth having available offline.
 const PRECACHE = [
@@ -76,6 +76,10 @@ const PRECACHE = [
     '/assets/pd-domey-questions.js',
     // Domey's real photograph — the talking host on the chat and quiz pages.
     '/assets/domey/domey-real.jpg',
+    // The live Domey companion on the AI assistant page. The widget itself is
+    // hosted on three.ws and needs the network; this loader shows the helpful
+    // offline/error panel instead of a blank frame.
+    '/assets/pd-domey-widget.js',
     '/assets/pd-upload.js',
     '/assets/pd-verse-data.js',
     '/assets/pd-verse-alerts.js',
