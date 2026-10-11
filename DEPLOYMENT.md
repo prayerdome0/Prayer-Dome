@@ -86,6 +86,26 @@ Variables (or with `vercel env add`) and never put it in a committed file:
 vercel env add BIBLE_API_KEY production   # your API.Bible key (required)
 ```
 
+**The key does not have to cost anything.** API.Bible's free Starter plan is
+$0/month and includes up to three licensed Bibles (plus every open-access one),
+5,000 API calls a month, for non-commercial use. The Message is one of the
+choices, so MSG can be read on the free plan. The steps, printed by the setup
+guide and returned by `GET /api/bible?action=setup&version=MSG`:
+
+1. Create a free account at <https://api.bible/sign-up>. No card is asked for.
+2. In the dashboard (<https://api.bible/dashboard>), add **The Message** (and
+   **New International Version**) to the account. Starter allows three licensed
+   Bibles; if all three slots are taken, remove one and add the edition you want.
+3. Copy the account API key.
+4. Add it to Vercel as `BIBLE_API_KEY` (above) and redeploy.
+5. Check it: `GET /api/bible?action=status&version=MSG` should say
+   `"configured": true`.
+
+With no key, `npm run bible:setup` prints the same steps without needing one.
+Readers never see these instructions — the reader shows a plain note that the
+translation is not switched on yet plus a collapsed "site owner?" section, and
+no text from any other translation is shown in its place.
+
 Add the key to every Vercel environment you use (Production, Preview, and/or
 Development). Vercel environment changes apply to new deployments, so redeploy
 after saving the key. The Bible IDs are optional, non-secret overrides; without
@@ -107,7 +127,9 @@ BIBLE_API_KEY=<your key> npm run bible:ids -- --verify
 After deploying, `GET /api/bible?action=bibles` reports the resolved IDs and
 `GET /api/bible?action=status&version=NIV` reports the provider and the ID
 source. If an edition is missing from the account, the reader shows a
-"setup required" note and no text from any other translation.
+"setup required" note — with the free Starter-plan steps attached in
+`GET /api/bible?action=setup&version=NIV|MSG` — and no text from any other
+translation.
 
 ### Cloudinary callable function
 

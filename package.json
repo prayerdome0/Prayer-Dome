@@ -25,7 +25,8 @@
     "build": "npm run build:vercel",
     "test:rules": "npx --yes firebase-tools@15.31.0 emulators:exec --only firestore --project demo-prayer-dome \"node tests/rules/firestore.test.js\"",
     "build:widget": "node scripts/build-widget-verses.mjs",
-    "bible:ids": "node scripts/bible-ids.mjs"
+    "bible:ids": "node scripts/bible-ids.mjs",
+    "bible:setup": "node scripts/bible-ids.mjs --setup"
   },
   "dependencies": {
     "@capacitor/android": "8.5.2",

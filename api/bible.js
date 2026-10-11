@@ -34,6 +34,7 @@
  *
  * Endpoints:
  *   GET /api/bible?action=status&version=NIV
+ *   GET /api/bible?action=setup&version=MSG
  *   GET /api/bible?action=bibles
  *   GET /api/bible?action=books&version=NIV
  *   GET /api/bible?action=chapter&id=43&chapter=3&version=KJV
@@ -342,7 +343,7 @@ function missingKeyError(version) {
       : '';
   return bibleError('TRANSLATION_NOT_CONFIGURED',
     `${edition.name} is served from API.Bible and is not configured on this server right now.${idNote} No ${version} text is shown. No other translation has been substituted.`,
-    { detail: `Set BIBLE_API_KEY (the API.Bible key) in Vercel → Settings → Environment Variables, then redeploy.${idSetup}` });
+    { detail: `Set BIBLE_API_KEY (the API.Bible key) in Vercel → Settings → Environment Variables, then redeploy.${idSetup} A free API.Bible Starter key is enough: sign up at ${API_BIBLE_LINKS.signUp}, add ${edition.name} to the account (Starter includes up to three licensed Bibles), then set BIBLE_API_KEY. Full steps: GET /api/bible?action=setup&version=${version}.` });
 }
 
 /* The key is present, the account list could not be read, and there is no
@@ -352,14 +353,93 @@ function bibleIdUnresolvedError(version, listingError) {
   const cause = listingError ? String(listingError.message || listingError).slice(0, 120) : '';
   return bibleError('TRANSLATION_NOT_CONFIGURED',
     `${edition.name} is served from API.Bible and its Bible ID could not be resolved right now, so no ${version} text is shown. No other translation has been substituted.`,
-    { detail: `Set ${edition.apiBibleEnv} to the Bible ID from your API.Bible account, or retry once the account's Bible list (GET /v1/bibles) can be reached.${cause ? ` Last error: ${cause}` : ''}` });
+    { detail: `Set ${edition.apiBibleEnv} to the Bible ID from your API.Bible account, or retry once the account's Bible list (GET /v1/bibles) can be reached.${cause ? ` Last error: ${cause}` : ''} A free API.Bible Starter key works for this: add ${edition.name} to the account (Starter includes up to three licensed Bibles), then set BIBLE_API_KEY. Steps: GET /api/bible?action=setup&version=${version}.` });
 }
 
 function notInAccountError(version) {
   const edition = TRANSLATIONS[version];
   return bibleError('TRANSLATION_NOT_IN_ACCOUNT',
     `${edition.name} is not available through this site's API.Bible account, so no ${version} text is shown. No other translation has been substituted.`,
-    { detail: `Your API.Bible account does not list ${edition.name}. Add this translation to your API.Bible plan (the free Starter plan includes a limited number of licensed translations), or set ${edition.apiBibleEnv} to its ID from the account.` });
+    { detail: `Your API.Bible account does not list ${edition.name}. Add this translation to your API.Bible plan — the free Starter plan includes up to three licensed Bibles, so it costs nothing — or set ${edition.apiBibleEnv} to its ID from the account. See GET /api/bible?action=setup&version=${version} for the steps.` });
+}
+
+/* ---------------------------------------------------------------------------
+ * Free setup guide
+ * ---------------------------------------------------------------------------
+ * The Message and the NIV are licensed translations, so a public-domain mirror
+ * may not serve them and the reader never substitutes another edition. They do
+ * not have to be paid for either: API.Bible's free Starter plan is $0 a month,
+ * includes up to three licensed Bibles, and The Message is one of the choices.
+ * The steps below are the same text the owner sees in the reader, in
+ * GET /api/bible?action=setup and from `npm run bible:ids -- --setup`. */
+
+const API_BIBLE_LINKS = {
+  signUp: 'https://api.bible/sign-up',
+  dashboard: 'https://api.bible/dashboard',
+  bibles: 'https://api.bible/bibles',
+  gettingStarted: 'https://api.bible/getting-started',
+  docs: 'https://docs.api.bible/'
+};
+
+/* Why a free key is enough, in the owner's words. `version` picks the edition
+   named in the steps; the plan facts are the same for every edition. */
+function freePlan(version) {
+  const edition = TRANSLATIONS[version];
+  return {
+    provider: 'api.bible',
+    plan: 'Starter',
+    price: '$0 per month',
+    callLimit: '5,000 API calls per month',
+    licensedBibles: 'up to 3 licensed Bibles, plus every open-access Bible',
+    commercialUse: false,
+    note: 'The Starter plan is for non-commercial use: no ads and no fees or upsells for the content. A church site with free membership and voluntary giving fits that; if the site is ever run for revenue, API.Bible\'s paid plan is needed.',
+    keyEnv: 'BIBLE_API_KEY',
+    idEnv: edition.apiBibleEnv || null,
+    links: API_BIBLE_LINKS,
+    steps: [
+      {
+        title: 'Create a free API.Bible account',
+        detail: `Open ${API_BIBLE_LINKS.signUp} and sign up. No card is asked for and no plan has to be bought: the Starter plan is $0 per month.`
+      },
+      {
+        title: `Add ${edition.name} (${version}) to the account`,
+        detail: `In the API.Bible dashboard (${API_BIBLE_LINKS.dashboard}) add ${edition.name} to your plan. Starter includes up to three licensed Bibles, so pick ${version}. If all three slots are already used, remove one and add ${version}.`
+      },
+      {
+        title: 'Copy the account API key',
+        detail: 'On the dashboard, copy the API key for the account. It is a long string; keep it private (never commit it or paste it in chat).'
+      },
+      {
+        title: 'Give the key to Prayer Dome',
+        detail: 'Vercel → the Prayer Dome project → Settings → Environment Variables → add BIBLE_API_KEY with that value (tick Production, and Preview/Development if you use them), then redeploy. Locally, start the server with BIBLE_API_KEY=<key> npm run dev.'
+      },
+      {
+        title: 'Check that it worked',
+        detail: `Open /api/bible?action=status&version=${version} and look for "configured": true, or run BIBLE_API_KEY=<key> npm run bible:ids -- --setup --verify. The reader then loads ${edition.name} chapters and says which Bible ID it read.`
+      }
+    ]
+  };
+}
+
+/* The reader and the owner both get this: a reader-facing summary line, plus
+   the owner steps folded into a "site owner?" section. */
+function setupPayload(version) {
+  const plan = freePlan(version);
+  return {
+    needed: true,
+    summary: `${TRANSLATIONS[version].name} is a licensed translation, so it is read from API.Bible rather than a free mirror. Switching it on costs nothing: the free API.Bible Starter plan covers it. No other translation is ever shown in its place.`,
+    plan: {
+      name: plan.plan,
+      price: plan.price,
+      callLimit: plan.callLimit,
+      licensedBibles: plan.licensedBibles,
+      commercialUse: plan.commercialUse,
+      note: plan.note
+    },
+    env: { key: plan.keyEnv, bibleId: plan.idEnv },
+    links: plan.links,
+    steps: plan.steps
+  };
 }
 
 /* ---------------------------------------------------------------------------
@@ -648,17 +728,26 @@ function parseReference(reference) {
 
 /* api.bible returns chapter HTML where each verse starts with
    <span data-number="N" class="v">N</span>. Text between two markers belongs to
-   the earlier verse. Verse numbers must run in order from 1 without gaps or
-   repeats, otherwise the response is rejected rather than shown out of order.
+   the earlier verse. Numbers may be printed as a range ("16-21"), may skip
+   (editions differ in versification and The Message folds several numbered
+   verses into one paragraph), and may repeat after a section break — those are
+   all read as the edition's own numbering. Only a number that runs backwards
+   is rejected, because that would reorder the text.
 
    Some editions mark verses with data-verse-id / data-sid attributes instead;
    those are read the same way when the default markers are absent. */
+/* Verse numbers can be printed on their own ("16") or as the start of a range
+   ("16-21"), which is how The Message groups most of its paragraphs; both are
+   read as the verse the text begins at. */
+const VERSE_NUMBER = '(\\d+)(?:\\s*[-\\u2013\\u2014]\\s*\\d+)?';
+
 function findVerseMarkers(source) {
-  const markerRe = /<span\b([^>]*\bclass="[^"]*\bv\b[^"]*"[^>]*)>\s*(\d+)\s*<\/span>/gi;
+  const markerRe = new RegExp(`<span\\b([^>]*\\bclass="[^"]*\\bv\\b[^"]*"[^>]*)>\\s*${VERSE_NUMBER}\\s*<\\/span>`, 'gi');
+  const attributeRe = new RegExp(`data-number="${VERSE_NUMBER}"`);
   const markers = [];
   let match;
   while ((match = markerRe.exec(source)) !== null) {
-    const attr = match[1].match(/data-number="(\d+)"/);
+    const attr = match[1].match(attributeRe);
     const number = parseInt(attr ? attr[1] : match[2], 10);
     markers.push({ number, start: match.index, end: match.index + match[0].length });
   }
@@ -679,18 +768,26 @@ function parseApiBibleHtml(html) {
   const source = String(html || '')
     .replace(/<(script|style)\b[\s\S]*?<\/\1>/gi, '')
     .replace(/<note\b[^>]*>[\s\S]*?<\/note>/gi, '');
-  const markers = findVerseMarkers(source);
+  // Markers numbered 0 (a chapter introduction in some editions) carry no
+  // verse of their own; they are dropped rather than rendered as verse 0.
+  const markers = findVerseMarkers(source).filter(marker => marker.number > 0);
   const verses = [];
   markers.forEach((marker, index) => {
     const next = markers[index + 1];
     const segment = source.slice(marker.end, next ? next.start : source.length);
     const text = decodeText(segment);
-    if (text) verses.push({ verse: marker.number, text });
-  });
-  verses.forEach((item, index) => {
-    if (item.verse !== index + 1) {
+    if (!text) return;
+    const last = verses[verses.length - 1];
+    if (last && marker.number < last.verse) {
       throw new Error('api.bible returned verses out of sequence');
     }
+    if (last && marker.number === last.verse) {
+      // The same verse number printed again after a paragraph or section break
+      // is a continuation of that verse, not a second verse.
+      last.text = `${last.text} ${text}`.replace(/\s+/g, ' ').trim();
+      return;
+    }
+    verses.push({ verse: marker.number, text });
   });
   return verses;
 }
@@ -722,7 +819,16 @@ async function fetchApiBibleChapter(version, book, chapter) {
     const json = await httpsGet(url, { 'api-key': apiBibleKey() }, { timeoutMs: API_BIBLE_TIMEOUT_MS });
     const data = json && json.data ? json.data : null;
     const copyright = assertApiBibleIdentity(data, version, resolved.bibleId);
-    const verses = parseApiBibleHtml(data.content);
+    let verses = [];
+    try {
+      verses = parseApiBibleHtml(data.content);
+    } catch (parseError) {
+      // The provider's own text stays out of the response; the reader is told
+      // what happened without pretending the edition is simply offline.
+      console.warn(`api.bible ${version} chapter ${chapterId} could not be laid out: ${String(parseError.message || parseError).slice(0, 120)}`);
+      throw bibleError('CHAPTER_FORMAT_UNSUPPORTED',
+        `API.Bible returned ${TRANSLATIONS[version].name} chapter ${chapterId} in a verse order the reader cannot lay out, so no ${version} text is shown. The text has not been substituted.`);
+    }
     if (!verses.length) {
       throw bibleError('CHAPTER_FORMAT_UNSUPPORTED',
         `API.Bible returned ${TRANSLATIONS[version].name} chapter ${chapterId} without verse numbers, so the reader cannot lay it out. The text has not been substituted.`);
@@ -1064,6 +1170,10 @@ async function statusPayload(version) {
   const edition = TRANSLATIONS[version];
   const required = apiBibleOnly(version);
   const providers = providerList(version);
+  // An edition that is not switched on carries the free Starter-plan steps, so
+  // the reader (and the owner reading over their shoulder) can see how to fix
+  // it without hunting through the deployment docs.
+  const finish = value => (value.configured ? value : Object.assign(value, { setup: setupPayload(version) }));
   const payload = {
     ok: true,
     translation: version,
@@ -1089,7 +1199,7 @@ async function statusPayload(version) {
       payload.message = error.message;
       payload.detail = error.detail;
     }
-    return payload;
+    return finish(payload);
   }
   if (!required && !apiBibleIdOverride(version)) {
     // Optional licensed feed without a pinned ID: the mirror answers, and the
@@ -1107,7 +1217,7 @@ async function statusPayload(version) {
     if (error && error.detail) payload.detail = error.detail;
     if (required) payload.configured = false;
   }
-  return payload;
+  return finish(payload);
 }
 
 /* The owner-facing check: which Bible IDs this account resolves for the
@@ -1148,6 +1258,38 @@ async function biblesPayload() {
   return payload;
 }
 
+/* The owner-facing setup answer for one edition: current state plus the free
+   steps. Works with no key at all — that is the case it is written for. */
+async function setupAction(version) {
+  const status = await statusPayload(version);
+  const edition = TRANSLATIONS[version];
+  const payload = {
+    ok: true,
+    action: 'setup',
+    translation: version,
+    translationName: edition.name,
+    apiBible: usesApiBible(version),
+    required: apiBibleOnly(version),
+    configured: status.configured,
+    providers: status.providers,
+    bibleId: status.bibleId || null,
+    bibleIdSource: status.bibleIdSource || null,
+    copyright: edition.copyright,
+    message: '',
+    detail: status.detail || ''
+  };
+  if (!usesApiBible(version)) {
+    payload.message = `${edition.name} needs no API.Bible key: it is read from ${status.providers.join(', ') || 'the bundled public-domain files'}. There is nothing to set up.`;
+    return payload;
+  }
+  payload.free = freePlan(version);
+  payload.setup = setupPayload(version);
+  payload.message = status.configured
+    ? `${edition.name} is already switched on${status.bibleId ? ` (Bible ID ${status.bibleId})` : ''}. The free steps below are kept for when the key or the plan has to be set up again.`
+    : `${edition.name} is not switched on yet. The free API.Bible Starter plan covers it — ${freePlan(version).steps.length} steps, no payment.`;
+  return payload;
+}
+
 function providerLabel(attempt) {
   if (typeof attempt === 'string') return attempt.split(':')[0];
   return attempt && attempt.provider;
@@ -1165,21 +1307,37 @@ const EXPLAINED_ERROR_STATUS = {
   CHAPTER_FORMAT_UNSUPPORTED: 502
 };
 
+/* Failures the owner can fix (a missing key, a translation that is not on the
+   plan, a spent call allowance) carry the free Starter-plan steps, so the
+   reader can show the owner what to do without a second request. */
+const OWNER_ACTION_CODES = new Set([
+  'TRANSLATION_NOT_CONFIGURED',
+  'TRANSLATION_NOT_IN_ACCOUNT',
+  'TRANSLATION_NOT_LICENSED',
+  'API_KEY_REJECTED',
+  'BIBLE_NOT_FOUND',
+  'RATE_LIMITED'
+]);
+
 function failureBody(version, error, fallbackCode, fallbackMessage) {
   const code = error && (error.readerCode || (error.code && EXPLAINED_ERROR_STATUS[error.code] ? error.code : null));
   const explained = code && EXPLAINED_ERROR_STATUS[code] ? code : null;
+  const body = {
+    ok: false,
+    translation: version,
+    translationName: TRANSLATIONS[version].name,
+    copyright: TRANSLATIONS[version].copyright,
+    error: explained || fallbackCode,
+    message: explained ? error.message : fallbackMessage,
+    detail: explained && error.detail ? error.detail : undefined,
+    providersTried: (error && error.providerAttempts || []).map(providerLabel)
+  };
+  if (explained && OWNER_ACTION_CODES.has(explained) && usesApiBible(version)) {
+    body.setup = setupPayload(version);
+  }
   return {
     status: explained ? (error.readerCode ? error.httpStatus || EXPLAINED_ERROR_STATUS[explained] : EXPLAINED_ERROR_STATUS[explained]) : 502,
-    body: {
-      ok: false,
-      translation: version,
-      translationName: TRANSLATIONS[version].name,
-      copyright: TRANSLATIONS[version].copyright,
-      error: explained || fallbackCode,
-      message: explained ? error.message : fallbackMessage,
-      detail: explained && error.detail ? error.detail : undefined,
-      providersTried: (error && error.providerAttempts || []).map(providerLabel)
-    }
+    body
   };
 }
 
@@ -1205,6 +1363,8 @@ module.exports = async function handler(req, res) {
   }
 
   if (action === 'status') return send(res, 200, await statusPayload(version));
+
+  if (action === 'setup') return send(res, 200, await setupAction(version));
 
   if (action === 'books') {
     const bundled = {
@@ -1307,6 +1467,8 @@ module.exports._apiBibleKey = apiBibleKey;
 module.exports._resolveBibleId = resolveBibleId;
 module.exports._usesApiBible = usesApiBible;
 module.exports._resetCaches = resetCaches;
+module.exports._freePlan = freePlan;
+module.exports._setupPayload = setupPayload;
 module.exports._stripStrongs = stripStrongs;
 module.exports._decodeText = decodeText;
 module.exports._parseReference = parseReference;
