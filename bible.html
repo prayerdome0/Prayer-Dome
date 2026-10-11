@@ -297,6 +297,20 @@
         .verse-item.reading { background: rgba(59,130,246,0.18); color: var(--accent-green); font-weight: 600; }
         .verse-num { font-size: .68em; font-weight: 800; color: var(--accent-gold); vertical-align: super; margin-right: .28em; margin-left: .18em; font-family: 'Inter', sans-serif; line-height: 0; opacity: 0.92; -webkit-font-smoothing: antialiased; }
         .verse-item:first-child .verse-num { margin-left: 0; }
+        /* Shown only when a licensed translation (NIV / MSG) is not switched on
+           yet. Readers see a plain sentence; the free setup steps live inside a
+           collapsed "site owner?" section so the reader is never blocked by
+           deployment instructions. */
+        .version-setup { flex-basis: 100%; width: 100%; margin-top: 4px; }
+        .version-setup .setup-card { font-family: 'Inter', sans-serif; font-size: .82rem; line-height: 1.6; color: var(--text-secondary); background: rgba(212,175,55,.10); border: 1px solid rgba(212,175,55,.35); border-radius: 14px; padding: 14px 16px; text-align: left; }
+        .version-setup .setup-card > strong { display: block; color: var(--accent-green); font-size: .88rem; margin-bottom: 6px; }
+        .version-setup .setup-card p { margin: 0 0 8px; max-width: none; }
+        .version-setup .setup-card details { margin-top: 8px; }
+        .version-setup .setup-card summary { cursor: pointer; font-weight: 700; color: var(--accent-green); }
+        .version-setup .setup-card ol { margin: 10px 0 0 18px; padding: 0; }
+        .version-setup .setup-card li { margin-bottom: 8px; }
+        .version-setup .setup-card li strong { color: var(--text-primary); }
+        .version-setup .setup-links a { color: var(--accent-green); font-weight: 600; }
         .bible-error { text-align: center; padding: 32px 20px; color: var(--text-secondary); font-family: 'Inter', sans-serif; }
         .bible-error h4 { color: var(--accent-green); margin: 0 0 8px; }
         .bible-error p { font-size: .9rem; line-height: 1.6; max-width: 520px; margin: 0 auto 14px; }
@@ -426,6 +440,7 @@
                     <button class="version-btn" id="versionMSG" data-version="MSG" aria-pressed="false" onclick="setVersion('MSG')" title="The Message">MSG</button>
                     <button class="version-btn" id="versionBSB" data-version="BSB" aria-pressed="false" onclick="setVersion('BSB')" title="Berean Standard Bible (public domain)">BSB</button>
                     <span class="version-note" id="versionStatus" role="status" aria-live="polite">Choose a version to read</span>
+                    <div class="version-setup" id="versionSetup" hidden></div>
                     <span class="text-size-controls" role="group" aria-label="Text size">
                         <button id="textSmall" onclick="setTextSize('small')" title="Smaller text" aria-label="Smaller text">A-</button>
                         <button id="textMedium" class="active" onclick="setTextSize('medium')" title="Medium text" aria-label="Medium text">A</button>
@@ -736,10 +751,46 @@
             });
         }
 
+        /* ---------- Free setup card ----------
+           NIV and MSG are licensed translations read from API.Bible. They are
+           free to switch on — the API.Bible Starter plan is $0 — but they do
+           need a key on the server. When an edition is not configured this card
+           says so plainly and keeps the owner's free steps folded away, so a
+           reader is never shown deployment instructions they cannot use. */
+        function renderSetupCard(setup) {
+            const box = document.getElementById('versionSetup');
+            if (!box) return;
+            if (!setup || !Array.isArray(setup.steps) || !setup.steps.length) {
+                box.hidden = true;
+                box.innerHTML = '';
+                return;
+            }
+            const plan = setup.plan || {};
+            const links = setup.links || {};
+            const linkList = [
+                links.signUp ? `<a href="${links.signUp}" target="_blank" rel="noopener">Create a free API.Bible account</a>` : '',
+                links.dashboard ? `<a href="${links.dashboard}" target="_blank" rel="noopener">API.Bible dashboard</a>` : ''
+            ].filter(Boolean).join(' · ');
+            box.hidden = false;
+            box.innerHTML = `
+                <div class="setup-card">
+                    <strong><i class="pd-i pd-i-lightbulb" aria-hidden="true"></i> ${escapeHtml(currentTranslationName)} is not switched on for this site yet</strong>
+                    <p>${escapeHtml(setup.summary || 'This translation needs a free API.Bible key on the server. No other translation is shown in its place.')}${plan.price ? ` The ${escapeHtml(plan.name || 'Starter')} plan is ${escapeHtml(plan.price)}${plan.callLimit ? ` and includes ${escapeHtml(plan.callLimit)}` : ''}.` : ''}</p>
+                    <details>
+                        <summary>Site owner? Switch it on free in a few minutes</summary>
+                        <ol>${setup.steps.map(step => `<li><strong>${escapeHtml(step.title || '')}</strong><br>${escapeHtml(step.detail || '')}</li>`).join('')}</ol>
+                        ${linkList ? `<p class="setup-links">${linkList}</p>` : ''}
+                    </details>
+                </div>`;
+        }
+
         async function checkVersionStatus(version) {
             const status = document.getElementById('versionStatus');
             if (version === 'BSB') {
-                if (status && version === currentVersion) status.textContent = `${BIBLE_VERSIONS.BSB.name} · public domain text on this site`;
+                if (status && version === currentVersion) {
+                    status.textContent = `${BIBLE_VERSIONS.BSB.name} · public domain text on this site`;
+                    renderSetupCard(null);
+                }
                 return;
             }
             if (status && version === currentVersion) {
@@ -762,6 +813,10 @@
                         status.title = json.detail || json.message || (json.getBibleFallbackAvailable
                             ? 'Exact-version sources include Bolls.life and the free GetBible.net KJV fallback.'
                             : `Version-matched sources: ${(json.providers || []).join(', ') || 'none configured yet'}. No other translation is substituted.`);
+                        // The server sends the free setup steps whenever an
+                        // edition needs a key; show them instead of leaving the
+                        // reader with a dead version button.
+                        renderSetupCard(json.configured ? null : json.setup);
                     }
                 }
                 return json;
@@ -785,6 +840,7 @@
             if (actionBar) actionBar.style.display = 'none';
             try { localStorage.setItem('pd_bible_version', version); } catch (e) { /* preference is optional */ }
             updateVersionButtons();
+            renderSetupCard(null);
             checkVersionStatus(version);
             if (currentBookName && currentChapter) fetchChapter();
         };
@@ -990,8 +1046,11 @@
 
                 const payload = error.payload || {};
                 const message = payload.message || error.message || (navigator.onLine
-                    ? `The ${BIBLE_VERSIONS[version].name} chapter could not be downloaded. No other translation has been substituted. Please try again.`
+                    ? `${BIBLE_VERSIONS[version].name} chapter could not be downloaded. No other translation has been substituted. Please try again.`
                     : "You're offline and this chapter has not been saved on this device yet. Chapters you have read stay available offline.");
+                // A failure the owner can fix (missing key, edition not on the
+                // plan) arrives with the free setup steps attached.
+                if (payload.setup) renderSetupCard(payload.setup);
                 reader.innerHTML = `
                     <div class="bible-error">
                         <i class="pd-i pd-i-book-open-text" style="font-size:2rem; color:var(--accent-gold); display:block; margin-bottom:14px; opacity:.7;"></i>

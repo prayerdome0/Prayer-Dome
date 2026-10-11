@@ -8,8 +8,8 @@ the providers. It is kept in step with `api/bible.js`.
 
 | Edition | Source | Fallback | Licence status |
 |---|---|---|---|
-| NIV | **api.bible** (`/v1/bibles/{id}/…`), key `BIBLE_API_KEY`, Bible ID from `NIV_BIBLE_ID` or the account's Bible list. | **None.** No mirror is ever shown in its place. | Copyrighted (Biblica). Served through the Prayer Dome api.bible account, which must have NIV licensed. |
-| MSG | **api.bible**, same key, Bible ID from `MSG_BIBLE_ID` or the account's Bible list. | **None.** The old Bolls.life MSG feed was removed so an unlicensed mirror can never be shown as The Message. | Copyrighted (NavPress). Served through the Prayer Dome api.bible account, which must have The Message licensed. |
+| NIV | **api.bible** (`/v1/bibles/{id}/…`), key `BIBLE_API_KEY`, Bible ID from `NIV_BIBLE_ID` or the account's Bible list. | **None.** No mirror is ever shown in its place. | Copyrighted (Biblica). Served through the Prayer Dome api.bible account, which must have NIV licensed. A free Starter key is enough. |
+| MSG | **api.bible**, same key, Bible ID from `MSG_BIBLE_ID` or the account's Bible list. | **None.** The old Bolls.life MSG feed was removed so an unlicensed mirror can never be shown as The Message. | Copyrighted (NavPress). Served through the Prayer Dome api.bible account, which must have The Message licensed. A free Starter key is enough. |
 | BSB | Bundled files in `assets/bible/bsb/` (no API, no key). Built by `scripts/build-bsb.mjs` from the USFM build in github.com/ethnosdev/bsb (CC0, `database_builder/bsb_usfm`). | none | Public domain. The Berean Standard Bible was dedicated to the public domain (CC0) on 30 April 2023. 31,086 verse entries. 16 verses the BSB omits from its main text (e.g. John 5:4) are not shown. |
 | KJV | GetBible v2 (`api.getbible.net/v2/kjv`) | Bolls.life KJV, Strong's numbers removed | Public domain (US). |
 | NLT | api.bible when `NLT_BIBLE_ID` and the key are set | Bolls.life NLT | Copyrighted (Tyndale). Bolls.life rights unverified. |
@@ -37,6 +37,26 @@ Rules the code enforces:
 - api.bible failures are reported for what they are: 401 rejected key, 403
   translation not licensed to the account, 404 unknown Bible ID, 429 call limit.
   The provider's own message is logged server-side, never returned.
+- The licensed editions do not have to be paid for. API.Bible's free Starter
+  plan is $0/month, includes up to three licensed Bibles and 5,000 calls a
+  month for non-commercial use, and The Message is one of the choices. The
+  steps are the same in three places, kept in step by hand: `freePlan()` in
+  `api/bible.js` (returned by `GET /api/bible?action=setup&version=MSG` and by
+  `?action=status` whenever an edition is not configured), `setupSteps()` in
+  `scripts/bible-ids.mjs` (`npm run bible:setup`), and DEPLOYMENT.md. Failures
+  the owner can fix (`TRANSLATION_NOT_CONFIGURED`, `TRANSLATION_NOT_IN_ACCOUNT`,
+  `TRANSLATION_NOT_LICENSED`, `API_KEY_REJECTED`, `BIBLE_NOT_FOUND`,
+  `RATE_LIMITED`) carry the same steps in a `setup` block of the response body.
+- The reader shows a reader-facing sentence plus the owner steps folded into a
+  collapsed "site owner?" section, so the congregation is never faced with
+  deployment instructions.
+- Chapters are laid out exactly as the edition numbers them: a number may be
+  printed as a range (`16-21`), skipped, or repeated after a section break —
+  The Message does all three, and reading only strict 1-2-3 numbering made
+  every MSG chapter fail while verses and search worked. A number that runs
+  backwards is still rejected (`CHAPTER_FORMAT_UNSUPPORTED`), because that
+  would reorder the text; a verse 0 marker is dropped rather than shown as
+  verse 0.
 - Error and status payloads carry two audiences: `message` is written for the
   reader and never names environment variables, while `detail` holds the owner
   instructions (`BIBLE_API_KEY`, `NIV_BIBLE_ID`, plan/access steps). The reader
@@ -55,7 +75,7 @@ Rules the code enforces:
 
 | Variable | Purpose |
 |---|---|
-| `BIBLE_API_KEY` | api.bible key for NIV, MSG and (optionally) NLT. Legacy aliases still read: `NIV_API_KEY`, `API_BIBLE_KEY`. |
+| `BIBLE_API_KEY` | api.bible key for NIV, MSG and (optionally) NLT. A free Starter-plan key is enough (add The Message and the NIV to the account). Legacy aliases still read: `NIV_API_KEY`, `API_BIBLE_KEY`. Run `npm run bible:setup` for the free steps. |
 | `NIV_BIBLE_ID` | Optional. Pins the NIV Bible ID instead of using the account's Bible list. |
 | `MSG_BIBLE_ID` | Optional. Pins The Message Bible ID instead of using the account's Bible list. |
 | `NLT_BIBLE_ID` | Optional. Enables the licensed NLT feed; without it NLT stays on the mirror. |
@@ -76,11 +96,13 @@ reports the provider, the resolved Bible ID and its source.
 ## Open decisions for the owner
 
 1. **api.bible plan limits.** API.Bible grants access per account and per plan.
-   Confirm that the Prayer Dome account is entitled to NIV and The Message, and
-   that the plan covers the site's call volume and commercial use (the Starter
-   plan is free but limited to a small number of licensed translations and to
-   non-commercial use). If the account does not list an edition, the reader
-   reports `TRANSLATION_NOT_IN_ACCOUNT` and no text is shown.
+   The intended free route is the Starter plan ($0/month, up to three licensed
+   Bibles, 5,000 calls a month, non-commercial): add NIV and The Message in the
+   dashboard and the site is licensed for both. Confirm the account lists both —
+   if it does not, the reader reports `TRANSLATION_NOT_IN_ACCOUNT` and shows no
+   text. If Prayer Dome ever takes ads or fees, or outgrows 5,000 calls a month
+   (the ten-minute memoisation keeps one chapter read to a single call), the
+   plan has to change before the licensed editions can stay on the site.
 2. **Attribution.** api.bible requires the translation's copyright line to be
    shown with the text. The reader renders the `copyright` string returned by
    api.bible with every chapter; do not remove it. Confirm any further

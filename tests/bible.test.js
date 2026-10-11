@@ -342,6 +342,87 @@ function clearConfiguration() {
       result.status === 502 && result.json.translation === 'MSG' && /not substituted/.test(result.json.message) &&
       requests.length === 1 && requests[0].url.includes('rest.api.bible'),
       JSON.stringify(result.json).slice(0, 160));
+    t('a failure message never reads "The The Message"',
+      !/The The Message/.test(result.json.message) && /^The Message is temporarily unavailable/.test(result.json.message),
+      result.json.message);
+  });
+
+  // The Message prints its paragraphs as verse ranges and breaks them with
+  // "* * *" stops. A chapter shaped like that must load, not fail.
+  clearConfiguration();
+  setConfigured('MSG');
+  const messageStyleContent = '<p><span data-number="2-4" class="v">2-4</span>This is how much God loved the world. ' +
+    '<span data-number="5" class="v">5</span>The light has come into the world.* * *' +
+    '<span data-number="5" class="v">5</span>Continued after the break.' +
+    '<span data-number="9" class="v">9</span>And this is the verdict.</p>';
+  await withHttpsResponses([{
+    body: { data: { id: 'JHN.3', bibleId: MSG_ID, content: messageStyleContent, copyright: MSG_COPYRIGHT, reference: 'John 3' } }
+  }], async () => {
+    const result = await invoke('/api/bible?action=chapter&id=43&chapter=3&version=MSG');
+    t('an MSG chapter written as verse ranges loads instead of failing',
+      result.status === 200 && result.json.translation === 'MSG' && result.json.verses.length === 3 &&
+      result.json.verses[0].verse === 2 && result.json.verses[1].verse === 5 &&
+      result.json.verses[2].verse === 9 && result.json.verses[0].text.indexOf('This is how much God loved') === 0,
+      JSON.stringify(result.json).slice(0, 200));
+  });
+
+  handler._resetCaches();
+  await withHttpsResponses([{
+    body: { data: { id: 'JHN.3', bibleId: MSG_ID, content: '<p><span data-number="5" class="v">5</span>Five. <span data-number="2" class="v">2</span>Two.</p>', copyright: MSG_COPYRIGHT, reference: 'John 3' } }
+  }], async () => {
+    const result = await invoke('/api/bible?action=chapter&id=43&chapter=3&version=MSG');
+    t('a chapter returned in a genuinely wrong order is reported, not rendered',
+      result.status === 502 && result.json.error === 'CHAPTER_FORMAT_UNSUPPORTED' &&
+      /verse order the reader cannot lay out/.test(result.json.message) &&
+      /has not been substituted/.test(result.json.message));
+  });
+
+  /* ------------------------------------------------ the free setup guide (MSG) */
+  clearConfiguration();
+  const setupGuide = await invoke('/api/bible?action=setup&version=MSG');
+  t('the setup guide works with no key at all and needs no provider call',
+    setupGuide.status === 200 && setupGuide.json.ok === true && setupGuide.json.action === 'setup' &&
+    setupGuide.json.translation === 'MSG' && setupGuide.json.configured === false);
+  t('the setup guide names the free API.Bible Starter plan and its limits',
+    setupGuide.json.free.provider === 'api.bible' && setupGuide.json.free.plan === 'Starter' &&
+    setupGuide.json.free.price === '$0 per month' && setupGuide.json.free.commercialUse === false &&
+    /5,000 API calls per month/.test(setupGuide.json.free.callLimit) &&
+    /3 licensed Bibles/.test(setupGuide.json.free.licensedBibles));
+  t('the setup guide spells out the steps: free account, add The Message, key, env, verify',
+    setupGuide.json.setup.steps.length === 5 &&
+    /free API\.Bible account/.test(setupGuide.json.setup.steps[0].title) &&
+    /Add The Message \(MSG\)/.test(setupGuide.json.setup.steps[1].title) &&
+    /API key/.test(setupGuide.json.setup.steps[2].title) &&
+    /BIBLE_API_KEY/.test(setupGuide.json.setup.steps[3].detail) &&
+    /action=status&version=MSG/.test(setupGuide.json.setup.steps[4].detail));
+  t('the setup guide links to the API.Bible sign-up, dashboard and help pages',
+    setupGuide.json.free.links.signUp === 'https://api.bible/sign-up' &&
+    setupGuide.json.free.links.dashboard === 'https://api.bible/dashboard' &&
+    /^https:\/\/api\.bible\//.test(setupGuide.json.free.links.gettingStarted) &&
+    /^https:\/\/docs\.api\.bible\//.test(setupGuide.json.free.links.docs));
+  t('the setup guide keeps the reader-facing summary free of environment variable names',
+    /free API\.Bible Starter plan/.test(setupGuide.json.setup.summary) &&
+    /No other translation is ever shown in its place/.test(setupGuide.json.setup.summary) &&
+    !/BIBLE_API_KEY/.test(setupGuide.json.message) && !/BIBLE_API_KEY/.test(setupGuide.json.setup.summary));
+
+  const kjvSetup = await invoke('/api/bible?action=setup&version=KJV');
+  t('a translation that needs no key says so instead of showing setup steps',
+    kjvSetup.status === 200 && kjvSetup.json.apiBible === false && kjvSetup.json.configured === true &&
+    /nothing to set up/.test(kjvSetup.json.message) && !kjvSetup.json.setup);
+
+  clearConfiguration();
+  const msgStatusNoKey = await invoke('/api/bible?action=status&version=MSG');
+  t('an unconfigured MSG status carries the free setup steps for the reader card',
+    msgStatusNoKey.status === 200 && msgStatusNoKey.json.configured === false &&
+    !!msgStatusNoKey.json.setup && msgStatusNoKey.json.setup.steps.length === 5 &&
+    msgStatusNoKey.json.setup.plan.name === 'Starter');
+
+  clearConfiguration();
+  setConfigured('MSG');
+  await withHttpsResponses([{ body: { data: { content: 'never used' } } }], async requests => {
+    const status = await invoke('/api/bible?action=status&version=MSG');
+    t('a configured MSG status does not nag the reader with setup steps',
+      requests.length === 0 && status.json.configured === true && !('setup' in status.json));
   });
 
   /* ------------------------------------------- configuration and access errors */
@@ -354,6 +435,14 @@ function clearConfiguration() {
       !/BIBLE_API_KEY/.test(result.json.message));
     t('the missing-key response tells the owner exactly what to set',
       /BIBLE_API_KEY/.test(result.json.detail) && /NIV_BIBLE_ID/.test(result.json.detail));
+    t('the missing-key response points at the free plan and the setup guide',
+      /free API\.Bible Starter key is enough/.test(result.json.detail) &&
+      /api\.bible\/sign-up/.test(result.json.detail) &&
+      /action=setup&version=NIV/.test(result.json.detail) && !/BIBLE_API_KEY/.test(result.json.message));
+    t('an owner-fixable failure carries the free setup steps for the reader card',
+      !!result.json.setup && result.json.setup.steps.length === 5 &&
+      result.json.setup.plan.price === '$0 per month' &&
+      result.json.setup.links.dashboard === 'https://api.bible/dashboard');
     t('no key material or provider payload is echoed back',
       !result.body.includes(TEST_KEY) && !JSON.stringify(result.json).includes('never used'));
   });
@@ -674,9 +763,33 @@ function clearConfiguration() {
   });
 
   /* ---------------------------------------------------- parser and hardening */
-  t('out-of-sequence verses are rejected rather than shown out of order', (function () {
-    try { handler._parseApiBibleHtml('<span class="v" data-number="1">1</span>a <span class="v" data-number="3">3</span>b'); return false; }
-    catch (error) { return /out of sequence/.test(error.message); }
+  t('a verse number the edition omits is kept, not thrown away (The Message folds some verses)', (function () {
+    const verses = handler._parseApiBibleHtml('<span class="v" data-number="1">1</span>a <span class="v" data-number="3">3</span>b');
+    return verses.length === 2 && verses[0].verse === 1 && verses[1].verse === 3 &&
+      verses[0].text === 'a' && verses[1].text === 'b';
+  })());
+  t('range markers ("16-21") and a chapter that does not open at verse 1 are laid out, as The Message prints them', (function () {
+    // The shape API.Bible returns for The Message: paragraphs numbered as
+    // ranges, a section break repeating a number, and no verse 1 marker.
+    const html = '<p><span class="v" data-number="2-3">2-3</span>First words of the passage.' +
+      '<span class="v" data-number="4">4</span>Then the next paragraph.* * *' +
+      '<span class="v" data-number="4">4</span>Continued after the break.' +
+      '<span class="v" data-number="7">7</span>A later paragraph.</p>';
+    const verses = handler._parseApiBibleHtml(html);
+    return verses.length === 3 && verses[0].verse === 2 && verses[1].verse === 4 &&
+      /First words/.test(verses[0].text) &&
+      verses[1].text === 'Then the next paragraph.* * * Continued after the break.' &&
+      verses[2].verse === 7;
+  })());
+  t('a verse 0 marker is dropped rather than shown as a verse', (function () {
+    const verses = handler._parseApiBibleHtml('<span class="v" data-number="0">0</span>Chapter introduction. <span class="v" data-number="1">1</span>Verse one.');
+    return verses.length === 1 && verses[0].verse === 1 && verses[0].text === 'Verse one.';
+  })());
+  t('a number that runs backwards is still rejected rather than shown out of order', (function () {
+    try {
+      handler._parseApiBibleHtml('<span class="v" data-number="3">3</span>a <span class="v" data-number="2">2</span>b');
+      return false;
+    } catch (error) { return /out of sequence/.test(error.message); }
   })());
 
   clearConfiguration();
@@ -704,6 +817,71 @@ function clearConfiguration() {
     html.includes("`${currentTranslationName} · setup required`"));
   t('an unconfigured translation shows the server message, not a substitute',
     html.includes('json.message') && html.includes('No other translation'));
+  t('the reader never prints "The The Message" in a fallback sentence',
+    !html.includes('The ${BIBLE_VERSIONS[version].name}') && !/The The Message/.test(html));
+  t('the reader offers the free setup route when a licensed translation is not switched on',
+    html.includes('id="versionSetup"') && html.includes('function renderSetupCard(') &&
+    html.includes('Site owner? Switch it on free in a few minutes') &&
+    html.includes('json.configured ? null : json.setup') && html.includes('payload.setup'));
+  t('the setup card keeps owner instructions out of the reader-facing sentence',
+    html.includes('renderSetupCard(null)') && html.includes('setup.summary') &&
+    html.includes('setup.steps') && html.includes('escapeHtml(step.detail'));
+  t('the reader links the free account pages, not a mirror, for the licensed editions',
+    html.includes('links.signUp') && html.includes('links.dashboard') &&
+    !/bolls\.life[^`]*MSG/.test(html));
+
+  /* The setup card is rendered for real in a DOM when jsdom is available (an
+     optional devDependency, skipped when it is not installed). */
+  let JSDOM = null;
+  try { ({ JSDOM } = require('jsdom')); } catch (error) { /* optional */ }
+  if (JSDOM) {
+    const fnStart = html.indexOf('function renderSetupCard(');
+    let depth = 0;
+    let fnEnd = -1;
+    for (let index = html.indexOf('{', fnStart); index !== -1; index += 1) {
+      if (html[index] === '{') depth += 1;
+      else if (html[index] === '}') {
+        depth -= 1;
+        if (depth === 0) { fnEnd = index + 1; break; }
+      }
+    }
+    const source = html.slice(fnStart, fnEnd);
+    const dom = new JSDOM('<!doctype html><html><body><div class="version-selector"><span id="versionStatus"></span><div class="version-setup" id="versionSetup" hidden></div></div></body></html>', { runScripts: 'outside-only' });
+    const { window } = dom;
+    window.currentTranslationName = 'The Message';
+    window.escapeHtml = value => {
+      if (!value) return '';
+      const div = window.document.createElement('div');
+      div.textContent = String(value);
+      return div.innerHTML;
+    };
+    let card = null;
+    try {
+      window.eval(`${source}\nwindow.__renderSetupCard = renderSetupCard;`);
+      card = window.__renderSetupCard;
+    } catch (error) { card = null; }
+    t('the setup card function is self-contained enough to render', typeof card === 'function');
+    const box = window.document.getElementById('versionSetup');
+    if (typeof card === 'function') {
+      card({
+        summary: 'The Message is a licensed translation, so it is read from API.Bible rather than a free mirror.',
+        plan: { name: 'Starter', price: '$0 per month', callLimit: '5,000 API calls per month' },
+        links: { signUp: 'https://api.bible/sign-up', dashboard: 'https://api.bible/dashboard' },
+        steps: [{ title: 'Create a free API.Bible account', detail: 'Open https://api.bible/sign-up and sign up.' }]
+      });
+      t('the setup card shows the reader sentence, the collapsed owner steps and the links',
+        box.hidden === false && box.innerHTML.includes('is not switched on for this site yet') &&
+        box.innerHTML.includes('Site owner? Switch it on free in a few minutes') &&
+        box.innerHTML.includes('Create a free API.Bible account') &&
+        box.innerHTML.includes('https://api.bible/sign-up') &&
+        box.innerHTML.includes('$0 per month') && box.innerHTML.includes('<details>'));
+      card(null);
+      t('the setup card is cleared again once the translation is switched on',
+        box.hidden === true && box.innerHTML === '');
+    }
+  } else {
+    console.log('SKIP  setup-card render test: jsdom not installed (npm install --no-save jsdom)');
+  }
   t('reader typography is fluid and prevents horizontal overflow',
     /font-size:\s*clamp\(/.test(html) && /overflow-wrap:\s*anywhere/.test(html) &&
     /overflow-x:\s*hidden/.test(html));
@@ -721,6 +899,23 @@ function clearConfiguration() {
   t('the licensing note documents API.Bible as the NIV and MSG source',
     /NIV[^\n]*api\.bible/i.test(licensing) && /MSG[^\n]*api\.bible/i.test(licensing) &&
     /BIBLE_API_KEY/.test(licensing) && /NIV_BIBLE_ID/.test(licensing) && /MSG_BIBLE_ID/.test(licensing));
+  t('the licensing note records the free Starter route and the setup guide',
+    /Starter\s+plan is \$0\/month/.test(licensing) && /action=setup/.test(licensing) &&
+    /bible:setup/.test(licensing) && /three licensed Bibles/.test(licensing));
+
+  const deployment = fs.readFileSync(path.join(ROOT, 'DEPLOYMENT.md'), 'utf8');
+  t('the deployment guide walks the owner through the free Starter-plan key',
+    /free Starter plan is\s+\$0\/month/.test(deployment) &&
+    /https:\/\/api\.bible\/sign-up/.test(deployment) &&
+    /action=setup&version=MSG/.test(deployment) && /npm run bible:setup/.test(deployment));
+
+  const helper = fs.readFileSync(path.join(ROOT, 'scripts/bible-ids.mjs'), 'utf8');
+  t('the helper script prints the same free steps without needing a key',
+    /--setup/.test(helper) && /function setupSteps\(/.test(helper) &&
+    /no key is given/.test(helper) && /api\.bible\/sign-up/.test(helper) &&
+    /Keep in step with freePlan\(\) in api\/bible\.js/.test(helper));
+  t('the helper script never falls back to a mirror for the licensed editions',
+    !/bolls\.life[^\n]*MSG/i.test(helper) && /--verify/.test(helper));
 
   console.log(`\n${pass} passed, ${fail} failed`);
   process.exitCode = fail ? 1 : 0;
