@@ -266,11 +266,15 @@
 
   /* ------------------------------------------------------------ the voice */
 
+  /* Domey is a woman, so the voice pick is female-first: a warm woman's voice
+     wherever the device has one, with male voices only as a last resort. */
   var VOICE_PRIORITY = [
-    'google uk english female', 'google uk english male',
-    'google us english', 'microsoft aria', 'microsoft jenny', 'microsoft guy',
-    'microsoft libby', 'microsoft sonia', 'samantha', 'karen', 'moira', 'tessa',
-    'daniel', 'alex', 'rishi', 'serena'
+    'google uk english female',
+    'microsoft aria', 'microsoft jenny', 'microsoft michelle', 'microsoft ana',
+    'microsoft sonia', 'microsoft libby', 'microsoft natasha',
+    'samantha', 'karen', 'moira', 'tessa', 'serena', 'victoria', 'fiona', 'karen-compact',
+    'google us english', 'google uk english male',
+    'microsoft guy', 'microsoft david', 'microsoft mark', 'daniel', 'alex', 'rishi', 'fred'
   ];
 
   function Voice() {
@@ -316,7 +320,8 @@
       if (/google/.test(name)) score += 22;
       if (/microsoft/.test(name)) score += 16;
       if (/natural|neural|enhanced|premium/.test(name)) score += 18;
-      if (/female|woman|aria|jenny|sonia|libby|samantha|karen|moira|tessa|serena|zira|amy/.test(name)) score += 10;
+      if (/female|woman|aria|jenny|sonia|libby|samantha|karen|moira|tessa|serena|zira|amy|michelle|natasha|victoria|fiona/.test(name)) score += 26;
+      if (/\bmale\b/.test(name) && !/female/.test(name)) score -= 18;
       if (v.localService) score += 4;
       if (v.default) score += 3;
       if (score > bestScore) { bestScore = score; best = v; }
@@ -362,8 +367,8 @@
       var voice = self.pick(opts.lang || self.lang);
       if (voice) { utterance.voice = voice; utterance.lang = voice.lang; }
       else { utterance.lang = (opts.lang || self.lang || 'en'); }
-      utterance.rate = opts.rate || 0.98;
-      utterance.pitch = opts.pitch || 1.06;
+      utterance.rate = opts.rate || 0.97;
+      utterance.pitch = opts.pitch || 1.12;
       utterance.volume = opts.volume == null ? 1 : opts.volume;
 
       var guard, safety, keepAlive;
@@ -396,7 +401,10 @@
         if (!opts.onWord) return;
         var name = event && event.name;
         if (name && name !== 'word') return;
-        try { opts.onWord(wordIndexAt(clean, event.charIndex || 0), event.charIndex || 0); } catch (e) {}
+        // Some engines stamp each boundary with the spoken time so far — that
+        // is the voice's own clock, and the mouth follows it exactly.
+        var elapsed = event && event.elapsedTime;
+        try { opts.onWord(wordIndexAt(clean, event.charIndex || 0), event.charIndex || 0, typeof elapsed === 'number' ? elapsed : null); } catch (e) {}
       };
       utterance.onend = function () { finish(true, false, 'ended'); };
       utterance.onerror = function () { finish(false, false, 'error'); };
@@ -489,7 +497,7 @@
           var result = event.results[i];
           var text = result[0] ? result[0].transcript : '';
           if (result.isFinal) { heard = heard ? heard + ' ' + text : text; }
-          else if (opts.continuous) { interim = interim ? interim + ' ' + text : text; }
+          else { interim = interim ? interim + ' ' + text : text; }
         }
         if (opts.onInterim) { try { opts.onInterim((interim || heard).trim()); } catch (e) {} }
         if (opts.continuous) {
@@ -674,6 +682,11 @@
           frames.push({ v: v, ms: Math.round((VISEME_MS[v] || 86) * pace) });
         }
         if (!frames.length) frames.push({ v: 'rest', ms: 110 });
+        // A sentence deserves a breath: commas hold the mouth closed briefly
+        // and full stops longer, exactly where a real speaker pauses.
+        var tail = /[,;:]$/.test(word) ? 150 : /[.!?]$/.test(word) ? 270
+          : /\.\.\.$/.test(word) ? 380 : 0;
+        if (tail) frames.push({ v: 'rest', ms: Math.round(tail * pace) });
         var total = frames.reduce(function (n, f) { return n + f.ms; }, 0);
         return { word: word, frames: frames, ms: total };
       });
@@ -687,6 +700,8 @@
     this.fi = 0;
     this.done = true;
     this.onWord = null;
+    this.rateScale = 1;        // learned from the voice's real word timing
+    this.lastBoundaryAt = 0;   // performance.now() of the last boundary
   }
   /** Move the lips: `data-pdm-vis` is what tells the stylesheet which mouth
    *  posture to show, and the jaw amount is how far open it sits. */
@@ -708,6 +723,8 @@
     this.plan = plan && plan.length ? plan : null;
     this.wi = 0;
     this.fi = 0;
+    this.rateScale = 1;
+    this.lastBoundaryAt = 0;
     this.done = !this.plan;
     if (this.done) { this.set('rest', 0.1); return this; }
     if (this.onWord) this.onWord(0);
@@ -723,7 +740,12 @@
     this.set(frame.v, frame.v === 'A' ? 0.95 : frame.v === 'rest' ? 0.1 : frame.v === 'O' || frame.v === 'U' ? 0.7 : 0.5);
     // The motor clears this timer itself (start/stop/hurry all go through it),
     // so it is deliberately not pushed onto the host's timer list.
-    this.timer = setTimeout(function () { self.advance(); }, frame.ms);
+    // When the voice's own boundaries say it is speaking slower than the plan
+    // (rateScale > 1), the frames are stretched so the mouth holds each shape
+    // longer instead of running ahead of the voice; faster compresses them.
+    var scale = this.rateScale || 1;
+    this.timer = setTimeout(function () { self.advance(); },
+      Math.max(30, Math.round(frame.ms * scale)));
   };
   MouthMotor.prototype.advance = function () {
     if (this.done || !this.plan) return;
@@ -743,10 +765,30 @@
    * reports boundaries, the lips follow the voice instead of a timer.
    */
   MouthMotor.prototype.jumpToWord = function (index) {
-    if (this.done || !this.plan || index == null) return;
-    if (index <= this.wi || index >= this.plan.length) return;
+    if (this.done || !this.plan || index == null || index >= this.plan.length) return;
+    var now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    // Learn the voice's real pace from the gap between its word boundaries, so
+    // the words that follow are held exactly as long (or as briefly) as the
+    // voice speaks them. This is what keeps the lips honest when the spoken
+    // response changes — nothing here is a fixed timing.
+    if (this.lastBoundaryAt && index > this.wi) {
+      var planned = 0;
+      for (var w = this.wi; w < index && w < this.plan.length; w++) planned += this.plan[w].ms;
+      var actual = now - this.lastBoundaryAt;
+      if (planned > 40 && actual > 40) {
+        var scale = Math.max(0.55, Math.min(1.9, actual / planned));
+        this.rateScale = Math.max(0.55, Math.min(1.9, this.rateScale * 0.4 + scale * 0.6));
+      }
+    }
+    // Every boundary stamps the clock — even a repeat of the word the mouth
+    // is already on — so the next gap is always measured from the voice.
+    this.lastBoundaryAt = now;
+    if (index === this.wi && this.fi === 0) return;
+    // A boundary behind the current word means the mouth ran ahead of the
+    // voice: go back to the word the voice is actually saying right now.
     this.wi = index;
     this.fi = 0;
+    if (this.timer) clearTimeout(this.timer);
     if (this.onWord) this.onWord(index);
     this.tick();
   };
@@ -817,11 +859,26 @@
     return out.join(' ');
   }
 
+  /* A member answering a true-or-false question says "yes"/"correct" as
+     often as "true" — both mean the same choice. */
+  var TF_WORDS = {
+    yes: 'true', yeah: 'true', yep: 'true', yup: 'true', correct: 'true',
+    right: 'true', truly: 'true', indeed: 'true', 'thats': '', 'that': '',
+    no: 'false', nope: 'false', wrong: 'false', untrue: 'false', incorrectly: 'false',
+    false: 'false', not: 'false', isnt: 'false', "isn't": 'false'
+  };
+
   function matchChoices(transcript, choices) {
     var text = withNumbers(norm(transcript));
     if (!text || !choices || !choices.length) return { index: null, score: 0 };
     var words = text.split(' ').filter(Boolean);
     var best = { index: null, score: 0 };
+    // True-or-false questions: translate the everyday words first.
+    var lowered = choices.map(function (c) { return withNumbers(norm(c)); });
+    if (lowered.length === 2 && lowered.indexOf('true') !== -1 && lowered.indexOf('false') !== -1) {
+      words = words.map(function (w) { return TF_WORDS[w] != null ? TF_WORDS[w] : w; }).filter(Boolean);
+      text = words.join(' ');
+    }
 
     // Explicit ordinal or letter: "b", "second", "number three"
     for (var w = 0; w < words.length; w++) {
@@ -886,6 +943,14 @@
     pitch: 1.06,
     placeholder: 'Type your answer…',
     captionsOnly: false,
+    // The Domey learning experience layout: a compact progress bar above the
+    // character, the character herself full width and unobstructed, and every
+    // word — hers and the member's — in areas below her, never over her face.
+    layout: 'classic',
+    // Where the top bar's back button goes ('classic' renders no top bar).
+    back: null,
+    // Show the written conversation history under the answer controls.
+    log: false,
     // Lip-sync and the little hand actions; both are pure decoration, so a page
     // that wants a calm Domey can simply switch them off.
     lipSync: true,
@@ -972,43 +1037,51 @@
    * Swap the drawing for the 3D character. Returns the renderer, or null when
    * there is nothing to swap (no module, no WebGL, already upgraded).
    *
-   * When the page ships the realistic head (pd-domey-scan.js), that head is used
-   * first. If the model cannot load, the cartoon rig is used instead, and if
-   * that fails too the drawing stays. Nothing is left on a permanent loader.
+   * Domey is the semi-realistic hostess (pd-domey-lady.js): a woman in Prayer
+   * Dome's royal blue and gold holding a Bible, generated entirely from
+   * geometry so she needs no download and appears on a cold start. If she
+   * cannot be built for any reason, the cartoon rig from pd-domey3d.js takes
+   * over, and if that fails too the drawing stays. Nothing is left on a
+   * permanent loader.
    */
   Host.prototype.use3D = function (opts) {
-    var self = this;
     if (this.renderer3d || this.destroyed || this.options.render === 'svg') return this.renderer3d;
     var engine = global.PDDomey3D;
     if (!engine || typeof engine.create !== 'function' || !engine.available()) return null;
     opts = opts || {};
-    var human = global.PDDomeyHuman;
-    if (human && !opts.cartoon && !opts.asset && typeof human.load === 'function' && engine.three && engine.three()) {
-      var THREE = engine.three();
-      // Low-end Android keeps the light 2D drawing: the stylised human is not
-      // loaded there, so the page stays responsive.
-      if (human.isLowEnd()) {
-        this.root.setAttribute('data-pdm-model', '2d-low-end');
-        this.emit('renderer', 'svg');
-        return null;
+    var lady = global.PDDomeyLady;
+    var THREE = engine.three && engine.three();
+    if (lady && typeof lady.buildRig === 'function' && THREE && !opts.cartoon) {
+      try {
+        var rig = lady.buildRig(THREE, {
+          reducedMotion: engine.prefersReducedMotion && engine.prefersReducedMotion()
+        });
+        // The engine's stage floor sits at y −0.685 and her feet reach −0.61 in
+        // her own space: step her down the last 9 cm so her shoes stand on the
+        // floor instead of hovering above it (the cartoon sinks through it,
+        // which reads as grounded but hides the feet).
+        rig.root.position.y -= 0.09;
+        return this._mount3D(engine, {
+          rig: rig,
+          fit: { height: 2.8, width: 1.72, y: 0.55 },   // head to feet, filling the stage
+          maxPixelRatio: ladyIsLowEnd() ? 1.25 : 2,
+          model: 'lady'
+        });
+      } catch (error) {
+        console.warn('[PDMascot] the hostess could not be built, using the cartoon rig', error && error.message);
       }
-      // The 2D drawing is already on stage, so a slow or failed download never
-      // leaves a blank or permanently loading character.
-      this.root.setAttribute('data-pdm-model', 'loading');
-      human.load(THREE).then(function (asset) {
-        if (self.destroyed || self.renderer3d) return;
-        self._mount3D(engine, { asset: asset, three: THREE, human: true });
-      }).catch(function (error) {
-        console.warn('[PDMascot] stylised character unavailable, keeping the drawing', error && error.message);
-        if (!self.destroyed) {
-          self.root.setAttribute('data-pdm-model', 'error');
-          self.emit('renderer', 'svg');
-        }
-      });
-      return null;
     }
     return this._mount3D(engine, opts);
   };
+
+  /* Light phones still get the full 3D hostess — she is pure geometry — but a
+     smaller canvas so the frame rate holds on slower GPUs. */
+  function ladyIsLowEnd() {
+    var nav = global.navigator || {};
+    var fewCores = typeof nav.hardwareConcurrency === 'number' && nav.hardwareConcurrency <= 4;
+    var lowMemory = typeof nav.deviceMemory === 'number' && nav.deviceMemory <= 3;
+    return !!(fewCores || lowMemory);
+  }
 
   Host.prototype._mount3D = function (engine, opts) {
     var self = this;
@@ -1022,20 +1095,17 @@
         self.use2D();
       }
     };
-    if (opts.human && opts.asset && global.PDDomeyHuman) {
-      createOptions.three = opts.three;
-      createOptions.rig = global.PDDomeyHuman.buildRig(opts.three, {
-        asset: opts.asset,
-        lowEnd: false,
-        reducedMotion: createOptions.reducedMotion
-      });
+    if (opts.rig) {
+      createOptions.rig = opts.rig;
+      createOptions.maxPixelRatio = opts.maxPixelRatio || 2;
+      if (opts.fit) createOptions.fit = opts.fit;
     }
     var instance = engine.create(this.stage, createOptions);
     if (!instance) return null;
     this.renderer3d = instance;
     this.root.classList.add('pdm-render-3d');
     this.root.setAttribute('data-pdm-render', '3d');
-    this.root.setAttribute('data-pdm-model', createOptions.rig ? 'human' : 'cartoon');
+    this.root.setAttribute('data-pdm-model', opts.model || (createOptions.rig ? 'lady' : 'cartoon'));
     this.emit('renderer', '3d');
     return instance;
   };
@@ -1092,6 +1162,10 @@
     this.root.classList.add('pd-mascot');
     if (this.options.compact) this.root.classList.add('pdm-compact');
     this.root.setAttribute('data-pdm-state', 'idle');
+    // The learning-experience layout: everything the member reads lives above
+    // or below the character, so Domey's face is never covered by text.
+    var companion = this.options.layout === 'companion';
+    if (companion) this.root.classList.add('pdm-companion');
 
     var stage = el('div', 'pdm-stage');
     stage.innerHTML =
@@ -1101,14 +1175,36 @@
       '<div class="pdm-char-wrap">' + characterMarkup(this.id) + '</div>' +
       '<div class="pdm-listen-ring"></div>' +
       '<div class="pdm-reactions" aria-hidden="true"></div>';
-    this.hud = el('div', 'pdm-hud');
-    this.hud.setAttribute('hidden', '');
-    stage.appendChild(this.hud);
-    this.stage = stage;
     this.reactions = stage.querySelector('.pdm-reactions');
     this.character = stage.querySelector('.pdm-char-wrap');
+    this.stage = stage;
 
     var dialog = el('div', 'pdm-dialog');
+    this.dialog = dialog;
+
+    if (companion) {
+      /* ---- the top bar: back, round, correct answers, XP ------------------
+         A compact strip above the stage. The score lives HERE, not floating
+         over the character. */
+      var topbar = el('div', 'pdm-topbar');
+      var back = this.options.back;
+      topbar.innerHTML =
+        (back && back.href
+          ? '<a class="pdm-back" href="' + esc(back.href) + '"' + (back.external ? ' target="_blank" rel="noopener"' : '') +
+            ' aria-label="' + esc(back.label || 'Go back') + '"><i class="pd-i pd-i-arrow-left" aria-hidden="true"></i><span>' + esc(back.label || 'Back') + '</span></a>'
+          : '<button class="pdm-back" type="button" aria-label="Go back"><i class="pd-i pd-i-arrow-left" aria-hidden="true"></i><span>Back</span></button>') +
+        '<div class="pdm-hud" hidden></div>';
+      this.hud = topbar.querySelector('.pdm-hud');
+      this.topbar = topbar;
+      var backBtn = topbar.querySelector('button.pdm-back');
+      if (backBtn) backBtn.addEventListener('click', function () {
+        try { global.history.back(); } catch (e) { global.location.href = (back && back.href) || '/'; }
+      });
+      this.root.appendChild(topbar);
+    }
+
+    this.root.appendChild(stage);
+
     this.bubble = el('div', 'pdm-bubble');
     this.bubble.innerHTML =
       '<span class="pdm-name"><i class="pd-i pd-i-sparkles" aria-hidden="true"></i> ' +
@@ -1140,7 +1236,14 @@
       var value = self.answerInput.value.trim();
       if (!value) return;
       self.answerInput.value = '';
-      self._accept(value, 'typed');
+      // Typing "C" or "Noah" answers the same question the same way saying it
+      // would: through the shared matcher, never a second code path.
+      var typedIndex = null;
+      if (self.question && self.question.kind === 'choice') {
+        var typedMatch = matchChoices(value, self.question.choices || []);
+        if (typedMatch.index != null) typedIndex = typedMatch.index;
+      }
+      self._accept(value, 'typed', typedIndex);
     });
 
     var enable = el('button', 'pdm-enable-voice',
@@ -1183,14 +1286,43 @@
       ? 'Answer by talking (tap the microphone), tapping a choice, or typing.'
       : 'Answer by tapping a choice or typing.';
 
-    dialog.appendChild(this.bubble);
-    dialog.appendChild(this.chips);
-    dialog.appendChild(this.answerForm);
-    dialog.appendChild(enable);
-    dialog.appendChild(bar);
-    dialog.appendChild(this.hint);
+    if (companion) {
+      /* The dialogue card: her name, her message, the microphone and the
+         live listening indicator — one rounded card under the character. */
+      var card = el('div', 'pdm-dialogue-card');
+      card.appendChild(this.bubble);
+      this.heardEl = el('p', 'pdm-heard');
+      this.heardEl.setAttribute('aria-live', 'polite');
+      this.heardEl.hidden = true;
+      card.appendChild(this.heardEl);
+      card.appendChild(bar);
+      dialog.appendChild(card);
+      dialog.appendChild(this.chips);
+      dialog.appendChild(this.answerForm);
+      dialog.appendChild(enable);
+      if (this.options.log !== false) {
+        this.logEl = el('div', 'pdm-log');
+        this.logEl.setAttribute('role', 'log');
+        this.logEl.setAttribute('aria-label', 'Conversation with ' + this.options.name);
+        this.logEl.appendChild(el('p', 'pdm-log-title',
+          '<i class="pd-i pd-i-messages-square" aria-hidden="true"></i> Conversation'));
+        dialog.appendChild(this.logEl);
+      }
+      dialog.appendChild(this.hint);
+    } else {
+      if (!this.hud) {
+        this.hud = el('div', 'pdm-hud');
+        this.hud.setAttribute('hidden', '');
+        stage.appendChild(this.hud);
+      }
+      dialog.appendChild(this.bubble);
+      dialog.appendChild(this.chips);
+      dialog.appendChild(this.answerForm);
+      dialog.appendChild(enable);
+      dialog.appendChild(bar);
+      dialog.appendChild(this.hint);
+    }
 
-    this.root.appendChild(stage);
     this.root.appendChild(dialog);
 
     // First touch anywhere unlocks audio + speech on mobile browsers.
@@ -1203,7 +1335,7 @@
     // is the most natural thing a member will try first.
     if (this.options.listenOnTap !== false) {
       stage.addEventListener('click', function () {
-        if (self.micEnabled || !self.ears.supported || self.destroyed) return;
+        if (self.micEnabled || !self.ears.supported || self.destroyed || self._waiting) return;
         self.enableMic().then(function (granted) {
           if (!granted || self.destroyed) return;
           // Never talk over a question that is already waiting for an answer:
@@ -1213,7 +1345,7 @@
           self.say('I can hear you now. Ask me anything, or tap Start the show.', { emote: 'listening' });
         });
       });
-      stage.setAttribute('title', this.ears.supported ? 'Tap Domey to let him hear you' : 'Domey, your Prayer Dome host');
+      stage.setAttribute('title', this.ears.supported ? 'Tap Domey to let her hear you' : 'Domey, your Prayer Dome host');
     }
   };
 
@@ -1242,6 +1374,44 @@
 
   Host.prototype.setStatus = function (text) {
     this.statusEl.textContent = text || '';
+  };
+
+  /* --------------------------------------------- the written conversation */
+
+  /**
+   * One line of the written conversation ("DOMEY …" / "YOU …"). The log is
+   * what the member reads back over the lesson; the spoken words and the
+   * written words are the same words, because both come through say().
+   */
+  Host.prototype.logLine = function (who, text, cls) {
+    if (!this.logEl || this.destroyed) return this;
+    var line = String(text || '').trim();
+    if (!line) return this;
+    var row = el('div', 'pdm-log-row' + (cls ? ' ' + cls : '') +
+      (who === 'you' ? ' pdm-log-you' : ' pdm-log-host'));
+    row.innerHTML =
+      '<span class="pdm-log-who">' + (who === 'you' ? 'You' : esc(this.options.name)) + '</span>' +
+      '<span class="pdm-log-text">' + esc(line) + '</span>';
+    this.logEl.appendChild(row);
+    // The newest message scrolls into view quietly, without jumping the page
+    // out from under the member's finger.
+    try {
+      this.logEl.scrollTop = this.logEl.scrollHeight;
+      if (row.scrollIntoView) row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    } catch (e) { /* older browsers just keep the container scrolled */ }
+    return this;
+  };
+
+  /** The live transcription of what the member is saying right now. */
+  Host.prototype.showHeard = function (partial) {
+    if (!this.heardEl) return this;
+    var text = String(partial || '').trim();
+    if (!text) { this.heardEl.hidden = true; this.heardEl.textContent = ''; return this; }
+    this.heardEl.hidden = false;
+    this.heardEl.innerHTML =
+      '<i class="pd-i pd-i-mic" aria-hidden="true"></i>' +
+      '<span class="pdm-heard-who">You</span> <span class="pdm-heard-text">' + esc(text) + '</span>';
+    return this;
   };
 
   Host.prototype.emote = function (state, ms) {
@@ -1441,6 +1611,7 @@
     this.lastSpoken = line;
     this.history.push({ who: 'host', text: line, at: Date.now() });
     this.emit('say', line);
+    this.logLine('host', line);
 
     var words = line ? line.split(' ').filter(Boolean).length : 0;
     var rate = opts.rate || this.options.rate || 1;
@@ -1465,10 +1636,10 @@
       onStart: opts.onStart,
       // The engine's word boundaries keep the lips honest; without them the
       // plan simply plays at its own pace.
-      onWord: function (index) {
+      onWord: function (index, charIndex, elapsedMs) {
         if (!self.mouthOn) return;
         captions.showWord(index);
-        self.mouth.jumpToWord(index);
+        self.mouth.jumpToWord(index, elapsedMs);
       }
     };
     var spoken = Promise.resolve({ spoken: false, blocked: false, reason: 'captions-only' });
@@ -1705,6 +1876,86 @@
 
   /* ------------------------------------------------------------- the ask */
 
+  /**
+   * The reading pause after an answer: hold the verdict and its verse on
+   * screen until the member is ready — a big Continue button, or simply
+   * saying "next". Nothing is spoken and nothing times out underneath the
+   * member's finger; resolve value is how the pause ended.
+   */
+  Host.prototype.waitForContinue = function (opts) {
+    var self = this;
+    opts = opts || {};
+    if (this.destroyed) return Promise.resolve('destroyed');
+    this._clearQuestion();
+    this._waiting = true;
+    this.setStatus(opts.status || 'Take your time');
+    this.chips.innerHTML = '';
+    var chip = el('button', 'pdm-chip pdm-chip-big pdm-chip-continue',
+      '<span class="pdm-chip-label">' + esc(opts.label || 'Continue') + '</span>' +
+      '<i class="pd-i pd-i-arrow-right" aria-hidden="true"></i>');
+    chip.type = 'button';
+    this.chips.appendChild(chip);
+
+    var done = false;
+    var resolveContinue;
+    var promise = new Promise(function (resolve) { resolveContinue = resolve; });
+    var timeoutId = null;
+
+    function finish(source) {
+      if (done) return;
+      done = true;
+      self._waiting = false;
+      if (timeoutId != null) clearTimeout(timeoutId);
+      self.ears.stop();
+      self.micBadge.hidden = true;
+      chip.disabled = true;
+      resolveContinue(source);
+    }
+
+    chip.addEventListener('click', function () { finish('chip'); });
+
+    var earsOpen = false;
+    function listenLoop() {
+      if (done || self.destroyed || !self.micEnabled || !self.ears.supported) return;
+      if (earsOpen) return;
+      earsOpen = true;
+      self.emote('listening');
+      self.micBadge.hidden = false;
+      self.ears.listenOnce({
+        lang: self.options.lang,
+        timeout: 12000,
+        onInterim: function (partial) {
+          if (!partial) return;
+          self.setStatus('Heard: ' + partial);
+          self.showHeard(partial);
+        }
+      }).then(function (result) {
+        earsOpen = false;
+        if (done || self.destroyed) return;
+        self.micBadge.hidden = true;
+        var text = norm(result.text || '');
+        if (text && /^(next|continue|yes|yeah|yep|ok|okay|ready|go on|go ahead|move on|proceed|another|keep going|lets go|let us go)\b/.test(text)) {
+          self.showHeard(text);
+          finish('voice');
+          return;
+        }
+        if (text && /^(stop|end the show|finish|no more|that is all)\b/.test(text)) {
+          finish('stop');
+          return;
+        }
+        if (result.reason === 'not-allowed' || result.reason === 'service-not-allowed') {
+          self.disableMic();
+          return;
+        }
+        if (!done) self._later(listenLoop, 300);
+      });
+    }
+
+    if (this.micEnabled && this.ears.supported) this._later(listenLoop, 350);
+    timeoutId = this._later(function () { if (!done) finish('timeout'); }, opts.timeout || 120000);
+    return promise;
+  };
+
   Host.prototype._clearQuestion = function () {
     this.question = null;
     this.chips.innerHTML = '';
@@ -1720,10 +1971,14 @@
     this.question = null;
     this.ears.stop();
     this.micBadge.hidden = true;
+    if (this.heardEl) this.heardEl.hidden = true;
     // Freeze the choice chips so one answer is never sent twice.
     this.chips.querySelectorAll('.pdm-chip').forEach(function (chip) { chip.disabled = true; });
     Band.play('listen');
-    resolve({ text: String(value == null ? '' : value), source: source, index: index == null ? null : index });
+    var answer = { text: String(value == null ? '' : value), source: source, index: index == null ? null : index };
+    if (answer.text) this.logLine('you', answer.text, source === 'voice' ? 'pdm-log-spoken' : '');
+    this.emit('answered', answer);
+    resolve(answer);
     return true;
   };
 
@@ -1762,14 +2017,32 @@
       var promise = new Promise(function (resolve) { self.answerResolve = resolve; });
       var token = self._token;
 
+      // Four choices carry their letter (A, B, C, D) so the member can say
+      // "C" or "option C" out loud, or tap the button — the same evaluation.
+      var letters = spec.letters != null ? spec.letters
+        : (self.options.layout === 'companion' && choices.length >= 3);
+      var LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
       choices.forEach(function (choice, index) {
-        var chip = el('button', 'pdm-chip', esc(choice));
+        var label = esc(choice);
+        if (letters) {
+          label = '<span class="pdm-chip-letter" aria-hidden="true">' + LETTERS[index] + '</span>' +
+            '<span class="pdm-chip-label">' + esc(choice) + '</span>';
+        }
+        var chip = el('button', 'pdm-chip' + (letters ? ' pdm-chip-big' : ''), label);
         chip.type = 'button';
+        chip.setAttribute('data-pdm-letter', letters ? LETTERS[index] : '');
         chip.addEventListener('click', function () {
           self.chips.querySelectorAll('.pdm-chip').forEach(function (c) { c.classList.remove('is-picked'); });
           chip.classList.add('is-picked');
           if (spec.correctIndex != null) {
-            chip.classList.add(index === spec.correctIndex ? 'is-correct' : 'is-wrong');
+            if (index === spec.correctIndex) {
+              chip.classList.add('is-correct');
+            } else {
+              chip.classList.add('is-wrong');
+              // A wrong answer teaches best when the right one is shown too.
+              var right = self.chips.querySelectorAll('.pdm-chip')[spec.correctIndex];
+              if (right) right.classList.add('is-correct');
+            }
           }
           self._accept(choice, 'chip', index);
         });
@@ -1826,9 +2099,15 @@
         return false;
       }
 
+      var earsOpen = false;
       function listenLoop() {
         if (self.destroyed || !self.answerResolve || token.cancelled) return;
         if (!self.micEnabled || !self.ears.supported) return;
+        // One recognition at a time: the question can be re-armed from several
+        // places (the ask itself, the microphone button, a tap on her), but
+        // two open ears only keep the microphone hot after the answer.
+        if (earsOpen) return;
+        earsOpen = true;
         self.emote('listening');
         self.micBadge.hidden = false;
         Band.play('listen');
@@ -1838,22 +2117,32 @@
           // A prayer request or a spoken sentence is longer than one quiz word,
           // so those keep the ears open a moment after the member stops.
           continuous: spec.kind === 'text' || !!spec.continuous,
-          onInterim: function (partial) { if (partial) self.setStatus('Heard: ' + partial); }
+          onInterim: function (partial) {
+            if (!partial) return;
+            // The member's own words appear on screen as they are spoken.
+            self.setStatus('Heard: ' + partial);
+            self.showHeard(partial);
+            self.emit('interim', partial);
+          }
         }).then(function (result) {
+          earsOpen = false;
           if (self.destroyed || !self.answerResolve || token.cancelled) return;
           self.micBadge.hidden = true;
           if (result.text) {
             self._setState('thinking');
+            // Show exactly what was understood BEFORE it is judged, so the
+            // member can catch a misheard answer and say it again or type it.
+            self.emit('heard', result.text);
+            self.showHeard(result.text);
             if (voiceCommand(result.text)) return;
             var match = spec.kind === 'choice' ? matchChoices(result.text, choices) : { index: null, score: 1 };
             if (spec.kind === 'choice' && match.index == null && (spec.accept || []).length === 0) {
               heardNothing++;
               self.react('hand', 1);
-              self.say(match.score > 0.3 ? 'I am not sure I caught that. Let us try once more.' : 'I did not catch an answer. Say it again, or tap a choice.', { status: 'Your turn' })
+              self.say(match.score > 0.3 ? 'I am not sure I caught that. Say it again, or type your answer below.' : 'I did not quite catch an answer. Say it again, tap a choice, or type it.', { status: 'Your turn' })
                 .then(function () { if (self.answerResolve) listenLoop(); });
               return;
             }
-            self.emit('heard', result.text);
             self._accept(result.text, 'voice', match.index);
             return;
           }
@@ -1979,6 +2268,9 @@
     return {
       q: item.q,
       verse: item.verse,
+      kind: item.kind || 'choice',     // 'choice' | 'tf' | 'verse'
+      topic: item.topic || '',
+      difficulty: item.difficulty || 0,
       options: mixed.map(function (p) { return p.text; }),
       correctIndex: mixed.findIndex(function (p) { return p.correct; }),
       explanation: item.explanation || ''
@@ -2071,7 +2363,8 @@
             correctIndex: item.correctIndex,
             listen: true,
             listenTimeout: 15000,
-            hints: [item.verse]
+            hints: [item.verse],
+            letters: true
           });
         })
         .then(function (answer) {
@@ -2084,6 +2377,15 @@
             if (m.index != null) chosen = m.index;
           }
           var isRight = chosen === item.correctIndex;
+          host.emit('verdict', {
+            round: index + 1,
+            right: isRight,
+            chosen: chosen,
+            correctIndex: item.correctIndex,
+            chosenText: chosen != null ? item.options[chosen] : answer.text,
+            correctText: item.options[item.correctIndex],
+            verse: item.verse
+          });
           if (isRight) {
             correct++;
             streak++;
@@ -2121,8 +2423,17 @@
         })
         .then(function () {
           if (token.cancelled) return null;
-          host.setStatus('Let us keep going');
-          return step();
+          // The verse and the explanation stay on screen while the member
+          // reads; the show moves on when they continue (or after a while).
+          host.setStatus('Take your time');
+          var hold = options.pace === 'manual'
+            ? host.waitForContinue({ label: index + 1 >= questions.length ? 'Finish the round' : 'Next question' })
+            : Promise.resolve('auto');
+          return hold.then(function (how) {
+            if (token.cancelled) return null;
+            if (how === 'stop') { token.cancelled = true; return finish(); }
+            return step();
+          });
         });
     }).then(function (summary) {
       if (token.cancelled) return null;

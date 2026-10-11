@@ -1074,10 +1074,12 @@
     container.appendChild(canvas);
 
     /* Keep the whole character in frame whatever the stage shape.
-       Full-body framing: camera shows head to feet (Domey now has legs!). */
-    var FIT_HEIGHT = 2.85;
-    var FIT_WIDTH = 1.95;
-    var TARGET_Y = 0.78;
+       Full-body framing: camera shows head to feet. A rig may pass its own
+       fit (the hostess is taller and slimmer than the cartoon), and the
+       defaults keep the original cartoon framed exactly as before. */
+    var FIT_HEIGHT = (options.fit && options.fit.height) || 2.85;
+    var FIT_WIDTH = (options.fit && options.fit.width) || 1.95;
+    var TARGET_Y = (options.fit && typeof options.fit.y === 'number') ? options.fit.y : 0.78;
     function fit() {
       var width = Math.max(1, container.clientWidth || canvas.clientWidth || 320);
       var height = Math.max(1, container.clientHeight || canvas.clientHeight || 380);

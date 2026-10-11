@@ -58,9 +58,12 @@ const importMapAt = game.indexOf('"importmap"');
 const threeAt = game.indexOf('/assets/three.module.min.js" type="module"');
 t('the game page maps "three" with an import map before any module script',
   importMapAt > -1 && importMapAt < threeAt && /"three":"\/assets\/three\.module\.min\.js"/.test(game));
-t('the game page loads the stylised human script', /pd-domey-human\.js/.test(game));
-t('the game page no longer loads the realistic scan', !/pd-domey-scan\.js/.test(game));
-t('the game page describes Domey as a stylised cartoon human', /stylised cartoon human/.test(game));
+/* The retired stylised human is no longer shipped to the page: the hostess
+   (assets/pd-domey-lady.js, modelled in code) took the stage. */
+t('the game page loads the hostess script', /pd-domey-lady\.js/.test(game));
+t('the game page no longer loads the realistic scan or the stylised human',
+  !/pd-domey-scan\.js/.test(game) && !/pd-domey-human\.js/.test(game));
+t('the game page describes Domey as the hostess in royal blue and gold', /royal blue and gold/.test(game));
 
 // ---- the rig module and the mascot integration
 const human = read('assets/pd-domey-human.js');
@@ -69,9 +72,13 @@ t('the human module loads the bundle and model from this site only',
   !/https?:\/\//.test(human));
 t('the human rig implements the host contract (update, setViseme, look, act, dispose)',
   ['update', 'setViseme', 'look', 'act', 'dispose', 'setState'].every(m => new RegExp(`rig\\.${m} = |${m}: function`).test(human)));
-t('the mascot keeps the 2D drawing on low-end Android and on any load failure',
-  /isLowEnd\(\)/.test(read('assets/pd-mascot.js')) && /2d-low-end/.test(read('assets/pd-mascot.js')) &&
-  /data-pdm-model', 'error'/.test(read('assets/pd-mascot.js')));
+t('the mascot builds the hostess first and falls back to the cartoon rig if she fails',
+  /global\.PDDomeyLady/.test(read('assets/pd-mascot.js')) &&
+  /lady\.buildRig\(THREE/.test(read('assets/pd-mascot.js')) &&
+  /the hostess could not be built, using the cartoon rig/.test(read('assets/pd-mascot.js')));
+t('the hostess is framed head to feet with her own fit, not the cartoon defaults',
+  /fit: \{ height: 2\.8, width: 1\.72, y: 0\.55 \}/.test(read('assets/pd-mascot.js')) &&
+  /rig\.root\.position\.y -= 0\.09/.test(read('assets/pd-mascot.js')));
 t('a load timeout is set so the character never sits on a permanent loader', /LOAD_TIMEOUT_MS = 30000/.test(human));
 
 console.log(`\n${pass} passed, ${fail} failed`);
