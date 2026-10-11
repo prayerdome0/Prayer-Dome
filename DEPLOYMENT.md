@@ -75,6 +75,35 @@ The Firestore rules target is explicitly configured. Firebase Hosting does not
 implement every Vercel-only `/api/*` handler; Vercel remains the recommended
 website target. Confirm feature parity before switching hosting providers.
 
+### Bible reader (API.Bible)
+
+NIV and The Message (MSG) are read from API.Bible through `/api/bible`. The
+key stays server-side; set it on the project (Vercel → Settings → Environment
+Variables, or `vercel env add`) and never in a file that is committed:
+
+```sh
+vercel env add BIBLE_API_KEY production   # your existing API.Bible key
+```
+
+Optional, to pin the exact Bible IDs instead of using the account's Bible list:
+
+```sh
+vercel env add NIV_BIBLE_ID production    # e.g. 78a9f6124f344018-01
+vercel env add MSG_BIBLE_ID production    # the ID from your account
+```
+
+Check the IDs the account is entitled to before deploying (run locally, the key
+is read from the environment and never printed):
+
+```sh
+BIBLE_API_KEY=<your key> npm run bible:ids -- --verify
+```
+
+After deploying, `GET /api/bible?action=bibles` reports the resolved IDs and
+`GET /api/bible?action=status&version=NIV` reports the provider and the ID
+source. If an edition is missing from the account, the reader shows a
+"setup required" note and no text from any other translation.
+
 ### Cloudinary callable function
 
 Copy `functions/.env.example` to `functions/.env.<project-id>` and supply your
