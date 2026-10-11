@@ -125,7 +125,7 @@ security launch gates and outstanding verification.
 - **Live AI companion (Domey on Three.ws)** — `assets/pd-domey-widget.js`
   embeds the ministry's one saved Three.ws widget
   (`https://three.ws/widget#widget=wdgt_fRRTp6-HRgOh&kiosk=true`) on the AI
-  assistant page (`/ai-prayer` / `/assistant`). The avatar, conversation,
+  assistant page (`/ai-prayer`). The avatar, conversation,
   voice and interactive Bible quiz all run inside that hosted widget; its
   behaviour and AI provider are configured in **Three.ws Studio** for widget
   `wdgt_fRRTp6-HRgOh`, so the website holds no AI key and adds no second AI
