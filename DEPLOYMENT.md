@@ -78,14 +78,19 @@ website target. Confirm feature parity before switching hosting providers.
 ### Bible reader (API.Bible)
 
 NIV and The Message (MSG) are read from API.Bible through `/api/bible`. The
-key stays server-side; set it on the project (Vercel → Settings → Environment
-Variables, or `vercel env add`) and never in a file that is committed:
+server-side API.Bible key is **required**; a `MSG_BIBLE_ID` by itself is not
+sufficient to authorize requests. Add the key in Vercel → Settings → Environment
+Variables (or with `vercel env add`) and never put it in a committed file:
 
 ```sh
-vercel env add BIBLE_API_KEY production   # your existing API.Bible key
+vercel env add BIBLE_API_KEY production   # your API.Bible key (required)
 ```
 
-Optional, to pin the exact Bible IDs instead of using the account's Bible list:
+Add the key to every Vercel environment you use (Production, Preview, and/or
+Development). Vercel environment changes apply to new deployments, so redeploy
+after saving the key. The Bible IDs are optional, non-secret overrides; without
+one, the server resolves each translation from the API.Bible account's Bible
+list. To pin an exact ID instead of using that account list:
 
 ```sh
 vercel env add NIV_BIBLE_ID production    # e.g. 78a9f6124f344018-01

@@ -331,9 +331,18 @@ function bibleError(code, message, extra) {
    instructions travel in `detail`, which the reader never renders. */
 function missingKeyError(version) {
   const edition = TRANSLATIONS[version];
+  const bibleIdIsSet = Boolean(apiBibleIdOverride(version));
+  const idNote = bibleIdIsSet
+    ? ' A Bible ID is configured, but an API.Bible server key is also required; the ID alone cannot authorize requests.'
+    : ' A server-side API.Bible key is required to read this translation.';
+  const idSetup = bibleIdIsSet
+    ? ` ${edition.apiBibleEnv} is already set and can remain unchanged.`
+    : edition.apiBibleEnv
+      ? ` Set ${edition.apiBibleEnv} only if you want to pin an ID instead of using the account list.`
+      : '';
   return bibleError('TRANSLATION_NOT_CONFIGURED',
-    `${edition.name} is served from API.Bible and is not configured on this server right now, so no ${version} text is shown. No other translation has been substituted.`,
-    { detail: `Set BIBLE_API_KEY (the API.Bible key) in the deployment environment${edition.apiBibleEnv ? `, and ${edition.apiBibleEnv} if the account lists more than one matching Bible` : ''}.` });
+    `${edition.name} is served from API.Bible and is not configured on this server right now.${idNote} No ${version} text is shown. No other translation has been substituted.`,
+    { detail: `Set BIBLE_API_KEY (the API.Bible key) in Vercel → Settings → Environment Variables, then redeploy.${idSetup}` });
 }
 
 /* The key is present, the account list could not be read, and there is no
@@ -1113,7 +1122,7 @@ async function biblesPayload() {
   };
   if (!apiBibleKey()) {
     payload.ok = false;
-    payload.message = 'No API.Bible key is configured on this server. Set BIBLE_API_KEY in the deployment environment.';
+    payload.message = 'No API.Bible key is configured on this server. A Bible ID, including MSG_BIBLE_ID, cannot replace the required key. Set BIBLE_API_KEY in Vercel and redeploy.';
     return payload;
   }
   const versions = Object.keys(TRANSLATIONS).filter(usesApiBible);

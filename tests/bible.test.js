@@ -359,6 +359,22 @@ function clearConfiguration() {
   });
 
   clearConfiguration();
+  process.env.MSG_BIBLE_ID = MSG_ID;
+  handler._resetCaches();
+  await withHttpsResponses([{ body: { data: { content: 'never used' } } }], async requests => {
+    const status = await invoke('/api/bible?action=status&version=MSG');
+    const chapter = await invoke('/api/bible?action=chapter&id=43&chapter=3&version=MSG');
+    t('MSG with only MSG_BIBLE_ID configured explains that the API.Bible key is also required',
+      requests.length === 0 && status.status === 200 && status.json.configured === false &&
+      /Bible ID is configured/.test(status.json.message) && /ID alone cannot authorize/.test(status.json.message) &&
+      /BIBLE_API_KEY/.test(status.json.detail) && /redeploy/.test(status.json.detail));
+    t('an MSG chapter with an ID but no API.Bible key returns a clear setup error without provider calls',
+      requests.length === 0 && chapter.status === 503 &&
+      chapter.json.error === 'TRANSLATION_NOT_CONFIGURED' &&
+      /Bible ID is configured/.test(chapter.json.message) && /API.Bible server key is also required/.test(chapter.json.message));
+  });
+
+  clearConfiguration();
   setConfigured('MSG');
   await withHttpsResponses([{ status: 403, body: { message: 'You are not authorized to access this Bible' } }], async () => {
     const result = await invoke('/api/bible?action=chapter&id=43&chapter=3&version=MSG');
@@ -513,9 +529,12 @@ function clearConfiguration() {
   });
 
   clearConfiguration();
+  process.env.MSG_BIBLE_ID = MSG_ID;
+  handler._resetCaches();
   const noKeyBibles = await invoke('/api/bible?action=bibles');
-  t('the account check explains that no key is configured',
-    noKeyBibles.status === 503 && /BIBLE_API_KEY/.test(noKeyBibles.json.message));
+  t('the account check explains that an MSG Bible ID does not replace the required API.Bible key',
+    noKeyBibles.status === 503 && /MSG_BIBLE_ID, cannot replace the required key/.test(noKeyBibles.json.message) &&
+    /BIBLE_API_KEY/.test(noKeyBibles.json.message) && /redeploy/.test(noKeyBibles.json.message));
 
   clearConfiguration();
   process.env.BIBLE_API_KEY = TEST_KEY;
