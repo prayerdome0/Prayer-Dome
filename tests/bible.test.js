@@ -342,6 +342,9 @@ function clearConfiguration() {
       result.status === 502 && result.json.translation === 'MSG' && /not substituted/.test(result.json.message) &&
       requests.length === 1 && requests[0].url.includes('rest.api.bible'),
       JSON.stringify(result.json).slice(0, 160));
+    t('a failure message never reads "The The Message"',
+      !/The The Message/.test(result.json.message) && /^The Message is temporarily unavailable/.test(result.json.message),
+      result.json.message);
   });
 
   // The Message prints its paragraphs as verse ranges and breaks them with
@@ -814,6 +817,8 @@ function clearConfiguration() {
     html.includes("`${currentTranslationName} · setup required`"));
   t('an unconfigured translation shows the server message, not a substitute',
     html.includes('json.message') && html.includes('No other translation'));
+  t('the reader never prints "The The Message" in a fallback sentence',
+    !html.includes('The ${BIBLE_VERSIONS[version].name}') && !/The The Message/.test(html));
   t('the reader offers the free setup route when a licensed translation is not switched on',
     html.includes('id="versionSetup"') && html.includes('function renderSetupCard(') &&
     html.includes('Site owner? Switch it on free in a few minutes') &&

@@ -1046,7 +1046,7 @@
 
                 const payload = error.payload || {};
                 const message = payload.message || error.message || (navigator.onLine
-                    ? `The ${BIBLE_VERSIONS[version].name} chapter could not be downloaded. No other translation has been substituted. Please try again.`
+                    ? `${BIBLE_VERSIONS[version].name} chapter could not be downloaded. No other translation has been substituted. Please try again.`
                     : "You're offline and this chapter has not been saved on this device yet. Chapters you have read stay available offline.");
                 // A failure the owner can fix (missing key, edition not on the
                 // plan) arrives with the free setup steps attached.

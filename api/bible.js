@@ -1411,7 +1411,7 @@ module.exports = async function handler(req, res) {
       return send(res, 200, Object.assign({ ok: true }, data));
     } catch (error) {
       const failure = failureBody(version, error, 'TRANSLATION_UNAVAILABLE',
-        `The ${TRANSLATIONS[version].name} text is temporarily unavailable. Prayer Dome has not substituted a different translation. Please try again shortly.`);
+        `${TRANSLATIONS[version].name} is temporarily unavailable right now. Prayer Dome has not substituted a different translation. Please try again shortly.`);
       return send(res, failure.status, failure.body);
     }
   }
@@ -1444,7 +1444,7 @@ module.exports = async function handler(req, res) {
         return send(res, 404, { ok: false, error: 'VERSE_NOT_FOUND', translation: version, message: error.message });
       }
       const failure = failureBody(version, error, 'TRANSLATION_UNAVAILABLE',
-        `The ${TRANSLATIONS[version].name} text is temporarily unavailable. No other translation has been substituted.`);
+        `${TRANSLATIONS[version].name} is temporarily unavailable right now. No other translation has been substituted.`);
       return send(res, failure.status, failure.body);
     }
   }
