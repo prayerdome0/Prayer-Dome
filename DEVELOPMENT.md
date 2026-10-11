@@ -122,6 +122,20 @@ security launch gates and outstanding verification.
   `game.html` uses it as the *Talk with Domey* Bible show (XP, badges, streak
   strip); `live.html` uses it as the Prayer Lounge that takes a prayer request
   while the member waits for the next service.
+- **Live AI companion (Domey on Three.ws)** — `assets/pd-domey-widget.js`
+  embeds the ministry's one saved Three.ws widget
+  (`https://three.ws/widget#widget=wdgt_fRRTp6-HRgOh&kiosk=true`) on the AI
+  assistant page (`/ai-prayer` / `/assistant`). The avatar, conversation,
+  voice and interactive Bible quiz all run inside that hosted widget; its
+  behaviour and AI provider are configured in **Three.ws Studio** for widget
+  `wdgt_fRRTp6-HRgOh`, so the website holds no AI key and adds no second AI
+  backend. The loader only manages the embed's life cycle: a bounded loading
+  placeholder, a helpful panel with retry + direct link when the browser is
+  offline or three.ws is unreachable, and lazy-load awareness so the watchdog
+  never fires before the frame is on screen. Voice input inside the frame
+  needs the `microphone` permission delegated to `https://three.ws`
+  (`Permissions-Policy` in `vercel.json`, plus `allow="… microphone …"` on
+  the iframe).
 - **Uploads** — `assets/pd-upload.js`: native device picker → preview →
   background upload with progress/retry to the ministry's media buckets.
 - **Certificates** — `assets/pd-certificate.js` renders certificates on

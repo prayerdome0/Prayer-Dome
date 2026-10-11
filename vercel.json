@@ -287,7 +287,7 @@
         },
         {
           "key": "Permissions-Policy",
-          "value": "camera=(self), microphone=(self), geolocation=(self)"
+          "value": "camera=(self), microphone=(self \"https://three.ws\"), geolocation=(self)"
         },
         {
           "key": "Strict-Transport-Security",
