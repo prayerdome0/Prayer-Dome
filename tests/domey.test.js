@@ -183,7 +183,7 @@ function installFakeEars(window) {
   /* tapping the character himself opens his ears */
   const tapper = M.mount(w.document.createElement('div'), { name: 'Domey' });
   t('tapping Domey himself offers to open his ears (a real gesture)',
-    tapper.stage.getAttribute('title') === 'Tap Domey to let him hear you');
+    tapper.stage.getAttribute('title') === 'Tap Domey to let her hear you');
   tapper.stage.click();
   await sleep(120);
   t('and the microphone really opens when he is tapped',

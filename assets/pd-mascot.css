@@ -1007,3 +1007,286 @@ body.light-mode .pd-mascot {
   .pdm-char-wrap { animation: none !important; transform: translateX(-50%) !important; }
   .pd-mascot[data-pdm-state="speaking"] .pdm-mouth-open { opacity: 1 !important; }
 }
+
+/* ==========================================================================
+   THE COMPANION LAYOUT  (layout: 'companion')
+   --------------------------------------------------------------------------
+   The Domey learning experience on a phone: a compact bar with back, round,
+   score and XP at the top; the character herself full width, head to feet,
+   with nothing ever drawn over her face; then one rounded dialogue card
+   (name, message, microphone, listening indicator), the answer choices or
+   voice area, the controls, and the written conversation. Text lives above
+   and below the character — never on top of her.
+   ========================================================================== */
+
+.pd-mascot.pdm-companion {
+  grid-template-columns: 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+
+/* ---- the top bar: back · round · correct · XP ---------------------------- */
+
+.pdm-companion .pdm-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-height: 44px;
+}
+
+.pdm-companion .pdm-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  appearance: none;
+  border: 1px solid var(--pdm-surface-line);
+  background: var(--pdm-surface);
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  font-size: .8rem;
+  padding: 8px 13px;
+  border-radius: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pdm-companion .pdm-back:hover { border-color: var(--pdm-gold); }
+.pdm-companion .pdm-back:focus-visible { outline: 3px solid var(--pdm-focus); outline-offset: 2px; }
+
+/* The HUD sits INSIDE the top bar here — not floating over the stage — so
+   the badges can never cover the character's face. */
+.pdm-companion .pdm-topbar .pdm-hud {
+  position: static;
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-end;
+  font-size: .64rem;
+}
+
+.pdm-companion .pdm-topbar .pdm-hud .pdm-dots { margin-left: 8px; }
+
+/* ---- the stage: all Domey, all the time ---------------------------------- */
+
+.pdm-companion .pdm-stage {
+  width: 100%;
+  min-height: clamp(300px, 58vh, 460px);
+  border-radius: 20px;
+}
+
+/* ---- the dialogue card ---------------------------------------------------- */
+
+.pdm-companion .pdm-dialogue-card {
+  background: var(--pdm-bubble-bg);
+  color: var(--pdm-bubble-fg);
+  border: 1px solid var(--pdm-bubble-line);
+  border-radius: 18px;
+  padding: 14px 16px 12px;
+  box-shadow: 0 10px 28px rgba(6, 26, 51, .18);
+}
+
+.pdm-companion .pdm-dialogue-card .pdm-bubble {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  color: var(--pdm-bubble-fg);
+}
+
+/* Her name in gold on the card, in Prayer Dome's blue-and-gold. */
+.pdm-companion .pdm-dialogue-card .pdm-name {
+  color: #0A4D9B;
+  font-weight: 800;
+  letter-spacing: .4px;
+}
+
+.pdm-companion .pdm-dialogue-card .pdm-text { font-size: 1rem; line-height: 1.5; }
+
+.pdm-companion .pdm-dialogue-card .pdm-status {
+  border: 0;
+  padding: 2px 0 0;
+  margin-top: 8px;
+}
+
+/* The live listening indicator + what was heard, inside the card. */
+.pdm-heard {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(10, 77, 155, .07);
+  border: 1px dashed rgba(10, 77, 155, .3);
+  font-size: .92rem;
+  color: #16324f;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pdm-heard[hidden] { display: none; }
+
+.pdm-heard .pd-i-mic { color: #0A4D9B; }
+.pdm-heard-who {
+  font-weight: 800;
+  font-size: .68rem;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: #0A4D9B;
+}
+
+.pdm-companion .pdm-dialogue-card .pdm-bar {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--pdm-bubble-line);
+}
+
+/* Mic button stays a big, friendly tap target inside the card. */
+.pdm-companion .pdm-bar .pdm-mic { min-height: 46px; }
+
+/* ---- the choices: A · B · C · D as big separated buttons ------------------- */
+
+.pdm-companion .pdm-chips {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.pdm-chip.pdm-chip-big {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: .95rem;
+  min-height: 52px;
+  background: var(--pdm-bubble-bg);
+  border: 1.5px solid var(--pdm-bubble-line);
+  color: var(--pdm-bubble-fg);
+  box-shadow: 0 3px 10px rgba(6, 26, 51, .08);
+}
+
+.pdm-chip-letter {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: #0A4D9B;
+  color: #f6df8a;
+  font-weight: 800;
+  font-size: .82rem;
+}
+
+.pdm-chip-label { flex: 1; min-width: 0; }
+
+.pdm-chip.pdm-chip-big.is-correct {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, .16);
+}
+
+.pdm-chip.pdm-chip-big.is-correct .pdm-chip-letter { background: #16a34a; color: #fff; }
+
+.pdm-chip.pdm-chip-big.is-wrong {
+  border-color: #f97316;
+  background: rgba(249, 115, 22, .14);
+}
+
+.pdm-chip.pdm-chip-big.is-wrong .pdm-chip-letter { background: #ea580c; color: #fff; }
+
+.pdm-chip.pdm-chip-big:not([disabled]):active { transform: scale(.97); }
+
+/* The Continue button spans the full row. */
+.pdm-chip-continue { grid-column: 1 / -1; justify-content: center; background: #0A4D9B; color: #fff; border-color: #07244d; }
+.pdm-chip-continue .pd-i-arrow-right { color: #f6df8a; }
+.pdm-chip-continue:not([disabled]):hover { border-color: var(--pdm-gold); }
+
+/* A single choice (or an odd count) still lines up. */
+.pdm-companion .pdm-chips .pdm-chip:not(.pdm-chip-big):last-child:nth-child(odd) { grid-column: 1 / -1; }
+
+.pdm-companion .pdm-answer { margin-top: 12px; }
+
+.pdm-companion .pdm-answer input {
+  background: var(--pdm-bubble-bg);
+  color: var(--pdm-bubble-fg);
+  border-color: var(--pdm-bubble-line);
+}
+
+.pdm-companion .pdm-hint { margin: 10px 2px 0; }
+
+/* ---- the written conversation --------------------------------------------- */
+
+.pdm-log {
+  margin-top: 14px;
+  border: 1px solid var(--pdm-bubble-line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .72);
+  color: var(--pdm-bubble-fg);
+  padding: 10px 12px;
+  max-height: 240px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+}
+
+.pdm-log-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color: #0A4D9B;
+  margin: 0 0 8px;
+}
+
+.pdm-log-row {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  padding: 7px 10px;
+  border-radius: 12px;
+  margin-bottom: 6px;
+  font-size: .92rem;
+  line-height: 1.45;
+}
+
+/* DOMEY: soft blue from the left. YOU: gold-tinted from the right. */
+.pdm-log-host { background: rgba(10, 77, 155, .08); }
+.pdm-log-you { background: rgba(212, 175, 55, .14); flex-direction: row-reverse; text-align: right; }
+
+.pdm-log-who {
+  flex: none;
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  color: #0A4D9B;
+}
+
+.pdm-log-you .pdm-log-who { color: #8a6d1a; }
+
+.pdm-log-text { min-width: 0; overflow-wrap: anywhere; }
+
+/* ---- narrow phones: the four choices stack, everything breathes ----------- */
+
+@media (max-width: 420px) {
+  .pdm-companion .pdm-chips { grid-template-columns: 1fr; }
+  .pdm-companion .pdm-stage { min-height: min(64vw, 380px); }
+  .pdm-companion .pdm-topbar { font-size: .9rem; }
+  .pdm-companion .pdm-topbar .pdm-hud { font-size: .58rem; }
+}
+
+/* Small tablets and up: she keeps most of the width and the dialogue card
+   grows beside her — the same order, just roomier. */
+@media (min-width: 760px) {
+  .pdm-companion .pdm-dialog { max-width: 720px; margin: 0 auto; width: 100%; }
+  .pdm-companion .pdm-stage { min-height: clamp(380px, 62vh, 560px); }
+}

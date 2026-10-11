@@ -50,14 +50,18 @@ t('the parsed model is upright with the face toward +Z (nose tip is the front-mo
 const licence = read('assets/domey/scan/LeePerrySmith_License.txt');
 t('the model licence (CC BY 3.0) ships beside the model', /Attribution 3\.0/.test(licence) && /triplegangers/.test(licence));
 const game = read('game.html');
-t('the game page credits the stylised character and links its licence', /VRM1_Constraint_Twist_Sample/.test(game) && /vrm\.dev\/licenses\/1\.0/.test(game));
-t('the game page loads the character script before the mascot', game.indexOf('pd-domey-human.js') > -1 && game.indexOf('pd-domey-human.js') < game.indexOf('pd-mascot.js'));
+/* The hostess replaced the downloaded characters: she is modelled entirely in
+   code (no VRM, no scan download), so the page credits the renderer only. */
+t('the game page credits the hostess modelled in code, with the renderer licence',
+  /modelled entirely in code/.test(game) && /three\.js \(MIT licence\)/.test(game));
+t('the game page loads the hostess script before the mascot',
+  game.indexOf('pd-domey-lady.js') > -1 && game.indexOf('pd-domey-lady.js') < game.indexOf('pd-mascot.js'));
 
 const mascot = read('assets/pd-mascot.js');
-t('the mascot uses the stylised human first and keeps the 2D drawing if it fails',
-  /global\.PDDomeyHuman/.test(mascot) && /human\.load\(THREE\)/.test(mascot) && /stylised character unavailable, keeping the drawing/.test(mascot) && /2d-low-end/.test(mascot));
-t('the stylised human is passed to the engine as its rig', /createOptions\.rig = global\.PDDomeyHuman\.buildRig/.test(mascot));
-t('the engine honours a lower pixel ratio on low-end devices', /maxPixelRatio/.test(read('assets/pd-domey3d.js')) && /maxPixelRatio: opts\.lowEnd \? 1 : 2/.test(mascot));
+t('the mascot builds the hostess first and keeps a working character if she fails',
+  /global\.PDDomeyLady/.test(mascot) && /lady\.buildRig\(THREE/.test(mascot) && /the hostess could not be built, using the cartoon rig/.test(mascot));
+t('the hostess is passed to the engine as her rig', /createOptions\.rig = opts\.rig/.test(mascot));
+t('the engine honours a lower pixel ratio on light phones', /maxPixelRatio/.test(read('assets/pd-domey3d.js')) && /maxPixelRatio: ladyIsLowEnd\(\) \? 1\.25 : 2/.test(mascot));
 t('low-end detection covers Android devices with little memory or few cores', /lowMemory && fewCores|android && \(lowMemory \|\| fewCores\)/.test(scanSrc));
 
 const rig = (function () {

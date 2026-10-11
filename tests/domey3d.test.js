@@ -384,7 +384,12 @@ function evalOnWindow(source) {
     }
     const chips = showHost.root.querySelectorAll('.pdm-chip');
     if (chips.length && !clicked) {
-      const right = Array.from(chips).find((chip) => chip.textContent === asked.options[asked.answer]);
+      /* The four choices now carry their A–D letter badge, so the answer the
+         driver looks for lives in the label span. */
+      const right = Array.from(chips).find((chip) => {
+        const label = chip.querySelector('.pdm-chip-label');
+        return (label ? label.textContent : chip.textContent) === asked.options[asked.answer];
+      });
       if (right) {
         const opening = asked.q.split(' ').slice(0, 4);
         heardQuestion = opening.every((word) => (showHost.lastSpoken || '').indexOf(word) !== -1);

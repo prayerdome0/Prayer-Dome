@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Talk with Domey — 3D Bible Quiz Host | Prayer Dome</title>
   <link rel="manifest" href="/manifest.json">
-  <meta name="description" content="Talk with Domey, the Prayer Dome 3D host: he speaks out loud, his lips and head move, and he hears your voice through 1,248 Bible questions across 14 topics.">
+  <meta name="description" content="Talk with Domey, the Prayer Dome 3D host: she speaks out loud, her lips follow her voice, and she hears your answers through 1,248 Bible questions across 14 topics.">
   <link rel="icon" type="image/png" href="/assets/logo.png">
   <link rel="apple-touch-icon" href="/assets/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,429 +14,111 @@
   <link rel="stylesheet" href="/assets/pd-icons.css">
   <script src="/assets/pd-icons.js"></script>
   <link rel="stylesheet" href="/assets/pd-brand.css">
-  <!-- Domey, the talking 3D host: greets out loud, asks Bible questions and
-       listens to the answer. Shared with the Live page waiting room. -->
+  <!-- Domey, the talking 3D hostess: she greets you out loud, asks Bible
+       questions and listens to your answer. Shared with the Live page. -->
   <link rel="stylesheet" href="/assets/pd-mascot.css">
-  <!-- The real 3D engine (three.js, vendored so it works offline) and the
-       1,248-question Bible bank Domey draws his rounds from. -->
-  <!-- Import map: the VRM character library imports the bare name "three". It
-       resolves to the vendored three.js (r165), so there is only one copy. It
-       must come before any module script. -->
+  <!-- The real 3D engine (three.js, vendored so it works offline), the
+       hostess herself (pure geometry — no download, no model to wait for) and
+       the 1,248-question Bible bank she draws her rounds from. -->
+  <!-- Import map: any module that imports the bare name "three" resolves to
+       the vendored three.js (r165), so there is only one copy. It must come
+       before any module script. -->
   <script type="importmap">{"imports":{"three":"/assets/three.module.min.js"}}</script>
   <script src="/assets/three.module.min.js" type="module" defer></script>
   <script src="/assets/pd-domey3d.js" defer></script>
-  <script src="/assets/pd-domey-human.js" defer></script>
+  <script src="/assets/pd-domey-lady.js" defer></script>
   <script src="/assets/pd-domey-questions.js" defer></script>
   <script src="/assets/pd-mascot.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  
+
   <style>
+    /* This page is built for the phone first: Domey is the star, she appears
+       right under a compact hero, and everything she says sits below her —
+       never over her face. */
     .game-wrap {
-      max-width: 1200px;
+      max-width: 1080px;
       margin: 0 auto;
-      padding: 40px 20px;
+      padding: 18px 12px 48px;
     }
-    
+
     .game-hero {
       text-align: center;
-      padding: 50px 20px;
+      padding: clamp(22px, 5vw, 44px) 14px;
       background: linear-gradient(135deg, rgba(10,77,155,0.9), rgba(7,36,77,0.95));
-      border-radius: 30px;
+      border-radius: 22px;
       color: white;
-      margin-bottom: 40px;
+      margin-bottom: 16px;
       box-shadow: var(--pd-shadow-lg);
       border: 1px solid rgba(212,175,55,0.3);
       position: relative;
       overflow: hidden;
     }
-    
+
     .game-hero h1 {
       font-family: 'Poppins', serif;
-      font-size: 3rem;
+      font-size: clamp(1.55rem, 6vw, 2.8rem);
       font-weight: 900;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       color: var(--pd-gold);
     }
-    
+
     .game-hero p {
-      font-size: 1.1rem;
+      font-size: clamp(.9rem, 2.6vw, 1.05rem);
       max-width: 700px;
-      margin: 0 auto 24px;
+      margin: 0 auto 18px;
       opacity: 0.9;
+      line-height: 1.55;
     }
 
+    /* STATS — two by two on a phone, four across on a tablet */
     .game-stats-row {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 30px;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 16px 0;
     }
-    
+
     .game-stat-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      padding: 20px;
-      border-radius: 20px;
+      padding: 14px 10px;
+      border-radius: 16px;
       text-align: center;
       box-shadow: var(--pd-shadow-sm);
       transition: transform 0.2s;
     }
-    
-    .game-stat-card:hover {
-      transform: translateY(-4px);
-    }
-    
-    .game-stat-card i {
-      font-size: 2rem;
-      color: var(--pd-gold);
-      margin-bottom: 10px;
-    }
-    
-    .game-stat-card .val {
-      font-size: 2.2rem;
-      font-weight: 850;
-      color: var(--pd-blue);
-      display: block;
-    }
-    
-    .game-stat-card .lbl {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    /* Stages Journey Map */
-    .journey-map-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 30px;
-      margin-bottom: 40px;
-      box-shadow: var(--pd-shadow-md);
-    }
-    
-    .journey-map-title {
-      font-family: 'Poppins', serif;
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: var(--pd-blue);
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    .journey-path {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-      padding: 40px 0;
-      overflow-x: auto;
-      gap: 20px;
-    }
-    
-    .journey-path::before {
-      content: '';
-      position: absolute;
-      left: 30px;
-      right: 30px;
-      height: 6px;
-      background: #e2e8f0;
-      z-index: 1;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-    
-    .journey-path-fill {
-      position: absolute;
-      left: 30px;
-      height: 6px;
-      background: var(--pd-blue);
-      z-index: 1;
-      top: 50%;
-      transform: translateY(-50%);
-      transition: width 0.5s ease-in-out;
-      width: 0%;
-    }
-    
-    .journey-step {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      flex: 0 0 100px;
-      text-align: center;
-    }
-    
-    .journey-step-circle {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: white;
-      border: 4px solid #cbd5e1;
-      color: var(--pd-blue);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.6rem;
-      transition: all 0.3s;
-      box-shadow: var(--pd-shadow-sm);
-    }
-    
-    .journey-step.active .journey-step-circle {
-      border-color: var(--pd-gold);
-      background: var(--pd-blue);
-      color: white;
-      transform: scale(1.15);
-      box-shadow: 0 0 20px rgba(10,77,155,0.4);
-    }
-    
-    .journey-step.completed .journey-step-circle {
-      border-color: var(--pd-blue);
-      background: #22c55e;
-      color: white;
-    }
-    
-    .journey-step-label {
-      margin-top: 12px;
-      font-size: 0.78rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      color: var(--text);
-    }
-    
-    .journey-step.active .journey-step-label {
-      color: var(--pd-blue);
-    }
-    
-    /* Play Panels */
-    .play-panels {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 30px;
-    }
-    
-    .challenge-panel {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 30px;
-      box-shadow: var(--pd-shadow-md);
-    }
-    
-    .challenge-title {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--pd-blue);
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .situation-card {
-      background: linear-gradient(135deg, rgba(10,77,155,0.03), rgba(212,175,55,0.03));
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 24px;
-      margin-bottom: 24px;
-    }
-    
-    .situation-text {
-      font-family: 'Lora', serif;
-      font-size: 1.2rem;
-      line-height: 1.6;
-      color: var(--text);
-      margin-bottom: 20px;
-    }
-    
-    .situation-option {
-      display: block;
-      width: 100%;
-      text-align: left;
-      padding: 16px 20px;
-      background: var(--bg-elev);
-      border: 2px solid var(--border);
-      border-radius: 16px;
-      margin-bottom: 12px;
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .situation-option:hover {
-      border-color: var(--pd-blue);
-      background: rgba(10,77,155,0.04);
-      transform: translateX(4px);
-    }
-    
-    .situation-option.correct {
-      border-color: #22c55e;
-      background: rgba(34,197,94,0.06);
-    }
-    
-    .situation-option.incorrect {
-      border-color: var(--pd-red);
-      background: rgba(239,68,68,0.06);
-    }
-    
-    /* Mystery Challenge */
-    .mystery-box {
-      text-align: center;
-      padding: 30px;
-      background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(10,77,155,0.05));
-      border: 2px dashed var(--pd-gold);
-      border-radius: 20px;
-      margin-bottom: 24px;
-    }
-    
-    .mystery-box i {
-      font-size: 3rem;
-      color: var(--pd-gold);
-      margin-bottom: 12px;
-      animation: pulse 2s infinite;
-    }
-    
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.08); }
-      100% { transform: scale(1); }
-    }
-    
-    /* Badges & Leaderboard */
-    .sidebar-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: var(--pd-shadow-sm);
-    }
-    
-    .sidebar-title {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--pd-blue);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .badge-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      text-align: center;
-    }
-    
-    .badge-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      opacity: 0.4;
-      transition: opacity 0.3s;
-    }
-    
-    .badge-item.unlocked {
-      opacity: 1;
-    }
-    
-    .badge-item img, .badge-item i {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: rgba(212,175,55,0.1);
-      color: var(--pd-gold);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      margin-bottom: 6px;
-      border: 2px solid var(--pd-gold);
-    }
-    
-    .badge-item span {
-      font-size: 0.68rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-    
-    .leader-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    
-    .leader-row:last-child {
-      border-bottom: 0;
-    }
-    
-    .leader-rank {
-      font-weight: 900;
-      font-size: 1rem;
-      width: 24px;
-      color: var(--text-dim);
-    }
-    
-    .leader-rank.rank-1 { color: var(--pd-gold); }
-    .leader-rank.rank-2 { color: #94a3b8; }
-    .leader-rank.rank-3 { color: #b45309; }
-    
-    .leader-name {
-      flex: 1;
-      font-weight: 700;
-      font-size: 0.9rem;
-    }
-    
-    .leader-score {
-      font-weight: 800;
-      font-size: 0.9rem;
-      color: var(--pd-blue);
-    }
-    
-    @media (max-width: 900px) {
-      .play-panels {
-        grid-template-columns: 1fr;
-      }
-      .game-stats-row {
-        grid-template-columns: 1fr 1fr;
-      }
+
+    .game-stat-card:hover { transform: translateY(-4px); }
+    .game-stat-card i { font-size: 1.5rem; color: var(--pd-gold); margin-bottom: 6px; display: block; }
+    .game-stat-card .val { font-size: 1.6rem; font-weight: 850; color: var(--pd-blue); display: block; }
+    .game-stat-card .lbl { font-size: .72rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    @media (min-width: 760px) {
+      .game-wrap { padding: 32px 20px 56px; }
+      .game-stats-row { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+      .game-stat-card { padding: 20px; }
+      .game-stat-card i { font-size: 2rem; }
+      .game-stat-card .val { font-size: 2.2rem; }
+      .game-stat-card .lbl { font-size: .85rem; }
     }
 
-    /* Domey is the star of this page: a bigger stage than the shared default,
-       so his face, mouth and hand actions are easy to see. */
-    #panel-talk .pd-mascot {
-      grid-template-columns: minmax(220px, min(46vw, 420px)) minmax(0, 1fr);
-      align-items: start;
-    }
-    #panel-talk .pdm-stage { aspect-ratio: 11 / 12.4; }
-    #panel-talk .pdm-char-wrap { width: 90%; }
-    @media (max-width: 760px) {
-      #panel-talk .pd-mascot { grid-template-columns: minmax(0, 1fr); }
-      #panel-talk .pdm-stage { max-width: 340px; margin: 0 auto; }
-    }
+    /* Domey is the star of this page: the companion stage fills the width and
+       keeps her whole — head to feet — whatever the screen. */
+    #panel-talk .pd-mascot { grid-template-columns: minmax(0, 1fr); }
+    #panel-talk .pdm-stage { min-height: clamp(340px, 62vh, 520px); }
+    #panel-talk .pdm-char-wrap { width: 92%; }
 
     /* The 3D character: a real WebGL canvas laid over the CSS stage. The stage
-       keeps its aspect ratio, so the character is framed the same on every
-       screen, and the drawn SVG character is hidden while it is up. */
+       keeps its shape, so she is framed the same on every screen, and the
+       drawn character is hidden while the 3D one is up. */
     #panel-talk .pdm-canvas3d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
     #panel-talk .pd-mascot.pdm-render-3d .pdm-char-wrap { display: none; }
     #domeyTopicChips .pd-acad-chip { transition: transform .15s ease, border-color .15s ease; }
     #domeyTopicChips .pd-acad-chip:hover { transform: translateY(-2px); border-color: var(--pd-gold); }
     #domeyBadges .badge-item { cursor: default; }
+    #domeyStage { min-height: 340px; }
   </style>
-  
-  <script src="/translation-data.js"></script>
+
   <script src="/assets/pd-verse-data.js" defer></script>
   <script src="/assets/pd-verse-alerts.js" defer></script>
   <script src="/assets/pd-phrases.js" defer></script>
@@ -482,12 +164,42 @@
   <section class="game-hero">
     <span class="pd-acad-eyebrow"><i class="pd-i pd-i-mic-vocal"></i> TALK WITH DOMEY • 3D BIBLE HOST</span>
     <h1>Talk with Domey in 3D</h1>
-    <p>Domey is your 3D host: he speaks out loud with a real moving mouth, waves, claps and dances, and he hears your voice when you answer. His question bank holds <strong id="domeyBankTotal">1,000+</strong> Bible questions across 14 topics — and he never asks the same one twice in a single show.</p>
+    <p>Domey is your 3D host in royal blue and gold: she speaks out loud with lips that follow her voice, she holds her Bible, she hears your answer when you speak — and her question bank holds <strong id="domeyBankTotal">1,000+</strong> Bible questions across 14 topics. Tap <strong>Start the show</strong>, then simply talk to her: say your answer, or tap A, B, C or D.</p>
     <div>
       <button class="pd-acad-btn pd-acad-btn-primary" type="button" onclick="talkWithDomey()"><i class="pd-i pd-i-play"></i> Talk with Domey</button>
       <button class="pd-acad-btn pd-acad-btn-ghost" type="button" onclick="chooseDomeyTopic()" style="border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-list"></i> Choose a topic</button>
     </div>
-    <p class="pd-acad-chip gold" style="margin-top:16px;"><i class="pd-i pd-i-sparkles"></i> Talk to him — he really does hear you, and he answers back</p>
+    <p class="pd-acad-chip gold" style="margin-top:14px;"><i class="pd-i pd-i-sparkles"></i> Talk to her — she really does hear you, and she answers back</p>
+  </section>
+
+  <!-- TALK WITH DOMEY — the 3D hostess who speaks, hears you and acts.
+       The companion layout keeps every word below her face: a compact bar
+       (back · round · correct · XP) above, her full body centre stage, the
+       dialogue card with her message and the microphone underneath, then the
+       four A–D choices, the typed-answer row and the written conversation. -->
+  <section class="pd-acad-card" id="panel-talk" style="padding:24px; margin-bottom:16px;">
+    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
+      <h2 style="margin:0; font-family:Poppins,sans-serif; color:var(--pd-acad-blue); font-size:1.35rem;"><i class="pd-i pd-i-mic-vocal" style="color:var(--pd-gold);"></i> Talk with Domey</h2>
+      <span class="pd-acad-chip gold" id="domeyRenderChip" style="margin-left:auto;"><i class="pd-i pd-i-sparkles"></i> Warming up the 3D stage…</span>
+    </div>
+    <p style="color:var(--pd-acad-muted); margin:0 0 18px; line-height:1.6;">Domey is the Prayer Dome 3D hostess: a friendly woman in royal blue and gold who blinks, looks at you and moves naturally while she talks — her lips follow every word she says. Answer by talking, by tapping <strong>A, B, C or D</strong>, or by typing. Ask her to <em>repeat</em>, ask for a <em>hint</em>, or say <em>skip</em>. She replies out loud and explains the scripture behind every question, and the whole conversation is written below so you can read along.</p>
+
+    <div id="domeyStage" role="img" aria-label="Domey, your 3D Bible quiz hostess"></div>
+    <p id="domeyCredit" style="color:var(--pd-acad-muted); font-size:.78rem; margin:8px 2px 0; line-height:1.5;">Domey is modelled entirely in code on this site — no character download, so she appears instantly even on a slow connection. Rendered with three.js (MIT licence).</p>
+
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:18px;">
+      <button class="pd-acad-btn pd-acad-btn-primary" id="domeyStartBtn" type="button"><i class="pd-i pd-i-play"></i> Start the show</button>
+      <button class="pd-acad-btn pd-acad-btn-ghost" id="domeyStopBtn" type="button" style="border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-square"></i> Stop talking</button>
+      <span class="pd-acad-chip" id="domeyBestChip"><i class="pd-i pd-i-trophy"></i> Best score: —</span>
+      <span class="pd-acad-chip" id="domeyMicChip"><i class="pd-i pd-i-mic"></i> Voice answers ready</span>
+    </div>
+
+    <p id="domeyMicNote" style="margin:12px 0 0; font-size:.86rem; color:var(--pd-acad-muted); line-height:1.55;">
+      <i class="pd-i pd-i-info" style="color:var(--pd-gold);"></i>
+      Domey listens on your device through your browser's own speech engine — Nothing is recorded, and you can always tap a choice or type instead. If she mishears you, just say it again or type the answer. Say <strong>repeat</strong>, <strong>hint</strong>, <strong>skip</strong> or <strong>slow down</strong> any time.
+    </p>
+
+    <div id="domeySummary" style="display:none; margin-top:18px; padding:18px; border-radius:20px; background:linear-gradient(135deg, rgba(212,175,55,.12), rgba(10,77,155,.06)); border:1px solid rgba(212,175,55,.35);"></div>
   </section>
 
   <!-- STATS -->
@@ -514,36 +226,8 @@
     </div>
   </section>
 
-  <!-- TALK WITH DOMEY — the 3D host who speaks, hears you and acts -->
-  <section class="pd-acad-card" id="panel-talk" style="padding:24px; margin-bottom:20px;">
-    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
-      <h2 style="margin:0; font-family:Poppins,sans-serif; color:var(--pd-acad-blue); font-size:1.35rem;"><i class="pd-i pd-i-mic-vocal" style="color:var(--pd-gold);"></i> Talk with Domey</h2>
-      <span class="pd-acad-chip gold" id="domeyRenderChip" style="margin-left:auto;"><i class="pd-i pd-i-sparkles"></i> Warming up the 3D stage…</span>
-    </div>
-    <p style="color:var(--pd-acad-muted); margin:0 0 18px; line-height:1.6;">Domey is the Prayer Dome 3D host, a stylised cartoon human who blinks, looks at you and moves his head and body as he talks, with lips that move through each word he says, a head that turns to you, and ears that hear your voice. Tap <strong>Start the show</strong>, then simply talk to him: say your answer, ask him to <em>repeat</em>, ask for a <em>hint</em>, or say <em>skip</em>. He replies out loud and explains the scripture behind every question.</p>
-
-    <div id="domeyStageWrap" style="padding:clamp(14px,2vw,22px); border-radius:26px; background:linear-gradient(150deg, #07244d 0%, #0A4D9B 60%, #0a3d7a 100%); box-shadow:var(--pd-shadow-lg);">
-      <div id="domeyStage" role="img" aria-label="Domey, your 3D Bible quiz host"></div>
-    </div>
-    <p id="domeyCredit" style="color:var(--pd-acad-muted); font-size:.78rem; margin:8px 2px 0; line-height:1.5;">Domey is a stylised cartoon human: the model <a href="https://github.com/pixiv/three-vrm/tree/dev/packages/three-vrm/examples/models" rel="noopener" target="_blank">VRM1_Constraint_Twist_Sample</a> by pixiv Inc., licensed under the <a href="https://vrm.dev/licenses/1.0/" rel="license noopener" target="_blank">VRM Public License 1.0</a> (free to use). Rendered with three.js and three-vrm (MIT).</p>
-
-    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:18px;">
-      <button class="pd-acad-btn pd-acad-btn-primary" id="domeyStartBtn" type="button"><i class="pd-i pd-i-play"></i> Start the show</button>
-      <button class="pd-acad-btn pd-acad-btn-ghost" id="domeyStopBtn" type="button" style="border:1px solid var(--pd-acad-border);"><i class="pd-i pd-i-square"></i> Stop talking</button>
-      <span class="pd-acad-chip" id="domeyBestChip"><i class="pd-i pd-i-trophy"></i> Best score: —</span>
-      <span class="pd-acad-chip" id="domeyMicChip"><i class="pd-i pd-i-mic"></i> Voice answers ready</span>
-    </div>
-
-    <p id="domeyMicNote" style="margin:12px 0 0; font-size:.86rem; color:var(--pd-acad-muted); line-height:1.55;">
-      <i class="pd-i pd-i-info" style="color:var(--pd-gold);"></i>
-      Domey listens on your device through your browser's own speech engine — Nothing is recorded, and you can always tap a choice or type instead. Say <strong>repeat</strong>, <strong>hint</strong>, <strong>skip</strong> or <strong>slow down</strong> any time.
-    </p>
-
-    <div id="domeySummary" style="display:none; margin-top:18px; padding:18px; border-radius:20px; background:linear-gradient(135deg, rgba(212,175,55,.12), rgba(10,77,155,.06)); border:1px solid rgba(212,175,55,.35);"></div>
-  </section>
-
   <!-- THE QUESTION BANK -->
-  <section class="pd-acad-card" id="domeyTopics" style="padding:24px; margin-bottom:20px;">
+  <section class="pd-acad-card" id="domeyTopics" style="padding:24px; margin-bottom:16px;">
     <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
       <h2 style="margin:0; font-family:Poppins,sans-serif; color:var(--pd-acad-blue); font-size:1.25rem;"><i class="pd-i pd-i-book-open" style="color:var(--pd-gold);"></i> Domey's Question Bank</h2>
       <span class="pd-acad-chip gold" style="margin-left:auto;"><i class="pd-i pd-i-sparkles"></i> <span id="domeyBankCount">1,000+</span> questions</span>
@@ -570,7 +254,7 @@
   </section>
 
   <!-- BADGES -->
-  <section class="pd-acad-card" id="domeyBadges" style="padding:24px; margin-bottom:20px;">
+  <section class="pd-acad-card" id="domeyBadges" style="padding:24px; margin-bottom:16px;">
     <h2 style="margin:0 0 8px; font-family:Poppins,sans-serif; color:var(--pd-acad-blue); font-size:1.25rem;"><i class="pd-i pd-i-award" style="color:var(--pd-gold);"></i> Achievement Badges</h2>
     <p style="color:var(--pd-acad-muted); margin:0 0 16px; line-height:1.6;">Playing with Domey earns Faith Points and badges — the same progress that syncs with your Prayer Dome account.</p>
     <div class="badge-grid" id="badgeGrid">
@@ -781,12 +465,12 @@
     note.innerHTML = '<i class="pd-i ' + (on ? 'pd-i-mic' : 'pd-i-info') + '" style="color:var(--pd-gold);"></i> ' +
       (on
         ? 'Your microphone is on — talk to Domey like a friend. Say <strong>repeat</strong>, <strong>hint</strong>, <strong>skip</strong> or <strong>slow down</strong> any time. Nothing is recorded; everything is answered on your device.'
-        : 'Tap <strong>Start the show</strong> and Domey will ask for your microphone so he can hear your answers. Nothing is recorded, and you can always tap a choice or type instead.');
+        : 'Tap <strong>Start the show</strong> and Domey will ask for your microphone so she can hear your answers. Nothing is recorded, and you can always tap a choice or type instead.');
   }
 
   /* The 3D character is drawn into a canvas, so it has to be told whenever the
      stage changes size — a rotated phone, a resized window, the summary card
-     opening under him. One fit per frame is enough. */
+     opening under her. One fit per frame is enough. */
   function fitDomey() {
     if (!domey || !domey.renderer3d || domeyFitQueued) return;
     domeyFitQueued = true;
@@ -800,9 +484,7 @@
     var chip = domeyElements().render;
     var model = domey && domey.root ? domey.root.getAttribute('data-pdm-model') : '';
     var label;
-    if (kind === '3d') label = model === 'human' ? '3D cartoon host • lips and eyes live' : '3D character • lips live';
-    else if (model === '2d-low-end') label = 'Drawing mode (lighter for this phone)';
-    else if (model === 'error') label = 'Drawing mode (3D character could not load)';
+    if (kind === '3d') label = model === 'lady' ? 'Domey in 3D • her lips follow her voice' : '3D character • lips live';
     else label = 'Drawing mode (no WebGL here)';
     if (chip) chip.innerHTML = '<i class="pd-i pd-i-sparkles"></i> ' + label;
     fitDomey();
@@ -814,9 +496,14 @@
     if (!ui.stage) return null;
     domey = PDMascot.mount(ui.stage, {
       name: 'Domey',
-      role: 'Prayer Dome quiz host',
+      role: 'Prayer Dome Bible host',
       lang: (document.documentElement.lang || 'en').slice(0, 2) || 'en',
       placeholder: 'Type your answer, or tap a choice…',
+      // The learning-experience layout: progress bar above her, dialogue card
+      // and every word below her — nothing is ever drawn over her face.
+      layout: 'companion',
+      back: { href: '/', label: 'Home' },
+      log: true,
       // Build the real 3D character when the browser can, and keep the drawn
       // one as the safety net when it cannot.
       render: 'auto'
@@ -852,7 +539,39 @@
     var select = document.getElementById('domeyTopicSelect');
     var topic = select ? select.value : '';
     var picked = PDDomeyQuestions.forMascot(count, topic ? { topic: topic } : {});
-    return (picked && picked.length) ? picked : null;
+    if (!picked || !picked.length) return null;
+    /* A little variety in the asking: every third question is offered as true
+       or false, derived from a question whose answer is a person ("Who was the
+       first man God created?" + Adam → "Adam was the first man God created.").
+       The statement uses only the bank's own question and answer, so no new
+       fact is ever invented — and the verse still explains it. Verse
+       completion is deliberately NOT generated: the bank carries references,
+       not full quotations, and completing a reference would invent a quote. */
+    return picked.map(function (item, index) {
+      if (index % 3 !== 2) return item;
+      var tf = asTrueFalse(item);
+      return tf || item;
+    });
+  }
+
+  /* "Who was …?" / "Who built …?" with a person for an answer becomes a
+     true-or-false statement — safely, by subject substitution only. */
+  var TF_WHO = /^(who)\s+(was|were|is|built|wrote|led|said|prayed|saw|made|gave|chose|called|named|rose|raised|walked|spoke|took|sent|showed|told|asked|cried|fought|won|died|lived|ruled|reigned|became|had|found|came|went|returned|followed|helped|saved|healed|taught|fed|visited|judged|tested|trusted|obeyed)\b/i;
+  function asTrueFalse(item) {
+    if (!TF_WHO.test(item.q || '')) return null;
+    var rest = String(item.q).replace(/^who\s+/i, '').replace(/\?\s*$/, '');
+    var answer = item.options[item.answer];
+    var wrong = item.options.find(function (text, i) { return i !== item.answer; });
+    if (!answer || !wrong) return null;
+    var useTrue = Math.random() < 0.5;
+    return {
+      q: 'True or false: ' + (useTrue ? answer : wrong) + ' ' + rest + '.',
+      options: ['True', 'False'],
+      answer: useTrue ? 0 : 1,
+      verse: item.verse,
+      topic: item.topic,
+      kind: 'tf'
+    };
   }
 
   function domeySummary(data) {
@@ -899,6 +618,9 @@
     PDMascot.show(host, {
       rounds: rounds,
       bank: domeyBank(rounds),
+      // The reading pace: her explanation and its verse stay on screen until
+      // the member continues — a big button, or simply saying "next".
+      pace: 'manual',
       onScore: function (score) {
         if (!score.right) return;
         answeredRight += 1;
@@ -1005,7 +727,7 @@
       roundsSelect.addEventListener('change', function () { renderDomeyStats(); });
     }
 
-    // Domey is the whole page: wake him up and let him wave hello.
+    // Domey is the whole page: wake her up and let her wave hello.
     wakeDomey();
 
     var domeyStart = document.getElementById('domeyStartBtn');
