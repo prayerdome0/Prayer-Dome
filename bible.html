@@ -753,14 +753,15 @@
                     currentTranslationName = json.translationName || BIBLE_VERSIONS[version].name;
                     currentCopyright = json.copyright || BIBLE_VERSIONS[version].copyright;
                     if (status) {
+                        // NIV and MSG are read from API.Bible. A version is only
+                        // "setup required" when the server has no key or no Bible ID
+                        // for it; the server message says which of the two is missing.
                         status.textContent = json.configured
                             ? `${currentTranslationName} · ready`
-                            : (version === 'NIV'
-                                ? `${currentTranslationName} · licensing limit`
-                                : `${currentTranslationName} · setup required`);
-                        status.title = json.message || (json.getBibleFallbackAvailable
+                            : `${currentTranslationName} · setup required`;
+                        status.title = json.detail || json.message || (json.getBibleFallbackAvailable
                             ? 'Exact-version sources include Bolls.life and the free GetBible.net KJV fallback.'
-                            : `Exact-version sources: ${(json.providers || []).join(', ') || 'version-matched providers'}. GetBible.net does not currently publish this edition; no other translation will be substituted.`);
+                            : `Version-matched sources: ${(json.providers || []).join(', ') || 'none configured yet'}. No other translation is substituted.`);
                     }
                 }
                 return json;
@@ -917,9 +918,23 @@
                 if (version === 'BSB') {
                     json = await fetchBsbChapter(book, chapter);
                 } else {
+                    // A slow API.Bible answer must not leave the reader spinning
+                    // forever: after 20 s the request is dropped and the error card
+                    // (with any saved offline copy) takes over.
                     const url = `/api/bible?action=chapter&id=${encodeURIComponent(book.id)}&chapter=${encodeURIComponent(chapter)}&version=${encodeURIComponent(version)}`;
-                    response = await fetch(url);
-                    json = await response.json();
+                    const controller = typeof AbortController === 'function' ? new AbortController() : null;
+                    const abortTimer = controller ? setTimeout(() => controller.abort(), 20000) : null;
+                    try {
+                        response = await fetch(url, controller ? { signal: controller.signal } : undefined);
+                        json = await response.json();
+                    } catch (fetchError) {
+                        if (controller && controller.signal.aborted) {
+                            throw new Error('The request took too long. Please check your connection and try again.');
+                        }
+                        throw fetchError;
+                    } finally {
+                        if (abortTimer) clearTimeout(abortTimer);
+                    }
                 }
                 if (requestId !== chapterRequestId) return;
                 if (!response.ok || !json.ok) {
