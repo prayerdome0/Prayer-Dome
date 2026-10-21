@@ -3,6 +3,16 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
+      "package_name": "net.prayerdome.app",
+      "sha256_cert_fingerprints": [
+        "43:70:D7:09:23:4E:F0:0B:A5:E0:88:1E:24:23:C6:1D:BB:76:48:F0:FB:31:1E:00:1F:D2:7B:D2:5A:B9:5C:70"
+      ]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
       "package_name": "co.median.android.qdoxnjx",
       "sha256_cert_fingerprints": [
         "40:9D:FC:AF:E0:C9:6F:71:EF:01:20:3E:92:F6:B3:6C:22:CF:93:70:22:F5:F9:2E:4B:78:DD:8A:92:46:70:E8"

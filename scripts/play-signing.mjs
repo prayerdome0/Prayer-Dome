@@ -17,7 +17,7 @@
  *   node scripts/play-signing.mjs --bundle app-release.aab
  *   node scripts/play-signing.mjs --keystore android/release.keystore --bundle app-release.aab
  *   node scripts/play-signing.mjs --bundle app-release.aab --expect-sha1 8D:25:36:…
- *   node scripts/play-signing.mjs --keystore release.jks --assetlinks co.median.android.qdoxnjx
+ *   node scripts/play-signing.mjs --keystore release.jks --assetlinks net.prayerdome.app
  *
  * Sources it understands:
  *   • Java keystores (.jks/.keystore) — certificate chain read directly from the
