@@ -421,7 +421,33 @@
 
   Voice.prototype.stop = function () {
     if (!this.supported) return;
+    this.paused = false;
     try { global.speechSynthesis.cancel(); } catch (e) {}
+  };
+
+  /**
+   * Hold the spoken line where it is. `speechSynthesis.pause()` is available on
+   * Chrome, Edge, Safari and the Android WebView; where an engine ignores it,
+   * the call is a no-op and the visible captions still pause, so the member is
+   * never left with a mouth moving in silence.
+   */
+  Voice.prototype.pause = function () {
+    if (!this.supported) return false;
+    try {
+      if (!global.speechSynthesis.speaking) return false;
+      global.speechSynthesis.pause();
+      this.paused = true;
+      return true;
+    } catch (e) { return false; }
+  };
+
+  Voice.prototype.resume = function () {
+    if (!this.supported) return false;
+    try {
+      global.speechSynthesis.resume();
+      this.paused = false;
+      return true;
+    } catch (e) { return false; }
   };
 
   /* ------------------------------------------------------------ the ears */
@@ -702,6 +728,7 @@
     this.onWord = null;
     this.rateScale = 1;        // learned from the voice's real word timing
     this.lastBoundaryAt = 0;   // performance.now() of the last boundary
+    this.paused = false;       // held while the member has paused the speech
   }
   /** Move the lips: `data-pdm-vis` is what tells the stylesheet which mouth
    *  posture to show, and the jaw amount is how far open it sits. */
@@ -734,6 +761,12 @@
   MouthMotor.prototype.tick = function () {
     var self = this;
     if (this.done || !this.plan || this.host.destroyed) return;
+    // A paused sentence keeps its mouth still instead of running on silently.
+    if (this.paused) {
+      if (this.timer) clearTimeout(this.timer);
+      this.timer = setTimeout(function () { self.tick(); }, 90);
+      return;
+    }
     var word = this.plan[this.wi];
     if (!word) { this.finish(); return; }
     var frame = word.frames[this.fi] || { v: 'rest', ms: 90 };
@@ -765,7 +798,7 @@
    * reports boundaries, the lips follow the voice instead of a timer.
    */
   MouthMotor.prototype.jumpToWord = function (index) {
-    if (this.done || !this.plan || index == null || index >= this.plan.length) return;
+    if (this.done || this.paused || !this.plan || index == null || index >= this.plan.length) return;
     var now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     // Learn the voice's real pace from the gap between its word boundaries, so
     // the words that follow are held exactly as long (or as briefly) as the
@@ -793,6 +826,7 @@
     this.tick();
   };
   MouthMotor.prototype.finish = function () {
+    this.paused = false;
     this.done = true;
     if (this.timer) clearTimeout(this.timer);
     this.timer = null;
@@ -1061,17 +1095,74 @@
         // floor instead of hovering above it (the cartoon sinks through it,
         // which reads as grounded but hides the feet).
         rig.root.position.y -= 0.09;
-        return this._mount3D(engine, {
+        var instance = this._mount3D(engine, {
           rig: rig,
           fit: { height: 2.8, width: 1.72, y: 0.55 },   // head to feet, filling the stage
           maxPixelRatio: ladyIsLowEnd() ? 1.25 : 2,
           model: 'lady'
         });
+        // The coded hostess is on stage in milliseconds. On a device that can
+        // afford it, the licensed realistic model then takes her place in the
+        // same scene (no flash, no second canvas) once it has downloaded.
+        this._upgradeToRealistic(instance, engine, THREE);
+        return instance;
       } catch (error) {
         console.warn('[PDMascot] the hostess could not be built, using the cartoon rig', error && error.message);
       }
     }
-    return this._mount3D(engine, opts);
+    var cartoon = this._mount3D(engine, opts);
+    this._upgradeToRealistic(cartoon, engine, THREE);
+    return cartoon;
+  };
+
+  /**
+   * Progressive upgrade: keep the instant character, then swap in the rigged
+   * VRM human (assets/pd-domey-human.js) when WebGL, the device and the
+   * connection allow a ~10 MB download. Every failure path leaves the coded
+   * hostess on stage — the game never waits on, or breaks because of, the model.
+   */
+  Host.prototype._upgradeToRealistic = function (instance, engine, THREE) {
+    var self = this;
+    var human = global.PDDomeyHuman;
+    if (!instance || !human || typeof human.load !== 'function' || !THREE) return;
+    if (this.options.realistic === false) return;
+    if (typeof human.wanted === 'function' && !human.wanted()) {
+      this.emit('character', 'lady');
+      return;
+    }
+    this.root.setAttribute('data-pdm-character', 'lady');
+    this.emit('character', 'loading');
+    var start = function () {
+      self._humanTimer = null;
+      if (self.destroyed || self.renderer3d !== instance) return;
+      human.load(THREE).then(function (asset) {
+        if (self.destroyed || self.renderer3d !== instance) return null;
+        var rig = human.buildRig(THREE, {
+          asset: asset,
+          reducedMotion: !!(engine.prefersReducedMotion && engine.prefersReducedMotion())
+        });
+        instance.swapRig(rig, human.FIT || { height: 1.86, width: 1.05, y: 0.93 });
+        self.root.setAttribute('data-pdm-character', 'human');
+        self.root.setAttribute('data-pdm-model', 'human');
+        self.emit('character', 'human');
+        self.emit('renderer', '3d');
+        return rig;
+      }).catch(function (error) {
+        if (self.destroyed) return;
+        self.root.setAttribute('data-pdm-character', 'lady');
+        self.emit('character', 'lady');
+        console.warn('[PDMascot] the realistic character is unavailable, keeping the coded hostess:',
+          (error && error.message) || error);
+      });
+    };
+    // Start while the page is otherwise idle, so the model never competes with
+    // the first question or the first tap.
+    if (typeof global.requestIdleCallback === 'function') {
+      var idle = global.requestIdleCallback(start, { timeout: 2200 });
+      this._humanTimer = { idle: idle };
+    } else {
+      this._humanTimer = this._later(start, 900);
+    }
   };
 
   /* Light phones still get the full 3D hostess — she is pure geometry — but a
@@ -1276,9 +1367,17 @@
       self.say(self.lastSpoken, { emote: 'happy' });
     });
 
+    /* Pause / resume the spoken line. A member reading along, a parent
+       interrupting, a noisy room — all reasons a talking companion must be
+       stoppable without losing the sentence. */
+    this.pauseBtn = this._barButton('pd-i-pause', 'Pause', function () { self.togglePause(); });
+    this.pauseBtn.setAttribute('aria-pressed', 'false');
+    this.pauseBtn.hidden = true;   // shown while she is speaking
+
     bar.appendChild(this.voiceBtn);
     bar.appendChild(this.micBtn);
     bar.appendChild(this.repeatBtn);
+    bar.appendChild(this.pauseBtn);
     bar.appendChild(this.micBadge);
 
     this.hint = el('p', 'pdm-hint');
@@ -1359,6 +1458,10 @@
   };
 
   Host.prototype._setState = function (state) {
+    if (this.pauseBtn) {
+      var canPause = !this.muted && !this.options.captionsOnly;
+      this.pauseBtn.hidden = !canPause;
+    }
     if (this.state === state) return;
     this.state = state;
     this.root.setAttribute('data-pdm-state', state);
@@ -1582,6 +1685,8 @@
     // there are no word boundaries, so the captions keep their own pace.
     var tick = setInterval(function () {
       if (self.destroyed || (token && token.cancelled)) { clearInterval(tick); return; }
+      // Paused speech holds the captions on the word the member is hearing.
+      if (self._paused) return;
       if (shown < spans.length) { showWord(shown); } else { clearInterval(tick); }
     }, perWord);
     this.timers.push(tick);
@@ -1608,6 +1713,8 @@
       this._token = { cancelled: false };
     }
     var line = cleanSpeech(text);
+    // A new line always starts audible: pause belongs to the line it paused.
+    if (this._paused) this.resume();
     this.lastSpoken = line;
     this.history.push({ who: 'host', text: line, at: Date.now() });
     this.emit('say', line);
@@ -1740,6 +1847,8 @@
     if (this._speechToken) this._speechToken.cancelled = true;
     this._clearTimers();
     this.mouth.stop();
+    this.mouth.paused = false;
+    this._paused = false;
     this.voice.stop();
     this.ears.stop();
     this.act(null);
@@ -1751,6 +1860,14 @@
   Host.prototype.destroy = function () {
     this.stop();
     if (this._stateTimer) { clearTimeout(this._stateTimer); this._stateTimer = null; }
+    if (this._humanTimer) {
+      if (typeof this._humanTimer === 'number') {
+        clearTimeout(this._humanTimer);   // _later() returns a timer id
+      } else if (this._humanTimer.idle != null && global.cancelIdleCallback) {
+        try { global.cancelIdleCallback(this._humanTimer.idle); } catch (e) {}
+      }
+      this._humanTimer = null;
+    }
     this.destroyed = true;
     this._unbindGaze();
     // Hand the GPU buffers back before the markup goes away; a page that mounts
@@ -1781,6 +1898,52 @@
     this.emit('muted', this.muted);
     try { global.localStorage.setItem('pd-domey-muted', this.muted ? '1' : '0'); } catch (e) {}
     return this;
+  };
+
+  /** True while the current spoken line is held. */
+  Host.prototype.isPaused = function () { return !!this._paused; };
+
+  Host.prototype.pause = function () {
+    if (!this.lastSpoken) return this;
+    if (this._paused) return this;
+    this._paused = true;
+    var held = this.voice.pause();
+    this.mouth.paused = true;
+    if (!held) this.voice.stop();
+    if (this.pauseBtn) {
+      this.pauseBtn.querySelector('i').className = iconClass('play');
+      var label = this.pauseBtn.querySelector('span');
+      if (label) label.textContent = 'Resume';
+      this.pauseBtn.setAttribute('aria-label', 'Resume speech');
+      this.pauseBtn.setAttribute('aria-pressed', 'true');
+    }
+    this.setStatus('Paused');
+    this.emit('pause', true);
+    return this;
+  };
+
+  Host.prototype.resume = function () {
+    if (!this._paused) return this;
+    this._paused = false;
+    this.mouth.paused = false;
+    var continued = this.voice.resume();
+    // Some engines drop the utterance on resume; replaying the line is the
+    // honest fallback and never leaves a silent, lip-syncing character.
+    if (!continued && this.lastSpoken) this.say(this.lastSpoken, { emote: this.state === 'speaking' ? 'speaking' : 'idle' });
+    if (this.pauseBtn) {
+      this.pauseBtn.querySelector('i').className = iconClass('pause');
+      var label = this.pauseBtn.querySelector('span');
+      if (label) label.textContent = 'Pause';
+      this.pauseBtn.setAttribute('aria-label', 'Pause speech');
+      this.pauseBtn.setAttribute('aria-pressed', 'false');
+    }
+    if (!continued) this.setStatus('Speaking');
+    this.emit('pause', false);
+    return this;
+  };
+
+  Host.prototype.togglePause = function () {
+    return this._paused ? this.resume() : this.pause();
   };
 
   Host.prototype.toggleMuted = function () {
@@ -1956,6 +2119,51 @@
     return promise;
   };
 
+  /**
+   * One judgement for every way an answer can arrive — a tapped chip, a spoken
+   * word, or typing — so the colours on the chips can never disagree with the
+   * score Domey gives. Returns null when nothing was actually answered (a skip,
+   * a timeout, or a question that has no right answer such as a name).
+   *
+   * spec: the question object handed to ask(); answer: its resolved value.
+   * -> { chosen, correctIndex, right } | null
+   */
+  function judgeAnswer(spec, answer) {
+    if (!spec || spec.correctIndex == null || !answer) return null;
+    var choices = spec.choices || [];
+    var chosen = answer.index == null ? null : answer.index;
+    if (chosen == null && answer.text) {
+      // A spoken or typed answer is matched against the printed choices with
+      // the very same matcher ask() uses, never a second rule of its own.
+      var found = matchChoices(answer.text, choices);
+      if (found.index != null) chosen = found.index;
+    }
+    var answered = !!answer.text || chosen != null;
+    if (!answered) return null;
+    var right = chosen != null && chosen === spec.correctIndex;
+    return { chosen: chosen, correctIndex: spec.correctIndex, right: right };
+  }
+
+  /**
+   * Paint the verdict on the chips the member is looking at: the correct
+   * choice is always marked, the chosen one is wrong-marked only when it was
+   * actually a different choice. Answers that were not understood still reveal
+   * the right one, because a question is a chance to learn, not a trap.
+   */
+  Host.prototype.markAnswer = function (verdict) {
+    if (!verdict || verdict.correctIndex == null) return this;
+    this.chips.querySelectorAll('.pdm-chip[data-pdm-index]').forEach(function (chip) {
+      var index = Number(chip.getAttribute('data-pdm-index'));
+      chip.classList.remove('is-wrong', 'is-correct', 'is-picked');
+      if (index === verdict.correctIndex) chip.classList.add('is-correct');
+      if (index === verdict.chosen) {
+        chip.classList.add('is-picked');
+        if (!verdict.right) chip.classList.add('is-wrong');
+      }
+    });
+    return this;
+  };
+
   Host.prototype._clearQuestion = function () {
     this.question = null;
     this.chips.innerHTML = '';
@@ -1965,6 +2173,7 @@
 
   Host.prototype._accept = function (value, source, index) {
     if (!this.answerResolve) return false;
+    var spec = this.question;
     var resolve = this.answerResolve;
     this.answerResolve = null;
     this._listenLoop = null;
@@ -1976,6 +2185,15 @@
     this.chips.querySelectorAll('.pdm-chip').forEach(function (chip) { chip.disabled = true; });
     Band.play('listen');
     var answer = { text: String(value == null ? '' : value), source: source, index: index == null ? null : index };
+    // Every answer path — tap, speech, typing, skip — is judged here once, so
+    // what the member sees and what the show scores come from one calculation.
+    var verdict = judgeAnswer(spec, answer);
+    if (verdict) {
+      answer.chosen = verdict.chosen;
+      answer.right = verdict.right;
+      answer.judged = verdict;
+      this.markAnswer(verdict);
+    }
     if (answer.text) this.logLine('you', answer.text, source === 'voice' ? 'pdm-log-spoken' : '');
     this.emit('answered', answer);
     resolve(answer);
@@ -2031,19 +2249,10 @@
         var chip = el('button', 'pdm-chip' + (letters ? ' pdm-chip-big' : ''), label);
         chip.type = 'button';
         chip.setAttribute('data-pdm-letter', letters ? LETTERS[index] : '');
+        chip.setAttribute('data-pdm-index', String(index));
         chip.addEventListener('click', function () {
-          self.chips.querySelectorAll('.pdm-chip').forEach(function (c) { c.classList.remove('is-picked'); });
-          chip.classList.add('is-picked');
-          if (spec.correctIndex != null) {
-            if (index === spec.correctIndex) {
-              chip.classList.add('is-correct');
-            } else {
-              chip.classList.add('is-wrong');
-              // A wrong answer teaches best when the right one is shown too.
-              var right = self.chips.querySelectorAll('.pdm-chip')[spec.correctIndex];
-              if (right) right.classList.add('is-correct');
-            }
-          }
+          // No painting here: _accept() judges every answer path once and
+          // markAnswer() colours the chips from that single verdict.
           self._accept(choice, 'chip', index);
         });
         self.chips.appendChild(chip);
@@ -2369,14 +2578,14 @@
         })
         .then(function (answer) {
           if (token.cancelled) return null;
-          var chosen = answer.index;
-          // Typed or free-spoken answers arrive as text: match them against the
-          // printed choices so "the first one" and "Moses" both count.
-          if (chosen == null && answer.text) {
-            var m = matchChoices(answer.text, item.options);
-            if (m.index != null) chosen = m.index;
-          }
-          var isRight = chosen === item.correctIndex;
+          // ask() already judged this answer (tapped, spoken or typed) with the
+          // shared matcher; the score reuses that verdict rather than judging
+          // a second time and risking a different result.
+          var judged = answer.judged || judgeAnswer({
+            kind: 'choice', choices: item.options, correctIndex: item.correctIndex
+          }, answer);
+          var chosen = judged && judged.chosen != null ? judged.chosen : null;
+          var isRight = !!(judged && judged.right);
           host.emit('verdict', {
             round: index + 1,
             right: isRight,
@@ -2675,6 +2884,10 @@
     cleanName: cleanName,
     greetingFor: greetingFor,
     supportsVoice: function () { return typeof global.speechSynthesis !== 'undefined' && typeof global.SpeechSynthesisUtterance !== 'undefined'; },
+    /** Is a realistic (downloaded) character available to this device? */
+    supportsRealistic: function () {
+      return !!(global.PDDomeyHuman && global.PDDomeyHuman.wanted && global.PDDomeyHuman.wanted());
+    },
     supportsListening: function () { return !!(global.SpeechRecognition || global.webkitSpeechRecognition); },
     stopped: function () { try { global.speechSynthesis.cancel(); } catch (e) {} },
     band: Band,

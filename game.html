@@ -27,6 +27,7 @@
   <script src="/assets/three.module.min.js" type="module" defer></script>
   <script src="/assets/pd-domey3d.js" defer></script>
   <script src="/assets/pd-domey-lady.js" defer></script>
+  <script src="/assets/pd-domey-human.js" defer></script>
   <script src="/assets/pd-domey-questions.js" defer></script>
   <script src="/assets/pd-mascot.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -123,6 +124,7 @@
   <script src="/assets/pd-verse-alerts.js" defer></script>
   <script src="/assets/pd-phrases.js" defer></script>
   <script src="/assets/pd-i18n.js" defer></script>
+  <script src="/assets/pd-nav.js" defer></script>
   <script src="/assets/pd-app.js" defer></script>
 </head>
 
@@ -130,17 +132,50 @@
 <div class="pd-aurora" aria-hidden="true"><span></span></div>
 
 <aside class="pd-drawer" id="pdDrawer" aria-label="Main menu">
-  <nav class="pd-drawer-nav">
-    <a class="pd-drawer-link" href="/"><i class="pd-i pd-i-house"></i> Home</a>
-    <a class="pd-drawer-link" href="/lessons"><i class="pd-i pd-i-graduation-cap"></i> Teaching</a>
-    <a class="pd-drawer-link" href="/stories"><i class="pd-i pd-i-book-open-text"></i> Stories</a>
-    <a class="pd-drawer-link" href="/quiz"><i class="pd-i pd-i-star"></i> Quizzes</a>
-    <a class="pd-drawer-link" href="/game.html"><i class="pd-i pd-i-gamepad-2"></i> Play with Domey</a>
-    <a class="pd-drawer-link" href="/resources"><i class="pd-i pd-i-folder-open"></i> Resources</a>
-    <a class="pd-drawer-link" href="/sermons"><i class="pd-i pd-i-mic"></i> Sermons</a>
-    <a class="pd-drawer-link" href="/prayer"><i class="pd-i pd-i-hands-praying"></i> Prayer Wall</a>
-    <a class="pd-drawer-link" href="/account"><i class="pd-i pd-i-circle-user"></i> Account</a>
-  </nav>
+    <div class="pd-drawer-head"><img src="/assets/logo.png" alt="Prayer Dome"><div class="pd-drawer-brand"><div class="pd-drawer-title">Prayer Dome</div><small>A House of Prayer for All Nations</small></div><button class="pd-drawer-close" type="button" aria-label="Close menu"><i class="pd-i pd-i-x" aria-hidden="true"></i></button></div><nav class="pd-drawer-nav" aria-label="Sections of Prayer Dome">
+      <div class="pd-drawer-group" data-pd-nav-group="main">
+        <p class="pd-drawer-group-title" id="pdNavGroup-main">Main</p>
+        <a class="pd-drawer-link" href="/" data-pd-nav="/"><i class="pd-i pd-i-house" aria-hidden="true"></i><span data-pd-t="nav.home">Home</span></a>
+        <a class="pd-drawer-link" href="/bible" data-pd-nav="/bible"><i class="pd-i pd-i-book-open" aria-hidden="true"></i><span data-pd-t="nav.bible">Bible</span></a>
+        <a class="pd-drawer-link" href="/lessons" data-pd-nav="/lessons"><i class="pd-i pd-i-graduation-cap" aria-hidden="true"></i><span data-pd-t="nav.teaching">Teachings</span></a>
+        <a class="pd-drawer-link" href="/prayer" data-pd-nav="/prayer"><i class="pd-i pd-i-hands-praying" aria-hidden="true"></i><span data-pd-t="nav.pray">Prayer Wall</span></a>
+      </div>
+      <div class="pd-drawer-group" data-pd-nav-group="learn">
+        <p class="pd-drawer-group-title" id="pdNavGroup-learn">Learn &amp; Play</p>
+        <a class="pd-drawer-link active" href="/game" data-pd-nav="/game" aria-current="page"><i class="pd-i pd-i-gamepad-2" aria-hidden="true"></i><span>Play with Domey</span></a>
+        <a class="pd-drawer-link" href="/quiz" data-pd-nav="/quiz"><i class="pd-i pd-i-star" aria-hidden="true"></i><span data-pd-t="nav.quizzes">Bible Quizzes</span></a>
+        <a class="pd-drawer-link" href="/stories" data-pd-nav="/stories"><i class="pd-i pd-i-book-open-text" aria-hidden="true"></i><span data-pd-t="nav.stories">Bible Stories</span></a>
+        <a class="pd-drawer-link" href="/resources" data-pd-nav="/resources"><i class="pd-i pd-i-folder-open" aria-hidden="true"></i><span data-pd-t="nav.resources">Study Resources</span></a>
+      </div>
+      <div class="pd-drawer-group" data-pd-nav-group="community">
+        <p class="pd-drawer-group-title" id="pdNavGroup-community">Community</p>
+        <a class="pd-drawer-link" href="/chat" data-pd-nav="/chat"><i class="pd-i pd-i-messages-square" aria-hidden="true"></i><span data-pd-t="nav.chat">Community Hub</span></a>
+        <a class="pd-drawer-link" href="/testimony" data-pd-nav="/testimony"><i class="pd-i pd-i-sparkles" aria-hidden="true"></i><span data-pd-t="nav.testimony">Testimonies</span></a>
+        <a class="pd-drawer-link" href="/events" data-pd-nav="/events"><i class="pd-i pd-i-calendar-days" aria-hidden="true"></i><span data-pd-t="nav.events">Events</span></a>
+        <a class="pd-drawer-link" href="/gallery" data-pd-nav="/gallery"><i class="pd-i pd-i-images" aria-hidden="true"></i><span data-pd-t="nav.gallery">Gallery</span></a>
+        <a class="pd-drawer-link" href="/news" data-pd-nav="/news"><i class="pd-i pd-i-newspaper" aria-hidden="true"></i><span data-pd-t="nav.news">Christian News</span></a>
+      </div>
+      <div class="pd-drawer-group" data-pd-nav-group="media">
+        <p class="pd-drawer-group-title" id="pdNavGroup-media">Media</p>
+        <a class="pd-drawer-link pd-drawer-live" href="/live" data-pd-nav="/live"><i class="pd-i pd-i-radio" aria-hidden="true"></i><span data-pd-t="nav.live">Live Service</span></a>
+        <a class="pd-drawer-link" href="/sermons" data-pd-nav="/sermons"><i class="pd-i pd-i-mic" aria-hidden="true"></i><span data-pd-t="nav.sermons">Sermons</span></a>
+        <a class="pd-drawer-link" href="/video" data-pd-nav="/video"><i class="pd-i pd-i-circle-play" aria-hidden="true"></i><span data-pd-t="nav.media">Gospel Media</span></a>
+        <a class="pd-drawer-link" href="/radio" data-pd-nav="/radio"><i class="pd-i pd-i-radio-tower" aria-hidden="true"></i><span>Radio &amp; Podcasts</span></a>
+      </div>
+      <div class="pd-drawer-group" data-pd-nav-group="personal">
+        <p class="pd-drawer-group-title" id="pdNavGroup-personal">Personal</p>
+        <a class="pd-drawer-link" href="/account" data-pd-nav="/account"><i class="pd-i pd-i-circle-user" aria-hidden="true"></i><span data-pd-t="nav.account">My Account</span></a>
+        <a class="pd-drawer-link" href="/widgets" data-pd-nav="/widgets"><i class="pd-i pd-i-smartphone" aria-hidden="true"></i><span>Verse Widget</span></a>
+        <a class="pd-drawer-link" href="/membership" data-pd-nav="/membership"><i class="pd-i pd-i-id-card" aria-hidden="true"></i><span>Membership</span></a>
+        <a class="pd-drawer-link" href="/give" data-pd-nav="/give"><i class="pd-i pd-i-heart" aria-hidden="true"></i><span data-pd-t="nav.give">Give</span></a>
+        <a class="pd-drawer-link" href="/support" data-pd-nav="/support"><i class="pd-i pd-i-hand-heart" aria-hidden="true"></i><span data-pd-t="nav.support">Support</span></a>
+      </div>
+    </nav><div class="pd-drawer-foot"><div class="pd-drawer-sub">
+      <a class="pd-drawer-sub-link" href="/about" data-pd-nav="/about"><i class="pd-i pd-i-church" aria-hidden="true"></i><span data-pd-t="nav.about">About</span></a>
+      <a class="pd-drawer-sub-link" href="/contact" data-pd-nav="/contact"><i class="pd-i pd-i-mail" aria-hidden="true"></i><span data-pd-t="nav.contact">Contact</span></a>
+      <a class="pd-drawer-sub-link" href="/team" data-pd-nav="/team"><i class="pd-i pd-i-users" aria-hidden="true"></i><span data-pd-t="nav.team">Team</span></a>
+      <a class="pd-drawer-sub-link" href="/privacy" data-pd-nav="/privacy"><i class="pd-i pd-i-shield-check" aria-hidden="true"></i><span>Privacy</span></a>
+    </div><p class="pd-drawer-verse"><i class="pd-i pd-i-book" aria-hidden="true"></i> “He does everything blamelessly.” — Mark 7:37</p><small>© Prayer Dome Ministry · Zambia · Eswatini · South Africa · Malawi · Ireland</small></div>
 </aside>
 <header class="pd-topbar">
   <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="pd-i pd-i-menu"></i></button>
@@ -185,7 +220,7 @@
     <p style="color:var(--pd-acad-muted); margin:0 0 18px; line-height:1.6;">Domey is the Prayer Dome 3D hostess: a friendly woman in royal blue and gold who blinks, looks at you and moves naturally while she talks — her lips follow every word she says. Answer by talking, by tapping <strong>A, B, C or D</strong>, or by typing. Ask her to <em>repeat</em>, ask for a <em>hint</em>, or say <em>skip</em>. She replies out loud and explains the scripture behind every question, and the whole conversation is written below so you can read along.</p>
 
     <div id="domeyStage" role="img" aria-label="Domey, your 3D Bible quiz hostess"></div>
-    <p id="domeyCredit" style="color:var(--pd-acad-muted); font-size:.78rem; margin:8px 2px 0; line-height:1.5;">Domey is modelled entirely in code on this site — no character download, so she appears instantly even on a slow connection. Rendered with three.js (MIT licence).</p>
+    <p id="domeyCredit" style="color:var(--pd-acad-muted); font-size:.78rem; margin:8px 2px 0; line-height:1.5;">Domey appears instantly as a character modelled in code, then upgrades on capable devices to a licensed, rigged human model with real facial expressions and hand gestures. Rendered with three.js (MIT licence); the model is VRM1_Constraint_Twist_Sample © 2022 pixiv Inc., used under the VRM Public License 1.0 (free for commercial use).</p>
 
     <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:18px;">
       <button class="pd-acad-btn pd-acad-btn-primary" id="domeyStartBtn" type="button"><i class="pd-i pd-i-play"></i> Start the show</button>
@@ -490,6 +525,22 @@
     fitDomey();
   }
 
+  /* The realistic model downloads in the background after the stage is live.
+     The chip says which character the member is actually looking at, so a
+     slow connection never leaves them guessing. */
+  function onDomeyCharacter(state) {
+    var chip = domeyElements().render;
+    if (!chip) return;
+    if (state === 'loading') {
+      chip.innerHTML = '<i class="pd-i pd-i-sparkles"></i> Domey is here • bringing her realistic face';
+    } else if (state === 'human') {
+      chip.innerHTML = '<i class="pd-i pd-i-star"></i> Domey in 3D • realistic model, live lips and gestures';
+    } else {
+      chip.innerHTML = '<i class="pd-i pd-i-sparkles"></i> Domey in 3D • stylised model (light device)';
+    }
+    fitDomey();
+  }
+
   function ensureDomey() {
     if (domey || !window.PDMascot) return domey;
     var ui = domeyElements();
@@ -514,7 +565,12 @@
       updateDomeyMicNote(on);
     });
     domey.on('renderer', onDomeyRenderer);
+    domey.on('character', onDomeyCharacter);
     if (domey.is3D && domey.is3D()) onDomeyRenderer('3d');
+    // The upgrade may already have started while this page was mounting, so the
+    // chip reads the state on the character itself rather than waiting for an
+    // event it has missed.
+    onDomeyCharacter(domey.root.getAttribute('data-pdm-character') || 'lady');
     renderDomeyStats();
     updateDomeyMicNote(false);
     fitDomey();
@@ -540,38 +596,16 @@
     var topic = select ? select.value : '';
     var picked = PDDomeyQuestions.forMascot(count, topic ? { topic: topic } : {});
     if (!picked || !picked.length) return null;
-    /* A little variety in the asking: every third question is offered as true
-       or false, derived from a question whose answer is a person ("Who was the
-       first man God created?" + Adam → "Adam was the first man God created.").
-       The statement uses only the bank's own question and answer, so no new
-       fact is ever invented — and the verse still explains it. Verse
-       completion is deliberately NOT generated: the bank carries references,
-       not full quotations, and completing a reference would invent a quote. */
-    return picked.map(function (item, index) {
-      if (index % 3 !== 2) return item;
-      var tf = asTrueFalse(item);
-      return tf || item;
-    });
-  }
-
-  /* "Who was …?" / "Who built …?" with a person for an answer becomes a
-     true-or-false statement — safely, by subject substitution only. */
-  var TF_WHO = /^(who)\s+(was|were|is|built|wrote|led|said|prayed|saw|made|gave|chose|called|named|rose|raised|walked|spoke|took|sent|showed|told|asked|cried|fought|won|died|lived|ruled|reigned|became|had|found|came|went|returned|followed|helped|saved|healed|taught|fed|visited|judged|tested|trusted|obeyed)\b/i;
-  function asTrueFalse(item) {
-    if (!TF_WHO.test(item.q || '')) return null;
-    var rest = String(item.q).replace(/^who\s+/i, '').replace(/\?\s*$/, '');
-    var answer = item.options[item.answer];
-    var wrong = item.options.find(function (text, i) { return i !== item.answer; });
-    if (!answer || !wrong) return null;
-    var useTrue = Math.random() < 0.5;
-    return {
-      q: 'True or false: ' + (useTrue ? answer : wrong) + ' ' + rest + '.',
-      options: ['True', 'False'],
-      answer: useTrue ? 0 : 1,
-      verse: item.verse,
-      topic: item.topic,
-      kind: 'tf'
-    };
+    /* Every question stays a four-choice question. An earlier version turned
+       every third "Who …?" item into a true-or-false statement by subject
+       substitution; it read well on paper but broke the show: with only
+       "True" and "False" to match against, a member who answered the obvious
+       "Daniel" was scored wrong, and a two-way choice is a coin toss rather
+       than a memory of the Word. The bank's own promise — four choices, so a
+       spoken answer is never a guess — is kept here. Verse completion is
+       deliberately NOT generated: the bank carries references, not full
+       quotations, and completing a reference would invent a quote. */
+    return picked;
   }
 
   function domeySummary(data) {

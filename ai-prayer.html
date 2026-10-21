@@ -386,6 +386,7 @@
 <script src="/assets/pd-verse-alerts.js" defer></script>
 <script src="/assets/pd-phrases.js" defer></script>
 <script src="/assets/pd-i18n.js" defer></script>
+<script src="/assets/pd-nav.js" defer></script>
 <script src="/assets/pd-app.js" defer></script>
 <script src="/assets/pd-domey-widget.js" defer></script>
 </head>
@@ -481,14 +482,8 @@
 </main>
 
 <div class="bottom-ui-system">
-    <nav class="nav-bar">
-        <a href="/index.html" class="nav-link"><i class="pd-i pd-i-house"></i><span>Home</span></a>
-        <a href="/bible.html" class="nav-link"><i class="pd-i pd-i-book-open"></i><span>Bible</span></a>
-        <a href="/sermons.html" class="nav-link"><i class="pd-i pd-i-mic"></i><span>Sermons</span></a>
-        <a href="/prayer.html" class="nav-link"><i class="pd-i pd-i-hands-praying"></i><span>Pray</span></a>
-        <a href="/ai-prayer.html" class="nav-link active"><i class="pd-i pd-i-wand-sparkles"></i><span>Assistant</span></a>
-        <a href="/account.html" class="nav-link"><i class="pd-i pd-i-user"></i><span>Account</span></a>
-    </nav>
+    <nav class="nav-bar pd-nav-bar" aria-label="Primary navigation"><a class="nav-link pd-nav-link" href="/" data-pd-nav="/"><i class="pd-i pd-i-house" aria-hidden="true"></i><span data-pd-t="nav.home">Home</span></a><a class="nav-link pd-nav-link" href="/bible" data-pd-nav="/bible"><i class="pd-i pd-i-book-open" aria-hidden="true"></i><span data-pd-t="nav.bible">Bible</span></a><a class="nav-link pd-nav-link" href="/lessons" data-pd-nav="/lessons"><i class="pd-i pd-i-graduation-cap" aria-hidden="true"></i><span data-pd-t="nav.teaching">Learn</span></a><a class="nav-link pd-nav-link" href="/game" data-pd-nav="/game"><i class="pd-i pd-i-gamepad-2" aria-hidden="true"></i><span>Play</span></a><a class="nav-link pd-nav-link" href="/prayer" data-pd-nav="/prayer"><i class="pd-i pd-i-hands-praying" aria-hidden="true"></i><span data-pd-t="nav.pray">Pray</span></a><a class="nav-link pd-nav-link" href="/account" data-pd-nav="/account"><i class="pd-i pd-i-circle-user" aria-hidden="true"></i><span data-pd-t="nav.account">Account</span></a></nav>
+
 </div>
 
 <div class="toast-container" id="toastContainer"></div>

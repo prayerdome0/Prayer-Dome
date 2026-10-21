@@ -634,6 +634,9 @@ body.light-mode .pd-mascot {
 .pdm-chip:hover { transform: translateY(-1px); border-color: var(--pdm-gold); }
 .pdm-chip:focus-visible { outline: 3px solid var(--pdm-focus); outline-offset: 2px; }
 .pdm-chip[disabled] { opacity: .5; cursor: default; transform: none; }
+/* The verdict is the point of answering: a marked chip keeps its full colour
+   even though every chip is disabled once the answer is in. */
+.pdm-chip[disabled].is-correct, .pdm-chip[disabled].is-wrong, .pdm-chip[disabled].is-picked { opacity: 1; }
 .pdm-chip.is-picked { border-color: var(--pdm-gold); background: rgba(212, 175, 55, .18); }
 .pdm-chip.is-correct { border-color: #22c55e; background: rgba(34, 197, 94, .18); }
 .pdm-chip.is-wrong { border-color: #f97316; background: rgba(249, 115, 22, .16); }

@@ -87,6 +87,19 @@ function invoke(modulePath, method = 'GET') {
     headerMap['content-security-policy'].includes("object-src 'none'") &&
     headerMap['content-security-policy'].includes("base-uri 'self'"));
 
+  const cacheRule = (source) => (config.headers || [])
+    .find((rule) => rule.source === source);
+  const cacheFor = (source) => {
+    const rule = cacheRule(source);
+    const header = rule && rule.headers.find((h) => h.key.toLowerCase() === 'cache-control');
+    return (header && header.value) || '';
+  };
+  test('static assets are cached for a week, including the 3D engine and its models',
+    ['/(.*).(js|mjs|css|png|jpg|jpeg|svg|webp|woff2|vrm|glb)', '/assets/domey/(.*)', '/assets/vendor/(.*)']
+      .every((source) => cacheFor(source).includes('max-age=604800')));
+  test('the character model is not marked immutable, because its URL never changes',
+    !cacheFor('/assets/domey/(.*)').includes('immutable'));
+
   execFileSync(process.execPath, ['scripts/build-vercel.mjs'], { cwd: ROOT, stdio: 'inherit' });
   const output = path.join(ROOT, 'dist');
   const htmlPages = fs.readdirSync(ROOT).filter(name => name.endsWith('.html'));

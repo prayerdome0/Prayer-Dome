@@ -91,26 +91,23 @@
   }
 
   /* --------------------------------------------------------- academy nav */
+  /* Kept as a named module because pages and older builds reference
+     PDApp.academyNav, but it is no longer its own list: the Academy
+     destinations live in the one global navigation configuration
+     (assets/pd-nav.js) and are rendered with every other group. Injecting a
+     second, page-level set of links here was what made the menu change shape
+     between Home and the Academy. */
   var academyNav = {
     links: [
-      { href: '/lessons.html', icon: 'pd-i-graduation-cap', label: 'Teaching', match: 'lessons' },
-      { href: '/stories.html', icon: 'pd-i-book-open-text', label: 'Stories', match: 'stories' },
-      { href: '/quiz.html', icon: 'pd-i-star', label: 'Quizzes', match: 'quiz' },
-      { href: '/resources.html', icon: 'pd-i-folder-open', label: 'Resources', match: 'resources' }
+      { href: '/lessons', icon: 'pd-i-graduation-cap', label: 'Teachings', match: 'lessons' },
+      { href: '/stories', icon: 'pd-i-book-open-text', label: 'Bible Stories', match: 'stories' },
+      { href: '/quiz', icon: 'pd-i-star', label: 'Bible Quizzes', match: 'quiz' },
+      { href: '/resources', icon: 'pd-i-folder-open', label: 'Study Resources', match: 'resources' }
     ],
     init: function () {
-      var nav = $('#pdDrawer .pd-drawer-nav');
-      if (!nav || nav.dataset.academyNav === 'ready') return;
-      var drawerHtml = nav.innerHTML;
-      if (drawerHtml.indexOf('/lessons.html') === -1) {
-        var prayerLink = $('a[href="/bible.html"], a[href="/sermons.html"]', nav);
-        var html = academyNav.links.map(function (l) {
-          return '<a class="pd-drawer-link" href="' + l.href + '"><i class="pd-i ' + l.icon + '"></i> ' + esc(l.label) + '</a>';
-        }).join('');
-        if (prayerLink) prayerLink.insertAdjacentHTML('afterend', html);
-        else nav.insertAdjacentHTML('beforeend', html);
+      if (window.PDNav && typeof window.PDNav.init === 'function') {
+        try { window.PDNav.init(); } catch (e) { /* the shared menu keeps its markup */ }
       }
-      nav.dataset.academyNav = 'ready';
     }
   };
 
@@ -442,6 +439,15 @@
     },
 
     drawer: function () {
+      /* The drawer is owned by assets/pd-nav.js: one config, one set of
+         handlers (click, Escape, focus trap, scroll lock, safe areas). This
+         method stays for pages that call PDApp.ui.drawer() directly and for
+         builds that ship without pd-nav.js, where the old behaviour is the
+         fallback rather than a competing second handler. */
+      if (window.PDNav && typeof window.PDNav.init === 'function') {
+        window.PDNav.init();
+        return;
+      }
       var btn = $('#pdMenuBtn');
       var drawer = $('#pdDrawer');
       var overlay = $('#pdDrawerOverlay');
@@ -2093,21 +2099,29 @@
       + '<select class="pd-lang-select" aria-label="Language"><option value="en">English</option><option value="tum">Tumbuka</option><option value="ssw">siSwati</option><option value="bem">Bemba</option><option value="nya">Nyanja</option></select>'
       + '<button class="pd-bell-btn" id="pdNotifBell" aria-label="Notifications"><i class="pd-i pd-i-bell"></i><span class="pd-bell-badge" id="pdNotifBadge" style="display:none;">0</span></button>'
       + '</div>',
-    DRAWER_LINKS: [
-      {href:'/', icon:'pd-i-house', label:'Home'},
-      {href:'/lessons', icon:'pd-i-graduation-cap', label:'Teaching'},
-      {href:'/stories', icon:'pd-i-book-open-text', label:'Stories'},
-      {href:'/quiz', icon:'pd-i-star', label:'Quizzes'},
-      {href:'/game', icon:'pd-i-gamepad-2', label:'Games'},
-      {href:'/resources', icon:'pd-i-folder-open', label:'Resources'},
-      {href:'/sermons', icon:'pd-i-mic', label:'Sermons'},
-      {href:'/prayer', icon:'pd-i-hands-praying', label:'Prayer Wall'},
-      {href:'/widgets', icon:'pd-i-smartphone', label:'Verse Widget'},
-      {href:'/account', icon:'pd-i-circle-user', label:'Account'},
-    ],
+    /* The global menu itself is NOT defined here any more: it lives in
+       assets/pd-nav.js so there is exactly one list to maintain. `d` is a thin
+       reader so older call sites (and the footer) keep working. */
+    drawerLinks: function () {
+      if (window.PDNav && window.PDNav.all) {
+        return window.PDNav.all().map(function (item) {
+          return { href: item.href, icon: 'pd-i-' + item.icon, label: item.label };
+        });
+      }
+      return [];
+    },
+    /* The footer repeats the primary destinations, read from the same config
+       as the bottom bar so the two can never disagree. */
+    FOOTER_LINKS_HTML: function () {
+      var items = (window.PDNav && window.PDNav.BOTTOM) || [];
+      if (!items.length) return '';
+      return items.map(function (item) {
+        return '<a href="' + item.href + '">' + esc(item.label) + '</a>';
+      }).join('');
+    },
     FOOTER_HTML: ''
       + '<div class="pd-footer-logo"><img src="/assets/logo.png" alt="Prayer Dome"><span class="pd-footer-brand">PRAYER DOME</span></div>'
-      + '<div class="pd-footer-nav"><a href="/">Home</a><a href="/lessons">Teaching</a><a href="/quiz">Quiz</a><a href="/game">Games</a><a href="/prayer">Prayer</a><a href="/widgets">Verse Widget</a><a href="/account">Account</a></div>'
+      + '<div class="pd-footer-nav"><a href="/">Home</a><a href="/bible">Bible</a><a href="/lessons">Teachings</a><a href="/game">Play with Domey</a><a href="/quiz">Quizzes</a><a href="/prayer">Prayer Wall</a><a href="/account">My Account</a></div>'
       + '<p class="pd-footer-copy">© 2018 PRAYER DOME MINISTRY. ALL RIGHTS RESERVED. · A House of Prayer for All Nations</p>',
     /* Full-screen application shells run their own chrome.
      *
@@ -2161,27 +2175,34 @@
             }
           }
         }
-        // Ensure drawer exists and has consistent links
+        // The drawer is rendered by assets/pd-nav.js from the one menu config.
+        // This layer only guarantees the element exists, so a page that was
+        // added without one still gets the same menu as every other route.
         var drawer = document.getElementById('pdDrawer') || document.querySelector('.pd-drawer');
         if(!drawer){
-          drawer=document.createElement('aside'); drawer.className='pd-drawer'; drawer.id='pdDrawer'; drawer.setAttribute('aria-label','Main menu');
-          drawer.innerHTML='<nav class="pd-drawer-nav"></nav>'; document.body.insertBefore(drawer, topbar.nextSibling || document.body.firstChild.nextSibling);
+          var overlay = document.getElementById('pdDrawerOverlay');
+          drawer=document.createElement('aside'); drawer.className='pd-drawer'; drawer.id='pdDrawer';
+          drawer.setAttribute('aria-label','Main menu');
+          if (overlay) document.body.insertBefore(drawer, overlay.nextSibling);
+          else document.body.insertBefore(drawer, document.body.firstChild);
         }
-        var nav = drawer.querySelector('.pd-drawer-nav') || drawer;
-        if(nav && nav.children.length < 5){
-          nav.innerHTML = layout.DRAWER_LINKS.map(function(l){ return '<a class="pd-drawer-link" href="'+l.href+'"><i class="pd-i '+l.icon+'"></i> '+l.label+'</a>'; }).join('');
+        if (window.PDNav) {
+          try { window.PDNav.hydrateDrawer(drawer); window.PDNav.hydrateBottomNav(); } catch (e) { /* keep page markup */ }
         }
         // Ensure footer exists
         var footer = document.querySelector('.pd-footer');
         if(!footer){
           footer=document.createElement('footer'); footer.className='pd-footer';
           footer.innerHTML = layout.FOOTER_HTML;
+          var freshNav = footer.querySelector('.pd-footer-nav');
+          if (freshNav && layout.FOOTER_LINKS_HTML()) freshNav.innerHTML = layout.FOOTER_LINKS_HTML();
           document.body.appendChild(footer);
         } else {
-          // Normalize footer nav if missing games link or inconsistent
+          // The footer repeats the primary destinations; keep it in step with
+          // the one navigation config instead of a second hand-written list.
           var navF = footer.querySelector('.pd-footer-nav');
-          if(navF && navF.children.length < 5){
-            navF.innerHTML = '<a href="/">Home</a><a href="/lessons">Teaching</a><a href="/quiz">Quiz</a><a href="/game">Games</a><a href="/prayer">Prayer</a><a href="/widgets">Verse Widget</a><a href="/account">Account</a>';
+          if(navF){
+            navF.innerHTML = layout.FOOTER_LINKS_HTML();
           }
         }
       } catch(e){}
