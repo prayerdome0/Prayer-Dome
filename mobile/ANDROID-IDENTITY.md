@@ -67,13 +67,15 @@ editing JSON.
 | Hosting headers | `vercel.json` and `firebase.json` already serve the file as `application/json`, no redirects on the path; `scripts/build-vercel.mjs` publishes it | Verified, unchanged |
 | `android/app/build.gradle`, `capacitor.config.json` | `net.prayerdome.app` in both | Verified — they agree, nothing to change |
 | Trusted Web Activity | **None.** No `androidbrowserhelper`/Custom Tabs dependency, no TWA activity, no `LAUNCHING_BROWSER` metadata | Not applicable. The Capacitor app ships its own web assets (`webDir: mobile/www`) and renders them in its own WebView |
-| App Links intent filter | **None.** `AndroidManifest.xml` has no `VIEW` filter for `prayerdome.net` | Left as is — see §6 |
+| App Links intent filter | Added `autoVerify` `VIEW` filter for the canonical `https://www.prayerdome.net/` host in `AndroidManifest.xml`; the apex redirects and cannot verify | The native app build now claims canonical HTTPS links; the host-wide apex redirect must be fixed in Vercel/domain settings before adding the apex host |
 | Browser identity / user agent | No spoofing anywhere | Verified |
 
-Because the native app declares no App Links filter, the `assetlinks.json`
-statement is dormant for it today. It becomes active the moment an `autoVerify`
-filter is added, and it is required for any future TWA, so it is correct to
-have it in place — but it is not what makes the installed app look like Chrome.
+The `net.prayerdome.app` statement now applies to links on `www.prayerdome.net`
+because the native app declares a matching `autoVerify` App Links filter. The
+apex domain `prayerdome.net` still redirects to `www`, and Google will not follow
+that redirect during verification; the app deliberately does not claim the
+unverified apex host. App Links affect how supported domain links are routed,
+but do not remove browser chrome from an ordinary browser tab or Custom Tab.
 
 ## 4. The six supplied fingerprints are not one list of six usable values
 
@@ -220,9 +222,11 @@ Adopting a TWA would replace the current Capacitor shell, which carries the
 verse widget, push notifications and the bundled offline web app. That is a
 product decision, not a configuration fix, so nothing was changed here.
 
-Same reasoning applies to adding an `autoVerify` App Links filter to the
-current app: it would make `net.prayerdome.app` compete with the installed PWA
-for `prayerdome.net` links. Correct only if that is the intent.
+The Capacitor app now declares `autoVerify` only for `www.prayerdome.net`,
+the origin whose production statement verifies. This can affect routing for
+canonical `www` links when the app is installed. It does not claim the apex
+host, whose redirect causes DAL verification to fail, and does not alter the
+manifest's installed-PWA launch mode.
 
 ## 7. Verifying on a real device
 
@@ -240,9 +244,7 @@ adb shell am start -a android.intent.action.VIEW -d "https://prayerdome.net/"
 curl -sS -D- https://prayerdome.net/.well-known/assetlinks.json | head
 ```
 
-`adb shell pm get-app-links net.prayerdome.app` reporting `none` is expected
-until an `autoVerify` filter is declared; it reporting `verified` is what a
-working App Links setup looks like.
+After installing the build with the `autoVerify` filter, `adb shell pm get-app-links net.prayerdome.app` should report `www.prayerdome.net` as `verified`. The apex host is not declared because its redirect prevents Google verification.
 
 Checklist used for this change:
 
@@ -254,6 +256,7 @@ Checklist used for this change:
 - [x] hosting serves the file as `application/json` with no redirect
 - [ ] **the published fingerprint matches the certificate that signed the installed APK** — must be
       confirmed against Play Console → App integrity on the real release
-- [ ] **`npm run assetlinks:verify` against production** — must be run where `prayerdome.net` is
-      reachable; it could not be reached from the environment this change was prepared in
-- [ ] install/launch test on a real device in Brave and in Chrome
+- [x] Google Digital Asset Links API confirms `www.prayerdome.net` publishes the package and fingerprint statement
+- [ ] apex domain association — currently fails because `prayerdome.net` returns HTTP 308 to `www`; fix the production domain redirect before declaring apex in the Android manifest
+- [ ] confirm that the published SHA-256 belongs to the certificate signing the installed Play APK (check Play Console → App integrity → App signing key certificate)
+- [ ] install the new Android build and verify domain-link launch / standalone display on a real device
