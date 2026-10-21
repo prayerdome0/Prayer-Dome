@@ -272,6 +272,49 @@ fs.writeFileSync(pem, '-----BEGIN CERTIFICATE-----\n'
     assetlinks.stdout.includes('delegate_permission/common.handle_all_urls'),
     assetlinks.stdout);
 
+  // A SHA-1 and a SHA-256 supplied together must come from ONE certificate.
+  // Play, keytool and apksigner print the SHA-1 first while assetlinks.json
+  // needs the SHA-256, so the two are routinely copied from the same listing —
+  // and a mix-up puts a key that never signed the app into the published file.
+  const pair = run(['--keystore', keystore, '--expect-sha1', FIXTURE_SHA1, '--expect-sha256', FIXTURE_SHA256]);
+  t('a SHA-1 and SHA-256 from the same certificate pass together',
+    pair.status === 0 && /the SHA-1 and SHA-256 are the same certificate/.test(pair.stdout),
+    `status ${pair.status}: ${pair.stdout}`);
+
+  // Two different certificates: the SHA-1 matches the first, the SHA-256 the
+  // second. Each expectation is satisfied, so only the pair check can catch it.
+  if (hasExecutable('openssl')) {
+    const otherKey = path.join(directory, 'other.key');
+    const otherPem = path.join(directory, 'other.pem');
+    const otherDer = path.join(directory, 'other.der');
+    const built = spawnSync('sh', ['-c',
+      'openssl req -x509 -newkey rsa:2048 -keyout "$1" -out "$2" -days 2 -nodes '
+      + '-subj "/CN=Prayer Dome Other Key" >/dev/null 2>&1 && '
+      + 'openssl x509 -in "$2" -outform DER -out "$3" >/dev/null 2>&1', 'sh', otherKey, otherPem, otherDer],
+      { encoding: 'utf8' });
+    const otherSha256 = spawnSync('sh', ['-c',
+      `openssl x509 -in ${otherPem} -noout -fingerprint -sha256 | cut -d= -f2`], { encoding: 'utf8' })
+      .stdout.trim();
+    const twoKeys = path.join(directory, 'two-keys.jks');
+    fs.writeFileSync(twoKeys, writeJks([
+      { type: 'private', alias: 'prayer-dome', certificates: [FIXTURE_CERT_DER] },
+      { type: 'trusted', alias: 'other', certificates: [fs.readFileSync(otherDer)] }
+    ]));
+    const crossed = run(['--keystore', twoKeys, '--expect-sha1', FIXTURE_SHA1, '--expect-sha256', otherSha256]);
+    t('a SHA-1 from one certificate and a SHA-256 from another fail the pair check',
+      built.status === 0 && otherSha256.length > 0 && crossed.status === 1 &&
+      /not in the SAME certificate/.test(crossed.stdout),
+      `status ${crossed.status}: ${crossed.stdout}`);
+
+    const crossedJson = JSON.parse(run(['--keystore', twoKeys, '--json',
+      '--expect-sha1', FIXTURE_SHA1, '--expect-sha256', otherSha256]).stdout);
+    t('the JSON report carries the pair result',
+      crossedJson.ok === false && crossedJson.pair && crossedJson.pair.ok === false);
+  } else {
+    t('openssl is not installed — the mismatched-pair case was not exercised here (CI has it)', true);
+    t('openssl is not installed — the mismatched-pair JSON was not exercised here', true);
+  }
+
   const missing = run(['--bundle', path.join(directory, 'nope.aab')]);
   t('a missing input file is a usage error (exit 2)', missing.status === 2, `status ${missing.status}`);
 

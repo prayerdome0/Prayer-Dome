@@ -17,7 +17,7 @@
  *   node scripts/play-signing.mjs --bundle app-release.aab
  *   node scripts/play-signing.mjs --keystore android/release.keystore --bundle app-release.aab
  *   node scripts/play-signing.mjs --bundle app-release.aab --expect-sha1 8D:25:36:…
- *   node scripts/play-signing.mjs --keystore release.jks --assetlinks co.median.android.qdoxnjx
+ *   node scripts/play-signing.mjs --keystore release.jks --assetlinks net.prayerdome.app
  *
  * Sources it understands:
  *   • Java keystores (.jks/.keystore) — certificate chain read directly from the
@@ -390,7 +390,9 @@ Usage:
   --cert <file>           PEM or DER certificate to inspect
   --storepass <password>  password for a PKCS#12 keystore (JKS certificates need none)
   --expect-sha1 <-fp->    Play's "Upload key certificate" SHA-1 — exit 1 when it is
-  --expect-sha256 <-fp->  not among the certificates found (repeatable)
+  --expect-sha256 <-fp->  not among the certificates found (repeatable). Give both
+                          together and they must belong to the same certificate,
+                          which is what assetlinks.json depends on
   --assetlinks <package>  print the assetlinks.json target for the certificates found
   --json                  machine-readable report
 
@@ -490,16 +492,39 @@ function main(argv) {
     const matches = rows.filter((row) => row[expectation.algorithm] === wanted);
     comparisons.push({ ...expectation, wanted, matches, verified: rows.length > 0 });
   }
+
+  // A SHA-1 and a SHA-256 expectation given together are one certificate shown
+  // two ways — Play, keytool and apksigner print the SHA-1 first, while
+  // assetlinks.json needs the SHA-256. Both values matching *some* certificate
+  // is not enough: two different certificates can satisfy one each, and then
+  // the published file names a key that did not sign the app. So when both are
+  // supplied, one certificate has to carry both.
+  const wantedSha1 = new Set(comparisons.filter((entry) => entry.algorithm === 'sha1' && entry.verified)
+    .map((entry) => entry.wanted));
+  const wantedSha256 = new Set(comparisons.filter((entry) => entry.algorithm === 'sha256' && entry.verified)
+    .map((entry) => entry.wanted));
+  const pair = wantedSha1.size && wantedSha256.size
+    ? {
+      sha1: [...wantedSha1],
+      sha256: [...wantedSha256],
+      matched: rows.filter((row) => wantedSha1.has(row.sha1) && wantedSha256.has(row.sha256))
+        .map((row) => row.label)
+    }
+    : null;
+  if (pair) pair.ok = pair.matched.length > 0;
+  const pairFailed = Boolean(pair && !pair.ok);
+
   const failed = comparisons.filter((comparison) => comparison.verified && !comparison.matches.length);
   const inspectedBundle = certificates.some((entry) => entry.kind === 'bundle');
 
   if (options.json) {
     console.log(JSON.stringify({
-      ok: !failed.length && !unsigned && !blocked && bundleSignedByKeystore,
+      ok: !failed.length && !pairFailed && !unsigned && !blocked && bundleSignedByKeystore,
       certificates: rows,
       expectations: comparisons.map(({ algorithm, wanted, matches }) => ({
         algorithm, wanted, matched: matches.map((match) => match.label)
       })),
+      pair,
       bundleSignedByKeystore,
       problems
     }, null, 2));
@@ -549,7 +574,20 @@ function main(argv) {
         lines.push('      See mobile/PLAY-UPLOAD-KEY.md.');
       }
     }
-    if (inspectedBundle && comparisons.length && !failed.length && !unsigned && !blocked && bundleSignedByKeystore) {
+    if (pairFailed) {
+      lines.push('\nFAIL  the SHA-1 and the SHA-256 were found, but not in the SAME certificate.');
+      for (const value of pair.sha1) {
+        lines.push(`      SHA-1   ${value} — ${rows.filter((row) => row.sha1 === value).map((row) => row.label).join(', ')}`);
+      }
+      for (const value of pair.sha256) {
+        lines.push(`      SHA-256 ${value} — ${rows.filter((row) => row.sha256 === value).map((row) => row.label).join(', ')}`);
+      }
+      lines.push('      assetlinks.json may only name a certificate that signed the app, so a SHA-1 from');
+      lines.push('      one key and a SHA-256 from another is exactly the mix-up to catch here.');
+    } else if (pair) {
+      lines.push(`\nPASS  the SHA-1 and SHA-256 are the same certificate — ${pair.matched.join(', ')}.`);
+    }
+    if (inspectedBundle && comparisons.length && !failed.length && !pairFailed && !unsigned && !blocked && bundleSignedByKeystore) {
       lines.push('\nThe bundle is signed with the expected upload key certificate. It is safe to upload.');
     } else if (!comparisons.length && !problems.length && bundleSignedByKeystore && certificates.length) {
       lines.push('\nCompare these fingerprints with App integrity → Play app signing in Play Console.');
@@ -558,7 +596,7 @@ function main(argv) {
   }
 
   if (inputErrors) return 2;
-  return failed.length || unsigned || blocked || !bundleSignedByKeystore ? 1 : 0;
+  return failed.length || pairFailed || unsigned || blocked || !bundleSignedByKeystore ? 1 : 0;
 }
 
 const invokedDirectly = process.argv[1] && import.meta.url.endsWith(basename(process.argv[1]));

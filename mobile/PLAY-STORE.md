@@ -19,7 +19,11 @@ Bundle is built by CI. This page is the Play Console side of that path —
 1. Create the app in [Play Console](https://play.google.com/console) with the
    application ID above and the default language.
 2. **App integrity → Play app signing** stays enabled (the AAB is signed with
-   the upload key; Google re-signs for delivery).
+   the upload key; Google re-signs for delivery). The certificate Android sees
+   afterwards is the *app signing key*, so that is the SHA-256 that
+   `.well-known/assetlinks.json` has to carry —
+   **[ANDROID-IDENTITY.md](ANDROID-IDENTITY.md)** explains the App Links/Brave/
+   Chrome identity question and how to check it (`npm run assetlinks:check`).
 3. Create the upload keystore once and store it with the secrets above:
 
    ```sh

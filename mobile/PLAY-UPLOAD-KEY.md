@@ -28,10 +28,11 @@ replaced without Play being told.
 > Console app dashboard, and it is printed by
 > `node scripts/play-signing.mjs --bundle <file.aab>` from the bundle itself.
 > This repository's Capacitor app is `net.prayerdome.app`
-> (`android/app/build.gradle`, `capacitor.config.json`); the App Links file
-> `.well-known/assetlinks.json` references the hosted-builder package
-> `co.median.android.qdoxnjx`. A bundle can only update the listing whose
-> package name it carries.
+> (`android/app/build.gradle`, `capacitor.config.json`), and
+> `.well-known/assetlinks.json` now carries a statement for it. The file also
+> keeps the hosted-builder package `co.median.android.qdoxnjx` so devices that
+> still have that build keep their verified App Links. A bundle can only update
+> the listing whose package name it carries.
 
 ## 1. Fingerprint the bundle before uploading it
 
@@ -158,12 +159,26 @@ the SHA-256 from **Play Console → App integrity → Play app signing → App s
 key certificate**:
 
 ```sh
-node scripts/play-signing.mjs --assetlinks co.median.android.qdoxnjx \
+node scripts/play-signing.mjs --assetlinks net.prayerdome.app \
   --expect-sha256 <app signing key SHA-256 from Play Console>
 ```
 
+Play Console and `keytool` show a SHA-1 for the same certificate too. Giving both
+values in one command makes the tool require that a single certificate carries
+both, which is the check that catches copying a SHA-1 and a SHA-256 from two
+different keys:
+
+```sh
+node scripts/play-signing.mjs --bundle app-release.aab \
+  --expect-sha1 <SHA-1> --expect-sha256 <SHA-256>
+```
+
 That prints the `target` block to paste into `.well-known/assetlinks.json`
-(`scripts/build-vercel.mjs` copies the file into the published bundle). Update
+(`scripts/build-vercel.mjs` copies the file into the published bundle). Use
+`sha256_cert_fingerprints` only — a SHA-1 fingerprint is 20 bytes and Android
+silently ignores it. Check the result, and the deployed endpoint, with
+`npm run assetlinks:check` and `npm run assetlinks:verify`
+(see `mobile/ANDROID-IDENTITY.md`). Update
 the same fingerprints in Firebase, Google Sign-In and any other API that
 authenticates by certificate. If more than one APK can open the site (for
 example a hosted-builder build and a Capacitor build), keep one `target` per
