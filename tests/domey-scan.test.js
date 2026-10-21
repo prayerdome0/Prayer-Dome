@@ -50,10 +50,12 @@ t('the parsed model is upright with the face toward +Z (nose tip is the front-mo
 const licence = read('assets/domey/scan/LeePerrySmith_License.txt');
 t('the model licence (CC BY 3.0) ships beside the model', /Attribution 3\.0/.test(licence) && /triplegangers/.test(licence));
 const game = read('game.html');
-/* The hostess replaced the downloaded characters: she is modelled entirely in
-   code (no VRM, no scan download), so the page credits the renderer only. */
-t('the game page credits the hostess modelled in code, with the renderer licence',
-  /modelled entirely in code/.test(game) && /three\.js \(MIT licence\)/.test(game));
+/* The retired photogrammetry head is not shipped. Domey now starts as the
+   hostess modelled in code and upgrades to the licensed VRM human, so the page
+   must credit both the renderer and the model's licence. */
+t('the game page credits the character and both licences',
+  /modelled in code/.test(game) && /three\.js \(MIT licence\)/.test(game) &&
+  /VRM Public License 1\.0/.test(game));
 t('the game page loads the hostess script before the mascot',
   game.indexOf('pd-domey-lady.js') > -1 && game.indexOf('pd-domey-lady.js') < game.indexOf('pd-mascot.js'));
 

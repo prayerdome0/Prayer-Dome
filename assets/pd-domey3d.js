@@ -1164,6 +1164,30 @@
       camera: camera,
       renderer: renderer,
       rig: rig,
+      /**
+       * Swap the character that is already on stage.
+       *
+       * This is how Domey starts instantly (a rig built in code) and then
+       * upgrades to the downloaded realistic model without a second canvas, a
+       * flash, or a second animation loop: the old rig is removed and disposed,
+       * the new one takes its place, and the camera is re-framed for its body.
+       */
+      swapRig: function (nextRig, nextFit) {
+        if (!nextRig || !nextRig.root) return null;
+        var previous = rig;
+        try { scene.remove(previous.root); } catch (e) {}
+        try { previous.dispose(); } catch (e) {}
+        rig = nextRig;
+        scene.add(rig.root);
+        if (nextFit) {
+          FIT_HEIGHT = nextFit.height || FIT_HEIGHT;
+          FIT_WIDTH = nextFit.width || FIT_WIDTH;
+          if (typeof nextFit.y === 'number') TARGET_Y = nextFit.y;
+        }
+        fit();
+        api.rig = rig;
+        return rig;
+      },
       /** The element the canvas lives in (the host's .pdm-stage). */
       container: container,
       fit: fit,

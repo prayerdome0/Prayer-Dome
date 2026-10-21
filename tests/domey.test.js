@@ -271,6 +271,114 @@ function installFakeEars(window) {
     typedAnswer.text === 'Isaiah' && typedAnswer.source === 'typed');
   host.ears.permission = 'granted';
 
+  /* --------------------- 3a. feedback always matches the real result */
+  /* The defect this protects: only a TAP used to be painted, so a member who
+     spoke or typed an answer saw no verdict at all — and the show could score
+     one thing while the chips said another. Every path now runs through the
+     same judgement. */
+  const chipNamed = (text) => [...host.chips.querySelectorAll('.pdm-chip')]
+    .find((c) => (c.textContent || '').trim() === text);
+  const until = async (fn, ms = 4000) => {
+    const end = Date.now() + ms;
+    while (Date.now() < end) { if (fn()) return true; await sleep(30); }
+    return false;
+  };
+  const askChoice = (extra = {}) => host.ask(Object.assign({
+    text: 'Who was thrown into the lions den?',
+    kind: 'choice',
+    choices: ['Daniel', 'Jonah', 'Peter', 'Paul'],
+    correctIndex: 0,
+    listen: false,
+    allowSkip: true,
+    timeout: 9000
+  }, extra));
+  const marked = (cls) => [...host.chips.querySelectorAll('.pdm-chip.' + cls)]
+    .map((c) => (c.textContent || '').trim());
+
+  /* a) the right choice, tapped */
+  let qa = askChoice();
+  await until(() => chipNamed('Daniel'));
+  chipNamed('Daniel').click();
+  let a = await qa;
+  t('tapping the right choice is marked right, and only that chip is green',
+    a.right === true && marked('is-correct').join() === 'Daniel' && marked('is-wrong').length === 0,
+    JSON.stringify({ right: a.right, green: marked('is-correct'), orange: marked('is-wrong') }));
+
+  /* b) a wrong choice, tapped — the right one is shown too */
+  qa = askChoice();
+  await until(() => chipNamed('Jonah'));
+  chipNamed('Jonah').click();
+  a = await qa;
+  t('tapping a wrong choice marks it wrong and reveals the right one',
+    a.right === false && marked('is-wrong').join() === 'Jonah' && marked('is-correct').join() === 'Daniel',
+    JSON.stringify({ green: marked('is-correct'), orange: marked('is-wrong') }));
+
+  /* c) the right answer, typed */
+  qa = askChoice();
+  await until(() => !host.answerForm.hasAttribute('hidden'));
+  host.answerInput.value = 'Daniel';
+  host.answerForm.dispatchEvent(new w.Event('submit', { bubbles: true, cancelable: true }));
+  a = await qa;
+  t('typing the right answer is marked right on the same chips',
+    a.source === 'typed' && a.right === true && marked('is-correct').join() === 'Daniel' &&
+    marked('is-wrong').length === 0, JSON.stringify(marked('is-correct')));
+
+  /* d) an answer that is not one of the choices: scored wrong, but the right
+        choice is still shown — nothing is guessed at */
+  qa = askChoice();
+  await until(() => !host.answerForm.hasAttribute('hidden'));
+  host.answerInput.value = 'Goliath';
+  host.answerForm.dispatchEvent(new w.Event('submit', { bubbles: true, cancelable: true }));
+  a = await qa;
+  t('an unrecognised answer claims no wrong chip but still shows the right one',
+    a.right === false && marked('is-wrong').length === 0 && marked('is-correct').join() === 'Daniel');
+
+  /* e) the right answer, spoken */
+  host.ears.permission = 'granted';
+  await host.enableMic();
+  qa = askChoice({ listen: true, listenTimeout: 3000 });
+  const listening = await until(() => host.ears.current && host.ears.current.started, 3000);
+  w.__say('Daniel');
+  a = await qa;
+  t('a spoken answer gets the same verdict as a tap',
+    listening === true && a.source === 'voice' && a.right === true &&
+    marked('is-correct').join() === 'Daniel' && marked('is-wrong').length === 0,
+    JSON.stringify({ heard: a.text, green: marked('is-correct') }));
+
+  /* f) skipping is not an answer: nothing is painted as right or wrong */
+  qa = askChoice();
+  await until(() => chipNamed('Skip'));
+  chipNamed('Skip').click();
+  a = await qa;
+  t('skipping paints no verdict, because no answer was given',
+    a.source === 'skip' && a.right === undefined && a.judged === undefined &&
+    marked('is-correct').length === 0 && marked('is-wrong').length === 0);
+
+  /* ---------------------------------- 3b. the member controls the speech */
+  host.say('God loves a cheerful giver.');
+  await sleep(120);
+  t('the paused line is the line she last spoke', !!host.lastSpoken);
+  const pauseResult = host.pause();
+  t('pause() holds the spoken line', pauseResult === host && host.isPaused() === true);
+  t('the control bar turns into a resume button',
+    host.pauseBtn.querySelector('span').textContent === 'Resume' &&
+    host.pauseBtn.getAttribute('aria-pressed') === 'true');
+  t('the mouth stops while the speech is held', host.mouth.paused === true);
+  const held = host.pause();
+  t('pausing twice does not stack another pause', held === host && host.isPaused() === true);
+  host.resume();
+  t('resume() lets the line continue',
+    host.isPaused() === false && host.mouth.paused === false &&
+    host.pauseBtn.querySelector('span').textContent === 'Pause');
+  host.pause();
+  t('togglePause() is the same control the button uses',
+    host.togglePause() === host && host.isPaused() === false);
+  host.pause();
+  host.say('A new line always starts audible.');
+  t('a new line clears a pause from the previous one', host.isPaused() === false);
+  t('stopping the show also clears any pause',
+    (host.pause(), host.stop(), host.isPaused() === false && host.mouth.paused === false));
+
   clearInterval(hurry);
   host.destroy();
   t('destroy() still cleans the character up completely', host.root.innerHTML === '');

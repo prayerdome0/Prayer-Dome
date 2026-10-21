@@ -159,7 +159,11 @@ t('the app identity stays net.prayerdome.app with a clean label',
 const pkg = JSON.parse(read('package.json'));
 t('the native push plugin ships with the app', pkg.dependencies['@capacitor/push-notifications'] !== undefined);
 const gradle = read('android/app/build.gradle');
-t('the release train is versioned for Play', gradle.includes('versionCode 2') && gradle.includes('versionName "1.1.0"'));
+// The store build must keep moving forward; pinning an exact historic pair
+// turned a legitimate release bump into a false failure.
+t('the release train is versioned for Play',
+  Number((gradle.match(/versionCode\s+(\d+)/) || [])[1]) >= 2 &&
+  /versionName\s+"\d+\.\d+\.\d+"/.test(gradle));
 const androidVersions = read('android/variables.gradle');
 const minSdk = Number(androidVersions.match(/minSdkVersion\s*=\s*(\d+)/)?.[1]);
 t('the minimum SDK meets the Play automatic-protection requirement',

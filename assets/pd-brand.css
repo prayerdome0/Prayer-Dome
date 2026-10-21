@@ -687,6 +687,79 @@ body.dark-mode .pd-drawer-link.pd-drawer-live i { background: rgba(248,113,113,.
 }
 .pd-drawer-foot { padding: 16px 20px 26px; font-size: .72rem; color: var(--text-sub, #64748b); }
 
+/* --- Grouped global menu (assets/pd-nav.js) -------------------------------
+   One drawer, the same groups on every route. The head and foot stay put and
+   the list scrolls, so a long menu never pushes the close button off screen
+   and never runs under the phone's gesture bar. */
+.pd-drawer {
+  display: flex; flex-direction: column;
+  overflow: hidden; overscroll-behavior: contain;
+  max-height: 100dvh;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}.pd-drawer-head { flex: 0 0 auto; position: sticky; top: 0; z-index: 1; }
+.pd-drawer-head .pd-drawer-brand { min-width: 0; }
+.pd-drawer-head .pd-drawer-title { line-height: 1.2; }
+.pd-drawer-head small { display: block; margin-top: 2px; line-height: 1.35; }
+.pd-drawer-nav {
+  flex: 1 1 auto; min-height: 0;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 10px 12px 6px;
+  scrollbar-width: thin;
+}
+.pd-drawer-group + .pd-drawer-group { margin-top: 6px; }
+.pd-drawer-group-title {
+  margin: 10px 0 4px; padding: 0 12px;
+  font-size: .64rem; font-weight: 800; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--pd-gold-deep, #a67c00);
+}
+.pd-drawer-group:first-child .pd-drawer-group-title { margin-top: 2px; }
+body.dark-mode .pd-drawer-group-title { color: var(--pd-gold-soft, #f6df8a); }
+.pd-drawer-link { position: relative; }
+.pd-drawer-link span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pd-drawer-link.active {
+  background: linear-gradient(135deg, rgba(10,77,155,.12), rgba(212,175,55,.14));
+  color: var(--pd-blue);
+  font-weight: 800;
+}
+body.dark-mode .pd-drawer-link.active {
+  background: linear-gradient(135deg, rgba(147,197,253,.16), rgba(212,175,55,.14));
+  color: #dbeafe;
+}
+.pd-drawer-link.active::before {
+  content: ''; position: absolute; left: 4px; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 22px; border-radius: 3px; background: var(--pd-gold, #d4af37);
+}
+.pd-drawer-link.active i { background: var(--pd-blue); color: #fff; }
+body.dark-mode .pd-drawer-link.active i { background: var(--pd-blue-mid, #3b82f6); color: #fff; }
+.pd-drawer-foot { flex: 0 0 auto; border-top: 1px solid rgba(10,77,155,.12); }
+body.dark-mode .pd-drawer-foot { border-top-color: rgba(255,255,255,.08); }
+.pd-drawer-foot small { display: block; line-height: 1.5; opacity: .8; }
+.pd-drawer-sub { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.pd-drawer-sub-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px; border-radius: 10px;
+  font-size: .72rem; font-weight: 700; text-decoration: none;
+  color: var(--pd-blue); background: rgba(10,77,155,.07);
+}
+body.dark-mode .pd-drawer-sub-link { color: #bfdbfe; background: rgba(147,197,253,.12); }
+.pd-drawer-sub-link i { font-size: .8rem; }
+.pd-drawer-verse { margin: 0 0 6px; font-size: .74rem; line-height: 1.5; }
+.pd-drawer-overlay[hidden] { display: none; }
+/* Scroll lock while the drawer is open (the page keeps its position). */
+body.pd-nav-open { position: fixed; left: 0; right: 0; width: 100%; overflow: hidden; }
+.pd-drawer-close { display: inline-flex; align-items: center; justify-content: center; }
+.pd-drawer-close i { font-size: 1rem; }
+
+/* --- The one bottom navigation bar ---------------------------------------
+   Same destinations, same order, same highlight on every page that shows it. */
+.pd-bottom-nav-page .bottom-ui-system .pd-nav-bar { position: relative; }
+.pd-nav-bar .pd-nav-link { text-decoration: none; font: inherit; }
+.pd-nav-bar .pd-nav-link i { display: block; }
+.pd-nav-bar .pd-nav-link span { display: block; line-height: 1.15; }
+.pd-nav-bar .pd-nav-link.active { font-weight: 800; }
+.pd-nav-bar .pd-nav-link:focus-visible { outline: 3px solid #3b82f6; outline-offset: 2px; }
+
 /* --- Splash screen -------------------------------------------------------- */
 .pd-splash {
   position: fixed; inset: 0; z-index: 2000;
@@ -3007,4 +3080,54 @@ button, input, select, textarea { max-width: 100%; }
   .pd-home .commentary-card:hover, .pd-home .prayer-card:hover { transform: none; }
   .pd-home .portal-item:hover .portal-icon { background: var(--pd-mobile-tint); color: var(--pd-mobile-ink); box-shadow: none; }
   .pd-home .portal-item:active, .pd-menu-btn:active, .pd-bell-btn:active { transform: scale(.97); }
+}
+
+/* --- Canonical bottom navigation bar --------------------------------------
+   One shell, one item design: every page that shows a bottom bar renders the
+   same markup from assets/pd-nav.js inside .bottom-ui-system, so the bar looks
+   and behaves the same on the home page, the news centre, the radio studio,
+   the sermon library, the translator and the widget studio. The extra class in
+   each selector is deliberate: it outranks the older page-level `.nav-bar`
+   rules that still exist in those pages' own <style> blocks. */
+.bottom-ui-system { position: fixed; bottom: 0; left: 0; width: 100%; z-index: 1000; }
+.pd-bottom-nav-page .bottom-ui-system .pd-nav-bar {
+  display: flex; align-items: stretch; justify-content: space-around; gap: 2px;
+  padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));
+  background: var(--nav-bg, rgba(255,255,255,.92));
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-top: 1px solid var(--border-color, rgba(10,77,155,.14));
+  box-shadow: 0 -6px 24px rgba(7,36,77,.08);
+  border-radius: 0;
+}
+.pd-bottom-nav-page .bottom-ui-system .pd-nav-bar .nav-link {
+  flex: 1 1 0; min-width: 0; min-height: 48px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; padding: 5px 2px; border-radius: 12px;
+  text-decoration: none; text-align: center;
+  color: var(--text-sub, #64748b);
+  font-size: .66rem; font-weight: 700; line-height: 1.1;
+  text-transform: none; letter-spacing: 0;
+  transition: color .2s ease, background .2s ease;
+}
+.pd-bottom-nav-page .bottom-ui-system .pd-nav-bar .nav-link i {
+  font-size: 20px; margin: 0; transform: none; transition: none;
+}
+.pd-bottom-nav-page .bottom-ui-system .pd-nav-bar .nav-link span {
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.pd-bottom-nav-page .bottom-ui-system .pd-nav-bar .nav-link:hover { color: var(--pd-blue); }
+.pd-bottom-nav-page .bottom-ui-system .pd-nav-bar .nav-link.active {
+  color: var(--pd-blue); background: rgba(10,77,155,.08); font-weight: 800;
+}
+body.dark-mode .pd-bottom-nav-page .bottom-ui-system .pd-nav-bar .nav-link { color: #b0bfd2; }
+body.dark-mode .pd-bottom-nav-page .bottom-ui-system .pd-nav-bar .nav-link.active {
+  color: #93c5fd; background: rgba(147,197,253,.14);
+}
+.pd-bottom-nav-page .bottom-ui-system .pd-nav-bar .nav-link:focus-visible {
+  outline: 3px solid #3b82f6; outline-offset: 2px;
+}
+/* A member who asked for reduced motion gets a still ticker, too. */
+@media (prefers-reduced-motion: reduce) {
+  .bottom-ui-system .ticker-track { animation: none; transform: none; }
 }

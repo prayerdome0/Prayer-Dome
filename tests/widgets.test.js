@@ -567,8 +567,10 @@ function installCanvasStub(window, sink) {
   t('the verse settings card links members to the studio', read('assets/pd-verse-alerts.js').includes('/widgets.html'));
   t('the pages a widget tap can land on load the bridge',
     ['index.html', 'account.html'].every((page) => read(page).includes('/assets/pd-widget.js')));
+  // The global menu moved into one configuration (assets/pd-nav.js); the
+  // studio must be reachable from it on every page, not just from pd-app.js.
   t('the shared drawer offers the studio on pages without their own drawer',
-    read('assets/pd-app.js').includes("{href:'/widgets', icon:'pd-i-smartphone', label:'Verse Widget'}"));
+    /href: '\/widgets', icon: 'smartphone', label: 'Verse Widget'/.test(read('assets/pd-nav.js')));
   t('the home screen offers the studio',
     read('index.html').includes('href="/widgets.html"'));
   t('the widget build runs on sync and is checked by lint',

@@ -143,11 +143,57 @@
 <script src="/assets/pd-verse-alerts.js" defer></script>
 <script src="/assets/pd-phrases.js" defer></script>
 <script src="/assets/pd-i18n.js" defer></script>
+<script src="/assets/pd-nav.js" defer></script>
 <script src="/assets/pd-app.js" defer></script><script src="/assets/pd-academy.js" defer></script>
 </head>
 <body class="pd-acad-page">
 <div class="pd-aurora" aria-hidden="true"><span></span></div>
-<aside class="pd-drawer" id="pdDrawer" aria-label="Main menu"><nav class="pd-drawer-nav"><a class="pd-drawer-link" href="/"><i class="pd-i pd-i-house"></i> Home</a><a class="pd-drawer-link" href="/lessons"><i class="pd-i pd-i-graduation-cap"></i> Teaching</a><a class="pd-drawer-link" href="/stories"><i class="pd-i pd-i-book-open-text"></i> Stories</a><a class="pd-drawer-link" href="/quiz"><i class="pd-i pd-i-star"></i> Quizzes</a><a class="pd-drawer-link" href="/resources"><i class="pd-i pd-i-folder-open"></i> Resources</a><a class="pd-drawer-link" href="/testimony"><i class="pd-i pd-i-sparkles"></i> Share Testimony</a></nav></aside>
+<aside class="pd-drawer" id="pdDrawer" aria-label="Main menu">
+    <div class="pd-drawer-head"><img src="/assets/logo.png" alt="Prayer Dome"><div class="pd-drawer-brand"><div class="pd-drawer-title">Prayer Dome</div><small>A House of Prayer for All Nations</small></div><button class="pd-drawer-close" type="button" aria-label="Close menu"><i class="pd-i pd-i-x" aria-hidden="true"></i></button></div><nav class="pd-drawer-nav" aria-label="Sections of Prayer Dome">
+      <div class="pd-drawer-group" data-pd-nav-group="main">
+        <p class="pd-drawer-group-title" id="pdNavGroup-main">Main</p>
+        <a class="pd-drawer-link" href="/" data-pd-nav="/"><i class="pd-i pd-i-house" aria-hidden="true"></i><span data-pd-t="nav.home">Home</span></a>
+        <a class="pd-drawer-link" href="/bible" data-pd-nav="/bible"><i class="pd-i pd-i-book-open" aria-hidden="true"></i><span data-pd-t="nav.bible">Bible</span></a>
+        <a class="pd-drawer-link" href="/lessons" data-pd-nav="/lessons"><i class="pd-i pd-i-graduation-cap" aria-hidden="true"></i><span data-pd-t="nav.teaching">Teachings</span></a>
+        <a class="pd-drawer-link" href="/prayer" data-pd-nav="/prayer"><i class="pd-i pd-i-hands-praying" aria-hidden="true"></i><span data-pd-t="nav.pray">Prayer Wall</span></a>
+      </div>
+      <div class="pd-drawer-group" data-pd-nav-group="learn">
+        <p class="pd-drawer-group-title" id="pdNavGroup-learn">Learn &amp; Play</p>
+        <a class="pd-drawer-link" href="/game" data-pd-nav="/game"><i class="pd-i pd-i-gamepad-2" aria-hidden="true"></i><span>Play with Domey</span></a>
+        <a class="pd-drawer-link" href="/quiz" data-pd-nav="/quiz"><i class="pd-i pd-i-star" aria-hidden="true"></i><span data-pd-t="nav.quizzes">Bible Quizzes</span></a>
+        <a class="pd-drawer-link active" href="/stories" data-pd-nav="/stories" aria-current="page"><i class="pd-i pd-i-book-open-text" aria-hidden="true"></i><span data-pd-t="nav.stories">Bible Stories</span></a>
+        <a class="pd-drawer-link" href="/resources" data-pd-nav="/resources"><i class="pd-i pd-i-folder-open" aria-hidden="true"></i><span data-pd-t="nav.resources">Study Resources</span></a>
+      </div>
+      <div class="pd-drawer-group" data-pd-nav-group="community">
+        <p class="pd-drawer-group-title" id="pdNavGroup-community">Community</p>
+        <a class="pd-drawer-link" href="/chat" data-pd-nav="/chat"><i class="pd-i pd-i-messages-square" aria-hidden="true"></i><span data-pd-t="nav.chat">Community Hub</span></a>
+        <a class="pd-drawer-link" href="/testimony" data-pd-nav="/testimony"><i class="pd-i pd-i-sparkles" aria-hidden="true"></i><span data-pd-t="nav.testimony">Testimonies</span></a>
+        <a class="pd-drawer-link" href="/events" data-pd-nav="/events"><i class="pd-i pd-i-calendar-days" aria-hidden="true"></i><span data-pd-t="nav.events">Events</span></a>
+        <a class="pd-drawer-link" href="/gallery" data-pd-nav="/gallery"><i class="pd-i pd-i-images" aria-hidden="true"></i><span data-pd-t="nav.gallery">Gallery</span></a>
+        <a class="pd-drawer-link" href="/news" data-pd-nav="/news"><i class="pd-i pd-i-newspaper" aria-hidden="true"></i><span data-pd-t="nav.news">Christian News</span></a>
+      </div>
+      <div class="pd-drawer-group" data-pd-nav-group="media">
+        <p class="pd-drawer-group-title" id="pdNavGroup-media">Media</p>
+        <a class="pd-drawer-link pd-drawer-live" href="/live" data-pd-nav="/live"><i class="pd-i pd-i-radio" aria-hidden="true"></i><span data-pd-t="nav.live">Live Service</span></a>
+        <a class="pd-drawer-link" href="/sermons" data-pd-nav="/sermons"><i class="pd-i pd-i-mic" aria-hidden="true"></i><span data-pd-t="nav.sermons">Sermons</span></a>
+        <a class="pd-drawer-link" href="/video" data-pd-nav="/video"><i class="pd-i pd-i-circle-play" aria-hidden="true"></i><span data-pd-t="nav.media">Gospel Media</span></a>
+        <a class="pd-drawer-link" href="/radio" data-pd-nav="/radio"><i class="pd-i pd-i-radio-tower" aria-hidden="true"></i><span>Radio &amp; Podcasts</span></a>
+      </div>
+      <div class="pd-drawer-group" data-pd-nav-group="personal">
+        <p class="pd-drawer-group-title" id="pdNavGroup-personal">Personal</p>
+        <a class="pd-drawer-link" href="/account" data-pd-nav="/account"><i class="pd-i pd-i-circle-user" aria-hidden="true"></i><span data-pd-t="nav.account">My Account</span></a>
+        <a class="pd-drawer-link" href="/widgets" data-pd-nav="/widgets"><i class="pd-i pd-i-smartphone" aria-hidden="true"></i><span>Verse Widget</span></a>
+        <a class="pd-drawer-link" href="/membership" data-pd-nav="/membership"><i class="pd-i pd-i-id-card" aria-hidden="true"></i><span>Membership</span></a>
+        <a class="pd-drawer-link" href="/give" data-pd-nav="/give"><i class="pd-i pd-i-heart" aria-hidden="true"></i><span data-pd-t="nav.give">Give</span></a>
+        <a class="pd-drawer-link" href="/support" data-pd-nav="/support"><i class="pd-i pd-i-hand-heart" aria-hidden="true"></i><span data-pd-t="nav.support">Support</span></a>
+      </div>
+    </nav><div class="pd-drawer-foot"><div class="pd-drawer-sub">
+      <a class="pd-drawer-sub-link" href="/about" data-pd-nav="/about"><i class="pd-i pd-i-church" aria-hidden="true"></i><span data-pd-t="nav.about">About</span></a>
+      <a class="pd-drawer-sub-link" href="/contact" data-pd-nav="/contact"><i class="pd-i pd-i-mail" aria-hidden="true"></i><span data-pd-t="nav.contact">Contact</span></a>
+      <a class="pd-drawer-sub-link" href="/team" data-pd-nav="/team"><i class="pd-i pd-i-users" aria-hidden="true"></i><span data-pd-t="nav.team">Team</span></a>
+      <a class="pd-drawer-sub-link" href="/privacy" data-pd-nav="/privacy"><i class="pd-i pd-i-shield-check" aria-hidden="true"></i><span>Privacy</span></a>
+    </div><p class="pd-drawer-verse"><i class="pd-i pd-i-book" aria-hidden="true"></i> “He does everything blamelessly.” — Mark 7:37</p><small>© Prayer Dome Ministry · Zambia · Eswatini · South Africa · Malawi · Ireland</small></div>
+</aside>
 <header class="pd-topbar">
   <button class="pd-menu-btn" id="pdMenuBtn" aria-label="Open menu"><i class="pd-i pd-i-menu"></i></button>
   <a href="/" class="pd-topbar-center">

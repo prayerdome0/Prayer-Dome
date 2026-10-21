@@ -3,7 +3,7 @@
 // shade) even when the app is closed — see /assets/pd-verse-data.js.
 try { importScripts('/assets/pd-verse-data.js'); } catch (e) { /* verses unavailable offline */ }
 // Bump CACHE_NAME whenever the precache list changes.
-const CACHE_NAME = 'prayer-dome-v31';
+const CACHE_NAME = 'prayer-dome-v32';
 
 // Shell assets worth having available offline.
 const PRECACHE = [
@@ -59,6 +59,8 @@ const PRECACHE = [
     '/assets/pd-academy-questions.js',
     '/assets/pd-academy.js',
     '/assets/pd-certificate.js',
+    '/assets/pd-quiz-session.js',
+    '/assets/pd-nav.js',
     '/assets/pd-app.js',
     '/assets/pd-phrases.js',
     '/assets/pd-i18n.js',
@@ -143,6 +145,16 @@ function isNetworkOnlyPage(url) {
     return NETWORK_ONLY_PATHS.includes(path);
 }
 
+// Do not fill the phone's storage with one-off large files (the 10 MB rigged
+// character model, long media). They are still served from the network and, for
+// the character, from the browser's own HTTP cache.
+const MAX_CACHE_BYTES = 6 * 1024 * 1024;
+function cacheableResponse(res) {
+    if (!res || res.status !== 200 || res.type === 'opaque') return false;
+    const size = Number(res.headers.get('content-length') || 0);
+    return !(size > MAX_CACHE_BYTES);
+}
+
 const NEVER_CACHE = [
     'firestore.googleapis.com',
     'identitytoolkit.googleapis.com',
@@ -196,7 +208,7 @@ self.addEventListener('fetch', event => {
         caches.match(req).then(hit => {
             const network = fetch(req)
                 .then(res => {
-                    if (res && res.status === 200 && res.type !== 'opaque') {
+                    if (cacheableResponse(res)) {
                         const copy = res.clone();
                         caches.open(CACHE_NAME).then(c => c.put(req, copy)).catch(() => {});
                     }

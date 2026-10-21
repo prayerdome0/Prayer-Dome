@@ -138,23 +138,21 @@ function installFakeEars(window) {
   t('she is stood on the engine\'s stage floor, not hovering above it',
     /rig\.root\.position\.y -= 0\.09/.test(MASCOT_JS));
 
-  /* ------------------------------- 1b. true-or-false, derived safely */
-  t('every third question is offered as true or false, derived from the bank',
-    /function asTrueFalse/.test(GAME) && /kind: 'tf'/.test(GAME) && /True or false: /.test(GAME));
+  /* ------------------------------- 1b. every question keeps four choices */
+  /* A true-or-false rewrite used to live here. It was removed because with
+     only "True" and "False" on the chips a member who answered the obvious
+     name was scored wrong — a 50/50 coin toss, not a memory of the Word. */
+  t('the game never turns a four-choice question into a two-way coin toss',
+    !/asTrueFalse/.test(GAME) && !/True or false: /.test(GAME) && !/kind: 'tf'/.test(GAME));
   t('verse completion is deliberately not invented from references',
     /deliberately NOT generated/.test(GAME));
-  t('the true-or-false derivation only re-words "who"-subject questions (no invented facts)',
+  t('the bank still hands Domey four distinct choices for every question',
     (() => {
-      const patternSrc = /var TF_WHO = (\/.*\/i);/.exec(GAME);
-      if (!patternSrc) return false;
-      const pattern = new Function('return ' + patternSrc[1])();
       const bankWindow = {};
       new Function('window', read('assets/pd-domey-questions.js'))(bankWindow);
       const items = bankWindow.PDDomeyQuestions.all();
-      const who = items.filter((i) => pattern.test(i.q));
-      // subject substitution needs a person for an answer, and the bank has
-      // plenty of them to keep the variety coming.
-      return who.length >= 60 && who.every((i) => /^[A-Z]/.test(String(i.options[i.answer])));
+      return items.length >= 1000 && items.every((i) => i.options.length === 4 &&
+        new Set(i.options).size === 4 && i.options[i.answer] != null);
     })());
 
   /* ------------------------------------------ 2. the companion layout DOM */
