@@ -60,6 +60,18 @@ catch (error) { console.error('FAIL  manifest.json is valid JSON:', error.messag
 t('manifest declares an installable app shell', manifest.display === 'standalone' &&
   Array.isArray(manifest.display_override) && manifest.display_override.includes('standalone'),
   JSON.stringify(manifest.display_override));
+t('Android app links for the canonical www host are verified', (() => {
+  const androidManifest = read('android/app/src/main/AndroidManifest.xml');
+  const links = androidManifest.match(/<intent-filter android:autoVerify="true">([\s\S]*?)<\/intent-filter>/)?.[1] || '';
+  return links.includes('android.intent.action.VIEW') &&
+    links.includes('android.intent.category.DEFAULT') &&
+    links.includes('android.intent.category.BROWSABLE') &&
+    links.includes('android:scheme="https"') && links.includes('android:host="www.prayerdome.net"');
+})());
+t('Android app-link package ID matches the assetlinks target', (() => {
+  const gradle = read('android/app/build.gradle');
+  return gradle.includes('applicationId "net.prayerdome.app"');
+})());
 t('manifest start_url stays inside the app scope',
   manifest.start_url.startsWith('/') && manifest.scope === '/', `${manifest.start_url} / ${manifest.scope}`);
 t('manifest keeps the brand colours and language',

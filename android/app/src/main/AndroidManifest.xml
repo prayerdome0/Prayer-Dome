@@ -23,6 +23,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Open canonical Prayer Dome HTTPS links in this native app.
+                 Digital Asset Links currently verifies www.prayerdome.net;
+                 prayerdome.net itself redirects, which Android will not follow
+                 during association verification. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="www.prayerdome.net" />
+            </intent-filter>
+
         </activity>
 
         <provider
