@@ -163,6 +163,16 @@ node scripts/play-signing.mjs --assetlinks net.prayerdome.app \
   --expect-sha256 <app signing key SHA-256 from Play Console>
 ```
 
+Play Console and `keytool` show a SHA-1 for the same certificate too. Giving both
+values in one command makes the tool require that a single certificate carries
+both, which is the check that catches copying a SHA-1 and a SHA-256 from two
+different keys:
+
+```sh
+node scripts/play-signing.mjs --bundle app-release.aab \
+  --expect-sha1 <SHA-1> --expect-sha256 <SHA-256>
+```
+
 That prints the `target` block to paste into `.well-known/assetlinks.json`
 (`scripts/build-vercel.mjs` copies the file into the published bundle). Use
 `sha256_cert_fingerprints` only — a SHA-1 fingerprint is 20 bytes and Android

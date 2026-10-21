@@ -84,21 +84,65 @@ looks right and verifies nothing.
 
 | # | Bytes | Usable in `assetlinks.json`? |
 | --- | --- | --- |
-| 1 `43:70:D7:…:B9:5C:70` | 32 | Yes — SHA-256 |
+| 1 `43:70:D7:…:B9:5C:70` | 32 | Yes — SHA-256. **Confirmed as the same certificate as 4** |
 | 2 `8E:FE:79:…:AE:67:D5` | 32 | Yes — SHA-256, but not yet tied to this package |
 | 3 `29:82:29:…:1D:83:0B:CA` | 32 | Yes — SHA-256, but not yet tied to this package |
-| 4 `80:6D:53:…:F4:2B:0E` | 20 | **No — SHA-1** |
+| 4 `80:6D:53:…:F4:2B:0E` | 20 | **No — SHA-1.** Same certificate as 1 |
 | 5 `A6:71:0E:…:39:27:CA` | 20 | **No — SHA-1** |
 | 6 `B9:DB:A4:…:8E:DB:53` | 20 | **No — SHA-1** |
 
 Fingerprint 1 is the value the supplied reference block paired with
 `net.prayerdome.app`, so it is the one now published for that package.
+
+**1 and 4 are one certificate** (supplied by the key owner as `Shai 256` /
+`Shai 1` — the same key, once as SHA-256 and once as SHA-1). That is a useful
+result rather than a sixth value: the SHA-1 is what Play, `keytool`, `apksigner`
+and Firebase display, so it is the value you can match by eye against Play
+Console, while the SHA-256 is the one the file must carry. It also means the six
+supplied values are not six distinct keys — they look like **three certificates
+each shown twice**. If the pairing holds, 2+5 and 3+6 are the other two:
+
+| Certificate | SHA-256 | SHA-1 (to confirm) |
+| --- | --- | --- |
+| Prayer Dome (`Shai`) — published | 1 `43:70:D7:…` | 4 `80:6D:53:…` ✔ confirmed |
+| unknown — not published | 2 `8E:FE:79:…` | 5 `A6:71:0E:…` ? |
+| unknown — not published | 3 `29:82:29:…` | 6 `B9:DB:A4:…` ? |
+
+Confirm any pair against a real artifact — supplying both values together makes
+the tool require that **one certificate** carries both, so a SHA-1 from one key
+and a SHA-256 from another cannot be mistaken for a match:
+
+```sh
+node scripts/play-signing.mjs --bundle app-release.aab \
+  --expect-sha1 80:6D:53:AC:A3:CA:F6:D7:7D:F8:37:39:F4:F6:DE:43:F3:F4:2B:0E \
+  --expect-sha256 43:70:D7:09:23:4E:F0:0B:A5:E0:88:1E:24:23:C6:1D:BB:76:48:F0:FB:31:1E:00:1F:D2:7B:D2:5A:B9:5C:70
+```
+
 Fingerprints 2 and 3 are valid SHA-256 but were supplied without a package;
 they are **not** published, because a fingerprint next to a package is a
-permission and a wrong one hands this domain's links to a different app.
-Fingerprints 4–6 cannot be used in any form.
+permission and a wrong one hands this domain's links to a different app. 4–6
+cannot be used in `assetlinks.json` in any form — the schema has no SHA-1 field,
+and adding one is silently ignored.
 
 `npm run assetlinks:check` enforces all of the above and refuses a SHA-1 value.
+
+### Does the published value belong to an upload key or the Play app signing key?
+
+A SHA-1/SHA-256 pair you hold yourself (`Shai` — a keystore in your possession)
+is by definition a **local/upload key**, not the key Google holds. Which one
+Android compares against depends on how the APK on the device was signed:
+
+| How the app was installed | Certificate Android compares | Action |
+| --- | --- | --- |
+| Play, **Play App Signing on** | Google's *app signing key* | Add that key's SHA-256 from Play Console → App integrity → *App signing key certificate*, **alongside** the current one. The upload key alone will not verify. |
+| Play, Play App Signing off / sideloaded / CI `assembleRelease` | the key that signed the APK — your `Shai` key | Fingerprint 1 (already published) is correct |
+| Built by the Median hosted builder | that builder's key | The `co.median.android.qdoxnjx` statement already covers it |
+
+Keeping both fingerprints in one target is normal and safe: the file says "these
+certificates may open links for this domain", and more than one is expected when
+an app moves to Play App Signing. Removing the one that is still on a device is
+what breaks links, which is why the legacy listing above was kept rather than
+deleted.
 
 ### Establishing the certificate that is actually installed
 
